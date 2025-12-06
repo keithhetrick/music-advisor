@@ -1,0 +1,65 @@
+{
+  "HCI_v1": {
+    "HCI_v1_score": 0.6
+  },
+  "Baseline": {
+    "id": null,
+    "note": "Baseline block unavailable; using safe default for tests.",
+    "MARKET_NORMS": {}
+  },
+  "TTC_Gate": {
+    "ttc_seconds": 14.0,
+    "ttc_confidence": 0.55,
+    "lift_db": 0.0,
+    "drop_features": [],
+    "source": "upstream"
+  },
+  "Structural_Gates": {
+    "drop": [
+      "exposures"
+    ],
+    "notes": {
+      "struct_mode": "optional",
+      "struct_reliable": false,
+      "use_ttc": true,
+      "use_exposures": false,
+      "ttc_gate_threshold": 0.55,
+      "reasoning": "Subfeatures dropped due to structural eligibility, not numeric HCI logic."
+    }
+  },
+  "Policy": {
+    "cap_audio": 0.6,
+    "ttc_conf_gate": 0.55,
+    "lift_window_sec": 6.0
+  },
+  "TTC": {
+    "seconds": 14.0,
+    "confidence": 0.55,
+    "lift_db": 0.0,
+    "dropped": [],
+    "source": "upstream"
+  },
+  "Structural": {
+    "drop": [
+      "exposures"
+    ],
+    "notes": {
+      "struct_mode": "optional",
+      "struct_reliable": false,
+      "use_ttc": true,
+      "use_exposures": false,
+      "ttc_gate_threshold": 0.55,
+      "reasoning": "Subfeatures dropped due to structural eligibility, not numeric HCI logic."
+    }
+  },
+  "Axes": {
+    "audio_axes": [
+      0.62,
+      0.63,
+      0.61,
+      0.6,
+      0.64,
+      0.62
+    ]
+  }
+}

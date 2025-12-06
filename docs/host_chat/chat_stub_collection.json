@@ -1,0 +1,61 @@
+{
+  "info": {
+    "name": "MusicAdvisor Chat Stub",
+    "description": "Example requests for /chat (local stub on http://localhost:8090). Replace payload with your track payload (merge client+hci).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Analyze (with payload)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": {
+          "raw": "http://localhost:8090/chat",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8090",
+          "path": ["chat"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"analyze\",\n  \"payload\": {},\n  \"norms\": {}\n}"
+        },
+        "description": "POST /chat with message=analyze, payload=/audio JSON, optional norms."
+      }
+    },
+    {
+      "name": "Follow-up (structure)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": {
+          "raw": "http://localhost:8090/chat",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8090",
+          "path": ["chat"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"structure\",\n  \"session\": { \"session_id\": \"<paste-session-id-from-analyze>\" }\n}"
+        },
+        "description": "Send a follow-up intent with the session from the analyze reply."
+      }
+    },
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8090/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8090",
+          "path": ["health"]
+        },
+        "description": "Check stub health and store status."
+      }
+    }
+  ]
+}

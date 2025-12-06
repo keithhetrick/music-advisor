@@ -1,0 +1,31 @@
+{
+  "audio_name": "1985_a_ha__take_on_me__single_20251115_081109",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.34766808458229953,
+        "lo": 0.33005937225170745,
+        "mid": 0.3222725431659931
+      },
+      "value": 0.5226660179282927
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.37697945989817894,
+        "lo": 0.2465649236850021,
+        "mid": 0.37645561641681896
+      },
+      "value": 0.5579733338588619
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_0/1985_a_ha__take_on_me__single/1985_a_ha__take_on_me__single_20251115_081109.features.json"
+}

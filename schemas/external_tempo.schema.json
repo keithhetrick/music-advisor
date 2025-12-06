@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BeatLink External Tempo/Key",
+  "type": "object",
+  "required": ["external_vendor", "model_version"],
+  "properties": {
+    "external_vendor": { "type": "string" },
+    "model_version": { "type": "string" },
+    "tempo_bpm_external": { "type": ["number", "null"] },
+    "key_signature_external": { "type": ["string", "null"] },
+    "beatgrid": {
+      "type": "object",
+      "properties": {
+        "first_beat_ms": { "type": ["integer", "null"] },
+        "grid_locked": { "type": "boolean" }
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "properties": {
+        "tempo": { "type": "number" },
+        "key": { "type": "number" }
+      }
+    },
+    "ts": { "type": "string" }
+  }
+}

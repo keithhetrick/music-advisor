@@ -1,0 +1,31 @@
+{
+  "audio_name": "2016_drake__one_dance__album_20251114_062103",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.5280079068261061,
+        "lo": 0.21191746558803415,
+        "mid": 0.26007462758585964
+      },
+      "value": 0.6212275277127268
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3265654539082478,
+        "lo": 0.36620951095136484,
+        "mid": 0.3072250351403873
+      },
+      "value": 0.5044350555824773
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/00_core_modern/2016_drake__one_dance__album/2016_drake__one_dance__album_20251114_062103.features.json"
+}

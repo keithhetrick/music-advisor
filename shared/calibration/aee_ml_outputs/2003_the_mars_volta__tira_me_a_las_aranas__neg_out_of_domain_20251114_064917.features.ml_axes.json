@@ -1,0 +1,31 @@
+{
+  "audio_name": "2003_the_mars_volta__tira_me_a_las_aranas__neg_out_of_domain_20251114_064917",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.002690762701113418,
+        "lo": 0.9246733829133034,
+        "mid": 0.0726358543855834
+      },
+      "value": 0.22353975207139878
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.017620475952361308,
+        "lo": 0.8859910856222414,
+        "mid": 0.09638843842539731
+      },
+      "value": 0.24036984089665403
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/13_negatives_out_of_domain/2003_the_mars_volta__tira_me_a_las_aranas__neg_out_of_domain/2003_the_mars_volta__tira_me_a_las_aranas__neg_out_of_domain_20251114_064917.features.json"
+}

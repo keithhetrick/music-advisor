@@ -1,0 +1,16 @@
+{
+  "cohort_id": "audio_hci_v2_pop_us_2025Q4",
+  "note": "Axis weight policy for experimental HCI_audio_v2.raw (US Pop 2025Q4). This does NOT replace HCI_v1; it runs in parallel for v2 planning.",
+  "HCI_audio_v2": {
+    "version": "v2.0.0-alpha",
+    "norm_source": "US_Pop_Cal_Baseline_2025Q4",
+    "axis_weights": {
+      "TempoFit": 0.15,
+      "RuntimeFit": 0.1,
+      "LoudnessFit": 0.15,
+      "Energy": 0.25,
+      "Danceability": 0.2,
+      "Valence": 0.15
+    }
+  }
+}

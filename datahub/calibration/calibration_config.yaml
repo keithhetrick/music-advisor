@@ -1,0 +1,48 @@
+# calibration/calibration_config.yaml
+schema: calibration.v1
+region: US
+profile: Pop
+
+paths:
+  core_modern: calibration/audio/00_core_modern
+  echo_root: calibration/audio/14_echo
+  negatives: calibration/audio/13_negatives
+
+echo_bins:
+  - year: 1985
+  - year: 1990
+  - year: 1995
+  - year: 2000
+  - year: 2005
+  - year: 2010
+  - year: 2015
+  - year: 2020
+
+# How much historical echo to blend into the center, per axis
+alpha:
+  tempo: 0.25
+  runtime: 0.30
+  energy: 0.40
+  danceability: 0.40
+  valence: 0.40
+  loudness: 0.30
+
+# Accept ±2 years around a bin label when tallying that bin
+bin_tolerance_years: 2
+
+# Banding for preferences (used to extract top tempo bands)
+tempo_bands:
+  - [70, 79]
+  - [80, 89]
+  - [90, 99]
+  - [100, 109]
+  - [110, 119]
+  - [120, 129]
+  - [130, 139]
+  - [140, 149]
+
+# Exclude everything under 13_negatives from stats; still log for guards
+exclude_negatives: true
+
+# ID/version for the baseline we emit
+baseline_id: US_Pop_Cal_Baseline_2025Q4.json

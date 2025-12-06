@@ -1,0 +1,12 @@
+{
+  "name": "HCI_v1_policy_2025Q4",
+  "version": "1.0",
+  "description": "Policy layer for HCI_v1: distinguishes calibration anchors vs WIP and applies WIP ceiling.",
+  "wip_max_score": 0.93,
+  "anchor_min_for_label_S": 0.95,
+  "notes": [
+    "Scores are computed from axes + calibration first, then policy is applied.",
+    "Songs listed in data/calibration_index_2025Q4.json are treated as anchors (can reach 1.0).",
+    "All other songs are treated as WIP and are softly capped below 1.0."
+  ]
+}

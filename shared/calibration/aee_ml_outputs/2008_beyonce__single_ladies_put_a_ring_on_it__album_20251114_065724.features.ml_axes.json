@@ -1,0 +1,31 @@
+{
+  "audio_name": "2008_beyonce__single_ladies_put_a_ring_on_it__album_20251114_065724",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.42810129571582967,
+        "lo": 0.28979934150835407,
+        "mid": 0.2820993627758162
+      },
+      "value": 0.5628956510480342
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.36574098571796965,
+        "lo": 0.296081065001219,
+        "mid": 0.3381779492808113
+      },
+      "value": 0.5391850255009236
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/05_echo_2005_09/2008_beyonce__single_ladies_put_a_ring_on_it__album/2008_beyonce__single_ladies_put_a_ring_on_it__album_20251114_065724.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "1991_michael_jackson__black_or_white__album_20251114_062954",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.263244721510856,
+        "lo": 0.41670180303222354,
+        "mid": 0.3200534754569205
+      },
+      "value": 0.4671251116191325
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3338813003930006,
+        "lo": 0.3221352251904521,
+        "mid": 0.3439834744165473
+      },
+      "value": 0.5202178875804147
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/02_echo_1990_94/1991_michael_jackson__black_or_white__album/1991_michael_jackson__black_or_white__album_20251114_062954.features.json"
+}

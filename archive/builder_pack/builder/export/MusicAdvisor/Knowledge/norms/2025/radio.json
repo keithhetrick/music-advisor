@@ -1,0 +1,78 @@
+{
+  "norm_version": "2025.1",
+  "generated_at": "2025-10-29T20:27:19Z",
+  "platform": "Radio",
+  "notes": "Starter norms. Replace ranges with monitored-panel data.",
+  "profiles": {
+    "US_Pop_2025": {
+      "tempo_band_bpm": {
+        "typical": [
+          88,
+          112
+        ],
+        "median": 100
+      },
+      "runtime_sec": {
+        "typical": [
+          168,
+          210
+        ],
+        "median": 192
+      },
+      "ttc_sec": {
+        "typical": [
+          15,
+          25
+        ],
+        "median": 20
+      },
+      "exposures": {
+        "typical": [
+          3,
+          4
+        ],
+        "median": 3
+      },
+      "weights": {
+        "callout": 0.5,
+        "spin_growth": 0.3,
+        "format_fit": 0.2
+      }
+    },
+    "Global_KPop_2025": {
+      "tempo_band_bpm": {
+        "typical": [
+          105,
+          130
+        ],
+        "median": 120
+      },
+      "runtime_sec": {
+        "typical": [
+          165,
+          200
+        ],
+        "median": 180
+      },
+      "ttc_sec": {
+        "typical": [
+          10,
+          20
+        ],
+        "median": 15
+      },
+      "exposures": {
+        "typical": [
+          3,
+          4
+        ],
+        "median": 3
+      },
+      "weights": {
+        "callout": 0.48,
+        "spin_growth": 0.32,
+        "format_fit": 0.2
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2011_maroon_5_christina_aguilera__moves_like_jagger__album_20251114_070018",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.44693617117750356,
+        "lo": 0.2625253810198841,
+        "mid": 0.29053844780261245
+      },
+      "value": 0.5776700456061611
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.34248353045403485,
+        "lo": 0.3372604088127794,
+        "mid": 0.3202560607331857
+      },
+      "value": 0.5186911130150784
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/06_echo_2010_14/2011_maroon_5_christina_aguilera__moves_like_jagger__album/2011_maroon_5_christina_aguilera__moves_like_jagger__album_20251114_070018.features.json"
+}

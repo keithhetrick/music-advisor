@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "advisor-host"
+version = "0.1.0"
+description = "Deterministic advisory host for Music Advisor payloads (no scoring logic)."
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{name = "Music Advisor", email = "dev@musicadvisor.app"}]
+dependencies = []
+
+[project.optional-dependencies]
+session_redis = ["redis>=5.0.0"]
+auth_google_sig = ["PyJWT>=2.8.0"]
+rapidfuzz_extra = ["rapidfuzz>=3.0.0"]
+
+[project.scripts]
+ma-host = "advisor_host.cli.ma_host:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["advisor_host*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "I"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_unused_configs = true
+ignore_missing_imports = true
+check_untyped_defs = true

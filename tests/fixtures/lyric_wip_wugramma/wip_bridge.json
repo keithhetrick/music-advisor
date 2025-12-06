@@ -1,0 +1,90 @@
+{
+  "count": 1,
+  "items": [
+    {
+      "song_id": "wip_wake_up_gramma_v4",
+      "title": "Wake up Grandma. Wake up!",
+      "artist": "Drew Ryn",
+      "year": 2024,
+      "tier": "WIP",
+      "era_bucket": "2015_2024",
+      "lyric_confidence_index": {
+        "score": 0.72,
+        "raw": 0.74,
+        "calibration_profile": "lci_us_pop_v1",
+        "axes": {
+          "structure_fit": 0.95,
+          "prosody_ttc_fit": 0.95,
+          "rhyme_texture_fit": 0.53,
+          "diction_style_fit": 0.81,
+          "pov_fit": 0.99,
+          "theme_fit": 0.17
+        },
+        "overlay": {
+          "lci_score_z": 1.0,
+          "axes_z": {
+            "structure_fit": 0.8,
+            "prosody_ttc_fit": 0.8,
+            "rhyme_texture_fit": 0.2,
+            "diction_style_fit": -1.0,
+            "pov_fit": 0.9,
+            "theme_fit": -0.7
+          }
+        }
+      },
+      "ttc_profile": {
+        "ttc_seconds_first_chorus": null,
+        "ttc_bar_position_first_chorus": null,
+        "estimation_method": "ttc_rule_based_v1",
+        "profile": "ttc_us_pop_v1",
+        "ttc_confidence": "low"
+      },
+      "lyric_intel": {
+        "structure_profile": {
+          "verse_count": 1,
+          "pre_count": 0,
+          "chorus_count": 0,
+          "bridge_count": 0,
+          "outro_count": 0,
+          "section_pattern": "V",
+          "hook_density": 0.0,
+          "repetition_rate": 0.0
+        },
+        "style_profile": {
+          "lexical_diversity": 0.5,
+          "avg_words_per_line": 8.0,
+          "avg_syllables_per_line": 10.0,
+          "explicit_fraction": 0.0,
+          "pov_first": 0.1,
+          "pov_second": 0.05,
+          "pov_third": 0.02
+        },
+        "sentiment_profile": {
+          "sentiment_mean": 0.0,
+          "sentiment_std": 0.0
+        },
+        "rhyme_profile": {
+          "rhyme_density": 0.1,
+          "internal_rhyme_density": 0.05
+        },
+        "theme_profile": {
+          "concreteness": 0.3,
+          "love": 0.1,
+          "heartbreak": 0.0,
+          "empowerment": 0.0,
+          "nostalgia": 0.05,
+          "flex": 0.0,
+          "spiritual": 0.0,
+          "family": 0.05,
+          "small_town": 0.0
+        },
+        "prosody_profile": {
+          "syllable_density": 1.0,
+          "tempo_bpm": 120.0,
+          "duration_sec": 180.0
+        },
+        "vector": [0.1, 0.2]
+      }
+    }
+  ]
+}

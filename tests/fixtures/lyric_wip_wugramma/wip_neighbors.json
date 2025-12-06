@@ -1,0 +1,27 @@
+{
+  "song_id": "wip_wake_up_gramma_v4",
+  "count": 3,
+  "items": [
+    {
+      "song_id": "wip_wake_up_gramma_v4",
+      "title": "Wake up Grandma. Wake up!",
+      "artist": "Drew Ryn",
+      "year": 2024,
+      "similarity": 1.0
+    },
+    {
+      "song_id": "nbr1",
+      "title": "no shoes no shirt no problems",
+      "artist": "kenny chesney",
+      "year": 2003,
+      "similarity": 0.99
+    },
+    {
+      "song_id": "nbr2",
+      "title": "Baby",
+      "artist": "Lil Baby",
+      "year": 2019,
+      "similarity": 0.99
+    }
+  ]
+}

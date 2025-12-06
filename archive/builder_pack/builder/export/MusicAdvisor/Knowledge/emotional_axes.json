@@ -1,0 +1,26 @@
+{
+  "axes": [
+    "Vulnerability",
+    "Guard",
+    "Memory",
+    "Presence",
+    "Ache",
+    "Acceptance",
+    "Detail",
+    "Universality",
+    "Intimacy",
+    "Theater"
+  ],
+  "defaults": {
+    "Vulnerability": 85,
+    "Guard": 25,
+    "Memory": 86,
+    "Presence": 62,
+    "Ache": 84,
+    "Acceptance": 74,
+    "Detail": 84,
+    "Universality": 86,
+    "Intimacy": 88,
+    "Theater": 58
+  }
+}

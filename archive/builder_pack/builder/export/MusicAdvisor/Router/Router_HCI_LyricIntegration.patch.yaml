@@ -1,0 +1,64 @@
+# Router/Router_HCI_LyricIntegration.patch.yaml
+# Append-only: after advisor_run_full, if lyric_analysis exists, compute LyricScore and blend into layers.
+
+router:
+  hooks:
+    advisor_run_full_complete:
+      - name: inject_lyric_score
+        action: |
+          advisor = context.get("advisor_result") or {}
+          la = context.get("lyric_analysis") or {}
+          if not la:
+            # no lyrics analyzed; skip
+            return
+
+          # Pull heuristics (with safe fallbacks)
+          lines = la.get("lines", 0)
+          avg_words = la.get("avg_words_per_line", 12.0)
+          concretes = la.get("concrete_imagery_hits", la.get("concrete_hits", 0))
+          motifs = la.get("motifs_detected", la.get("motifs", [])) or []
+          sentiment = la.get("sentiment", "neutral")
+          sections = la.get("sections_detected", {}) or {}
+          choruses = sections.get("choruses", 0) if isinstance(sections, dict) else 0
+
+          # Subscores 0..1
+          def clamp(x, lo=0.0, hi=1.0): 
+            return hi if x>hi else (lo if x<lo else x)
+
+          hook_clarity = 0.0
+          if choruses > 0:
+            # ideal avg words ≤ 9
+            hook_clarity = clamp(1.0 - max(0.0, (avg_words - 9.0)/9.0))  # 9→1.0, 18→0.0
+          imagery = clamp(concretes / 8.0)  # ≥8 concretes ~ 1.0
+          specificity = clamp((len(motifs) + min(concretes, 8)/2.0) / 8.0)
+          cohesion = 1.0 if choruses>0 else 0.4  # crude: chorus existence boosts cohesion
+          polarity = 1.0 if sentiment in ("positive","negative") else 0.4
+          singability = clamp(1.0 - max(0.0, (avg_words - 10.0)/10.0))  # ≤10 words/line ideal
+          quotability = 1.0 if avg_words <= 9.0 and choruses>0 else 0.5
+
+          LyricScore = clamp(
+              0.25*hook_clarity +
+              0.20*imagery +
+              0.15*specificity +
+              0.10*cohesion +
+              0.10*polarity +
+              0.10*singability +
+              0.10*quotability
+          )
+
+          # Blend into layer scores if present
+          def g(layer):
+            return (advisor.get(layer) or {}).get("score", 0.0)
+
+          baseE, baseCr, baseM = g("emotional"), g("creative"), g("market")
+
+          newE  = clamp(baseE  + 0.40*LyricScore)
+          newCr = clamp(baseCr + 0.30*LyricScore)
+          newM  = clamp(baseM  + 0.10*LyricScore)
+
+          # Write back
+          advisor.setdefault("emotional", {})["score"] = newE
+          advisor.setdefault("creative",  {})["score"] = newCr
+          advisor.setdefault("market",    {})["score"] = newM
+          advisor["lyric"] = {"score": LyricScore, "notes": "Derived from Hook/Imagery/Specificity/Cohesion/Sentiment/Singability/Quotability"}
+          context["advisor_result"] = advisor

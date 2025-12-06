@@ -1,0 +1,31 @@
+{
+  "audio_name": "18. Shaboozey - A Bar Song (Tipsy)_20251114_061131",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.24621197631160127,
+        "lo": 0.47714833778159377,
+        "mid": 0.2766396859068048
+      },
+      "value": 0.4430296903745823
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2759208766145477,
+        "lo": 0.38070133404729867,
+        "mid": 0.34337778933815355
+      },
+      "value": 0.48236190660090206
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/18. Shaboozey - A Bar Song (Tipsy)/18. Shaboozey - A Bar Song (Tipsy)_20251114_061131.features.json"
+}

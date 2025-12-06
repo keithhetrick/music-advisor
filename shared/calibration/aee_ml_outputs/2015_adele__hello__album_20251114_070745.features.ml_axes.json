@@ -1,0 +1,31 @@
+{
+  "audio_name": "2015_adele__hello__album_20251114_070745",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.28565860055776565,
+        "lo": 0.3313116333583548,
+        "mid": 0.38302976608387956
+      },
+      "value": 0.5005870201877115
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3736716365974336,
+        "lo": 0.3209961915194553,
+        "mid": 0.30533217188311107
+      },
+      "value": 0.5344862153532651
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/07_echo_2015_19/2015_adele__hello__album/2015_adele__hello__album_20251114_070745.features.json"
+}

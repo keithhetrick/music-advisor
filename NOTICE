@@ -1,0 +1,6 @@
+This project is distributed under the MIT License. Key components:
+
+- music-advisor-config (src/ma_config)
+- music-advisor-shared (shared)
+
+See LICENSE files for full terms. Third-party dependencies retain their respective licenses.

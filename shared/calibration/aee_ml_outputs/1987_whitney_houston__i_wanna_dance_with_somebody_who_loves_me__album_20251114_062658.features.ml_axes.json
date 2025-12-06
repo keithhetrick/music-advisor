@@ -1,0 +1,31 @@
+{
+  "audio_name": "1987_whitney_houston__i_wanna_dance_with_somebody_who_loves_me__album_20251114_062658",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.23041207119299628,
+        "lo": 0.42809437670750283,
+        "mid": 0.341493552099501
+      },
+      "value": 0.45221591190529786
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.35929924229961385,
+        "lo": 0.2936644237476505,
+        "mid": 0.3470363339527356
+      },
+      "value": 0.5376554076805696
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/01_echo_1985_89/1987_whitney_houston__i_wanna_dance_with_somebody_who_loves_me__album/1987_whitney_houston__i_wanna_dance_with_somebody_who_loves_me__album_20251114_062658.features.json"
+}

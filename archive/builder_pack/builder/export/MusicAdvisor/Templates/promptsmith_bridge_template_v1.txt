@@ -1,0 +1,28 @@
+# Templates/promptsmith_bridge_template_v1.txt
+# Input context: {current_pack}, {advisor_result}, {trend_signals}, {summary}, {MARKET_NORMS}, {tp_key}, {tp_mode}, {tp_energy}
+
+TITLE: {current_pack[genre]} • {current_pack[region]} • {MARKET_NORMS[profile]} • HCI {advisor_result[HCI]:.2f}
+
+CONTEXT:
+- Tempo: {current_pack[tempo_band_bpm]} BPM • Runtime: {current_pack[runtime_sec]}s • TTC: {current_pack[ttc_sec]}s • Exposures: {current_pack[exposures]}
+- Historical Echo (40/30/20/10): {advisor_result[historical][echo_40]:.2f}/{advisor_result[historical][echo_30]:.2f}/{advisor_result[historical][echo_20]:.2f}/{advisor_result[historical][echo_10]:.2f}
+- Market Notes: {summary[market_notes]}
+- Cultural Notes: {summary[cultural_notes]}
+- Sonic Notes: {summary[sonic_notes]}
+
+PROMPT (Paste into Promptsmith):
+You are producing a {current_pack[genre]} track for the {current_pack[region]} market.
+Constraints:
+- Target tempo ~{current_pack[tempo_band_bpm]} BPM; runtime ~{current_pack[runtime_sec]}s; hook by {current_pack[ttc_sec]}s.
+- Prioritize: {summary[key_priorities]}
+- Avoid: {summary[anti_patterns]}
+
+Production Targets:
+- Rhythm profile: {current_pack.get(rhythm_profile, 'auto-from-genre')}
+- Tonal: key {tp_key} {tp_mode}, energy {tp_energy}
+- Era echo cues (weight 40>30>20>10): {summary[echo_cues]}
+
+If helpful, reference these tags:
+{summary[production_tags]}
+
+Deliver: 1-paragraph production brief + 5 bullet sonic moves + 3 alt-hook concepts.

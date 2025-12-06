@@ -1,0 +1,31 @@
+{
+  "audio_name": "1979_queen__dont_stop_me_now__album_20251114_064251",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.38518897134210456,
+        "lo": 0.28626241183429846,
+        "mid": 0.328548616823597
+      },
+      "value": 0.548937416419447
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3052299665550745,
+        "lo": 0.4012682927680819,
+        "mid": 0.2935017406768436
+      },
+      "value": 0.48645000046385145
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/99_legacy_pop_eval/1979_queen__dont_stop_me_now__album/1979_queen__dont_stop_me_now__album_20251114_064251.features.json"
+}

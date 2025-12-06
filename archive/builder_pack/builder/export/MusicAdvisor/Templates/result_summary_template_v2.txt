@@ -1,0 +1,125 @@
+# Templates/result_summary_template_v2.txt
+# NOTE: This template is used by: /advisor export summary
+# Update adds a built-in "Promptsmith Bridge" block at the end so you don’t need a new command.
+
+=== MUSIC ADVISOR — SUMMARY ===
+Pack: {current_pack.genre or 'N/A'} • {current_pack.region or 'N/A'} • Profile: {MARKET_NORMS.profile or 'N/A'}
+Generated: {current_pack.generated_at or 'N/A'}
+
+Tempo: {current_pack.tempo_band_bpm or 'N/A'} BPM
+Runtime: {current_pack.runtime_sec or 'N/A'} s
+TTC (hook): {current_pack.ttc_sec or 'N/A'} s
+Exposures: {current_pack.exposures or 'N/A'}
+
+HCI: {advisor_result.HCI:.2f}
+Layers:
+- Historical   : {advisor_result.historical.score:.2f}  (40:{advisor_result.historical.echo_40:.2f} / 30:{advisor_result.historical.echo_30:.2f} / 20:{advisor_result.historical.echo_20:.2f} / 10:{advisor_result.historical.echo_10:.2f})
+- Market       : {advisor_result.market.score:.2f}
+- Cultural     : {advisor_result.cultural.score:.2f}
+- Sonic        : {advisor_result.sonic.score:.2f}
+- Emotional    : {advisor_result.emotional.score:.2f}
+- Creative     : {advisor_result.creative.score:.2f}
+
+Norms snapshot: 2025 (streaming/radio/tiktok)
+Trend signals loaded: {len(current_trend_signals) if current_trend_signals else 0}
+
+Known_Gaps:
+{format_list(Known_Gaps, default="- none")}
+
+Top Notes:
+- Market  : {advisor_result.market.notes or '—'}
+- Cultural: {advisor_result.cultural.notes or '—'}
+- Sonic   : {advisor_result.sonic.notes or '—'}
+
+Recommendations (Do):
+{format_list(advisor_result.recommendations.do, default="- —")}
+
+Anti-Patterns (Avoid):
+{format_list(advisor_result.recommendations.avoid, default="- —")}
+
+------------------------------------------------------------
+PROMPTSMITH BRIDGE — Paste below into your Promptsmith GPT
+------------------------------------------------------------
+
+TITLE: {current_pack.genre or 'N/A'} • {current_pack.region or 'N/A'} • {MARKET_NORMS.profile or 'N/A'} • HCI {advisor_result.HCI:.2f}
+
+CONTEXT:
+- Tempo: {current_pack.tempo_band_bpm or 'N/A'} BPM • Runtime: {current_pack.runtime_sec or 'N/A'}s • TTC: {current_pack.ttc_sec or 'N/A'}s • Exposures: {current_pack.exposures or 'N/A'}
+- Historical Echo (40/30/20/10): {advisor_result.historical.echo_40:.2f}/{advisor_result.historical.echo_30:.2f}/{advisor_result.historical.echo_20:.2f}/{advisor_result.historical.echo_10:.2f}
+- Market Notes: {advisor_result.market.notes or '—'}
+- Cultural Notes: {advisor_result.cultural.notes or '—'}
+- Sonic Notes: {advisor_result.sonic.notes or '—'}
+
+PROMPT:
+You are producing a {current_pack.genre or 'pop'} track for the {current_pack.region or 'US'} market.
+Constraints:
+- Target tempo ~{current_pack.tempo_band_bpm or 100} BPM; runtime ~{current_pack.runtime_sec or 180}s; hook by {current_pack.ttc_sec or 8}s.
+- Prioritize: {join_or_default(advisor_result.recommendations.do, sep='; ', default='paid-stream share; radio legibility; strong hook')}
+- Avoid: {join_or_default(advisor_result.recommendations.avoid, sep='; ', default='overlong intros; muddy vocals; unfocused drums')}
+
+Production Targets:
+- Rhythm profile: {current_pack.rhythm_profile or 'auto-from-genre'}
+- Tonal: key {current_pack.tonal_profile.key if current_pack.tonal_profile else 'auto'} {current_pack.tonal_profile.mode if current_pack.tonal_profile else ''}, energy {current_pack.tonal_profile.energy if current_pack.tonal_profile else 'auto'}
+- Era echo cues (40>30>20>10): 40:{advisor_result.historical.echo_40:.2f}, 30:{advisor_result.historical.echo_30:.2f}, 20:{advisor_result.historical.echo_20:.2f}, 10:{advisor_result.historical.echo_10:.2f}
+
+If helpful, reference these tags:
+{join_or_default(current_pack.production_tags, default='—')}
+
+Deliverables:
+- 1 paragraph production brief
+- 5 bullet sonic moves
+- 3 alternate hook concepts
+
+------------------------------------------------------------
+OPTIMIZATION SNAPSHOT
+------------------------------------------------------------
+{{
+  "target_HCI": {optimization_plan.notes.target_HCI if optimization_plan and optimization_plan.get('notes') else 'null'},
+  "targets": {optimization_plan.targets if optimization_plan else []},
+  "quick_fixes": {optimization_plan.quick_fixes if optimization_plan else []}
+}}
+
+Tip: run /optimize for a full plan.
+
+------------------------------------------------------------
+LYRIC LAYER
+------------------------------------------------------------
+Tip: Paste lyrics into the pack:
+  /cp edit lyrics=<paste full lyric here>
+Then run:
+  /lyrics analyze
+
+------------------------------------------------------------
+LYRIC SCORE
+------------------------------------------------------------
+{{
+  "lyric_score": {advisor_result.lyric.score if advisor_result and advisor_result.get('lyric') else 'null'}
+}}
+
+=== RESULT SUMMARY ===
+
+Title: {track_title}
+Region: {region}
+Profile: {MARKET_NORMS.profile}
+HCI_v1: {HCI_v1:.2f}
+
+-- COMPONENTS --
+Historical: {components.Historical:.2f}
+Cultural:   {components.Cultural:.2f}
+Market:     {components.Market:.2f}
+Emotional:  {components.Emotional:.2f}
+Sonic:      {components.Sonic:.2f}
+Creative:   {components.Creative:.2f}
+
+-- DATA_PACK SNAPSHOT --
+{json_export_block}
+
+---
+Baseline:
+  active_profile: {Baseline.active_profile}
+  effective_utc:  {Baseline.effective_utc}
+  previous:       {Baseline.previous_profile}
+  pinned:         {Baseline.pinned}
+  note:           {Baseline.note}
+
+# END PROMPT

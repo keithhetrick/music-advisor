@@ -1,0 +1,31 @@
+{
+  "audio_name": "2016_calvin_harris_rihanna__this_is_what_you_came_for__album_20251114_070558",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.39267120151204277,
+        "lo": 0.30384164804580577,
+        "mid": 0.3034871504421515
+      },
+      "value": 0.5462824261154733
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3466673755828221,
+        "lo": 0.32289790922938716,
+        "mid": 0.3304347151877907
+      },
+      "value": 0.5244642086851716
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/07_echo_2015_19/2016_calvin_harris_rihanna__this_is_what_you_came_for__album/2016_calvin_harris_rihanna__this_is_what_you_came_for__album_20251114_070558.features.json"
+}

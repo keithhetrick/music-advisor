@@ -1,0 +1,56 @@
+# Router_LyricAnalysis.patch.yaml
+# Adds /lyrics analyze + auto-detect lyrics in pack.
+
+router:
+  hooks:
+    advisor_ingest:
+      - name: lyric_detect
+        action: |
+          pack = context.get("current_pack") or {}
+          lyrics = pack.get("lyrics") or ""
+          context["has_lyrics"] = bool(lyrics and len(lyrics.splitlines()) >= 4)
+
+  commands:
+    - name: lyrics_analyze
+      patterns: ["/lyrics analyze", "/lyric analyze"]
+      action: |
+        pack   = context.get("current_pack") or {}
+        lyrics = pack.get("lyrics") or context.get("clipboard_text") or ""
+        if not lyrics:
+          print_block("LYRICS", "No lyrics found. Use: /cp edit lyrics=<paste>"); return
+
+        def lines(s): return [l.strip() for l in s.splitlines() if l.strip()]
+        L = lines(lyrics)
+        wc = sum(len(l.split()) for l in L)
+        avg = round(wc / max(1,len(L)), 2)
+
+        import re
+        motifs = {
+          "time": r"\b(time|tonight|forever|never|now|always|again)\b",
+          "love": r"\b(love|heart|baby|kiss|hold)\b",
+          "motion": r"\b(run|drive|fly|fall|rise|dance|move)\b",
+          "digital": r"\b(phone|screen|scroll|DM|online|AI)\b"
+        }
+        present = [k for k,r in motifs.items() if re.search(r, lyrics, re.I)]
+        concretes = len(re.findall(r"\b(neon|rain|sunset|jeans|dashboard|coffee|hotel|mirror)\b", lyrics, re.I))
+        pos = len(re.findall(r"\b(love|light|free|smile|shine|hope)\b", lyrics, re.I))
+        neg = len(re.findall(r"\b(cry|dark|lost|alone|hurt|fall)\b", lyrics, re.I))
+        sentiment = "positive" if pos>neg else ("negative" if neg>pos else "neutral")
+
+        report = {
+          "lines": len(L),
+          "words": wc,
+          "avg_words_per_line": avg,
+          "motifs": present,
+          "concrete_hits": concretes,
+          "sentiment": sentiment,
+          "suggestions": []
+        }
+
+        if avg > 10: report["suggestions"].append("Tighten lines (≤9 words/line)")
+        if concretes < 5: report["suggestions"].append("Add 5–8 vivid nouns (imagery)")
+        if "digital" not in present: report["suggestions"].append("Add subtle digital-era detail")
+        if sentiment == "neutral": report["suggestions"].append("Increase emotional polarity in chorus")
+
+        tpl = read_text("Templates/lyric_analysis_template_v1.txt")
+        print_block("LYRIC_ANALYSIS", render_template(tpl, {"r": report}))

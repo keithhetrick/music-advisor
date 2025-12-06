@@ -1,0 +1,31 @@
+{
+  "audio_name": "2004_maroon_5__this_love__album_20251114_065516",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.40466589324238783,
+        "lo": 0.31333002260239073,
+        "mid": 0.28200408415522144
+      },
+      "value": 0.5476340558541185
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3621138297998721,
+        "lo": 0.29193064100097915,
+        "mid": 0.34595552919914885
+      },
+      "value": 0.5391606481296616
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/04_echo_2000_04/2004_maroon_5__this_love__album/2004_maroon_5__this_love__album_20251114_065516.features.json"
+}

@@ -1,0 +1,6 @@
+version: 0.3.5
+routes:
+  - match: "/audio import"
+    validate: "contracts/schema/audiotools_payload_v0.3.5.schema.json"
+  - match: "/advisor run full"
+    notes: "Advisory-only routing; see Policy.md"

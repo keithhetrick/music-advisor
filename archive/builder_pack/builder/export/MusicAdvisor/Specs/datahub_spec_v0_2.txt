@@ -1,0 +1,8 @@
+# DataHub v0.2 (in-chat registry)
+Goal: Save/load DATA_PACKs by ID without external DB.
+Commands (/datahub):
+  save "<label>" → store last DATA_PACK with auto ID (e.g., PK001). Echo label+ID.
+  list → show IDs, labels, timestamps.
+  load <id> → retrieve into active context (for /advisor ingest).
+Policy:
+  Store minimal: the JSON and a brief note. Do not store PII.

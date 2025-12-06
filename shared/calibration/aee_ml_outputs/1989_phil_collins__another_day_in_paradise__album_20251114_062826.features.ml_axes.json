@@ -1,0 +1,31 @@
+{
+  "audio_name": "1989_phil_collins__another_day_in_paradise__album_20251114_062826",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2310628755508657,
+        "lo": 0.4336039080657455,
+        "mid": 0.3353332163833887
+      },
+      "value": 0.4507908340230793
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.40712455113681323,
+        "lo": 0.23333904320458138,
+        "mid": 0.3595364056586054
+      },
+      "value": 0.5724918799365102
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/01_echo_1985_89/1989_phil_collins__another_day_in_paradise__album/1989_phil_collins__another_day_in_paradise__album_20251114_062826.features.json"
+}

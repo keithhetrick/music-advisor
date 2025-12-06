@@ -1,0 +1,31 @@
+{
+  "audio_name": "1995_los_del_rio__macarena__neg_novelty_20251114_064554",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.0970674361921515,
+        "lo": 0.6351691272226391,
+        "mid": 0.2677634365852095
+      },
+      "value": 0.34342286450046133
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.23431182579941073,
+        "lo": 0.427271911956664,
+        "mid": 0.33841626224392524
+      },
+      "value": 0.4538275654427945
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/14_negatives_novelty_eval/1995_los_del_rio__macarena__neg_novelty/1995_los_del_rio__macarena__neg_novelty_20251114_064554.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2018_calvin_harris_dua_lipa__one_kiss__album_20251114_070812",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4492827310867018,
+        "lo": 0.26414853903991714,
+        "mid": 0.2865687298733811
+      },
+      "value": 0.5780043941683705
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.35915005938312417,
+        "lo": 0.31224376717549146,
+        "mid": 0.3286061734413843
+      },
+      "value": 0.5320293906314459
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/07_echo_2015_19/2018_calvin_harris_dua_lipa__one_kiss__album/2018_calvin_harris_dua_lipa__one_kiss__album_20251114_070812.features.json"
+}

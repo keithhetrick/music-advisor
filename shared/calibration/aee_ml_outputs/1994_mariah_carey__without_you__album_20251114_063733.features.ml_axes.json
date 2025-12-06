@@ -1,0 +1,31 @@
+{
+  "audio_name": "1994_mariah_carey__without_you__album_20251114_063733",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.37837785577748606,
+        "lo": 0.34854663361292154,
+        "mid": 0.27307551060959234
+      },
+      "value": 0.5278682594382437
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.39978332904757863,
+        "lo": 0.23255253012579236,
+        "mid": 0.36766414082662896
+      },
+      "value": 0.5701584061289148
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/10_golden_set_for_eval/1994_mariah_carey__without_you__album/1994_mariah_carey__without_you__album_20251114_063733.features.json"
+}

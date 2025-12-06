@@ -1,0 +1,10 @@
+# Instructions/COMMANDS.append.txt
+/optimize — show detailed HCI improvement plan
+/lyrics analyze — analyze pasted lyrics and suggest fixes
+
+# Ingest (free-first)
+ /ingest help      — how to paste CSV/JSON
+ /ingest json      — ingest JSON block from clipboard
+ /ingest csv       — ingest CSV block from clipboard
+ /ingest status    — show in-memory warehouse counts
+ /ingest clear     — clear in-memory warehouse

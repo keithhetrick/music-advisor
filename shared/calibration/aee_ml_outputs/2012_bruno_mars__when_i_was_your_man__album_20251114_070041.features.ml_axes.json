@@ -1,0 +1,31 @@
+{
+  "audio_name": "2012_bruno_mars__when_i_was_your_man__album_20251114_070041",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.40161735995437464,
+        "lo": 0.32109972719623286,
+        "mid": 0.2772829128493925
+      },
+      "value": 0.5442361578251612
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4023806260564543,
+        "lo": 0.24435911452843878,
+        "mid": 0.3532602594151069
+      },
+      "value": 0.5675254847612273
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/06_echo_2010_14/2012_bruno_mars__when_i_was_your_man__album/2012_bruno_mars__when_i_was_your_man__album_20251114_070041.features.json"
+}

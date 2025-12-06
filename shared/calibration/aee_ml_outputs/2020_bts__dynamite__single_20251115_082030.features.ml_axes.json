@@ -1,0 +1,31 @@
+{
+  "audio_name": "2020_bts__dynamite__single_20251115_082030",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4281063616368571,
+        "lo": 0.2379182223944383,
+        "mid": 0.33397541596870467
+      },
+      "value": 0.5784617598545685
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.38526160313846075,
+        "lo": 0.28239516392563885,
+        "mid": 0.3323432329359004
+      },
+      "value": 0.5501230119207696
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_0/2020_bts__dynamite__single/2020_bts__dynamite__single_20251115_082030.features.json"
+}

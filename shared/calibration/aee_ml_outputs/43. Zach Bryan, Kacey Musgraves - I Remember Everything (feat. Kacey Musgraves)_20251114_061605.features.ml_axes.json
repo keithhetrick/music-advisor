@@ -1,0 +1,31 @@
+{
+  "audio_name": "43. Zach Bryan, Kacey Musgraves - I Remember Everything (feat. Kacey Musgraves)_20251114_061605",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4807739560888067,
+        "lo": 0.21303680997025523,
+        "mid": 0.30618923394093817
+      },
+      "value": 0.6043598416400058
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3673535492833711,
+        "lo": 0.33503112654334305,
+        "mid": 0.2976153241732858
+      },
+      "value": 0.5280644042861768
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/43. Zach Bryan, Kacey Musgraves - I Remember Everything (feat. Kacey Musgraves)/43. Zach Bryan, Kacey Musgraves - I Remember Everything (feat. Kacey Musgraves)_20251114_061605.features.json"
+}

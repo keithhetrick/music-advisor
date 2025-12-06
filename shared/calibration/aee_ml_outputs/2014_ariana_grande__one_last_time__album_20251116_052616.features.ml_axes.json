@@ -1,0 +1,31 @@
+{
+  "audio_name": "2014_ariana_grande__one_last_time__album_20251116_052616",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4466493041862947,
+        "lo": 0.2357014686115069,
+        "mid": 0.3176492272021984
+      },
+      "value": 0.5856168158817511
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3549563804931916,
+        "lo": 0.307936305002613,
+        "mid": 0.3371073145041954
+      },
+      "value": 0.5318538416718331
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2014_ariana_grande__one_last_time__album/2014_ariana_grande__one_last_time__album_20251116_052616.features.json"
+}

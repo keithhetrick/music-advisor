@@ -1,0 +1,31 @@
+{
+  "audio_name": "2003_beyonce_jay_z__crazy_in_love__album_20251116_041743",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.441730837260239,
+        "lo": 0.23169652090943976,
+        "mid": 0.32657264183032136
+      },
+      "value": 0.5850968367682517
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.43798917111358127,
+        "lo": 0.2148603486650835,
+        "mid": 0.34715048022133527
+      },
+      "value": 0.5888381052902284
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2003_beyonce_jay_z__crazy_in_love__album/2003_beyonce_jay_z__crazy_in_love__album_20251116_041743.features.json"
+}

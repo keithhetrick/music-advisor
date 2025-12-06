@@ -1,0 +1,31 @@
+{
+  "audio_name": "1998_brandy_and_monica__the_boy_is_mine__album_20251116_041633",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3160718232507956,
+        "lo": 0.31147220444159895,
+        "mid": 0.37245597230760547
+      },
+      "value": 0.5171834768052987
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4531145813985888,
+        "lo": 0.18702013887069055,
+        "mid": 0.3598652797307207
+      },
+      "value": 0.602484061828299
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/1998_brandy_and_monica__the_boy_is_mine__album/1998_brandy_and_monica__the_boy_is_mine__album_20251116_041633.features.json"
+}

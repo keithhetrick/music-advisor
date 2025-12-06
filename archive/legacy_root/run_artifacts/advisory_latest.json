@@ -1,0 +1,169 @@
+{
+  "HCI_v1": {
+    "HCI_v1_score": 0.446
+  },
+  "Baseline": {
+    "id": "US_Pop_Cal_Baseline_2025Q4.json",
+    "MARKET_NORMS": {
+      "tempo_bpm_mean": 112.0,
+      "tempo_bpm_std": 14.0,
+      "tempo_band_pref": [
+        "100–109",
+        "110–119",
+        "120–129"
+      ],
+      "key_distribution": {
+        "C": 0.06,
+        "D": 0.1,
+        "E": 0.09,
+        "F": 0.08,
+        "G": 0.12,
+        "A": 0.14,
+        "B": 0.04,
+        "Db": 0.05,
+        "Eb": 0.07,
+        "Gb": 0.04,
+        "Ab": 0.1,
+        "Bb": 0.11
+      },
+      "mode_ratio": {
+        "major": 0.74,
+        "minor": 0.26
+      },
+      "runtime_sec_mean": 176.0,
+      "runtime_sec_std": 18.0
+    },
+    "advisory": {
+      "Market_Fit": {
+        "tempo_window": "98–126",
+        "top_keys": [
+          "A",
+          "G",
+          "Bb",
+          "D",
+          "Ab"
+        ],
+        "mode_pref": "major 74% / minor 26%"
+      },
+      "tempo": {
+        "preferred_bands": [
+          "100–109",
+          "110–119",
+          "120–129"
+        ],
+        "center_bpm": 112.0,
+        "suggested_window_bpm": "98–126"
+      },
+      "key": {
+        "top_keys": [
+          "A",
+          "G",
+          "Bb",
+          "D",
+          "Ab"
+        ],
+        "top_keys_with_weights": [
+          {
+            "key": "A",
+            "p": 0.14
+          },
+          {
+            "key": "G",
+            "p": 0.12
+          },
+          {
+            "key": "Bb",
+            "p": 0.11
+          },
+          {
+            "key": "D",
+            "p": 0.1
+          },
+          {
+            "key": "Ab",
+            "p": 0.1
+          }
+        ]
+      },
+      "runtime": {
+        "suggested_window_sec": [
+          158,
+          194
+        ],
+        "center_sec": 176.0,
+        "suggested_window_human": "158–194 s"
+      }
+    }
+  },
+  "Policy": {
+    "cap_audio": 0.58,
+    "ttc_conf_gate": 0.6,
+    "lift_window_sec": 6.0
+  },
+  "TTC_Gate": {
+    "ttc_seconds": null,
+    "ttc_confidence": null,
+    "lift_db": null,
+    "drop_features": [
+      "chorus_lift"
+    ],
+    "source": "absent"
+  },
+  "TTC": {
+    "seconds": null,
+    "confidence": null,
+    "lift_db": null,
+    "dropped": [],
+    "source": "absent"
+  },
+  "Structural_Gates": {
+    "drop": [
+      "chorus_lift",
+      "exposures"
+    ],
+    "notes": {
+      "struct_mode": "optional",
+      "struct_reliable": false,
+      "use_ttc": true,
+      "use_exposures": false,
+      "ttc_gate_threshold": 0.6,
+      "reasoning": "Subfeatures dropped due to structural eligibility, not numeric HCI logic."
+    }
+  },
+  "Structural": {
+    "drop": [
+      "chorus_lift",
+      "exposures"
+    ],
+    "notes": {
+      "struct_mode": "optional",
+      "struct_reliable": false,
+      "use_ttc": true,
+      "use_exposures": false,
+      "ttc_gate_threshold": 0.6,
+      "reasoning": "Subfeatures dropped due to structural eligibility, not numeric HCI logic."
+    }
+  },
+  "Goldilocks": {
+    "advisory": {
+      "target_market": 0.5,
+      "target_emotional": 0.5,
+      "delta_market": 0.02,
+      "delta_emotional": -0.17
+    },
+    "rationale": "Shift modestly toward market framing while tempering emotive claims.",
+    "safety": {
+      "note": "Goldilocks is advisory-only; HCI remains unchanged."
+    }
+  },
+  "Axes": {
+    "audio_axes": [
+      0.253,
+      0.0,
+      0.995,
+      0.429,
+      0.5,
+      0.5
+    ]
+  }
+}

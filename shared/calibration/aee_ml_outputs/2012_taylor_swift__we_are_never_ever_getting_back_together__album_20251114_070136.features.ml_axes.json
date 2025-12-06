@@ -1,0 +1,31 @@
+{
+  "audio_name": "2012_taylor_swift__we_are_never_ever_getting_back_together__album_20251114_070136",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3499407780981246,
+        "lo": 0.366476004796495,
+        "mid": 0.28358321710538037
+      },
+      "value": 0.5125364708953951
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3372502897308159,
+        "lo": 0.31317227261896596,
+        "mid": 0.3495774376502181
+      },
+      "value": 0.5240859196200958
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/06_echo_2010_14/2012_taylor_swift__we_are_never_ever_getting_back_together__album/2012_taylor_swift__we_are_never_ever_getting_back_together__album_20251114_070136.features.json"
+}

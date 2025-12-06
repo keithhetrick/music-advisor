@@ -1,0 +1,31 @@
+{
+  "audio_name": "1995_oasis__wonderwall__album_20251116_041553",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3424920458107463,
+        "lo": 0.29842448633946633,
+        "mid": 0.35908346784978734
+      },
+      "value": 0.5303448701319213
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3928635560192827,
+        "lo": 0.2551046754131056,
+        "mid": 0.35203176856761165
+      },
+      "value": 0.5609708419828172
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/1995_oasis__wonderwall__album/1995_oasis__wonderwall__album_20251116_041553.features.json"
+}

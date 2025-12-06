@@ -1,0 +1,31 @@
+{
+  "audio_name": "1997_elton_john__candle_in_the_wind_1997__album_20251114_063411",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.37346790826409365,
+        "lo": 0.2928949621299229,
+        "mid": 0.3336371296059834
+      },
+      "value": 0.5428452792534558
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3873360610821512,
+        "lo": 0.2861541313016457,
+        "mid": 0.32650980761620313
+      },
+      "value": 0.5497213819882592
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/03_echo_1995_99/1997_elton_john__candle_in_the_wind_1997__album/1997_elton_john__candle_in_the_wind_1997__album_20251114_063411.features.json"
+}

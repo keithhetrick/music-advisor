@@ -1,0 +1,31 @@
+{
+  "audio_name": "1975_queen__bohemian_rhapsody__album_20251114_064116",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.11931084228956995,
+        "lo": 0.5125497592969945,
+        "mid": 0.36813939841343557
+      },
+      "value": 0.38799386701225114
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.34163223412636273,
+        "lo": 0.32565517939236266,
+        "mid": 0.3327125864812746
+      },
+      "value": 0.5218747281265181
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/99_legacy_pop_eval/1975_queen__bohemian_rhapsody__album/1975_queen__bohemian_rhapsody__album_20251114_064116.features.json"
+}

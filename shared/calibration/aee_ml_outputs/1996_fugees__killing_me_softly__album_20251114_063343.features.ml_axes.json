@@ -1,0 +1,31 @@
+{
+  "audio_name": "1996_fugees__killing_me_softly__album_20251114_063343",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.0013543653733959682,
+        "lo": 0.9307951693752811,
+        "mid": 0.06785046525132299
+      },
+      "value": 0.22123547706810429
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.06225737464889462,
+        "lo": 0.7000419579062958,
+        "mid": 0.2377006674448097
+      },
+      "value": 0.3117774937552244
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/03_echo_1995_99/1996_fugees__killing_me_softly__album/1996_fugees__killing_me_softly__album_20251114_063343.features.json"
+}

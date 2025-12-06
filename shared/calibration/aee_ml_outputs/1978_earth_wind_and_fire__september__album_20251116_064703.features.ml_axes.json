@@ -1,0 +1,31 @@
+{
+  "audio_name": "1978_earth_wind_and_fire__september__album_20251116_064703",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.2868128580473931,
+        "lo": 0.3314280828501802,
+        "mid": 0.38175905910242663
+      },
+      "value": 0.5009560754615334
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3340741124560229,
+        "lo": 0.3406445072680649,
+        "mid": 0.32528138027591225
+      },
+      "value": 0.5147325871791886
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/1978_earth_wind_and_fire__september__album/1978_earth_wind_and_fire__september__album_20251116_064703.features.json"
+}

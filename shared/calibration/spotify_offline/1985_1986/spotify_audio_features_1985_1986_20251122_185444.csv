@@ -1,0 +1,80 @@
+year,year_end_rank,artist,title,spotify_id,match_source,ext_artist_raw,ext_title_raw,tempo,danceability,energy,loudness,valence,duration_ms
+1985,1,a-ha,Take On Me,2WfaOiMkCvy7F5fcp2zZ8L,id,['a-ha'],Take on Me,84.412,0.573,0.902,-7.638,0.876,225280
+1985,2,Kool & The Gang,Cherish,2yCAGizViD7HZXwNYxJToQ,fuzzy,['Kool & The Gang'],Cherish,95.116,0.611,0.516,-11.316,0.384,340133
+1985,3,Tears For Fears,Everybody Wants To Rule The World,4RvWPyQ5RL0ao9LPZeSouE,id,['Tears For Fears'],Everybody Wants To Rule The World,112.067,0.645,0.795,-12.095,0.535,251489
+1985,4,Paul Young,Everytime You Go Away,0yNvCWhV6EyDpYAAczCm1E,id,['Paul Young'],Every Time You Go Away - Single Version,164.199,0.621,0.484,-11.966,0.506,257960
+1985,5,Dire Straits,Money For Nothing,4yqtwO7MQIIXqoiRBPHAgR,id,['Dire Straits'],Money for Nothing,134.212,0.667,0.655,-9.339,0.657,506400
+1985,6,Madonna,Crazy For You,6G7PVlifniapyhDCmWS2VM,id,['Madonna'],Crazy for You - Edit,95.01,0.672,0.549,-11.93,0.588,225627
+1985,7,Simple Minds,Don't You (Forget About Me),3fH4KjXFYMmljxrcGrbPj9,id,['Simple Minds'],Don't You (Forget About Me),111.346,0.66,0.816,-6.61,0.678,263040
+1985,9,Howard Jones,Things Can Only Get Better,2zbXf2qz52eXmw4dpHWWq6,fuzzy,['Howard Jones'],Things Can Only Get Better,108.254,0.752,0.743,-6.083,0.832,235827
+1985,10,Whitney Houston,Saving All My Love For You,1lx8ddGT5wCD6W2xmLeRKG,id,['Whitney Houston'],Saving All My Love for You,99.304,0.636,0.264,-14.567,0.264,238467
+1985,11,Huey Lewis & The News,The Power Of Love,3tMW1Zbt9Z6cnEBO0HSZ5t,fuzzy,['Huey Lewis & The News'],"The Power Of Love - From ""Back To The Future""",118.39,0.68,0.79,-5.471,0.818,234160
+1985,12,Teena Marie,Lover Girl,6JGEFDAbkolVtylkQfnnom,id,['Teena Marie'],Lovergirl,123.301,0.76,0.853,-4.594,0.842,290893
+1985,13,John Parr,St. Elmo's Fire (Man In Motion),1A2PWRltFrX8iB8IP3CUgo,id,['John Parr'],St. Elmos Fire (Man in Motion),111.203,0.612,0.6,-10.945,0.471,251800
+1985,14,Debarge,Rhythm Of The Night,5yGTQzYbEdY6B9RFZJypgt,id,['DeBarge'],Rhythm Of The Night,115.142,0.707,0.759,-12.328,0.955,229107
+1985,15,Animotion,Obsession,3N7GqZMpZJW69Te1bfUTc3,id,['Animotion'],Obsession,114.748,0.673,0.613,-11.997,0.415,337267
+1985,16,Wham!,Everything She Wants,3kRLA6tLTlFR5ll80NULRE,id,['Wham!'],Everything She Wants - Remix,114.958,0.875,0.622,-10.22,0.918,389773
+1985,17,Glenn Frey,The Heat Is On,0PXw9NKvolWTo7U9JkNzmc,fuzzy,['Glenn Frey'],"The Heat Is On - From ""Beverly Hills Cop"" Soundtrack",149.583,0.649,0.857,-7.015,0.962,225507
+1985,18,REO Speedwagon,Can't Fight This Feeling,5WwqdeavrQrbeAMDxGawse,id,['REO Speedwagon'],Can't Fight This Feeling,156.344,0.408,0.48,-11.017,0.19,294773
+1985,19,Commodores,Nightshift,23IK8TF2MSiLnuEjaYPfVV,id,['Commodores'],Nightshift,105.06,0.727,0.559,-10.194,0.393,306560
+1985,20,Ready For The World,Oh Sheila,5PM96PMKMfD1lLX2lryUsG,id,['Ready For The World'],Oh Sheila,128.82,0.798,0.577,-10.347,0.835,240093
+1985,21,Survivor,The Search Is Over,1M3xrSPzPcKkCnXGHFPKaw,id,['Survivor'],The Search Is Over,124.209,0.527,0.342,-12.272,0.148,252613
+1985,22,Bryan Adams,Heaven,7Ewz6bJ97vUqk5HdkvguFQ,id,['Bryan Adams'],Heaven,140.059,0.382,0.589,-7.315,0.335,243360
+1985,23,Billy Ocean,Suddenly,65h7Qhxl2WfW31Bl6sjWAI,id,['Billy Ocean'],Suddenly,129.486,0.496,0.338,-9.512,0.202,234707
+1985,24,Stevie Wonder,Part-Time Lover,0Dm43YLUlGdePpSbI1ct8h,id,['Stevie Wonder'],Part-Time Lover,174.513,0.662,0.624,-13.606,0.961,252560
+1985,25,Corey Hart,Never Surrender,5U5p472hgeXUKvh0d8RL4K,id,['Corey Hart'],Never Surrender,104.131,0.552,0.538,-11.085,0.401,295000
+1985,26,Whitney Houston,You Give Good Love,0t6DdFmFQhQYWhmfa5FJer,id,['Whitney Houston'],You Give Good Love,74.802,0.559,0.365,-13.654,0.534,277240
+1985,27,Tears For Fears,Shout,2gQaQUhDCNGfBVXTvxAmXQ,id,['Tears For Fears'],Shout,97.909,0.511,0.942,-10.407,0.498,393667
+1985,28,Aretha Franklin,Freeway Of Love,0lpIVCLNQRBKffcRRNrHyh,id,['Aretha Franklin'],Freeway Of Love,126.509,0.688,0.899,-6.328,0.833,352093
+1985,29,'Til Tuesday,Voices Carry,0ZYf6N5eBeXStMri0mf3DZ,id,"[""'Til Tuesday""]",Voices Carry,104.995,0.583,0.574,-9.044,0.578,263573
+1985,30,Starship,We Built This City,6OnfBiiSc9RGKiBKKtZXgQ,id,['Starship'],We Built This City,144.091,0.661,0.908,-4.897,0.656,296080
+1985,31,Murray Head,One Night In Bangkok,0F8Uf6JE5bCOTVAsoQ98iJ,fuzzy,['Murray Head'],One Night In Bangkok - From “Chess” / Remastered 2016,108.842,0.954,0.451,-9.124,0.839,193440
+1985,32,Diana Ross,Missing You,0jVfjWK9DUc5ShqwwPADyp,id,['Diana Ross'],Missing You,86.822,0.644,0.355,-11.41,0.187,245347
+1985,33,Mary Jane Girls,In My House,11vItFXykyMe5BNKmItbo2,id,['Mary Jane Girls'],In My House,116.832,0.793,0.637,-11.037,0.943,302200
+1985,34,Jan Hammer,Miami Vice Theme,1biP5gM7Le8S3E7GJEKgXC,fuzzy,['Jan Hammer'],Miami Vice Theme,115.438,0.569,0.92,-10.314,0.879,147720
+1985,35,Foreigner,I Want To Know What Love Is,1JLn8RhQzHz3qDqsChcmBl,id,['Foreigner'],I Want to Know What Love Is - 1999 Remaster,81.204,0.477,0.471,-10.036,0.423,304787
+1985,36,Sting,If You Love Somebody Set Them Free,5Xhqe9xu6bKRSqLj1mS1SB,id,['Sting'],If You Love Somebody Set Them Free,125.058,0.627,0.849,-10.61,0.817,256227
+1985,37,Phil Collins,One More Night,6fkvIT9KFKxO8poBeKfaEf,id,['Phil Collins'],One More Night - 2016 Remaster,136.369,0.534,0.442,-9.442,0.343,288973
+1985,38,Phil Collins,Don't Lose My Number,2ZIzyHDYsXIHUojfr6bAbO,id,['Phil Collins'],Don't Lose My Number - 2016 Remaster,80.614,0.585,0.832,-5.016,0.952,288547
+1985,39,Sade,Smooth Operator,1Hv1VTm8zeOeybub15mA2R,id,['Sade'],Smooth Operator - Single Version,119.336,0.734,0.58,-6.619,0.962,258693
+1985,40,Prince And The Revolution,Raspberry Beret,2I1W3hcSsPIsEJfD69pHrW,id,"['Prince', 'The Revolution']",Raspberry Beret,120.75,0.761,0.67,-12.759,0.91,215173
+1986,1,Patti LaBelle & Michael McDonald,On My Own,5HrVgmO1govSOrPUehW1VV,id,['Patti LaBelle'],On My Own,92.093,0.62,0.402,-12.964,0.483,290840
+1986,2,Level 42,Something About You,0GZzK43dJ6uNjOuitlCxDr,fuzzy,['Level 42'],Something About You - Single Version,104.893,0.689,0.863,-5.345,0.889,225733
+1986,3,Nu Shooz,I Can't Wait,0KCCNoVVXBatkTRvKOEf2t,id,['Nu Shooz'],I Can't Wait,104.274,0.851,0.574,-13.622,0.84,326507
+1986,4,Atlantic Starr,Secret Lovers,4nKPgKXfFiPW7cNex5oDtt,id,['Atlantic Starr'],Secret Lovers,74.142,0.339,0.379,-15.08,0.429,330667
+1986,5,Carl Anderson & Gloria Loring,Friends And Lovers,19u5G7pWq3Nj6lQiP4W4Hp,id,"['Carl Anderson', 'Gloria Loring']",Friends And Lovers (feat. Gloria Loring),80.521,0.39,0.313,-9.928,0.157,226560
+1986,6,Robert Palmer,Addicted To Love,5izGeTxueiFX1UPFGohY9w,id,"['Robert Palmer', ""Eric 'ET' Thorngren""]",Addicted To Love,111.617,0.702,0.578,-13.415,0.975,363640
+1986,7,Glass Tiger,Don't Forget Me (When I'm Gone),2G0ioyDyvIT1hu71VePzOL,fuzzy,['Glass Tiger'],Don't Forget Me (When I'm Gone),109.837,0.612,0.697,-9.144,0.736,248027
+1986,8,Steve Winwood,Higher Love,4ZExvJvQXPEeYzGU0N3THi,id,['Steve Winwood'],Higher Love,98.699,0.696,0.78,-12.159,0.954,351507
+1986,9,Simply Red,Holding Back The Years,1yg7fwwYmx9DQ2TdXUmfpJ,id,['Simply Red'],Holding Back the Years - 2008 Remaster,86.035,0.707,0.514,-8.885,0.524,269840
+1986,10,Billy Ocean,There'll Be Sad Songs (To Make You Cry),1mP8BJQBRZWjSQLVmxQEyG,id,['Billy Ocean'],There'll Be Sad Songs (To Make You Cry),79.738,0.563,0.458,-7.673,0.259,292680
+1986,11,Miami Sound Machine,Words Get In The Way,5xbqrbNPBTAOGDA6GD3O46,id,['Miami Sound Machine'],Words Get In the Way,155.656,0.674,0.31,-17.352,0.56,205533
+1986,12,Belinda Carlisle,Mad About You,1SWfuzL0VJx1oYnEtqueSr,fuzzy,['Belinda Carlisle'],Mad About You,143.797,0.596,0.655,-9.531,0.512,218227
+1986,13,Sly Fox,Let's Go All The Way,6eLDMmVI7HF7W56cOrJj00,fuzzy,['Sly Fox'],Let's Go All The Way,98.25,0.659,0.808,-10.221,0.796,309013
+1986,14,Peter Cetera,"Glory Of Love (Theme From ""The Karate Kid Part II"")",1eyq8cjUQ2daFthW2PC2GM,id,['Peter Cetera'],Glory of Love,144.998,0.518,0.585,-8.485,0.312,258120
+1986,15,Pet Shop Boys,West End Girls,2Di0qFNb7ATroCGB3q0Ka7,id,['Pet Shop Boys'],West End Girls - 2018 Remaster,113.259,0.656,0.914,-7.471,0.576,285907
+1986,16,Peter Gabriel,Sledgehammer,4AUS8KNz7zX8XFu9L38GT0,id,['Peter Gabriel'],Sledgehammer - 2012 Remaster,96.319,0.641,0.682,-7.561,0.468,311986
+1986,17,Lisa Lisa And Cult Jam With Full Force Featuring Paul Anthony & Bow Legged Lou,All Cried Out,0046quUYhSAFccrKIC3Iht,id,"['Lisa Lisa & Cult Jam', 'Full Force']",All Cried Out (with Full Force),144.435,0.48,0.435,-9.959,0.328,284973
+1986,18,Whitney Houston,How Will I Know,2kfB5H5vNYcG87SKabmKCa,fuzzy,['Whitney Houston'],How Will I Know - Acappella,118.306,0.592,0.228,-14.942,0.413,239413
+1986,19,Stacey Q,Two Of Hearts,2dURQIBrw3XcHyVZlfdpC1,id,['Stacey Q'],Two of Hearts,130.154,0.852,0.523,-6.716,0.65,237533
+1986,20,Berlin,"Take My Breath Away (Love Theme From ""Top Gun"")",7opCkB3bkWEstc2UvmbI7u,fuzzy,['Berlin'],Take My Breath Away (as heard in Top Gun) (Re-Recorded / Remastered),96.225,0.518,0.642,-6.009,0.597,249250
+1986,21,Howard Jones,No One Is To Blame,4AoR61nMXOgXrrNjuusASh,fuzzy,['Howard Jones'],No One Is To Blame - Remastered,95.119,0.747,0.496,-8.824,0.817,249853
+1986,22,Janet Jackson,What Have You Done For Me Lately,2SFq0UIiBWkBgky0fkrHP0,id,['Janet Jackson'],What Have You Done For Me Lately,114.045,0.846,0.396,-12.408,0.841,299493
+1986,23,Kenny Loggins,Danger Zone,34x6hEJgGAOQvmlMql5Ige,id,['Kenny Loggins'],"Danger Zone - From ""Top Gun"" Original Soundtrack",157.17,0.544,0.897,-6.056,0.647,215133
+1986,24,Whitney Houston,Greatest Love Of All,6yJxCltgtmGxIgKOS6ndnu,id,['Whitney Houston'],Greatest Love of All,131.242,0.502,0.305,-16.011,0.248,291400
+1986,25,The Outfield,Your Love,0WoFs3EdGOx58yX5BtXvOa,fuzzy,['The Outfield'],Your Love,129.617,0.556,0.764,-7.725,0.597,222960
+1986,26,Heart,These Dreams,22wWxHGHRH8gZXNDXRgSqY,id,['Heart'],These Dreams,79.106,0.535,0.532,-9.865,0.3,254476
+1986,27,Prince And The Revolution,Kiss,62LJFaYihsdVrrkgUOJC05,id,['Prince'],Kiss,111.485,0.898,0.271,-12.238,0.742,226240
+1986,28,Robert Palmer,I Didn't Mean To Turn You On,4JF9MKFo5i85o5ap1JHKYE,id,['Robert Palmer'],I Didn't Mean To Turn You On,120.657,0.68,0.485,-15.589,0.967,224800
+1986,29,Starship,Sara,0HzjKCZmFhwcO2vnnHpj9q,id,['Starship'],Sara,100.273,0.642,0.805,-5.675,0.365,292800
+1986,30,INXS,What You Need,14tERgpNCOzUE1ztMR4CGe,id,['INXS'],What You Need - 45 Version,116.033,0.697,0.838,-6.156,0.444,215373
+1986,31,Mr. Mister,Kyrie,5K3Q1gue9nWLLwh6bYQFoB,id,['Mr. Mister'],Kyrie,89.913,0.496,0.566,-13.749,0.672,265840
+1986,32,The Bangles,Manic Monday,00vYs0qZA40Z8AAaN7xmMO,id,['The Bangles'],Manic Monday,121.761,0.685,0.594,-10.906,0.853,184160
+1986,33,Janet Jackson,When I Think Of You,3mJ6pNcFM2CkykCYSREdKT,id,['Janet Jackson'],When I Think Of You,116.207,0.759,0.639,-11.386,0.706,235493
+1986,34,Huey Lewis & The News,Stuck With You,2cFl7utlqyZjCXN1G5nRvA,id,['Huey Lewis & The News'],Stuck With You,120.717,0.704,0.544,-11.402,0.628,269573
+1986,35,Orchestral Manoeuvres In The Dark,If You Leave,0Des4gyZ2Z9jq6VA8VPwGE,id,['Orchestral Manoeuvres In The Dark'],"If You Leave - From ""Pretty In Pink""",120.362,0.631,0.592,-13.808,0.896,265360
+1986,36,Jermaine Stewart,We Don't Have To Take Our Clothes Off,6S7OQQ19MSi5Fo2PQ6LL1u,id,['Jermaine Stewart'],We Don't Have To Take Our Clothes Off,122.588,0.807,0.841,-4.0,0.911,245027
+1986,37,Madonna,Live To Tell,095MMFhB9qxPx2VsmvjnUs,id,['Madonna'],Live to Tell,109.841,0.673,0.314,-14.156,0.27,353000
+1986,38,Bananarama,Venus,4XX1pFUkQOZTYp6Hb6a6Ae,id,['Bananarama'],Venus,126.113,0.722,0.961,-4.812,0.91,229165
+1986,39,The Jets,Crush On You,1ZszesnDwcH48WJGR03gO3,fuzzy,['The Jets'],Crush On You,120.332,0.777,0.834,-10.851,0.967,272493
+1986,40,Lionel Richie,Dancing On The Ceiling,0snPJPxkk0MbTc0xeUvAPt,id,['Lionel Richie'],Dancing On The Ceiling,133.197,0.698,0.774,-8.642,0.731,270720

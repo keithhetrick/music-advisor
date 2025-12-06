@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Neighbors",
+  "type": "object",
+  "required": ["neighbors"],
+  "properties": {
+    "neighbors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["tier", "distance"],
+        "properties": {
+          "tier": { "type": "string" },
+          "distance": { "type": "number" }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

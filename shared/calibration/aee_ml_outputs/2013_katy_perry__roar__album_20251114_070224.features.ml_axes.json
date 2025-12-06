@@ -1,0 +1,31 @@
+{
+  "audio_name": "2013_katy_perry__roar__album_20251114_070224",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.21804680889732717,
+        "lo": 0.48332920937833185,
+        "mid": 0.298623981724341
+      },
+      "value": 0.431317620300565
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3079565575725995,
+        "lo": 0.34120086007335954,
+        "mid": 0.350842582354041
+      },
+      "value": 0.505424537128402
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/06_echo_2010_14/2013_katy_perry__roar__album/2013_katy_perry__roar__album_20251114_070224.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2008_coldplay__viva_la_vida__album_20251116_051553",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.21134946069901311,
+        "lo": 0.43460955563659365,
+        "mid": 0.35404098366439324
+      },
+      "value": 0.44358944455367644
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2646226112621358,
+        "lo": 0.39132520035954693,
+        "mid": 0.34405218837831736
+      },
+      "value": 0.4752203538338835
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2008_coldplay__viva_la_vida__album/2008_coldplay__viva_la_vida__album_20251116_051553.features.json"
+}

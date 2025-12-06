@@ -1,0 +1,24 @@
+{
+  "source_audio": "~/audio/test.wav",
+  "source_mtime": 0.0,
+  "sample_rate": 44100,
+  "duration_sec": 180.0,
+  "tempo_bpm": 120.0,
+  "tempo_backend": "stub",
+  "tempo_confidence_score": 0.9,
+  "key": "C",
+  "mode": "minor",
+  "loudness_LUFS": -12.0,
+  "energy": 0.5,
+  "danceability": 0.5,
+  "valence": 0.5,
+  "feature_pipeline_meta": {
+    "source_hash": "abc123",
+    "config_fingerprint": "test",
+    "pipeline_version": "test"
+  },
+  "qa_status": "ok",
+  "qa_gate": "pass",
+  "config_fingerprint": "test",
+  "source_hash": "abc123"
+}

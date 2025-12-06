@@ -1,0 +1,155 @@
+{
+  "profile": "lci_us_pop_v1",
+  "lanes": [
+    {
+      "tier": 1,
+      "era_bucket": "1995_2004",
+      "count": 169,
+      "axes_mean": {
+        "structure_fit": 0.9016463765521632,
+        "prosody_ttc_fit": 0.8379747667369492,
+        "rhyme_texture_fit": 0.5090775411498685,
+        "diction_style_fit": 0.9363783168876286,
+        "pov_fit": 0.8509295832421172,
+        "theme_fit": 0.17107005670611444
+      },
+      "axes_std": {
+        "structure_fit": 0.07237884197491987,
+        "prosody_ttc_fit": 0.10880821638012904,
+        "rhyme_texture_fit": 0.11745205708433765,
+        "diction_style_fit": 0.06161122481425295,
+        "pov_fit": 0.10378996046365606,
+        "theme_fit": 0.003881946884799106
+      },
+      "lci_score_mean": 0.6310265638338838,
+      "lci_score_std": 0.07642394544175915,
+      "ttc_seconds_mean": null,
+      "ttc_seconds_std": null
+    },
+    {
+      "tier": 1,
+      "era_bucket": "2005_2014",
+      "count": 356,
+      "axes_mean": {
+        "structure_fit": 0.8957638501014215,
+        "prosody_ttc_fit": 0.8427367042681341,
+        "rhyme_texture_fit": 0.5126498157805365,
+        "diction_style_fit": 0.9302793353313796,
+        "pov_fit": 0.8169127765337061,
+        "theme_fit": 0.17058810861423226
+      },
+      "axes_std": {
+        "structure_fit": 0.08431805424655807,
+        "prosody_ttc_fit": 0.09967935882836285,
+        "rhyme_texture_fit": 0.11534860812988879,
+        "diction_style_fit": 0.06427704966312085,
+        "pov_fit": 0.14167995817116044,
+        "theme_fit": 0.004214044124836024
+      },
+      "lci_score_mean": 0.6151549483409617,
+      "lci_score_std": 0.10038466462970089,
+      "ttc_seconds_mean": null,
+      "ttc_seconds_std": null
+    },
+    {
+      "tier": 1,
+      "era_bucket": "2015_2024",
+      "count": 504,
+      "axes_mean": {
+        "structure_fit": 0.8950963420903847,
+        "prosody_ttc_fit": 0.8420527738448516,
+        "rhyme_texture_fit": 0.5151589269484534,
+        "diction_style_fit": 0.926727766989031,
+        "pov_fit": 0.8303833205272713,
+        "theme_fit": 0.17020986689814818
+      },
+      "axes_std": {
+        "structure_fit": 0.07531019773472696,
+        "prosody_ttc_fit": 0.09757791308834059,
+        "rhyme_texture_fit": 0.12584593637500147,
+        "diction_style_fit": 0.0773567676026187,
+        "pov_fit": 0.12993676062523754,
+        "theme_fit": 0.0036287142229415796
+      },
+      "lci_score_mean": 0.6192816078825615,
+      "lci_score_std": 0.09424230294958913,
+      "ttc_seconds_mean": null,
+      "ttc_seconds_std": null
+    },
+    {
+      "tier": 2,
+      "era_bucket": "2015_2024",
+      "count": 771,
+      "axes_mean": {
+        "structure_fit": 0.9009974524622061,
+        "prosody_ttc_fit": 0.8396144173840189,
+        "rhyme_texture_fit": 0.5226233332816099,
+        "diction_style_fit": 0.927142572220902,
+        "pov_fit": 0.8047172230493378,
+        "theme_fit": 0.1701633187418937
+      },
+      "axes_std": {
+        "structure_fit": 0.07129769890399079,
+        "prosody_ttc_fit": 0.09999918549678843,
+        "rhyme_texture_fit": 0.12396038678764523,
+        "diction_style_fit": 0.06576741374470503,
+        "pov_fit": 0.15504898180907176,
+        "theme_fit": 0.0033129001340191197
+      },
+      "lci_score_mean": 0.6130585708997568,
+      "lci_score_std": 0.10165926810198699,
+      "ttc_seconds_mean": null,
+      "ttc_seconds_std": null
+    },
+    {
+      "tier": 2,
+      "era_bucket": "2005_2014",
+      "count": 489,
+      "axes_mean": {
+        "structure_fit": 0.9045635593107342,
+        "prosody_ttc_fit": 0.8513204861945082,
+        "rhyme_texture_fit": 0.5117119122296235,
+        "diction_style_fit": 0.9389555342927033,
+        "pov_fit": 0.8279301535082216,
+        "theme_fit": 0.17050393234492167
+      },
+      "axes_std": {
+        "structure_fit": 0.07894832162399094,
+        "prosody_ttc_fit": 0.10057846947661819,
+        "rhyme_texture_fit": 0.11983389085345139,
+        "diction_style_fit": 0.05559226065183394,
+        "pov_fit": 0.14137882922082756,
+        "theme_fit": 0.0045446141918713
+      },
+      "lci_score_mean": 0.62985751598072,
+      "lci_score_std": 0.09112980726021885,
+      "ttc_seconds_mean": null,
+      "ttc_seconds_std": null
+    },
+    {
+      "tier": 2,
+      "era_bucket": "1995_2004",
+      "count": 195,
+      "axes_mean": {
+        "structure_fit": 0.9168398405126166,
+        "prosody_ttc_fit": 0.835978445921813,
+        "rhyme_texture_fit": 0.5352899118456425,
+        "diction_style_fit": 0.9308908448270624,
+        "pov_fit": 0.8563861608439904,
+        "theme_fit": 0.17034847222222227
+      },
+      "axes_std": {
+        "structure_fit": 0.06771745102394437,
+        "prosody_ttc_fit": 0.10251712452584616,
+        "rhyme_texture_fit": 0.11051454123755357,
+        "diction_style_fit": 0.0662856892805206,
+        "pov_fit": 0.12117048586200457,
+        "theme_fit": 0.003298430395859451
+      },
+      "lci_score_mean": 0.646868004437526,
+      "lci_score_std": 0.07764619202326709,
+      "ttc_seconds_mean": null,
+      "ttc_seconds_std": null
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2019_lizzo__truth_hurts__album_20251114_070955",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.524191455277818,
+        "lo": 0.20189036848835762,
+        "mid": 0.2739181762338245
+      },
+      "value": 0.622899898800729
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.31281646783463474,
+        "lo": 0.3961925911429228,
+        "mid": 0.2909909410224424
+      },
+      "value": 0.49062798639924526
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/07_echo_2015_19/2019_lizzo__truth_hurts__album/2019_lizzo__truth_hurts__album_20251114_070955.features.json"
+}

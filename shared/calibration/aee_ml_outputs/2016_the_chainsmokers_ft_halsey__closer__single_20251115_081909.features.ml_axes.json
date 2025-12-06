@@ -1,0 +1,31 @@
+{
+  "audio_name": "2016_the_chainsmokers_ft_halsey__closer__single_20251115_081909",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.1839089883757426,
+        "lo": 0.48369153844716156,
+        "mid": 0.33239947317709584
+      },
+      "value": 0.4192606843973614
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3043208882878641,
+        "lo": 0.31617093718989125,
+        "mid": 0.3795081745222447
+      },
+      "value": 0.5116610297437851
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_0/2016_the_chainsmokers_ft_halsey__closer__single/2016_the_chainsmokers_ft_halsey__closer__single_20251115_081909.features.json"
+}

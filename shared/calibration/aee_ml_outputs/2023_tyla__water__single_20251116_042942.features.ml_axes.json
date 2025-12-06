@@ -1,0 +1,31 @@
+{
+  "audio_name": "2023_tyla__water__single_20251116_042942",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3883941624842568,
+        "lo": 0.28524104565103375,
+        "mid": 0.3263647918647095
+      },
+      "value": 0.5503656431741798
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2718924143124682,
+        "lo": 0.39827782373954723,
+        "mid": 0.32982976194798447
+      },
+      "value": 0.4756789978874996
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2023_tyla__water__single/2023_tyla__water__single_20251116_042942.features.json"
+}

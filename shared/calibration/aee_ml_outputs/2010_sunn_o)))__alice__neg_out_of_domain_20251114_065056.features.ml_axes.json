@@ -1,0 +1,31 @@
+{
+  "audio_name": "2010_sunn_o)))__alice__neg_out_of_domain_20251114_065056",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.025423535809148724,
+        "lo": 0.3836455887356686,
+        "mid": 0.5909308754551825
+      },
+      "value": 0.39380456091250143
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.807741040122129,
+        "lo": 0.013449297347063488,
+        "mid": 0.17880966253080757
+      },
+      "value": 0.7786745748386261
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/13_negatives_out_of_domain/2010_sunn_o)))__alice__neg_out_of_domain/2010_sunn_o)))__alice__neg_out_of_domain_20251114_065056.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "1982_david_bowie_queen__under_pressure__album_20251114_064339",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.22535694799648207,
+        "lo": 0.45794021340205177,
+        "mid": 0.3167028386014661
+      },
+      "value": 0.44149286777815316
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2987251942161408,
+        "lo": 0.3659672536287386,
+        "mid": 0.33530755215512054
+      },
+      "value": 0.49476364188702765
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/99_legacy_pop_eval/1982_david_bowie_queen__under_pressure__album/1982_david_bowie_queen__under_pressure__album_20251114_064339.features.json"
+}

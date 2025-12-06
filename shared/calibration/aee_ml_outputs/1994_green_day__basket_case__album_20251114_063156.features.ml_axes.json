@@ -1,0 +1,31 @@
+{
+  "audio_name": "1994_green_day__basket_case__album_20251114_063156",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3489263733581529,
+        "lo": 0.3674103178463138,
+        "mid": 0.2836633087955333
+      },
+      "value": 0.5119011353214593
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.32723222002605323,
+        "lo": 0.33055744551886196,
+        "mid": 0.3422103344550848
+      },
+      "value": 0.5153640433534601
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/02_echo_1990_94/1994_green_day__basket_case__album/1994_green_day__basket_case__album_20251114_063156.features.json"
+}

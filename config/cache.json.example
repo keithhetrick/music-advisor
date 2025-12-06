@@ -1,0 +1,4 @@
+{
+  "default_cache_dir": "/tmp/ma_cache",
+  "default_backend": "disk"
+}

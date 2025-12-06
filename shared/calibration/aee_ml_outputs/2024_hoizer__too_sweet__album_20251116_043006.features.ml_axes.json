@@ -1,0 +1,31 @@
+{
+  "audio_name": "2024_hoizer__too_sweet__album_20251116_043006",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3564450858509469,
+        "lo": 0.2851835216830655,
+        "mid": 0.35837139246598765
+      },
+      "value": 0.5392007235429117
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.39373297622240583,
+        "lo": 0.25826715696858127,
+        "mid": 0.347999866809013
+      },
+      "value": 0.5603263945872677
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2024_hoizer__too_sweet__album/2024_hoizer__too_sweet__album_20251116_043006.features.json"
+}

@@ -1,0 +1,25 @@
+{
+  "profile_id": "Alt_Soul_RnB_Echo",
+  "version": "1.0",
+  "description": "Alt-R&B / soul minimalism with 1980s Quiet Storm lineage — intimate space, conversational topline, sub-aware mixing.",
+  "era_lineage": ["Y-40:quiet_storm", "Y-20:neo_rnb_minimal", "Y-10:alt_rnb"],
+  "emotional_palette": [
+    "late_night",
+    "vulnerable",
+    "magnetic",
+    "soft_confrontation"
+  ],
+  "production_language": [
+    "pad_pillow",
+    "dry_vocal_lead",
+    "808_floor",
+    "nocturne_fx"
+  ],
+  "rhythmic_bias": ["swing_hip", "half_time_glide", "loose_pocket"],
+  "harmonic_tendencies": ["minor7_stacks", "ii-V_feels", "color_extensions"],
+  "vocal_shape": ["whisper_confide", "micro_riff", "adlib_trails"],
+  "reference_frames": {
+    "artists": ["SZA", "Daniel Caesar", "H.E.R."],
+    "eras": ["Anita Baker/Quiet Storm aesthetics"]
+  }
+}

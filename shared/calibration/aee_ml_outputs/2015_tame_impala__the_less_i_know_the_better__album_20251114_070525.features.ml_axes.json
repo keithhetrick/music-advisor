@@ -1,0 +1,31 @@
+{
+  "audio_name": "2015_tame_impala__the_less_i_know_the_better__album_20251114_070525",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2934625281578117,
+        "lo": 0.3965248285842151,
+        "mid": 0.31001264325797306
+      },
+      "value": 0.4837544362799695
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3051332101987005,
+        "lo": 0.36507507097942843,
+        "mid": 0.3297917188218711
+      },
+      "value": 0.4972741022757166
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/07_echo_2015_19/2015_tame_impala__the_less_i_know_the_better__album/2015_tame_impala__the_less_i_know_the_better__album_20251114_070525.features.json"
+}

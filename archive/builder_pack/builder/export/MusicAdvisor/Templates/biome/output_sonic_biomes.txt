@@ -1,0 +1,8 @@
+SONIC BIOME
+Lane: {{lane}}
+
+Neighbors: {{neighbors.join(', ')}}
+Palette  : {{palette.join(', ')}}
+Space    : {{space}}
+
+Note: {{note}}

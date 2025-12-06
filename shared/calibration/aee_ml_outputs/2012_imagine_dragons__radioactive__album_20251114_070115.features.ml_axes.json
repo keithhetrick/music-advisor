@@ -1,0 +1,31 @@
+{
+  "audio_name": "2012_imagine_dragons__radioactive__album_20251114_070115",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3473200081261965,
+        "lo": 0.3268446360944904,
+        "mid": 0.3258353557793131
+      },
+      "value": 0.5235086120158217
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2960819438095744,
+        "lo": 0.40830162773397916,
+        "mid": 0.29561642845644653
+      },
+      "value": 0.48113819201315733
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/06_echo_2010_14/2012_imagine_dragons__radioactive__album/2012_imagine_dragons__radioactive__album_20251114_070115.features.json"
+}

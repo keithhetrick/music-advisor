@@ -1,0 +1,31 @@
+{
+  "audio_name": "2010_eminem_rihanna__love_the_way_you_lie__album_20251114_070159",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3125505654297988,
+        "lo": 0.32076541630646893,
+        "mid": 0.3666840182637323
+      },
+      "value": 0.513163073008489
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3173328623379499,
+        "lo": 0.38713082457121034,
+        "mid": 0.2955363130908397
+      },
+      "value": 0.4949272544469193
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/06_echo_2010_14/2010_eminem_rihanna__love_the_way_you_lie__album/2010_eminem_rihanna__love_the_way_you_lie__album_20251114_070159.features.json"
+}

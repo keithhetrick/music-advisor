@@ -1,0 +1,27 @@
+# Templates/ingest_help.txt
+FREE-FIRST INGEST (Pasteboard)
+
+Supported commands:
+- /ingest json   → paste a JSON array/object (auto-bucket by keys)
+- /ingest csv    → paste CSV with headers; auto-map to a fact table
+- /ingest status → show row counts by table
+- /ingest clear  → reset in-memory warehouse
+
+CSV header signatures (match these headers):
+1) fact_daily_metrics:
+   metric_date, platform, track_id, isrc, region, streams, unique_listeners, skips, completes, saves, playlist_adds, paid_ratio
+2) fact_audio_features:
+   track_id, isrc, bpm, key, mode, loudness_lufs, energy, danceability, valence, rhythm_profile
+3) fact_lyrics_features:
+   track_id, isrc, lyrics
+4) fact_chart_positions:
+   chart_name, metric_date, track_id, position
+5) fact_playlists:
+   playlist_id, playlist_name, platform, followers, track_id, date_added, position
+
+JSON keys auto-bucketing (examples):
+- {"metric_date":"2025-10-29","platform":"spotify","streams":12345,...} → fact_daily_metrics
+- {"track_id":"X","bpm":100,"key":"C#","mode":"minor",...} → fact_audio_features
+- {"track_id":"X","lyrics":"..."} → fact_lyrics_features
+- {"chart_name":"Billboard Hot 100","position":23,...} → fact_chart_positions
+- {"playlist_id":"ABC","track_id":"X",...} → fact_playlists

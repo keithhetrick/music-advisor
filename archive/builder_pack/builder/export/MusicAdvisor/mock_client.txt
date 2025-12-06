@@ -1,0 +1,3 @@
+# STRUCTURE_POLICY: mode=optional | reliable=false | use_ttc=true | use_exposures=false
+# GOLDILOCKS_POLICY: active=true | priors={'Market': 0.5, 'Emotional': 0.5} | caps={'Market': 0.58, 'Emotional': 0.58}
+/audio map pack region=US profile=Pop

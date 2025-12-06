@@ -1,0 +1,59 @@
+default:
+  tone: friendly
+  primary_slices: ["hci", "axes", "optimization", "historical"]
+  quick_actions:
+    compare: "Compare to previous"
+    plan: "Show plan"
+    health: "Show status"
+  phrasing:
+    structure: "Structure highlights:"
+    groove: "Groove/dance highlights:"
+    loudness: "Loudness notes:"
+    mood: "Mood/valence notes:"
+    historical: "Historical echo notes:"
+    optimization: "Ideas to try:"
+    plan: "Plan:"
+    compare: "Comparison:"
+    summarize: "Summary:"
+    expand: "Details:"
+    summarize: "Summary:"
+    expand: "Details:"
+    capabilities: "Capabilities:"
+producer_advisor_v1:
+  tone: friendly
+  primary_slices: ["axes", "optimization", "hci", "historical"]
+  quick_actions:
+    compare: "Compare to previous"
+    plan: "Show plan"
+    health: "Show status"
+  phrasing:
+    structure: "Structure highlights:"
+    groove: "Groove/dance highlights:"
+    loudness: "Loudness notes:"
+    mood: "Mood/valence notes:"
+    historical: "Historical echo notes:"
+    optimization: "Ideas to try:"
+    plan: "Plan:"
+    compare: "Comparison:"
+    summarize: "Summary:"
+    expand: "Details:"
+    capabilities: "Capabilities:"
+mix_engineer_v1:
+  tone: direct
+  primary_slices: ["loudness", "structure", "hci", "optimization"]
+  quick_actions:
+    compare: "Compare to previous"
+    plan: "Show plan"
+    health: "Show status"
+  phrasing:
+    structure: "Structure:"
+    groove: "Groove:"
+    loudness: "Loudness:"
+    mood: "Mood:"
+    historical: "Historical:"
+    optimization: "Do this next:"
+    plan: "Plan:"
+    compare: "Comparison:"
+    summarize: "Summary:"
+    expand: "Details:"
+    capabilities: "Capabilities:"

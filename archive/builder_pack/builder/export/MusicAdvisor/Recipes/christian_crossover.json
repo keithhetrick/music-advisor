@@ -1,0 +1,14 @@
+{
+  "tempo_band_bpm": [70, 98],
+  "arrangement": [
+    "intro (pad/piano)",
+    "verse",
+    "pre (lift)",
+    "anthemic chorus",
+    "bridge (tagline)",
+    "final chorus"
+  ],
+  "mix_focus": ["clear lead", "stacked harmonies", "dynamic lift"],
+  "lyric_motifs": ["hope", "gratitude", "overcoming"],
+  "radio_legibility_target": 0.78
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2000_coldplay__yellow__album_20251116_041728",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2951243054312755,
+        "lo": 0.3588602402723859,
+        "mid": 0.3460154542963386
+      },
+      "value": 0.49563543481923067
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4035102595863684,
+        "lo": 0.2186831217473366,
+        "mid": 0.37780661866629495
+      },
+      "value": 0.5756236543310279
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2000_coldplay__yellow__album/2000_coldplay__yellow__album_20251116_041728.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2007_rihanna_jay_z__umbrella__album_20251115_081629",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3414669143717723,
+        "lo": 0.3302982809947253,
+        "mid": 0.3282348046335024
+      },
+      "value": 0.5204239357317026
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4113196201952757,
+        "lo": 0.19909759701786228,
+        "mid": 0.3895827827868619
+      },
+      "value": 0.5842325879629877
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_0/2007_rihanna_jay_z__umbrella__album/2007_rihanna_jay_z__umbrella__album_20251115_081629.features.json"
+}

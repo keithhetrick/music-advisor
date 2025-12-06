@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GenrePresetProfile",
+  "type": "object",
+  "required": [
+    "profile_id",
+    "version",
+    "description",
+    "era_lineage",
+    "emotional_palette"
+  ],
+  "properties": {
+    "profile_id": { "type": "string" },
+    "version": { "type": "string" },
+    "description": { "type": "string" },
+    "era_lineage": { "type": "array", "items": { "type": "string" } },
+    "emotional_palette": { "type": "array", "items": { "type": "string" } },
+    "production_language": { "type": "array", "items": { "type": "string" } },
+    "rhythmic_bias": { "type": "array", "items": { "type": "string" } },
+    "harmonic_tendencies": { "type": "array", "items": { "type": "string" } },
+    "vocal_shape": { "type": "array", "items": { "type": "string" } },
+    "reference_frames": {
+      "type": "object",
+      "properties": {
+        "artists": { "type": "array", "items": { "type": "string" } },
+        "eras": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

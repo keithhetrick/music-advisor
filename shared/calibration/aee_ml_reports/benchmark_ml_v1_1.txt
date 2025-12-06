@@ -1,0 +1,247 @@
+=== ML Benchmark vs benchmark_truth.csv (1:1 allowlist) ===
+
+Truth rows in CSV (allowlist): 100
+Truth rows with ML sidecars:   100
+Truth rows missing ML:         0
+
+Energy axis:
+  n_total   = 100
+  n_correct = 31
+  accuracy  = 0.310
+
+Confusion matrix for Energy (truth rows, predicted cols):
+  truth \ pred	lo	mid	hi
+  lo	3	0	5
+  mid	19	3	27
+  hi	12	6	25
+
+Danceability axis:
+  n_total   = 100
+  n_correct = 39
+  accuracy  = 0.390
+
+Confusion matrix for Danceability (truth rows, predicted cols):
+  truth \ pred	lo	mid	hi
+  lo	14	2	8
+  mid	21	4	16
+  hi	10	4	21
+
+All truth songs had at least one ML sidecar.
+
+Tracks with ML sidecars but no matching truth row (unlabeled, not scored):
+  - 1. Sabrina Carpenter - Espresso_20251114_061725
+  - 10. Lady Gaga, Bruno Mars - Die With A Smile_20251114_061002
+  - 11. Artemas - I Like The Way You Kiss Me_20251114_061015
+  - 12. Ariana Grande - We Can't Be Friends (Wait For Your Love)_20251114_061024
+  - 13. Sabrina Carpenter - Please Please Please_20251114_061037
+  - 14. Chappell Roan - Good Luck, Babe!_20251114_061048
+  - 15. Tate McRae - Greedy_20251114_061102
+  - 16. Tommy Richman - MILLION DOLLAR BABY_20251114_061111
+  - 17. Jimin - Who_20251114_061121
+  - 18. Shaboozey - A Bar Song (Tipsy)_20251114_061131
+  - 19. Feid, ATL Jacob - LUNA_20251114_061141
+  - 1966_the_mamas_and_the_papas__california_dreamin__album_20251114_064417
+  - 1970_creedence_clearwater_revival__have_you_ever_seen_the_rain__album_20251114_064107
+  - 1975_queen__bohemian_rhapsody__album_20251114_064116
+  - 1977_electric_light_orchestra__mr_blue_sky__album_20251114_064208
+  - 1977_fleetwood_mac__dreams__album_20251114_063603
+  - 1979_ac_dc__highway_to_hell__album_20251114_064225
+  - 1979_queen__dont_stop_me_now__album_20251114_064251
+  - 1980_ac_dc__back_in_black__album_20251114_064302
+  - 1980_queen__another_one_bites_the_dust__album_20251114_064315
+  - 1981_journey__dont_stop_believin__album_20251114_064326
+  - 1982_david_bowie_queen__under_pressure__album_20251114_064339
+  - 1983_eurythmics__sweet_dreams__album_20251114_064405
+  - 1983_metallica__seek_and_destroy__neg_out_of_domain_20251114_065017
+  - 1983_the_police__every_breath_you_take__album_20251114_063631
+  - 1985_dire_straits__money_for_nothing__single_20251114_062532
+  - 1986_metallica__master_of_puppets__neg_out_of_domain_20251114_064607
+  - 1986_peter_gabriel__sledgehammer__album_20251114_062615
+  - 1987_george_michael__faith__album_20251114_062630
+  - 1988_bobby_mcferrin__dont_worry_be_happy__album_20251114_062714
+  - 1988_guns_n_roses__sweet_child_o_mine__album_20251114_062731
+  - 1988_roxette__listen_to_your_heart__album_20251114_062750
+  - 1989_madonna__like_a_prayer__single_20251114_062808
+  - 1989_madonna__like_a_prayer__single_20251114_063701
+  - 1989_phil_collins__another_day_in_paradise__album_20251114_062826
+  - 1990_madonna__vogue__album_20251114_063217
+  - 1990_vanilla_ice__ice_ice_baby__single_20251114_062926
+  - 1991_mariah_carey__emotions__album_20251114_062940
+  - 1991_metallica__enter_sandman__neg_out_of_domain_20251114_064634
+  - 1991_michael_jackson__black_or_white__album_20251114_062954
+  - 1991_r_e_m__losing_my_religion__album_20251114_063008
+  - 1991_whitney_houston__i_will_always_love_you__single_20251114_063021
+  - 1992_aphex_twin__digeridoo__neg_out_of_domain_20251114_064651
+  - 1992_dr_dre__nuthin_but_a_g_thang__album_20251114_063051
+  - 1993_ace_of_base__the_sign__album_20251114_063103
+  - 1993_aerosmith__cryin__album_20251114_063113
+  - 1993_celine_dion__the_power_of_love__album_20251114_063127
+  - 1994_green_day__basket_case__album_20251114_063156
+  - 1994_mariah_carey__all_i_want_for_christmas_is_you__album_20251114_063205
+  - 1994_mariah_carey__without_you__album_20251114_063733
+  - 1994_tlc__waterfalls__album_20251114_063246
+  - 1995_coolio__gangstas_paradise__album_20251114_063543
+  - 1995_los_del_rio__macarena__neg_novelty_20251114_064554
+  - 1995_mariah_carey__always_be_my_baby__album_20251114_063300
+  - 1995_slipknot__sic__neg_out_of_domain_20251114_064712
+  - 1996_fugees__killing_me_softly__album_20251114_063343
+  - 1996_tool__stinkfist__neg_out_of_domain_20251114_064723
+  - 1997_eiffel_65__blue_da_ba_dee__album_20251114_063745
+  - 1997_elton_john__candle_in_the_wind_1997__album_20251114_063411
+  - 1997_third_eye_blind__semi_charmed_life__album_20251114_063424
+  - 1998_cher__believe__album_20251114_063453
+  - 1998_neutral_milk_hotel__communist_daughter__neg_out_of_domain_20251114_064737
+  - 1998_neutral_milk_hotel__oh_comely__neg_out_of_domain_20251114_064745
+  - 1998_neutral_milk_hotel__the_fool__neg_out_of_domain_20251114_064808
+  - 1998_neutral_milk_hotel__untitled__neg_out_of_domain_20251114_064815
+  - 1999_and_you_know_us_by_the_trail_of_dead__up_from_redemption__neg_out_of_domain_20251114_064822
+  - 1999_britney_spears__baby_one_more_time__album_20251114_063505
+  - 1999_santana__smooth__album_20251114_063516
+  - 2. Benson Boone - Beautiful Things_20251114_060828
+  - 20. Kendrick Lamar - Not Like Us_20251114_061153
+  - 2000_eminem__stan__album_20251114_063759
+  - 2000_eminem__the_real_slim_shady__album_20251114_065304
+  - 2000_tool__schism__neg_out_of_domain_20251114_064825
+  - 2001_kylie_minogue__cant_get_you_out_of_my_head__single_20251114_065323
+  - 2001_squarepusher__my_red_hot_car__neg_out_of_domain_20251114_064844
+  - 2001_u2__beautiful_day__album_20251114_065337
+  - 2002_kelly_clarkson__a_moment_like_this__album_20251114_065403
+  - 2002_nelly__hot_in_herre__album_20251114_065414
+  - 2003_britney_spears__toxic__album_20251114_065436
+  - 2003_the_mars_volta__drunkship_of_lanterns__neg_out_of_domain_20251114_064857
+  - 2003_the_mars_volta__tira_me_a_las_aranas__neg_out_of_domain_20251114_064917
+  - 2004_green_day__american_idiot__album_20251114_065458
+  - 2004_maroon_5__this_love__album_20251114_065516
+  - 2005_crazy_frog__axel_f__neg_novelty_20251114_064452
+  - 2005_gorillaz__feel_good_inc__album_20251114_065833
+  - 2005_kanye_west__gold_digger__album_20251114_065551
+  - 2005_shakira_wyclef_jean__hips_dont_lie__album_20251114_065601
+  - 2006_amy_winehouse__rehab__album_20251114_065612
+  - 2006_animal_collective__peacebone__neg_out_of_domain_20251114_064923
+  - 2006_beyonce__irreplaceable__album_20251114_065622
+  - 2006_fergie__big_girls_dont_cry_personal__album_20251114_065633
+  - 2006_justin_timberlake__sexy_back__album_20251114_065646
+  - 2007_amy_winehouse__back_to_black__album_20251114_063820
+  - 2008_beyonce__halo__album_20251114_065711
+  - 2008_beyonce__single_ladies_put_a_ring_on_it__album_20251114_065724
+  - 2008_katy_perry__i_kissed_a_girl__album_20251114_065747
+  - 2008_kings_of_leon__use_somebody__album_20251114_065756
+  - 2008_meshuggah__bleed__neg_out_of_domain_20251114_064939
+  - 2009_animals_as_leaders__on_impulse__neg_out_of_domain_20251114_064959
+  - 2010_avenged_sevenfold__nightmare__neg_out_of_domain_20251114_065037
+  - 2010_bruno_mars__just_the_way_you_are__album_20251114_062402
+  - 2010_eminem_rihanna__love_the_way_you_lie__album_20251114_070159
+  - 2010_katy_perry__last_friday_night_tgif__album_20251114_065855
+  - 2010_kesha__tik_tok__album_20251114_065907
+  - 2010_sunn_o)))__alice__neg_out_of_domain_20251114_065056
+  - 2010_taio_cruz__dynamite__single_20251114_065918
+  - 2011_adele__rolling_in_the_deep__album_20251114_065928
+  - 2011_calvin_harris_rihanna__we_found_love__album_20251114_065954
+  - 2011_maroon_5_christina_aguilera__moves_like_jagger__album_20251114_070018
+  - 2011_rebecca_black__friday__neg_novelty_20251114_064502
+  - 2012_bruno_mars__locked_out_of_heaven__album_20251114_070029
+  - 2012_fun_janelle_monae__we_are_young__album_20251114_070102
+  - 2012_imagine_dragons__radioactive__album_20251114_070115
+  - 2012_pitbull_kesha__timber__album_20251114_070125
+  - 2012_psy__gangnam_style__neg_novelty_20251114_064514
+  - 2012_taylor_swift__we_are_never_ever_getting_back_together__album_20251114_070136
+  - 2013_baauer__harlem_shake__neg_novelty_20251114_064527
+  - 2013_daft_punk_pharrell_williams__get_lucky__album_20251114_063833
+  - 2013_daft_punk_pharrell_williams__get_lucky__album_20251116_051446
+  - 2013_katy_perry__dark_horse__album_20251114_070213
+  - 2013_katy_perry__roar__album_20251114_070224
+  - 2013_one_republic__counting_stars__album_20251114_070246
+  - 2013_robin_thicke_pharrell_williams_ti__blurred_lines__album_20251114_070259
+  - 2013_ylvis__the_fox_what_does_the_fox_say__neg_novelty_20251114_064537
+  - 2014_meghan_trainor__all_about_that_bass__album_20251114_070323
+  - 2014_pharrell__happy__album_20251114_070332
+  - 2014_taylor_swift__blank_space__album_20251114_070353
+  - 2014_taylor_swift__wildest_dreams__album_20251114_070428
+  - 2015_dj_snake_major_lazer_mø__lean_on__single_20251114_070440
+  - 2015_justin_bieber__sorry__album_20251114_070501
+  - 2015_mark_ronson_bruno_mars__uptown_funk__album_20251114_070511
+  - 2015_tame_impala__the_less_i_know_the_better__album_20251114_070525
+  - 2015_the_weeknd_cant_feel_my_face__album_20251114_070536
+  - 2016_bruno_mars__thats_what_i_like__album_20251114_070547
+  - 2016_calvin_harris_rihanna__this_is_what_you_came_for__album_20251114_070558
+  - 2016_dj_snake_justin_bieber__let_me_love_you__album_20251114_070609
+  - 2016_drake_rihanna__work__album_20251114_070629
+  - 2016_pinkfong__baby_shark__neg_novelty_20251114_064548
+  - 2016_the_chainsmokers_daya__dont_let_me_down__single_20251114_070640
+  - 2016_the_chainsmokers_halsey__closer__single_20251114_070650
+  - 2016_the_weeknd_daft_punk__starboy__album_20251114_062113
+  - 2017_dua_lipa__new_rules__album_20251114_070712
+  - 2017_ed_sheeran__perfect__album_20251114_062126
+  - 2017_ed_sheeran__shape_of_you__single_20251114_063852
+  - 2017_j_balvin_willy_william__mi_gente__album_20251114_064425
+  - 2017_kygo_selena_gomez__it_aint_me__single_20251114_070723
+  - 2017_the_chainsmokers__paris__album_20251114_070734
+  - 2017_the_chainsmokers_coldplay__something_just_like_this__album_20251114_070800
+  - 2018_camila_cabello_young_thug__havana__album_20251114_063931
+  - 2018_dj_snake_ozuna_selena_gomez_cardi_b__taki_taki__single_20251114_070823
+  - 2019_100_gecs__money__machine__neg_out_of_domain_20251114_065147
+  - 2019_ariana_grande__7_rings__album_20251114_070855
+  - 2019_ariana_grande__thank_u_next__album_20251114_070904
+  - 2019_billie_eilish__bad_guy__single_20251114_062205
+  - 2019_camila_cabello_shawn_mendes__senorita__single_20251114_070925
+  - 2019_kygo_whitney_houston__higher_love__single_20251114_070935
+  - 2019_lil_nas_x_billy_ray_cyrus__old_town_road__album_20251114_070947
+  - 2019_lizzo__truth_hurts__album_20251114_070955
+  - 2019_luis_fonsi_daddy_yankee__despacito__album_20251114_063943
+  - 2019_post_malone__circles__album_20251114_062227
+  - 2019_post_malone_swae_lee__sunflower__album_20251114_062238
+  - 2019_taylor_swift__cruel_summer__album_20251114_062247
+  - 2019_taylor_swift__cruel_summer__album_20251114_063904
+  - 2020_bad_bunny_jhay_cortez__dakiti__album_20251114_063955
+  - 2020_bts__dynamite__album_20251114_071230
+  - 2020_dua_lipa__dont_start_now__album_20251114_062256
+  - 2020_the_weeknd_ariana_grande__save_your_tears__album_20251114_071024
+  - 2021_doja_cat__woman__album_20251114_071034
+  - 2021_justin_bieber_daniel_caesar_giveon__peaches__album_20251114_071043
+  - 2021_kid_laroi_justin_bieber__stay__album_20251114_062328
+  - 2021_olivia_rodrigo__good_4_u__album_20251114_071054
+  - 2022_lizzo__about_damn_time__album_20251114_071103
+  - 2022_metro_boomin_the_weeknd_21_savage__creepin__album_20251114_071113
+  - 2022_taylor_swift__antihero__album_20251114_071136
+  - 2023_grupo_frontera_bad_bunny__un_x100to__album_20251114_064022
+  - 2023_lady_gaga_bruno_mars__die_with_a_smile__album_20251114_071147
+  - 2023_sza__kill_bill__album_20251114_062433
+  - 2025_bad_bunny__debi_tirar_mas_fotos__album_20251114_064033
+  - 2025_justin_bieber__daisies__album_20251114_062501
+  - 21. Mitski - My Love Mine All Mine_20251114_061208
+  - 22. Artic Monkeys - I Wanna Be Yours_20251114_061217
+  - 23. Noah Kahan - Stick Season_20251114_061227
+  - 24. Lord Huron - The Night We Met_20251114_061237
+  - 25. Post Malone, Morgan Wallen - I Had Some Help (feat. Morgan Wallen)_20251114_061248
+  - 26. The Neighbourhood - Sweater Weather_20251114_061258
+  - 27. Travis Scott, Playboi Carti - FE!N (feat. Playboi Carti)_20251114_061310
+  - 28. Jung Kook, Latto - Seven (feat. Latto)_20251114_061320
+  - 29. Taylor Swift, Post Malone - Fornight (feat. Post Malone)_20251114_061329
+  - 3. Billie Eilish - BIRDS OF A FEATHER_20251114_060839
+  - 30. KAROL G - Si Antes Te Hubiera Conocido_20251114_061341
+  - 31. Harry Styles - As It Was_20251114_061352
+  - 32. Xavi - La Diabla_20251114_061401
+  - 33. The Weeknd, Daft Punk - Starboy_20251114_061410
+  - 34. Jung Kook - Standing Next To You_20251114_061423
+  - 35. Dasha - Austin (Boots Stop Workin')_20251114_061434
+  - 36. Tyler, The Creator, Kali Uchis - See You Again (feat. Kali Uchis)_20251114_061443
+  - 37. SZA - Kill Bill_20251114_061452
+  - 38. Coldplay - Yellow_20251114_061501
+  - 39. Tom Odell - Another Love_20251114_061515
+  - 4. FloyyMenor, Cris Mj - Gata Only_20251114_060851
+  - 40. Miley Cyrus - Flowers_20251114_061527
+  - 41. ¥$, Kanye West, Ty Dolla Sign - CARNIVAL_20251114_061538
+  - 42. Natasha Bedingfield - Unwritten_20251114_061551
+  - 43. Zach Bryan, Kacey Musgraves - I Remember Everything (feat. Kacey Musgraves)_20251114_061605
+  - 44. KAROL G, Peso Pluma - QLONA_20251114_061617
+  - 45. SZA - Saturn_20251114_061627
+  - 46. Billie Eilish - LUNCH_20251114_061636
+  - 47. Vance Joy - Riptide_20251114_061645
+  - 48. The Weeknd - Blinding Lights_20251114_061656
+  - 49. Bad Bunny, Feid - PERRO NEGRO_20251114_061706
+  - 5. Teddy Swims - Lose Control_20251114_060903
+  - 50. Tyla - Water_20251114_061715
+  - 6. Djo - End of Beginning_20251114_060914
+  - 7. Hoizer - Too Sweet_20251114_060923
+  - 8. The Weeknd - One of The Girls (with JENNIE, Lily-Rose Depp)_20251114_060937
+  - 9. Taylor Swift - Cruel Summer_20251114_060951

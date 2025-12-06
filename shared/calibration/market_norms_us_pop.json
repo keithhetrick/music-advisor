@@ -1,0 +1,55 @@
+{
+  "cohort_id": "US_Pop_Cal_Baseline_2025Q4",
+  "baseline_id": "US_Pop_Baseline_2025",
+  "region": "US",
+  "profile": "Pop",
+  "effective_utc": "2025-11-03T08:09:45Z",
+  "note": "Auto-generated calibration cohort for US Pop",
+  "packs": [
+    "datahub/packs/pack_100-110_long_ballad.json",
+    "datahub/packs/pack_112-118_mid_synth.json",
+    "datahub/packs/pack_118-122_mid_clean.json",
+    "datahub/packs/pack_122-126_mid_pad.json",
+    "datahub/packs/pack_122-126_mid_fill.json",
+    "datahub/packs/pack_122-126_mid_fill_2.json",
+    "datahub/packs/pack_126-129_short_vocal.json",
+    "datahub/packs/pack_126-129_short_fill.json",
+    "datahub/packs/pack_120-129_mid_fill.json",
+    "datahub/packs/pack_120-129_mid_fill_10.json"
+  ],
+  "Baseline": {
+    "active_profile": "Pop",
+    "effective_utc": "2025-11-03T08:09:45Z",
+    "pinned": true,
+    "note": "Pinned reference for reproducibility"
+  },
+  "Known_Gaps": [],
+  "MARKET_NORMS": {
+    "tempo_bpm_mean": 112.0,
+    "tempo_bpm_std": 14.0,
+    "tempo_band_pref": ["100–109", "110–119", "120–129"],
+    "key_distribution": {
+      "C": 0.06,
+      "D": 0.1,
+      "E": 0.09,
+      "F": 0.08,
+      "G": 0.12,
+      "A": 0.14,
+      "B": 0.04,
+      "Db": 0.05,
+      "Eb": 0.07,
+      "Gb": 0.04,
+      "Ab": 0.1,
+      "Bb": 0.11
+    },
+    "mode_ratio": {
+      "major": 0.74,
+      "minor": 0.26
+    },
+    "runtime_sec_mean": 176.0,
+    "runtime_sec_std": 18.0,
+
+    "loudness_mean": -18.6,
+    "loudness_std": 2.5
+  }
+}

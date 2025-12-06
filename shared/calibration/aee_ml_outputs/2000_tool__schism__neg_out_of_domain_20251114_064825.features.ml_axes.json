@@ -1,0 +1,31 @@
+{
+  "audio_name": "2000_tool__schism__neg_out_of_domain_20251114_064825",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.1399051215936548,
+        "lo": 0.4975282091130339,
+        "mid": 0.3625666692933113
+      },
+      "value": 0.399708329823869
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4411778496790767,
+        "lo": 0.19710944329371743,
+        "mid": 0.36171270702720587
+      },
+      "value": 0.5952794143995617
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/13_negatives_out_of_domain/2000_tool__schism__neg_out_of_domain/2000_tool__schism__neg_out_of_domain_20251114_064825.features.json"
+}

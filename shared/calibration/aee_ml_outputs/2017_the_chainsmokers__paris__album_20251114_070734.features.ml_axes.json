@@ -1,0 +1,31 @@
+{
+  "audio_name": "2017_the_chainsmokers__paris__album_20251114_070734",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.31975963725694295,
+        "lo": 0.3790836724489474,
+        "mid": 0.3011566902941096
+      },
+      "value": 0.4981907713052458
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3416285326617005,
+        "lo": 0.312464797711938,
+        "mid": 0.3459066696263615
+      },
+      "value": 0.5258305471180138
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/07_echo_2015_19/2017_the_chainsmokers__paris__album/2017_the_chainsmokers__paris__album_20251114_070734.features.json"
+}

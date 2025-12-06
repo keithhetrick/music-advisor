@@ -1,0 +1,152 @@
+# Router/Router_OptimizationLayer.patch.yaml  (compat-upgrade)
+router:
+  hooks:
+    advisor_run_full_complete:
+      - name: build_optimization_plan
+        action: |
+          import json
+          def read_cfg():
+            try:
+              txt = read_text("norms/2025/optimization.json")
+              return json.loads(txt)
+            except:
+              return {}
+          cfg = read_cfg()
+
+          def cfg_get(*path, default=None):
+            cur = cfg
+            for p in path:
+              if not isinstance(cur, dict) or p not in cur:
+                return default
+              cur = cur[p]
+            return cur if cur is not None else default
+
+          pack    = context.get("current_pack") or {}
+          advisor = context.get("advisor_result") or {}
+          trends  = context.get("current_trend_signals") or []
+          gaps    = pack.get("Known_Gaps") or []
+
+          prof  = (pack.get("MARKET_NORMS") or {}).get("profile")
+          genre = pack.get("genre")
+
+          HT = cfg_get("defaults","historical_threshold", default=0.78)
+          MT = cfg_get("defaults","market_threshold", default=0.78)
+          CT = cfg_get("defaults","cultural_threshold", default=0.78)
+          ST = cfg_get("defaults","sonic_threshold", default=0.78)
+          ET = cfg_get("defaults","emotional_threshold", default=0.78)
+          CRT= cfg_get("defaults","creative_threshold", default=0.78)
+
+          def pick(path):
+            v = cfg_get("profiles", prof, *path)
+            if v is None: v = cfg_get("genres", genre, *path)
+            if v is None: v = cfg_get("defaults", *path)
+            return v
+
+          TTC   = pick(("ttc_sec",)) or {"min":5,"max":12,"fallback":8}
+          RUN   = pick(("runtime_sec",)) or {"tighten_if_over":210,"target_min":165,"target_max":195}
+          LUFS  = pick(("loudness_lufs_short_term",)) or {"min":-9.5,"max":-7.5,"target":-8.5}
+          ECHO5 = pick(("echo_bpm_corridor",)) or 5
+
+          def safe(obj, *ks, default=None):
+            cur=obj
+            for k in ks:
+              if not isinstance(cur, dict) or k not in cur: return default
+              cur=cur[k]
+            return cur
+
+          plan = {"targets": [], "quick_fixes": [], "risks": [], "notes": {}}
+
+          H   = safe(advisor,"historical","score",default=0) or 0
+          M   = safe(advisor,"market","score",default=0) or 0
+          C   = safe(advisor,"cultural","score",default=0) or 0
+          S   = safe(advisor,"sonic","score",default=0) or 0
+          E   = safe(advisor,"emotional","score",default=0) or 0
+          Cr  = safe(advisor,"creative","score",default=0) or 0
+          HCI = advisor.get("HCI", 0)
+
+          def need_boost(x, t): return x < t
+
+          if need_boost(H, HT):
+            plan["targets"].append({
+              "layer": "Historical",
+              "goal": f"Improve era-echo fit (±{ECHO5} BPM toward era median)",
+              "actions": [
+                f"Adjust tempo within ±{ECHO5} BPM of era median",
+                "Add 1–2 era-congruent production tags (analog_synth, gated_reverb)",
+                "Align rhythm_profile to period (post-disco, synthpop, trap bounce)"
+              ]
+            })
+
+          if need_boost(M, MT):
+            ttc_target = max(TTC.get("min",5), min(TTC.get("max",12), int(pack.get("ttc_sec") or TTC.get("fallback",8))))
+            plan["targets"].append({
+              "layer": "Market",
+              "goal": "Boost radio legibility & paid-stream conversion",
+              "actions": [
+                f"Move chorus to ≤ {ttc_target}s",
+                f"If runtime >{RUN.get('tighten_if_over',210)}s, tighten to {RUN.get('target_min',165)}–{RUN.get('target_max',195)}s",
+                "Brighten lead-vocal presence (+1–2 dB @ 3–6 kHz); reduce 200–350 Hz mud"
+              ]
+            })
+
+          if need_boost(S, ST):
+            plan["targets"].append({
+              "layer": "Sonic",
+              "goal": "Enhance groove & mobile translation",
+              "actions": [
+                "Sidechain kick/bass for punch",
+                "Mono-check hooks; widen doubles/ad-libs only",
+                f"Target short-term loudness ~ {LUFS.get('target', -8.5)} LUFS (range {LUFS.get('min',-9.5)}..{LUFS.get('max',-7.5)})"
+              ]
+            })
+
+          if need_boost(E, ET):
+            plan["targets"].append({
+              "layer": "Emotional",
+              "goal": "Increase replay intent",
+              "actions": [
+                "Insert micro-hook (2–4s) pre-chorus",
+                "Ad-lib lift + sparkle percussion in final chorus",
+                "Shift lyric to more concrete imagery"
+              ]
+            })
+
+          if need_boost(C, CT):
+            plan["targets"].append({
+              "layer": "Cultural",
+              "goal": "Align with 2025 vernacular",
+              "actions": [
+                "Incorporate one micro-trend fill (pluck gliss, dembow-lite)",
+                "Consider cross-genre collab texture"
+              ]
+            })
+
+          if need_boost(Cr, CRT):
+            plan["targets"].append({
+              "layer": "Creative",
+              "goal": "Differentiate safely",
+              "actions": [
+                "Add distinct FX earcon by :02–:04",
+                "Use one unexpected chord color (bVII, IVmaj7)"
+              ]
+            })
+
+          for g in gaps:
+            if isinstance(g, dict):
+              plan["quick_fixes"].append(f"Resolve: {g.get('field')} (severity {g.get('severity')})")
+
+          if trends:
+            plan["notes"]["trend_suggestion"] = "Add 1 trending tag/texture from snapshots."
+
+          floor = cfg_get("defaults","target_hci_floor", default=0.80)
+          plan["notes"]["target_HCI"] = max(floor, round(HCI + 0.05, 2))
+          context["optimization_plan"] = plan
+
+  commands:
+    - name: optimize
+      patterns: ["/optimize", "/advisor optimize", "/optimization plan"]
+      action: |
+        plan = context.get("optimization_plan") or {}
+        tpl  = read_text("Templates/optimization_report_template_v1.txt")
+        out  = render_template(tpl, {"plan": plan})
+        print_block("OPTIMIZATION_REPORT", out)

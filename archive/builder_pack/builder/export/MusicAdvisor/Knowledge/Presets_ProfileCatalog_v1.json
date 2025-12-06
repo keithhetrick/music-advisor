@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "v1.0.0",
+  "updated_at": "2025-10-29T00:00:00Z",
+  "profiles": [
+    {
+      "id": "US_Pop_2025",
+      "region": "US",
+      "genre": "Pop",
+      "market_norms_profile": "US_Pop_2025",
+      "defaults": {
+        "tempo_band_bpm": 98,
+        "runtime_sec": 180,
+        "ttc_sec": 18,
+        "exposures": 3
+      },
+      "notes": ["midtempo bias", "short TTC for social"]
+    },
+    {
+      "id": "Global_KPop_2025",
+      "region": "Global",
+      "genre": "K-Pop",
+      "market_norms_profile": "Global_KPop_2025",
+      "defaults": {
+        "tempo_band_bpm": 118,
+        "runtime_sec": 172,
+        "ttc_sec": 12,
+        "exposures": 4
+      },
+      "notes": ["double-time grooves", "dance break"]
+    },
+    {
+      "id": "LATAM_Urban_2025",
+      "region": "LATAM",
+      "genre": "Urban",
+      "market_norms_profile": "LATAM_Urban_2025",
+      "defaults": {
+        "tempo_band_bpm": 94,
+        "runtime_sec": 168,
+        "ttc_sec": 14,
+        "exposures": 3
+      },
+      "notes": ["dembo pulse", "rhythm-led"]
+    }
+  ]
+}

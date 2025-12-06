@@ -1,0 +1,31 @@
+{
+  "audio_name": "2022_metro_boomin_the_weeknd_21_savage__creepin__album_20251114_071113",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.1992201220310896,
+        "lo": 0.5052184968359634,
+        "mid": 0.29556138113294694
+      },
+      "value": 0.41816149366009236
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2863996308905469,
+        "lo": 0.3686031944977727,
+        "mid": 0.3449971746116805
+      },
+      "value": 0.4896589124623596
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/08_echo_2020_24/2022_metro_boomin_the_weeknd_21_savage__creepin__album/2022_metro_boomin_the_weeknd_21_savage__creepin__album_20251114_071113.features.json"
+}

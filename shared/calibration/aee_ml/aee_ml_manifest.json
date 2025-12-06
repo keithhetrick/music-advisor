@@ -1,0 +1,47 @@
+{
+  "aee_ml_version": "aee_ml_v0.1",
+  "axis_reports": {
+    "dance": {
+      "axis": "dance",
+      "bands_present": [
+        "lo",
+        "mid",
+        "hi"
+      ],
+      "n_test": 20,
+      "n_train": 80,
+      "test_acc": 0.65,
+      "train_acc": 0.4625
+    },
+    "energy": {
+      "axis": "energy",
+      "bands_present": [
+        "lo",
+        "mid",
+        "hi"
+      ],
+      "n_test": 20,
+      "n_train": 80,
+      "test_acc": 0.25,
+      "train_acc": 0.475
+    }
+  },
+  "band_encoding": {
+    "hi": 2,
+    "lo": 0,
+    "mid": 1
+  },
+  "created_utc": "2025-11-16T07:22:47.037554Z",
+  "feature_keys": [
+    "tempo_bpm",
+    "duration_sec",
+    "loudness_LUFS",
+    "energy",
+    "danceability",
+    "valence"
+  ],
+  "features_root": "/Users/keithhetrick/music-advisor/features_output",
+  "missing_audio_names": [],
+  "n_records": 100,
+  "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "1988_guns_n_roses__sweet_child_o_mine__album_20251114_062731",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.21365160455897514,
+        "lo": 0.40436935678640745,
+        "mid": 0.3819790386546174
+      },
+      "value": 0.45346725455971904
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4287639474885055,
+        "lo": 0.2326716787190332,
+        "mid": 0.3385643737924613
+      },
+      "value": 0.580265878005267
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/01_echo_1985_89/1988_guns_n_roses__sweet_child_o_mine__album/1988_guns_n_roses__sweet_child_o_mine__album_20251114_062731.features.json"
+}

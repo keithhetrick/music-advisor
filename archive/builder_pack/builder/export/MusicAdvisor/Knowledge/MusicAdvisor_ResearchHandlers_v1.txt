@@ -1,0 +1,79 @@
+# Music Advisor — Research Handlers (in-chat, browsing-aware)
+
+GOAL
+Given a query (artist, song concept, niche, trend), scan web sources (press/platforms) and synthesize a RESEARCH_PACK that can be mapped into a validated DATA_PACK.
+
+RESEARCH ENTITIES (lightweight)
+- seed.query: user string
+- seed.region: "US" | "Global" | "LATAM" | ...
+- seed.profile_hint: e.g., "US_Pop_2025"
+- scan.params: { depth:1-3, window_days:30|90|365, platforms:[spotify|tiktok|youtube|press] }
+- sources[]: { url, domain, source_type, date, title, notes, signals }
+- signals: { bpm?, runtime?, ttc?, exposures?, tags[], motifs[], rhythm?, tonal.mode? }
+- aggregate: { tempo_band_bpm_est, runtime_sec_est, ttc_sec_est, exposures_est, production_tags[], lyric_motifs[], rhythm_profile, tonal_profile }
+- confidence: 0..1
+
+COMMANDS
+/research help
+• Print the list and short usage examples.
+
+/research seed "<query>" [region=...] [profile=...]
+• Persist seed (query/region/profile_hint). Reset prior sources.
+
+/research scan [depth=2] [window=90] [platforms=spotify,tiktok,youtube,press]
+• Use browsing for fresh data. Depth increases page coverage and retrieval attempts.
+• Heuristics:
+  - Prefer official/verified domains (billboard.com, rollingstone.com, pitchfork.com, spotifycharts.com, luminate, ifpi, artist/label sites, platform analytics blogs).
+  - Avoid rumor-only or scraped spam.
+  - Limit quotes; store short notes in sources[].notes
+• Extract signals (lightweight):
+  - bpm: if mentioned; else infer from context (“midtempo pop”, “140 BPM dance”) → map to number or null.
+  - runtime: if mentioned; else use norms median for profile_hint.
+  - ttc: infer from platform form factor (short-form: 8–14s; radio/album cuts: 12–22s), only if not found.
+  - exposures: 3–4 default unless repeated exposure cycles are evidenced (e.g., multi-teaser rollouts).
+  - tags: production keywords (trap_hats, analog_synths, guitar_crunch, house_piano, etc.)
+  - motifs: lyric/culture keywords (nostalgia, late_night, romance, empowerment, etc.)
+  - rhythm: "four_on_the_floor" | "half_time_trap" | "double_time_groove" | "dembo_half_time" | null
+  - tonal.mode: major | minor | null
+• Save sources[] with per-source mini confidence based on domain/date/specificity:
+  - domain_weight: 1.0 (primary/official), 0.8 (tier-1 media), 0.6 (blogs/forums)
+  - recency_weight: 1.0 (≤30d), 0.8 (≤90d), 0.6 (≤365d), 0.4 (>365d)
+  - specificity_weight: 1.0 (numeric/technical), 0.7 (qualitative), 0.5 (vague/hype)
+  - source_confidence = mean(weights)
+
+/research compile
+• Aggregate sources → aggregate.* fields:
+  - tempo_band_bpm_est: median numeric, or map qualitative to band (e.g., “midtempo pop” → 90–110 → pick median 100)
+  - runtime_sec_est: median numeric or norms median
+  - ttc_sec_est: median numeric or infer from platform
+  - exposures_est: median or default 3–4
+  - Merge tags/motifs: top 6–10 by frequency × confidence
+  - rhythm_profile: choose most frequent confident rhythm
+  - tonal_profile.mode: choose majority if present
+• Compute research confidence as average of source_confidence with a penalty if <5 credible sources.
+
+/research build pack
+• Map RESEARCH_PACK aggregate → DATA_PACK candidate(s):
+  - region = seed.region || "US"
+  - MARKET_NORMS.profile = seed.profile_hint if set; else infer by region+genre guess (from tags/motifs/platform mix)
+  - tempo_band_bpm = tempo_band_bpm_est || norms.median
+  - runtime_sec = runtime_sec_est || norms.median
+  - ttc_sec = ttc_sec_est || norms.median
+  - exposures = exposures_est || norms.median
+  - production_tags = top tags
+  - lyric_motifs = top motifs
+  - rhythm_profile, tonal_profile.mode
+  - reference_year = current year; reference_eras = [Y-40, Y-30, Y-20, Y-10]
+  - Known_Gaps[] for any inferred fields or weak confidence signals
+• If multiple viable genre/profiles appear (e.g., dance vs. trap-pop), output 2–3 candidates ordered by confidence.
+
+/research preview
+• Print a short lint on candidates: which fields are inferred vs sourced; any missing MVPs; confidence bands.
+
+/research finalize
+• Select the top candidate by confidence, run inline validation (fill medians as needed), then print the final DATA_PACK JSON block.
+
+NOTES
+• If browsing is OFF or rate-limited, fallback to internal Knowledge (norms, fingerprints) and clearly mark Known_Gaps with "source":"fallback".
+• Do not overfit: if extracted BPMs conflict wildly, prefer medians + log Known_Gaps.
+• Always keep outputs concise; print only the structured results and short one-liners.

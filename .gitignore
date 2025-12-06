@@ -1,0 +1,220 @@
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+docs/.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*~
+
+# Editors / IDEs
+.vscode/
+.idea/
+.fleet/
+.vs/
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# Environments
+.env
+.env.*
+.envrc
+.direnv/
+.venv/
+venv/
+ENV/
+env/
+.virtualenv/
+.pyenv
+.python-version
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+*.so
+*.dylib
+*.egg
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+wheelhouse/
+build/
+dist/
+wheels/
+*.manifest
+*.spec
+
+# Testing / coverage
+.coverage
+.coverage.*
+coverage.xml
+coverage-html/
+coverage/
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+.benchmarks/
+.hypothesis/
+*.cover
+*.lcov
+
+# Profiling
+*.prof
+*.pstats
+
+# Type-checking / lint caches
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+.cache/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Logs / temp files
+logs/
+run_logs/
+*.log
+*.log.*
+*.out
+*.err
+*.pid
+*.pid.lock
+*.tmp
+*.swp
+*.swo
+*.lock
+*.bak
+*.orig
+*.~*
+
+# Project outputs
+features_output/
+.ma_cache/
+.ma_helper/
+
+# Mac / Xcode builds
+DerivedData/
+*.xcworkspace
+*.xcuserstate
+xcuserdata/
+*.xcuserdatad
+*.xccheckout
+*.xcscmblueprint
+*.moved-aside
+*.app
+*.dmg
+*.pkg
+*.ipa
+
+# Docker / containers
+.docker/
+.docker-build/
+docker-compose.override.yml
+.docker-compose.local.yml
+docker-compose.local.yml
+.docker-compose.*.yml
+.docker-env
+
+# Secrets / certificates
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.csr
+*.keystore
+*.jks
+*.token
+secrets.*
+*.env.local
+*.envrc.local
+
+# Archives / bundles
+*.tar
+*.tar.gz
+*.tgz
+*.tbz
+*.tbz2
+*.tar.bz2
+*.7z
+*.zip
+
+# Crash dumps
+*.dmp
+*.crash
+
+# Infra state
+.terraform/
+terraform.tfstate*
+.terragrunt-cache/
+
+# Disk images (if exported locally)
+*.img
+*.qcow2
+*.vmdk
+
+# Compiled artifacts
+*.o
+*.obj
+*.a
+*.la
+*.lo
+*.dll
+*.lib
+*.exe
+
+# Node (keep lockfiles tracked)
+node_modules/
+npm-cache/
+.npm/
+npm-packages-offline-cache/
+yarn-cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.pnpm-store/
+.bun/
+.bun-install/
+.eslintcache
+.stylelintcache
+
+# Audio / media temp files
+*.wav.tmp
+*.mp3.tmp
+*.flac.tmp
+
+# Data / databases (keep folder docs/markers only)
+data/
+!data/.gitkeep
+!data/README.md
+# Global DB artifacts
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.sqlite-shm
+*.sqlite-wal
+data/*.joblib
+data/*.gz
+data/*.xlsx
+data/*.pdf
+data/*.sql
+data/*.dump
+data/*.rdb
+
+# Python PEP 582
+__pypackages__/
+
+# Scratch
+tmp/
+scratch/

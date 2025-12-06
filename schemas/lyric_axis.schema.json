@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Lyric Axis (HLM/HLI Advisory)",
+  "type": "object",
+  "required": ["schema_version", "provenance"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "provenance": {
+      "type": "object",
+      "required": ["source", "lang", "confidence_overall", "ts"],
+      "properties": {
+        "source": { "type": "string" },
+        "lang": { "type": "string" },
+        "confidence_overall": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "ts": { "type": "string" }
+      }
+    },
+    "HLM": { "type": "object" },
+    "HLI": { "type": "object" },
+    "recommendations": { "type": "array" },
+    "vector_strengths": { "type": "object" },
+    "flags": { "type": "object" }
+  }
+}

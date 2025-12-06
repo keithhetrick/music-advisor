@@ -1,0 +1,18 @@
+{
+  "supported_backends": ["essentia", "madmom", "librosa", "auto"],
+  "default_sidecar_cmd": "python3 tools/tempo_sidecar_runner.py --audio {audio} --out {out}",
+  "enabled_backends": {
+    "essentia": true,
+    "madmom": true,
+    "librosa": true,
+    "auto": true
+  },
+  "backends": {
+    "essentia": {
+      "tempo_confidence_bounds": [0.93, 3.63]
+    },
+    "madmom": {
+      "tempo_confidence_bounds": [0.21, 0.38]
+    }
+  }
+}

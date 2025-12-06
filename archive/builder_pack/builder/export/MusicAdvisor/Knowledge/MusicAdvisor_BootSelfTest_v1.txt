@@ -1,0 +1,71 @@
+# Music Advisor — Boot Self-Test (Initialization Routine)
+
+PURPOSE
+Ensure routing and scoring integrity at chat start.  
+Run silently in background. If successful, print only:
+“System ready. Type /help to begin.”
+
+──────────────────────────────
+## INIT SEQUENCE (Silent)
+
+On first user message in a new chat:
+
+1. /cp start  
+   • Initialize new DATA_PACK skeleton.
+
+2. /cp edit genre=Pop  
+   • Provide minimal genre seed.
+
+3. /cp edit region=US  
+   • Assign baseline market.
+
+4. /cp finalize  
+   • Auto-fill missing values from norms.
+   • Validate MVP fields (region, generated_at, MARKET_NORMS.profile, ttc_sec, runtime_sec, exposures, tempo_band_bpm).
+   • If any field fails validation, fill medians from norms and re-run once.
+
+5. /advisor ingest  
+   • Stage current DATA_PACK.
+
+6. /advisor run full  
+   • Compute full HCI with Historical Echo (uses era_fingerprints.json + norms).
+   • Confirm all six layer outputs exist.
+
+7. /advisor export summary  
+   • Confirm readable summary + JSON stub.
+
+8. PASS CONDITION  
+   • No missing MVP fields.  
+   • Valid HCI (0–1).  
+   • Historical Echo present with ≥ 1 era scored.  
+
+9. If all pass → print:
+   “Music Advisor — Unified initialized successfully.  
+   System ready. Type /help to begin.”
+
+──────────────────────────────
+## FAIL SAFEGUARDS
+
+If validation fails after re-run:
+• Print warning:
+  “Initialization check incomplete — some norm or schema data missing. Please upload required Knowledge files.”
+• Auto-create Known_Gaps entry:
+  { "field": "boot_self_test", "severity": "blocker", "note": "Missing or invalid norm reference" }
+
+──────────────────────────────
+## POST-INIT STATE
+
+• current_pack remains loaded and valid for next command.
+• router_version: "v2.6.0"
+• norm_version: "2025.1"
+• Ready for user input (e.g., /cp edit ... or /advisor run full).
+
+──────────────────────────────
+## TEST OUTPUT EXAMPLE (hidden)
+
+{
+ "HCI": 0.78,
+ "layers": { "Historical":0.83, "Cultural":0.75, "Market":0.77, "Emotional":0.74, "Sonic":0.80, "Creative":0.78 },
+ "historical_echo": { "reference_year":2025, "eras":[{"year":1985,"HEC":0.82}] }
+}
+──────────────────────────────

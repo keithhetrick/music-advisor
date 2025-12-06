@@ -1,0 +1,30 @@
+name: Sparse Smokes
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+jobs:
+  smokes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11.0"
+          cache: "pip"
+          cache-dependency-path: |
+            requirements.txt
+            requirements.lock
+            engines/**/requirements*.txt
+            engines/**/pyproject.toml
+            src/ma_config/pyproject.toml
+            shared/pyproject.toml
+      - name: Install shared
+        run: pip install -e src/ma_config -e shared
+      - name: Run sparse smokes
+        run: |
+          PYTHONPATH=. make -f docs/Makefile.sparse-smoke sparse-smoke-all

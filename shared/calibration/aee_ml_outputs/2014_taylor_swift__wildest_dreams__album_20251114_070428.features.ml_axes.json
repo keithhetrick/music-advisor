@@ -1,0 +1,31 @@
+{
+  "audio_name": "2014_taylor_swift__wildest_dreams__album_20251114_070428",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.33247300383142553,
+        "lo": 0.3197376482637738,
+        "mid": 0.3477893479048006
+      },
+      "value": 0.5204442568618668
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3302504199047271,
+        "lo": 0.3703667000512684,
+        "mid": 0.2993828800440045
+      },
+      "value": 0.504477636951274
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/06_echo_2010_14/2014_taylor_swift__wildest_dreams__album/2014_taylor_swift__wildest_dreams__album_20251114_070428.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2017_daniel_caesar_h_e_r__best_part__album_20251116_051413",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.41077896212031545,
+        "lo": 0.2756710706388808,
+        "mid": 0.3135499672408037
+      },
+      "value": 0.5610713155504461
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3009680113467391,
+        "lo": 0.3520690916380708,
+        "mid": 0.3469628970151899
+      },
+      "value": 0.4997180764799374
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2017_daniel_caesar_h_e_r__best_part__album/2017_daniel_caesar_h_e_r__best_part__album_20251116_051413.features.json"
+}

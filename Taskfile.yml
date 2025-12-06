@@ -1,0 +1,143 @@
+version: "3"
+
+tasks:
+  list-projects:
+    desc: List all registered projects
+    cmds:
+      - python3 tools/ma_orchestrator.py list-projects
+
+  deps:
+    desc: Show dependency graph (per project)
+    cmds:
+      - python3 tools/ma_orchestrator.py deps
+
+  test-all:
+    desc: Run tests for all projects
+    cmds:
+      - python3 tools/ma_orchestrator.py test-all
+
+  test-affected:
+    desc: Run tests for projects affected since base (default origin/main)
+    cmds:
+      - python3 tools/ma_orchestrator.py test-affected --base {{.base | default "origin/main"}}
+    vars:
+      base: ""
+
+  test-audio:
+    desc: Test audio engine
+    cmds:
+      - python3 tools/ma_orchestrator.py test audio_engine
+
+  test-lyrics:
+    desc: Test lyrics engine
+    cmds:
+      - python3 tools/ma_orchestrator.py test lyrics_engine
+
+  test-ttc:
+    desc: Test TTC engine
+    cmds:
+      - python3 tools/ma_orchestrator.py test ttc_engine
+
+  test-reco:
+    desc: Test recommendation engine
+    cmds:
+      - python3 tools/ma_orchestrator.py test recommendation_engine
+
+  test-host:
+    desc: Test advisor host
+    cmds:
+      - python3 tools/ma_orchestrator.py test advisor_host
+
+  test-host-core:
+    desc: Test advisor host core contracts/helpers
+    cmds:
+      - python3 tools/ma_orchestrator.py test advisor_host_core
+
+  test-root:
+    desc: Run root integration/pipeline tests
+    cmds:
+      - python3 tools/ma_orchestrator.py test root_integration
+
+  run-audio-cli:
+    desc: Show audio CLI help (ma_audio_engine.pipe_cli)
+    cmds:
+      - python3 tools/ma_orchestrator.py run audio_engine
+
+  run-lyrics-cli:
+    desc: Show lyrics WIP pipeline CLI help
+    cmds:
+      - python3 tools/ma_orchestrator.py run lyrics_engine
+
+  run-ttc-cli:
+    desc: Show TTC engine help
+    cmds:
+      - python3 tools/ma_orchestrator.py run ttc_engine
+
+  run-reco-cli:
+    desc: Show recommendation service help
+    cmds:
+      - python3 tools/ma_orchestrator.py run recommendation_engine
+
+  run-advisor-host:
+    desc: Start advisor host FastAPI shim
+    cmds:
+      - python3 tools/ma_orchestrator.py run advisor_host
+
+  install-audio:
+    desc: pip install -e engines/audio_engine
+    cmds:
+      - python3 -m pip install -e engines/audio_engine
+
+  install-lyrics:
+    desc: pip install -e engines/lyrics_engine
+    cmds:
+      - python3 -m pip install -e engines/lyrics_engine
+
+  install-ttc:
+    desc: pip install -e engines/ttc_engine
+    cmds:
+      - python3 -m pip install -e engines/ttc_engine
+
+  install-reco:
+    desc: pip install -e engines/recommendation_engine
+    cmds:
+      - python3 -m pip install -e engines/recommendation_engine
+
+  install-host:
+    desc: pip install -e hosts/advisor_host
+    cmds:
+      - python3 -m pip install -e hosts/advisor_host
+
+  install-host-core:
+    desc: pip install -e hosts/advisor_host_core
+    cmds:
+      - python3 -m pip install -e hosts/advisor_host_core
+
+  bootstrap-all:
+    desc: Create venv, install deps, fetch data, and run quick check
+    cmds:
+      - test -x .venv/bin/python || python3 -m venv .venv
+      - . .venv/bin/activate && pip install --upgrade pip
+      - . .venv/bin/activate && pip install --no-build-isolation -r requirements.txt
+      - . .venv/bin/activate && pip install --no-build-isolation -e engines/audio_engine -e engines/lyrics_engine -e engines/ttc_engine -e engines/recommendation_engine -e hosts/advisor_host_core -e hosts/advisor_host
+      - . .venv/bin/activate && python infra/scripts/data_bootstrap.py --manifest infra/scripts/data_manifest.json
+      - . .venv/bin/activate && ./infra/scripts/quick_check.sh
+      - echo "[ma] bootstrap complete. Next: run 'python -m ma_helper help' (or alias ma=\"python -m ma_helper\") for helper commands."
+
+  bootstrap-locked:
+    desc: Bootstrap using requirements.lock (pinned deps)
+    cmds:
+      - test -x .venv/bin/python || python3 -m venv .venv
+      - . .venv/bin/activate && pip install --upgrade pip
+      - . .venv/bin/activate && pip install --no-build-isolation -r requirements.lock
+      - . .venv/bin/activate && pip install --no-build-isolation -e engines/audio_engine -e engines/lyrics_engine -e engines/ttc_engine -e engines/recommendation_engine -e hosts/advisor_host_core -e hosts/advisor_host
+      - . .venv/bin/activate && python infra/scripts/data_bootstrap.py --manifest infra/scripts/data_manifest.json
+      - . .venv/bin/activate && ./infra/scripts/quick_check.sh
+      - echo "[ma] bootstrap complete. Next: run 'python -m ma_helper help' (or alias ma=\"python -m ma_helper\") for helper commands."
+
+  rebuild-venv:
+    desc: Remove and recreate .venv, then bootstrap-all
+    cmds:
+      - 'read -p "This will remove .venv and recreate it. Continue? [y/N] " ans; case $$ans in [Yy]*) ;; *) echo "Aborted."; exit 1 ;; esac'
+      - rm -rf .venv
+      - task: bootstrap-all

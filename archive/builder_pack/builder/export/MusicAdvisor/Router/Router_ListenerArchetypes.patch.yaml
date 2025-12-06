@@ -1,0 +1,35 @@
+command:
+  name: "/listener map"
+  description: "Map to human listener archetype; output arrangement & lyric guidance."
+  params:
+    - name: archetype
+      required: false
+  steps:
+    - load_json:
+        from: "Knowledge/listener_archetypes.json"
+        as: LA
+    - set:
+        arch: "${args.archetype || context.meta.listener_archetype || 'Late-Night Thinker'}"
+    - choose:
+        when: "${LA[arch] != null}"
+        then:
+          set:
+            archetype: "${arch}"
+            lyric: "${LA[arch].lyric}"
+            arr: "${LA[arch].arr}"
+            avoid: "${LA[arch].avoid}"
+            freq: "${LA[arch].freq}"
+        else:
+          set:
+            archetype: "Late-Night Thinker"
+            lyric: "${LA['Late-Night Thinker'].lyric}"
+            arr: "${LA['Late-Night Thinker'].arr}"
+            avoid: "${LA['Late-Night Thinker'].avoid}"
+            freq: "${LA['Late-Night Thinker'].freq}"
+    - render:
+        template: "Templates/listener/output_listener_archetypes.txt"
+        to: result
+    - print: "${result}"
+    - append:
+        to: advisor.notes[]
+        value: "Target listener: ${archetype} — lyric: ${lyric}; arr: ${arr}; avoid: ${avoid}"

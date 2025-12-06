@@ -1,0 +1,26 @@
+{
+  "profiles": [
+    {
+      "region": "US",
+      "profile_id": "US_Pop_2025",
+      "bpm_min": 90,
+      "bpm_max": 130,
+      "tag_boost": ["midtempo_pop", "house_pulse"]
+    },
+    {
+      "region": "Global",
+      "profile_id": "Global_KPop_2025",
+      "bpm_min": 110,
+      "bpm_max": 135,
+      "tag_boost": ["uptempo"]
+    },
+    {
+      "region": "LATAM",
+      "profile_id": "LATAM_Urban_2025",
+      "bpm_min": 85,
+      "bpm_max": 105,
+      "tag_boost": ["dembo_half_time"]
+    }
+  ],
+  "defaults": { "region": "US", "profile_id": "US_Pop_2025" }
+}

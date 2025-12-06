@@ -1,0 +1,31 @@
+{
+  "audio_name": "2024_taylor_swift_post_malone__fortnight__album_20251114_071219",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.1824031710038355,
+        "lo": 0.5189395071459808,
+        "mid": 0.29865732185018373
+      },
+      "value": 0.4081592577075482
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2886750709040075,
+        "lo": 0.3670249902496276,
+        "mid": 0.34429993884636484
+      },
+      "value": 0.49092877774151433
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/08_echo_2020_24/2024_taylor_swift_post_malone__fortnight__album/2024_taylor_swift_post_malone__fortnight__album_20251114_071219.features.json"
+}

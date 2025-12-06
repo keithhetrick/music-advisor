@@ -1,0 +1,31 @@
+{
+  "audio_name": "2020_dua_lipa__levitating__album_20251114_071004",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3435374014608555,
+        "lo": 0.3582014024938087,
+        "mid": 0.29826119604533585
+      },
+      "value": 0.5127776697631569
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3310530472303704,
+        "lo": 0.3309263669896826,
+        "mid": 0.33802058577994704
+      },
+      "value": 0.5165906564337248
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/08_echo_2020_24/2020_dua_lipa__levitating__album/2020_dua_lipa__levitating__album_20251114_071004.features.json"
+}

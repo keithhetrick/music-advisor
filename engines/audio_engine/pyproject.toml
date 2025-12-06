@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "audio-engine"
+version = "0.0.0"
+description = "Audio/HCI/TTC pipeline for Music Advisor (monorepo module)."
+requires-python = ">=3.9"
+readme = "README.md"
+dependencies = []
+
+[project.scripts]
+ma-extract = "ma_audio_engine.extract_cli:main"
+ma-pipe = "ma_audio_engine.pipe_cli:main"
+music-advisor-smoke = "ma_audio_engine.smoke:main"
+ma-audio-features = "ma_audio_engine.tools.ma_audio_features:main"
+tempo-sidecar-runner = "ma_audio_engine.tools.tempo_sidecar_runner:main"
+equilibrium-merge = "ma_audio_engine.tools.equilibrium_merge:main"
+pack-writer = "ma_audio_engine.tools.pack_writer:main"
+musicadvisor-song-context = "ma_audio_engine.tools.song_context_builder:main"
+ma-add-philosophy-hci = "ma_audio_engine.tools.ma_add_philosophy_to_hci:main"
+ma-add-echo-hci = "ma_audio_engine.tools.ma_add_echo_to_hci_v1:main"
+ma-merge-client-hci = "ma_audio_engine.tools.ma_merge_client_and_hci:main"
+ma-add-philosophy-client = "ma_audio_engine.tools.ma_add_philosophy_to_client_rich:main"
+ma-add-echo-client = "ma_audio_engine.tools.hci.ma_add_echo_to_client_rich_v1:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["ma_audio_engine*"]

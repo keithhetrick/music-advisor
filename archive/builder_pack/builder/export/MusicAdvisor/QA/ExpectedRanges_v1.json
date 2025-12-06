@@ -1,0 +1,55 @@
+{
+  "QA_EXPECTED_RANGES": {
+    "US_Pop.fixture": {
+      "Historical": [0.78, 0.9],
+      "Cultural": [0.7, 0.82],
+      "Market": [0.75, 0.85],
+      "Emotional": [0.7, 0.8],
+      "Sonic": [0.78, 0.86],
+      "Creative": [0.74, 0.84],
+      "HCI": [0.76, 0.84],
+      "note": "Should strongly reflect 1985_pop fingerprint; HEC_40 dominant."
+    },
+    "Global_KPop.fixture": {
+      "Historical": [0.65, 0.78],
+      "Cultural": [0.75, 0.85],
+      "Market": [0.78, 0.88],
+      "Emotional": [0.7, 0.82],
+      "Sonic": [0.8, 0.88],
+      "Creative": [0.76, 0.86],
+      "HCI": [0.77, 0.86],
+      "note": "Balanced historical echoes; Market/Sonic peaks."
+    },
+    "LATAM_Urban.fixture": {
+      "Historical": [0.55, 0.7],
+      "Cultural": [0.72, 0.82],
+      "Market": [0.76, 0.84],
+      "Emotional": [0.75, 0.85],
+      "Sonic": [0.73, 0.83],
+      "Creative": [0.74, 0.84],
+      "HCI": [0.72, 0.82],
+      "note": "Shows rhythmic focus and moderate echo alignment."
+    }
+  },
+  "version": "v1.0",
+  "router_version": "v2.6.0",
+  "norm_version": "2025.1",
+  "updated_at": "2025-10-29T00:00:00Z",
+  "region": "US",
+  "generated_at": "2025-11-03T06:11:32Z",
+  "MARKET_NORMS": { "profile": "Pop" },
+  "MVP": {
+    "tempo_band_bpm": "120-129",
+    "runtime_sec": 176.07,
+    "ttc_sec": null,
+    "exposures": null
+  },
+  "Baseline": {
+    "active_profile": "Pop",
+    "effective_utc": "2025-11-03T06:11:32Z",
+    "previous_profile": null,
+    "pinned": true,
+    "note": "Autofix: pinned for reproducibility"
+  },
+  "Known_Gaps": []
+}

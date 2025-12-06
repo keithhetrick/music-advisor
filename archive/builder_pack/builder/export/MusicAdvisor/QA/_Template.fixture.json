@@ -1,0 +1,24 @@
+{
+  "id": "TEMPLATE_PROFILE_001",
+  "generated_at": "2025-10-29T00:00:00Z",
+  "region": "REGION_HERE",
+  "genre": "GENRE_HERE",
+  "tempo_band_bpm": 100,
+  "runtime_sec": 170,
+  "ttc_sec": 12,
+  "exposures": 3,
+  "MARKET_NORMS": {
+    "profile": "PROFILE_ID_HERE",
+    "norm_version": "2025.1",
+    "source": "norms/2025/streaming.json"
+  },
+  "reference_year": 2025,
+  "reference_eras": [1985, 1995, 2005, 2015],
+  "production_tags": [],
+  "lyric_motifs": [],
+  "rhythm_profile": null,
+  "tonal_profile": { "key": null, "mode": null, "energy": 0.75 },
+  "Known_Gaps": [],
+  "router_version": "v2.6.0",
+  "norm_version": "2025.1"
+}

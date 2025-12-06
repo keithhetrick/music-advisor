@@ -1,0 +1,29 @@
+{
+  "id": "QA_LATAM_URBAN_001",
+  "generated_at": "2025-10-29T00:00:00Z",
+  "region": "LATAM",
+  "genre": "Urban",
+  "tempo_band_bpm": 94,
+  "runtime_sec": 168,
+  "ttc_sec": 14,
+  "exposures": 3,
+  "MARKET_NORMS": {
+    "profile": "LATAM_Urban_2025",
+    "norm_version": "2025.1",
+    "source": "norms/2025/streaming.json"
+  },
+  "reference_year": 2025,
+  "reference_eras": [1985, 1995, 2005, 2015],
+  "production_tags": [
+    "808_sub",
+    "dembo_pulse",
+    "clean_vocal_lead",
+    "percussion_layers"
+  ],
+  "lyric_motifs": ["romance", "dancefloor", "heat"],
+  "rhythm_profile": "dembo_half_time",
+  "tonal_profile": { "key": "G", "mode": "minor", "energy": 0.78 },
+  "Known_Gaps": [],
+  "router_version": "v2.6.0",
+  "norm_version": "2025.1"
+}

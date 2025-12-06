@@ -1,0 +1,31 @@
+{
+  "audio_name": "16. Tommy Richman - MILLION DOLLAR BABY_20251114_061111",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.517809235782221,
+        "lo": 0.2448563934001635,
+        "mid": 0.23733437081761544
+      },
+      "value": 0.6077763145037283
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.35093848775293834,
+        "lo": 0.3066352759096706,
+        "mid": 0.34242623633739094
+      },
+      "value": 0.5308378879406273
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/16. Tommy Richman - MILLION DOLLAR BABY/16. Tommy Richman - MILLION DOLLAR BABY_20251114_061111.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2003_the_mars_volta__drunkship_of_lanterns__neg_out_of_domain_20251114_064857",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.14592930615174043,
+        "lo": 0.42953523706060953,
+        "mid": 0.4245354567876501
+      },
+      "value": 0.42221468603492635
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4376301802806278,
+        "lo": 0.2329472706530671,
+        "mid": 0.3294225490663051
+      },
+      "value": 0.5832863819022995
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/13_negatives_out_of_domain/2003_the_mars_volta__drunkship_of_lanterns__neg_out_of_domain/2003_the_mars_volta__drunkship_of_lanterns__neg_out_of_domain_20251114_064857.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2013_daft_punk_pharrell_williams__get_lucky__single_20251114_070147",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4384715884452103,
+        "lo": 0.2652905632576273,
+        "mid": 0.29623784829716243
+      },
+      "value": 0.5738778869785355
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.40442050213889114,
+        "lo": 0.257965524691645,
+        "mid": 0.3376139731694639
+      },
+      "value": 0.5641575183411184
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/06_echo_2010_14/2013_daft_punk_pharrell_williams__get_lucky__single/2013_daft_punk_pharrell_williams__get_lucky__single_20251114_070147.features.json"
+}

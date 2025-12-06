@@ -1,0 +1,31 @@
+{
+  "audio_name": "2020_the_weeknd__blinding_lights__album_20251116_042318",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.42530209886897963,
+        "lo": 0.26581300982890127,
+        "mid": 0.30888489130211905
+      },
+      "value": 0.5691118316554724
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3973900695825331,
+        "lo": 0.2432293379924468,
+        "mid": 0.3593805924250201
+      },
+      "value": 0.5661177229561525
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2020_the_weeknd__blinding_lights__album/2020_the_weeknd__blinding_lights__album_20251116_042318.features.json"
+}

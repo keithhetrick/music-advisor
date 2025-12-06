@@ -1,0 +1,92 @@
+# Music Advisor — QA Macro (Test-All)
+
+PURPOSE
+Provide macro commands to run full regression in chat:
+- /qa help
+- /qa run all
+- /qa run smoke
+- /qa run <profile>
+- /qa set strict <true|false>
+- /qa set tolerance <float>        ; optional, overrides default ±0.05 when strict=false
+
+SESSION STATE (implicit, persisted in chat)
+- qa_strict: boolean = false
+- qa_tolerance: number = 0.05      ; only used when qa_strict=false
+
+ASSUMPTIONS
+- Fixtures live in Knowledge under QA/:
+  - US_Pop.fixture.json
+  - Global_KPop.fixture.json
+  - LATAM_Urban.fixture.json
+- Expected ranges in QA/ExpectedRanges_v1.json with keys:
+  - "US_Pop.fixture", "Global_KPop.fixture", "LATAM_Urban.fixture"
+- Advisor output returns: HCI, layers{Historical,Cultural,Market,Emotional,Sonic,Creative}, historical_echo, router_version, norm_version
+
+STRICT MODE & TOLERANCE
+- strict=false (default): allow ±qa_tolerance (default 0.05) outside ranges → WARN
+- strict=true: any layer/HCI outside expected by >0.00 → FAIL
+
+COMMANDS
+/qa help
+• Print command list, current strict/tolerance, and short usage notes.
+
+/qa set strict <true|false>
+• Toggle strict policy. Persist to qa_strict. Reply: "[/qa] strict = true|false"
+
+/qa set tolerance <float>
+• Set qa_tolerance (e.g., 0.03). Only used when strict=false. Reply: "[/qa] tolerance = <value>"
+
+/qa run smoke
+• Alias of /qa run US_Pop.fixture. Prints summary row + PASS/WARN/FAIL.
+
+/qa run all
+• profiles = ["US_Pop.fixture","Global_KPop.fixture","LATAM_Urban.fixture"]
+• For each fixture p:
+  1) Load fixture JSON: "QA/<p>.json"
+  2) /advisor ingest
+  3) /advisor run full
+  4) Load ranges from "QA/ExpectedRanges_v1.json" under key p
+  5) Compare metrics: [Historical, Cultural, Market, Emotional, Sonic, Creative, HCI]
+     - tol = (0.00 if qa_strict else qa_tolerance)
+     - If score < min - tol: deviation = (min - score), direction = "↓"
+       If qa_strict: mark FAIL else WARN
+     - If score > max + tol: deviation = (score - max), direction = "↑"
+       If qa_strict: mark FAIL else WARN
+  6) Collect row: {profile:p, scores, HCI, status, deviations[]}
+• Print table:
+  Profile              | Historical | Cultural | Market | Emotional | Sonic | Creative | HCI  | Status
+  US_Pop.fixture       | 0.84       | 0.76     | 0.81   | 0.75      | 0.82  | 0.79     | 0.80 | PASS
+• Then print compact JSON:
+  {
+    "overall": "ALL PASS|PASS with WARNINGS|FAIL",
+    "qa_strict": <bool>,
+    "qa_tolerance": <number>,
+    "router_version": "v2.6.0",
+    "norm_version": "2025.1",
+    "profiles": [
+      {"id":"US_Pop.fixture","HCI":0.80,"layers":{...},"status":"PASS","deviations":[...] }
+    ]
+  }
+• If mixed router/norm versions are detected across runs, add:
+  "note": "Mixed versions detected across profiles — verify Knowledge sync."
+
+/qa run <profile>
+• Accepts exactly: US_Pop.fixture | Global_KPop.fixture | LATAM_Urban.fixture
+• Otherwise: "[/qa] Unknown profile: <x>. Try: US_Pop.fixture | Global_KPop.fixture | LATAM_Urban.fixture"
+• Executes ingest → run full → range check → prints one-row table + JSON.
+
+MISSING FILES / KEYS
+• If a fixture file is missing → print error and continue (for /qa run all).
+• If ExpectedRanges_v1.json is missing → run without assertions; note:
+  "[/qa] ranges not found — assertions skipped; informational only."
+• If advisor output lacks any metric → mark FAIL for that profile and list missing keys.
+
+SAMPLE SUMMARY (illustrative)
+QA SUMMARY
+Profile              Historical Cultural Market Emotional Sonic Creative  HCI   Status
+US_Pop.fixture       0.84       0.76     0.81   0.75      0.82  0.79      0.80  PASS
+Global_KPop.fixture  0.74       0.84     0.87   0.80      0.88  0.82      0.83  PASS
+LATAM_Urban.fixture  0.63       0.78     0.82   0.81      0.79  0.80      0.77  PASS
+
+Overall: ALL PASS
+router_version=v2.6.0, norm_version=2025.1

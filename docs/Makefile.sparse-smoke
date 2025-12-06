@@ -1,0 +1,20 @@
+PYTHONPATH?=.
+
+sparse-smoke-chat:
+	@PYTHONPATH=$(PYTHONPATH) HOST_CHAT_BACKEND_MODE=on python -m advisor_host.cli.http_stub >/dev/null 2>&1 || true
+
+sparse-smoke-tempo:
+	@PYTHONPATH=$(PYTHONPATH) python tools/tempo_norms_sidecar.py --song-id demo --lane-id tier1__2015_2024 --song-bpm 120 --out /tmp/demo.tempo_norms.json --overwrite >/dev/null 2>&1 || true
+
+sparse-smoke-key:
+	@PYTHONPATH=$(PYTHONPATH) python tools/key_norms_sidecar.py --song-id demo --lane-id tier1__2015_2024 --song-key "C major" --out /tmp/demo.key_norms.json --overwrite >/dev/null 2>&1 || true
+
+sparse-smoke-ttc:
+	@PYTHONPATH=$(PYTHONPATH) python tools/ttc_sidecar.py estimate --db /tmp/ttc.db --song-id demo --out /tmp/demo.ttc.json >/dev/null 2>&1 || true
+
+sparse-smoke-reco:
+	@PYTHONPATH=$(PYTHONPATH) python - <<'PY'\nfrom recommendation_engine.engine.recommendation import compute_recommendation\nfrom recommendation_engine.tests.fixtures import sample_payload, sample_market_norms\nrec = compute_recommendation(sample_payload, sample_market_norms)\nprint('ok', bool(rec))\nPY
+
+sparse-smoke-all: sparse-smoke-chat sparse-smoke-tempo sparse-smoke-key sparse-smoke-ttc sparse-smoke-reco
+
+.PHONY: sparse-smoke-chat sparse-smoke-tempo sparse-smoke-key sparse-smoke-ttc sparse-smoke-reco

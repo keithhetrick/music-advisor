@@ -1,0 +1,31 @@
+{
+  "audio_name": "2008_lady_gaga__pokerface__album_20251116_041905",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3051822382873569,
+        "lo": 0.32165915595431727,
+        "mid": 0.37315860575832577
+      },
+      "value": 0.5103160366142797
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3635896072001966,
+        "lo": 0.29708698325880506,
+        "mid": 0.33932340954099827
+      },
+      "value": 0.5381302675424273
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2008_lady_gaga__pokerface__album/2008_lady_gaga__pokerface__album_20251116_041905.features.json"
+}

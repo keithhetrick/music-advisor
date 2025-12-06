@@ -1,0 +1,411 @@
+=== MusicAdvisor Benchmark Check ===
+Total benchmark songs: 50
+
+Axis-level accuracy:
+  Tempo       : 0/50 OK (  0.0%)
+  Runtime     : 41/50 OK ( 82.0%)
+  Loudness    : 39/50 OK ( 78.0%)
+  Energy      : 22/50 OK ( 44.0%)
+  Danceability: 11/50 OK ( 22.0%)
+  Valence     : 35/50 OK ( 70.0%)
+
+------------------------------------------------------------------------
+Michael Jackson – Billie Jean  [1982_michael_jackson__billie_jean__album]
+  Tempo: local/ truth missing
+  Runtime band: local=long  truth=mid  status=MISMATCH
+  Loudness: -17.95 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.392  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.319  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.577  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Cyndi Lauper – Girls Just Want to Have Fun  [1983_cyndi_lauper__girls_just_want_to_have_fun__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.75 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.366  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.328  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.566  band local=mid  truth=hi  status=MISMATCH
+------------------------------------------------------------------------
+Prince – When Doves Cry  [1984_prince__when_doves_cry__album]
+  Tempo: local/ truth missing
+  Runtime band: local=long  truth=mid  status=MISMATCH
+  Loudness: -20.22 LUFS  band local=lo  truth=mid  status=MISMATCH
+  Energy: 0.386  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.319  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.574  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+a-ha – Take On Me  [1985_a_ha__take_on_me__single]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.80 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.380  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.315  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.572  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Tears for Fears – Everybody Wants to Rule the World  [1985_tears_for_fears__everybody_wants_to_rule_the_world__single]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -18.21 LUFS  band local=lo  truth=mid  status=MISMATCH
+  Energy: 0.364  band local=mid  truth=mid  status=OK
+  Dance : 0.326  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.565  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Bon Jovi – Livin' on a Prayer  [1986_bon_jovi__livin_on_a_prayer__single]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.97 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.364  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.323  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.566  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Guns N' Roses – Sweet Child o' Mine  [1987_guns_n_roses__sweet_child_o_mine__album]
+  Tempo: local/ truth missing
+  Runtime band: local=long  truth=long  status=OK
+  Loudness: -17.84 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.372  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.331  band local=mid  truth=mid  status=OK
+  Valence: 0.569  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Whitney Houston – I Wanna Dance With Somebody (Who Loves Me)  [1987_whitney_houston__i_wanna_dance_with_somebody_who_loves_me__album]
+  Tempo: local/ truth missing
+  Runtime band: local=long  truth=mid  status=MISMATCH
+  Loudness: -17.97 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.383  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.319  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.573  band local=mid  truth=hi  status=MISMATCH
+------------------------------------------------------------------------
+Madonna – Like a Prayer  [1989_madonna__like_a_prayer__album]
+  Tempo: local/ truth missing
+  Runtime band: local=long  truth=mid  status=MISMATCH
+  Loudness: -18.22 LUFS  band local=lo  truth=mid  status=MISMATCH
+  Energy: 0.369  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.329  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.568  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Nirvana – Smells Like Teen Spirit  [1991_nirvana__smells_like_teen_spirit__single]
+  Tempo: local/ truth missing
+  Runtime band: local=long  truth=long  status=OK
+  Loudness: -18.32 LUFS  band local=lo  truth=mid  status=MISMATCH
+  Energy: 0.368  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.319  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.567  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Oasis – Wonderwall  [1995_oasis__wonderwall__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.69 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.347  band local=mid  truth=mid  status=OK
+  Dance : 0.323  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.559  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Mariah Carey – Fantasy  [1995_mariah_carey__fantasy__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.67 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.384  band local=mid  truth=mid  status=OK
+  Dance : 0.336  band local=mid  truth=mid  status=OK
+  Valence: 0.574  band local=mid  truth=hi  status=MISMATCH
+------------------------------------------------------------------------
+Spice Girls – Wannabe  [1996_spice_girls__wannabe__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=short  status=MISMATCH
+  Loudness: -17.69 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.367  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.332  band local=mid  truth=hi  status=MISMATCH
+  Valence: 0.567  band local=mid  truth=hi  status=MISMATCH
+------------------------------------------------------------------------
+Celine Dion – My Heart Will Go On  [1997_celine_dion__my_heart_will_go_on__album]
+  Tempo: local/ truth missing
+  Runtime band: local=long  truth=long  status=OK
+  Loudness: -17.37 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.382  band local=mid  truth=mid  status=OK
+  Dance : 0.327  band local=lo  truth=lo  status=OK
+  Valence: 0.573  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Brandy & Monica – The Boy Is Mine  [1998_brandy_and_monica__the_boy_is_mine__album]
+  Tempo: local/ truth missing
+  Runtime band: local=long  truth=mid  status=MISMATCH
+  Loudness: -17.70 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.390  band local=mid  truth=mid  status=OK
+  Dance : 0.322  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.576  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Britney Spears – ...Baby One More Time  [1998_britney_spears__baby_one_more_time__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.85 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.380  band local=mid  truth=mid  status=OK
+  Dance : 0.315  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.572  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Backstreet Boys – I Want It That Way  [1999_backstreet_boys__i_want_it_that_way__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -18.01 LUFS  band local=lo  truth=mid  status=MISMATCH
+  Energy: 0.375  band local=mid  truth=mid  status=OK
+  Dance : 0.330  band local=lo  truth=lo  status=OK
+  Valence: 0.570  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+TLC – No Scrubs  [1999_tlc__no_scrubs__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.81 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.399  band local=mid  truth=mid  status=OK
+  Dance : 0.328  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.579  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Coldplay – Yellow  [2000_coldplay__yellow__album]
+  Tempo: local/ truth missing
+  Runtime band: local=long  truth=mid  status=MISMATCH
+  Loudness: -17.83 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.363  band local=mid  truth=mid  status=OK
+  Dance : 0.328  band local=lo  truth=lo  status=OK
+  Valence: 0.565  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Beyoncé feat. JAY-Z – Crazy in Love  [2003_beyonce_jay_z__crazy_in_love__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.49 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.377  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.327  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.571  band local=mid  truth=hi  status=MISMATCH
+------------------------------------------------------------------------
+Outkast – Hey Ya!  [2003_outkast__hey_ya__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.41 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.360  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.322  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.564  band local=mid  truth=hi  status=MISMATCH
+------------------------------------------------------------------------
+Kelly Clarkson – Since U Been Gone  [2004_kelly_clarkson__since_u_been_gone__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.93 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.358  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.325  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.563  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Usher feat. Lil Jon & Ludacris – Yeah!  [2004_usher_lil_jon_ludacris__yeah__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.70 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.372  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.331  band local=mid  truth=hi  status=MISMATCH
+  Valence: 0.569  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Shakira feat. Wyclef Jean – Hips Don't Lie  [2006_shakira_wyclef_jean__hips_dont_lie__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.19 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.361  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.336  band local=mid  truth=hi  status=MISMATCH
+  Valence: 0.564  band local=mid  truth=hi  status=MISMATCH
+------------------------------------------------------------------------
+Rihanna feat. JAY-Z – Umbrella  [2007_rihanna_jay_z__umbrella__album]
+  Tempo: local/ truth missing
+  Runtime band: local=long  truth=mid  status=MISMATCH
+  Loudness: -17.46 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.391  band local=mid  truth=mid  status=OK
+  Dance : 0.318  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.576  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Lady Gaga – Poker Face  [2008_lady_gaga__pokerface__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -18.06 LUFS  band local=lo  truth=mid  status=MISMATCH
+  Energy: 0.355  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.330  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.562  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Black Eyed Peas – I Gotta Feeling  [2009_black_eyed_peas__i_gotta_feeling__album]
+  Tempo: local/ truth missing
+  Runtime band: local=long  truth=long  status=OK
+  Loudness: -17.59 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.378  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.320  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.571  band local=mid  truth=hi  status=MISMATCH
+------------------------------------------------------------------------
+Adele – Rolling in the Deep  [2010_adele__rolling_in_the_deep__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.41 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.364  band local=mid  truth=mid  status=OK
+  Dance : 0.341  band local=mid  truth=mid  status=OK
+  Valence: 0.565  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Gotye feat. Kimbra – Somebody That I Used to Know  [2011_gotye__somebody_that_i_used_to_know__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.50 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.373  band local=mid  truth=mid  status=OK
+  Dance : 0.331  band local=mid  truth=mid  status=OK
+  Valence: 0.569  band local=mid  truth=lo  status=MISMATCH
+------------------------------------------------------------------------
+Lorde – Royals  [2013_lorde__royals__single]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.39 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.352  band local=mid  truth=lo  status=MISMATCH
+  Dance : 0.320  band local=lo  truth=lo  status=OK
+  Valence: 0.561  band local=mid  truth=lo  status=MISMATCH
+------------------------------------------------------------------------
+Mark Ronson feat. Bruno Mars – Uptown Funk  [2014_mark_ronson_bruno_mars__uptown_funk__album]
+  Tempo: local/ truth missing
+  Runtime band: local=long  truth=long  status=OK
+  Loudness: -17.48 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.391  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.318  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.577  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Pharrell Williams – Happy  [2014_pharrell_williams__happy__single]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.63 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.374  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.323  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.570  band local=mid  truth=hi  status=MISMATCH
+------------------------------------------------------------------------
+Taylor Swift – Shake It Off  [2014_taylor_swift__shake_it_off__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.98 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.367  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.326  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.567  band local=mid  truth=hi  status=MISMATCH
+------------------------------------------------------------------------
+Justin Bieber – Love Yourself  [2015_justin_bieber__love_yourself__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.12 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.365  band local=mid  truth=lo  status=MISMATCH
+  Dance : 0.328  band local=lo  truth=lo  status=OK
+  Valence: 0.566  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Drake – One Dance  [2016_drake__one_dance__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.28 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.402  band local=mid  truth=mid  status=OK
+  Dance : 0.323  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.581  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+The Chainsmokers feat. Halsey – Closer  [2016_the_chainsmokers_ft_halsey__closer__single]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -18.44 LUFS  band local=lo  truth=mid  status=MISMATCH
+  Energy: 0.373  band local=mid  truth=mid  status=OK
+  Dance : 0.313  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.569  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Imagine Dragons – Believer  [2017_imagine_dragons__believer__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -18.52 LUFS  band local=lo  truth=mid  status=MISMATCH
+  Energy: 0.359  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.314  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.564  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Ed Sheeran – Shape of You  [2017_ed_sheeran__shape_of_you__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.38 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.361  band local=mid  truth=mid  status=OK
+  Dance : 0.320  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.564  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Luis Fonsi & Daddy Yankee feat. Justin Bieber – Despacito (Remix)  [2017_luis_fonsi_daddy_yankee_ft_justin_bieber__despacito__single]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.85 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.378  band local=mid  truth=mid  status=OK
+  Dance : 0.329  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.571  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Billie Eilish – bad guy  [2019_billie_eilish__bad_guy__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.17 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.343  band local=mid  truth=mid  status=OK
+  Dance : 0.318  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.557  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Dua Lipa – Don't Start Now  [2019_dua_lipa__dont_start_now__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.62 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.387  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.322  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.575  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+BTS – Dynamite  [2020_bts__dynamite__single]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.77 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.369  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.331  band local=mid  truth=hi  status=MISMATCH
+  Valence: 0.568  band local=mid  truth=hi  status=MISMATCH
+------------------------------------------------------------------------
+Dua Lipa – Levitating  [2020_dua_lipa__levitating__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.90 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.369  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.330  band local=mid  truth=hi  status=MISMATCH
+  Valence: 0.567  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+The Weeknd – Blinding Lights  [2020_the_weeknd__blinding_lights__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.69 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.355  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.326  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.562  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Doja Cat feat. SZA – Kiss Me More  [2021_doja_cat__kiss_me_more__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.36 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.386  band local=mid  truth=hi  status=MISMATCH
+  Dance : 0.325  band local=lo  truth=hi  status=MISMATCH
+  Valence: 0.574  band local=mid  truth=hi  status=MISMATCH
+------------------------------------------------------------------------
+Olivia Rodrigo – drivers license  [2021_olivia_rodrigo__drivers_license__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=long  status=MISMATCH
+  Loudness: -18.14 LUFS  band local=lo  truth=mid  status=MISMATCH
+  Energy: 0.370  band local=mid  truth=mid  status=OK
+  Dance : 0.333  band local=mid  truth=lo  status=MISMATCH
+  Valence: 0.568  band local=mid  truth=lo  status=MISMATCH
+------------------------------------------------------------------------
+Glass Animals – Heat Waves  [2022_glass_animals__heat_waves__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -18.35 LUFS  band local=lo  truth=mid  status=MISMATCH
+  Energy: 0.361  band local=mid  truth=mid  status=OK
+  Dance : 0.317  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.564  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Harry Styles – As It Was  [2022_harry_styles__as_it_was__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.54 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.354  band local=mid  truth=mid  status=OK
+  Dance : 0.331  band local=mid  truth=mid  status=OK
+  Valence: 0.561  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Miley Cyrus – Flowers  [2023_miley_cyrus__flowers__album]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -17.38 LUFS  band local=mid  truth=mid  status=OK
+  Energy: 0.362  band local=mid  truth=mid  status=OK
+  Dance : 0.324  band local=lo  truth=mid  status=MISMATCH
+  Valence: 0.565  band local=mid  truth=mid  status=OK
+------------------------------------------------------------------------
+Alex Warren – Ordinary  [2025_alex_warren__ordinary__single]
+  Tempo: local/ truth missing
+  Runtime band: local=mid  truth=mid  status=OK
+  Loudness: -18.96 LUFS  band local=lo  truth=mid  status=MISMATCH
+  Energy: 0.352  band local=mid  truth=mid  status=OK
+  Dance : 0.329  band local=lo  truth=lo  status=OK
+  Valence: 0.561  band local=mid  truth=mid  status=OK

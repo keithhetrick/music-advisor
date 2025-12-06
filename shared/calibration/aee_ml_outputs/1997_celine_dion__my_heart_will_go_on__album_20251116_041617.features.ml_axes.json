@@ -1,0 +1,31 @@
+{
+  "audio_name": "1997_celine_dion__my_heart_will_go_on__album_20251116_041617",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3983020585823612,
+        "lo": 0.257738855988759,
+        "mid": 0.3439590854288798
+      },
+      "value": 0.5620840637071987
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4561685904347792,
+        "lo": 0.18650099633178827,
+        "mid": 0.35733041323343256
+      },
+      "value": 0.6037087077526362
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/1997_celine_dion__my_heart_will_go_on__album/1997_celine_dion__my_heart_will_go_on__album_20251116_041617.features.json"
+}

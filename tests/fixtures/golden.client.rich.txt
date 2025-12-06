@@ -1,0 +1,8 @@
+# header
+/audio import {
+  "historical_echo_v1": {},
+  "historical_echo_meta": {},
+  "feature_pipeline_meta": {},
+  "features": {"runtime_sec": 1},
+  "features_full": {"runtime_sec": 1}
+}

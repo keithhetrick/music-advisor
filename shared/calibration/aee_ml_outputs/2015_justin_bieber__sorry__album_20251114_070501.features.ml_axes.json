@@ -1,0 +1,31 @@
+{
+  "audio_name": "2015_justin_bieber__sorry__album_20251114_070501",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3732084867420998,
+        "lo": 0.3188923438913279,
+        "mid": 0.3078991693665723
+      },
+      "value": 0.5349552671923365
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3068726958968341,
+        "lo": 0.37902608460225357,
+        "mid": 0.31410121950091247
+      },
+      "value": 0.4936976181832159
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/07_echo_2015_19/2015_justin_bieber__sorry__album/2015_justin_bieber__sorry__album_20251114_070501.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2017_dua_lipa__new_rules__album_20251114_070712",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.41514271731553043,
+        "lo": 0.2946364249155082,
+        "mid": 0.2902208577689613
+      },
+      "value": 0.5569090235857832
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3500953350068594,
+        "lo": 0.31467242965953757,
+        "mid": 0.33523223533360297
+      },
+      "value": 0.5281316383545395
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/07_echo_2015_19/2017_dua_lipa__new_rules__album/2017_dua_lipa__new_rules__album_20251114_070712.features.json"
+}

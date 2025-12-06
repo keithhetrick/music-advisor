@@ -1,0 +1,28 @@
+{
+  "profile_id": "Cinematic_PopBallad_Echo",
+  "version": "1.0",
+  "description": "Cinematic pop ballad with 1980s power-ballad lineage — dynamic arc, wide chorus, strings/choir lift risk-managed.",
+  "era_lineage": [
+    "Y-40:power_ballad",
+    "Y-20:cinematic_pop",
+    "Y-10:gospel_lift_crossover"
+  ],
+  "emotional_palette": ["ache", "devotion", "redemption", "triumph"],
+  "production_language": [
+    "piano_front",
+    "string_bed",
+    "choir_smear",
+    "drum_toms_lift"
+  ],
+  "rhythmic_bias": ["half_time_bloom", "anthemic_6_8"],
+  "harmonic_tendencies": [
+    "relative_minor_verse",
+    "Lydian_color",
+    "late_modulation_optional"
+  ],
+  "vocal_shape": ["belt_peak", "breath_intro", "call_response_finale"],
+  "reference_frames": {
+    "artists": ["Adele (large-form)", "Sam Smith (cinematic cuts)"],
+    "eras": ["80s ballad grandeur with modern restraint"]
+  }
+}

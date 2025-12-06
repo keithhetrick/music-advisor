@@ -1,0 +1,31 @@
+{
+  "audio_name": "1985_dire_straits__money_for_nothing__single_20251114_062532",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.22682986564219224,
+        "lo": 0.4417687516295832,
+        "mid": 0.3314013827282246
+      },
+      "value": 0.44685982748589237
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.28509235530830357,
+        "lo": 0.39506220769408706,
+        "mid": 0.3198454369976093
+      },
+      "value": 0.4812636620496801
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/01_echo_1985_89/1985_dire_straits__money_for_nothing__single/1985_dire_straits__money_for_nothing__single_20251114_062532.features.json"
+}

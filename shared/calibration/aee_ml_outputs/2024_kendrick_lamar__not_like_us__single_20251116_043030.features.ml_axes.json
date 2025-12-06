@@ -1,0 +1,31 @@
+{
+  "audio_name": "2024_kendrick_lamar__not_like_us__single_20251116_043030",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4693762783350616,
+        "lo": 0.20380564981630714,
+        "mid": 0.32681807184863126
+      },
+      "value": 0.6031400024723794
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.49214204042468956,
+        "lo": 0.17024141341079205,
+        "mid": 0.33761654616451836
+      },
+      "value": 0.6211772901254037
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2024_kendrick_lamar__not_like_us__single/2024_kendrick_lamar__not_like_us__single_20251116_043030.features.json"
+}

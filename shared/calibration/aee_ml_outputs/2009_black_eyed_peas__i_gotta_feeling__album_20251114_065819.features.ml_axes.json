@@ -1,0 +1,31 @@
+{
+  "audio_name": "2009_black_eyed_peas__i_gotta_feeling__album_20251114_065819",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3105510212475198,
+        "lo": 0.34564433300070263,
+        "mid": 0.34380464575177755
+      },
+      "value": 0.5049995575364212
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.38767091396151265,
+        "lo": 0.27639725107988894,
+        "mid": 0.3359318349585984
+      },
+      "value": 0.5527656445625627
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/05_echo_2005_09/2009_black_eyed_peas__i_gotta_feeling__album/2009_black_eyed_peas__i_gotta_feeling__album_20251114_065819.features.json"
+}

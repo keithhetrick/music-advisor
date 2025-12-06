@@ -1,0 +1,31 @@
+{
+  "audio_name": "1999_backstreet_boys__i_want_it_that_way__album_20251116_041702",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3536893869425178,
+        "lo": 0.2968901848749634,
+        "mid": 0.34942042818251895
+      },
+      "value": 0.5347242299673922
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3846758533538963,
+        "lo": 0.2692273190211272,
+        "mid": 0.3460968276249765
+      },
+      "value": 0.5538683529675256
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/1999_backstreet_boys__i_want_it_that_way__album/1999_backstreet_boys__i_want_it_that_way__album_20251116_041702.features.json"
+}

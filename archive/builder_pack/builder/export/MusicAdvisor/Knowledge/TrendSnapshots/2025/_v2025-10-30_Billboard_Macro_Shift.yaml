@@ -1,0 +1,51 @@
+id: TrendSnapshot_v2025_Billboard_Macro_Shift
+version: 2025.10.30
+generated_at: 2025-10-30T10:00:00
+valid_until: 2026-04-30T00:00:00
+source: Chat session integration
+category: Genre Trajectory & Chart Forensics
+tags:
+  [
+    Billboard,
+    Streaming,
+    Luminate,
+    Fraud,
+    Hip-Hop,
+    Latin,
+    Country,
+    Pop,
+    Christian,
+    Radio,
+    Hot100,
+  ]
+
+signals:
+  billboard_formula: [streams, radio, sales]
+  stream_weighting:
+    { paid_on_demand: high, ad_supported: medium, programmed: lower }
+  audits: { billboard_luminate: true, dsps_anti_fraud: true }
+  hiphop: { us_stream_share: leader, conversion_risk: radio_underindex }
+  latin: { growth: strong, regional_mexican: surging_2023_2024_2025 }
+  country: { growth_since_2023: true }
+  pop: { nostalgia_wave_2025: true }
+  christian: { uptick_2025: true }
+  fraud_cross_genre: true
+
+hot100_conversion:
+  levers: [paid_streams, radio_crossover, sales_support]
+  tactics:
+    hiphop: [radio-legible edits, pop/Latin collabs, tempo/hooks optimized]
+    latin: [bilingual mixes, pop-format cuts]
+    country: [radio mix clarity, tour-driven streaming]
+    pop: [multi-format radio, nostalgia tie-ins]
+    christian: [viral-ready choruses, crossover features]
+
+historical_echo_alignment:
+  core_rule: "Top 40 today ≈ Top 40 ~40 years ago (echo weights at 40/30/20/10 years)"
+  weights: { "40": 0.50, "30": 0.20, "20": 0.20, "10": 0.10 }
+
+recommendations:
+  - Track paid-tier share by genre monthly; prefer paid-stream KPIs in HCI.
+  - Add DSP anti-fraud change-log feed to norms.
+  - Expose 'radio legibility' heuristic in Sonic/Market layers.
+  - Add cross-genre conversion recipes to /advisor run full outputs.

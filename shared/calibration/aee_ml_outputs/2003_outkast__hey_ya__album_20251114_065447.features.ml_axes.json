@@ -1,0 +1,31 @@
+{
+  "audio_name": "2003_outkast__hey_ya__album_20251114_065447",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4246233953253973,
+        "lo": 0.29956638631421695,
+        "mid": 0.2758102183603858
+      },
+      "value": 0.558748272469624
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.41804423378296773,
+        "lo": 0.22586943354353642,
+        "mid": 0.35608633267349576
+      },
+      "value": 0.5785546517609778
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/04_echo_2000_04/2003_outkast__hey_ya__album/2003_outkast__hey_ya__album_20251114_065447.features.json"
+}

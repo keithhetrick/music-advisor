@@ -1,0 +1,31 @@
+{
+  "audio_name": "1977_fleetwood_mac__dreams__album_20251114_063603",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.005671179166500862,
+        "lo": 0.8807664160650032,
+        "mid": 0.11356240476849601
+      },
+      "value": 0.23775498788877436
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.07321543566717127,
+        "lo": 0.6995247619168533,
+        "mid": 0.22725980241597557
+      },
+      "value": 0.31576797390845407
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/10_golden_set_for_eval/1977_fleetwood_mac__dreams__album/1977_fleetwood_mac__dreams__album_20251114_063603.features.json"
+}

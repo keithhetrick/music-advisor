@@ -1,0 +1,16 @@
+{
+  "logging": {
+    "json_printer": "plugins.logging.json_printer",
+    "http_post": "plugins.logging.http_post"
+  },
+  "sidecar": {
+    "stub": "plugins.sidecar.stub",
+    "rich_stub": "plugins.sidecar.rich_stub"
+  },
+  "cache": {
+    "memory_cache": "plugins.cache.memory_cache"
+  },
+  "exporter": {
+    "echo_stdout": "plugins.exporter.echo_stdout"
+  }
+}

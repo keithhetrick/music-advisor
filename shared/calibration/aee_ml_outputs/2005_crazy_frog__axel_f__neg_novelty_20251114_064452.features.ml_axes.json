@@ -1,0 +1,31 @@
+{
+  "audio_name": "2005_crazy_frog__axel_f__neg_novelty_20251114_064452",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.5149878281628949,
+        "lo": 0.2187602565937722,
+        "mid": 0.2662519152433329
+      },
+      "value": 0.6146176628788815
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3194601157227521,
+        "lo": 0.37664314378624175,
+        "mid": 0.30389674049100607
+      },
+      "value": 0.4988180973670907
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/14_negatives_novelty_eval/2005_crazy_frog__axel_f__neg_novelty/2005_crazy_frog__axel_f__neg_novelty_20251114_064452.features.json"
+}

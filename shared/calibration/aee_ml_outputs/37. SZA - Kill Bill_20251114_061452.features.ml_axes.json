@@ -1,0 +1,31 @@
+{
+  "audio_name": "37. SZA - Kill Bill_20251114_061452",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.5500649305171914,
+        "lo": 0.2152766711220771,
+        "mid": 0.23465839836073155
+      },
+      "value": 0.6279397243443938
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3782753411839251,
+        "lo": 0.2893686302998531,
+        "mid": 0.33235602851622187
+      },
+      "value": 0.5455857803244178
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/37. SZA - Kill Bill/37. SZA - Kill Bill_20251114_061452.features.json"
+}

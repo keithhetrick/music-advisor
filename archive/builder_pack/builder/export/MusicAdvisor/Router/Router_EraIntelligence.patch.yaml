@@ -1,0 +1,35 @@
+command:
+  name: "/era map"
+  description: "Place track in cyclical lineage; translate era, don't mimic."
+  params:
+    - name: title
+      required: false
+    - name: lane
+      required: false
+    - name: region
+      required: false
+  steps:
+    - load_json:
+        from: "Knowledge/era_fingerprints.json"
+        as: ERA
+    - set:
+        title: "${args.title || context.meta.title}"
+        lane: "${args.lane  || context.meta.lane  || 'Neon Heart Pop'}"
+        region: "${args.region || context.meta.region || 'US'}"
+    - choose:
+        when: "${lane == 'Porch Gospel'}"
+        then:
+          set:
+            lineage: "${ERA.porch_gospel.lineage}"
+            execution: "Lean timeless; room honesty; avoid shiny reverb."
+        else:
+          set:
+            lineage: "${ERA.default.lineage}"
+            execution: "Modern transient control; avoid hype edges; translate era."
+    - render:
+        template: "Templates/era/output_era_intelligence.txt"
+        to: result
+    - print: "${result}"
+    - append:
+        to: advisor.notes[]
+        value: "Era lineage: ${lineage} — ${execution}"

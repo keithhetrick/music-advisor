@@ -1,0 +1,31 @@
+{
+  "audio_name": "2004_usher_lil_jon_ludacris__yeah__album_20251115_081601",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3931422706785362,
+        "lo": 0.24647105166940977,
+        "mid": 0.36038667765205407
+      },
+      "value": 0.5636584792366648
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.44782045138168125,
+        "lo": 0.21640081084138887,
+        "mid": 0.33577873777692996
+      },
+      "value": 0.5918169147311718
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_0/2004_usher_lil_jon_ludacris__yeah__album/2004_usher_lil_jon_ludacris__yeah__album_20251115_081601.features.json"
+}

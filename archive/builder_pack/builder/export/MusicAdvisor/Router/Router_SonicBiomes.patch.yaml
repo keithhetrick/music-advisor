@@ -1,0 +1,20 @@
+command:
+  name: "/biome classify"
+  description: "Classify sonic biome; suggest neighboring biomes & palette (advisory)."
+  steps:
+    - load_json:
+        from: "Knowledge/sonic_biomes.json"
+        as: SB
+    - set:
+        lane: "${context.meta.lane || 'Neon Heart Pop'}"
+        neighbors: "${SB.neighbors[lane] || ['Bedroom Whisper']}"
+        palette: "${SB.palette[lane]   || ['tasteful minimal synths']}"
+        space: "${SB.space}"
+        note: "${lane.contains('Neon') ? 'Avoid maximal drums; intimacy is the currency.' : 'Keep room honesty; resist shiny reverb.'}"
+    - render:
+        template: "Templates/biome/output_sonic_biomes.txt"
+        to: result
+    - print: "${result}"
+    - append:
+        to: advisor.notes[]
+        value: "Biome ${lane} → neighbors ${neighbors.join(', ')}; palette ${palette.join(', ')}; ${note}"

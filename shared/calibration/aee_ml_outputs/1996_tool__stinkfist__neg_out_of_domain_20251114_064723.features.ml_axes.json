@@ -1,0 +1,31 @@
+{
+  "audio_name": "1996_tool__stinkfist__neg_out_of_domain_20251114_064723",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.338088988155106,
+        "lo": 0.279942931698921,
+        "mid": 0.38196808014597294
+      },
+      "value": 0.5343482663446109
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3820802775321714,
+        "lo": 0.3158820799712628,
+        "mid": 0.30203764249656584
+      },
+      "value": 0.5389634731448811
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/13_negatives_out_of_domain/1996_tool__stinkfist__neg_out_of_domain/1996_tool__stinkfist__neg_out_of_domain_20251114_064723.features.json"
+}

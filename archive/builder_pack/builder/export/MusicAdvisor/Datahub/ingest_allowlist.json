@@ -1,0 +1,18 @@
+{
+  "ingest_allowlist": [
+    "MusicAdvisor/Config/presets/pop_us_default.json",
+    "MusicAdvisor/Config/runtime_flags.json",
+    "MusicAdvisor/Data/HitCheck_Cohorts/Blueprint_US_Pop_2025_midtempo_v1_1/Profiles/pop_us_profile.json",
+    "MusicAdvisor/Examples/legacy_flat_fields.json",
+    "MusicAdvisor/Examples/minimal_pack.json",
+    "MusicAdvisor/QA/Global_KPop.fixture.json",
+    "MusicAdvisor/QA/LATAM_Urban.fixture.json",
+    "MusicAdvisor/QA/US_Pop.fixture.json",
+    "MusicAdvisor/QA/_Template.fixture.json",
+    "MusicAdvisor/Recipes/christian_crossover.json",
+    "MusicAdvisor/Recipes/hiphop_pop_crossover.json",
+    "MusicAdvisor/Recipes/latin_crossover.json",
+    "MusicAdvisor/Recipes/pop_radio_mix.json",
+    "MusicAdvisor/Templates/datapack_template.json"
+  ]
+}

@@ -1,0 +1,37 @@
+paths:
+  # Adjust these three paths to match your repo layout.
+  # If your repo root contains: MusicAdvisor/Data/HitCheck_Cohorts/...
+  index_npz: MusicAdvisor/Data/HitCheck_Cohorts/Blueprint_US_Pop_2025_midtempo_v1_1/hitcheck_index.npz
+  reference_features: MusicAdvisor/Data/HitCheck_Cohorts/Blueprint_US_Pop_2025_midtempo_v1_1/features.csv
+  reference_meta: MusicAdvisor/Data/HitCheck_Cohorts/Blueprint_US_Pop_2025_midtempo_v1_1/meta.json
+
+defaults:
+  k: 8
+  metric: cosine
+  alpha: 0.12     # similarity weight for HCI_v1p
+  lambda: 0.08    # cohort normalization weight for HCI_v1p
+
+
+defaults:
+  metric: "cosine"
+  k: 8
+  alpha: 0.12 # neighbor uplift scale
+  lambda: 0.08 # drift penalty weight
+
+normalization:
+  method: "zscore_by_cohort"
+  circular: "key_pitch_class"
+  embed_cats: ["rhythm_profile", "genre", "tags"]
+
+drift_thresholds:
+  tempo_z: 1.0
+  lufs_z: 0.8
+  energy_z: 1.0
+  danceability_z: 1.0
+  valence_z: 1.0
+  ttc_z: 0.8
+  rhythm_dist_pct: 0.75 # percentile in cohort
+
+projection:
+  clamp_min: 0.0
+  clamp_max: 1.0

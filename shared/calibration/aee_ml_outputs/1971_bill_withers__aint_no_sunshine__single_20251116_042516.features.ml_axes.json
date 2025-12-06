@@ -1,0 +1,31 @@
+{
+  "audio_name": "1971_bill_withers__aint_no_sunshine__single_20251116_042516",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.23718313271133673,
+        "lo": 0.4348042526465943,
+        "mid": 0.328012614642069
+      },
+      "value": 0.45257282065498955
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.15450943774917156,
+        "lo": 0.5826431692027931,
+        "mid": 0.2628473930480352
+      },
+      "value": 0.37928535245137207
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/1971_bill_withers__aint_no_sunshine__single/1971_bill_withers__aint_no_sunshine__single_20251116_042516.features.json"
+}

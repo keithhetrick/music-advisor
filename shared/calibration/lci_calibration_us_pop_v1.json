@@ -1,0 +1,36 @@
+{
+  "version": "LCI_lyric_v1",
+  "calibration_profile": "lci_us_pop_v1",
+  "profile": "us_pop",
+  "axes": {
+    "structure_fit": {
+      "component_weights": { "section_count": 0.3, "section_diversity": 0.3, "hook_texture": 0.4 },
+      "mu": 0.5, "sigma": 0.2, "clip": 3.0, "weight": 1.0
+    },
+    "prosody_ttc_fit":   {
+      "component_weights": { "words_score": 1.0, "syll_score": 1.0, "density_score": 1.0 },
+      "mu": 0.5, "sigma": 0.2, "clip": 3.0, "weight": 1.0
+    },
+    "rhyme_texture_fit":     {
+      "component_weights": { "rhyme_density": 0.6, "internal_rhyme": 0.4 },
+      "mu": 0.5, "sigma": 0.2, "clip": 3.0, "weight": 1.0
+    },
+    "diction_style_fit":   {
+      "component_weights": { "lexical_diversity": 0.6, "verbosity": 0.2, "explicit_restraint": 0.2, "sentiment_level": 0.0 },
+      "mu": 0.5, "sigma": 0.2, "clip": 3.0, "weight": 1.0
+    },
+    "pov_fit":       {
+      "component_weights": { "pov_balance": 0.6, "pov_presence": 0.4 },
+      "mu": 0.5, "sigma": 0.2, "clip": 3.0, "weight": 1.0
+    },
+    "theme_fit":     {
+      "component_weights": { "theme_mean": 0.7, "concreteness": 0.3 },
+      "mu": 0.5, "sigma": 0.2, "clip": 3.0, "weight": 1.0
+    }
+  },
+  "aggregation": {
+    "method": "weighted_mean",
+    "target_mu": 0.65,
+    "target_sigma": 0.15
+  }
+}

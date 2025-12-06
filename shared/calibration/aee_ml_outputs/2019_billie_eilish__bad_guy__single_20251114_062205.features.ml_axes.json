@@ -1,0 +1,31 @@
+{
+  "audio_name": "2019_billie_eilish__bad_guy__single_20251114_062205",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.5359454912675178,
+        "lo": 0.2031883758790307,
+        "mid": 0.26086613285345145
+      },
+      "value": 0.626624409179922
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.35725205130571847,
+        "lo": 0.3296736315195398,
+        "mid": 0.31307431717474166
+      },
+      "value": 0.5261361285011394
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/00_core_modern/2019_billie_eilish__bad_guy__single/2019_billie_eilish__bad_guy__single_20251114_062205.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "1988_roxette__listen_to_your_heart__album_20251114_062750",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.16886025254434803,
+        "lo": 0.499428663940595,
+        "mid": 0.33171108351505685
+      },
+      "value": 0.40927248920834325
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.40277108686383006,
+        "lo": 0.2288034767939034,
+        "mid": 0.36842543634226654
+      },
+      "value": 0.5723288373641695
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/01_echo_1985_89/1988_roxette__listen_to_your_heart__album/1988_roxette__listen_to_your_heart__album_20251114_062750.features.json"
+}

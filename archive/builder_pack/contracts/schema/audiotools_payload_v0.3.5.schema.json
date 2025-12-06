@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MusicAdvisor AudioTools Payload v0.3.5",
+  "type": "object",
+  "required": ["duration_sec", "audio_axes", "TTC"],
+  "properties": {
+    "duration_sec": { "type": "number", "minimum": 0 },
+    "audio_axes": {
+      "type": "array",
+      "items": { "type": "number", "minimum": 0, "maximum": 1 },
+      "minItems": 6,
+      "maxItems": 6
+    },
+    "TTC": {
+      "type": "object",
+      "properties": {
+        "seconds": { "type": ["number", "null"], "minimum": 0 },
+        "confidence": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "lift_db": { "type": ["number", "null"] },
+        "dropped": { "type": "array", "items": { "type": "string" } },
+        "source": { "type": "string" }
+      },
+      "required": ["seconds", "confidence", "lift_db", "dropped", "source"]
+    },
+    "tonal": {
+      "type": "object",
+      "properties": {
+        "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+      },
+      "required": ["confidence"]
+    },
+    "tempo": {
+      "type": ["object", "null"],
+      "properties": {
+        "bpm": { "type": ["number", "null"] },
+        "band_10s": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

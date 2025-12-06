@@ -1,0 +1,29 @@
+{
+  "id": "QA_US_POP_001",
+  "generated_at": "2025-10-29T00:00:00Z",
+  "region": "US",
+  "genre": "Pop",
+  "tempo_band_bpm": 98,
+  "runtime_sec": 180,
+  "ttc_sec": 18,
+  "exposures": 3,
+  "MARKET_NORMS": {
+    "profile": "US_Pop_2025",
+    "norm_version": "2025.1",
+    "source": "norms/2025/streaming.json"
+  },
+  "reference_year": 2025,
+  "reference_eras": [1985, 1995, 2005, 2015],
+  "production_tags": [
+    "analog_synths",
+    "gated_reverb",
+    "bright_chorus_guitar",
+    "modern_vocal_chops"
+  ],
+  "lyric_motifs": ["big_romance", "city_night", "youth_nostalgia"],
+  "rhythm_profile": "four_on_the_floor",
+  "tonal_profile": { "key": "A", "mode": "major", "energy": 0.72 },
+  "Known_Gaps": [],
+  "router_version": "v2.6.0",
+  "norm_version": "2025.1"
+}

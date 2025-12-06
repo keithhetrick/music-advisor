@@ -1,0 +1,29 @@
+{
+  "profile_id": "Dance_NuGroove_Echo",
+  "version": "1.0",
+  "description": "Dance-pop / nu-disco with 1980s disco/funk lineage — movement-first, bassline hooks, glossy but warm highs.",
+  "era_lineage": [
+    "Y-40:disco_funk",
+    "Y-20:bloghouse_nu",
+    "Y-10:retro_dance_pop"
+  ],
+  "emotional_palette": ["joy", "release", "flirt", "city_night"],
+  "production_language": [
+    "octave_bass",
+    "comp_piano",
+    "perc_glitter",
+    "clap_stack",
+    "filter_rise"
+  ],
+  "rhythmic_bias": ["four_on_floor", "shuffle_dance", "disco_pocket"],
+  "harmonic_tendencies": ["minor_to_major_lifts", "secondary_dominants"],
+  "vocal_shape": ["unison_hook", "falsetto_spice", "chant_tag"],
+  "reference_frames": {
+    "artists": [
+      "Dua Lipa",
+      "Calvin Harris (soul-tinge)",
+      "The Weeknd (nu-disco tracks)"
+    ],
+    "eras": ["Chic/Disco DNA, 80s boogie"]
+  }
+}

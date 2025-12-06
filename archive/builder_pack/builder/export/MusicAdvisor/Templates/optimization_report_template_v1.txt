@@ -1,0 +1,14 @@
+=== OPTIMIZATION REPORT ===
+Target HCI: {plan[notes][target_HCI] if plan.get('notes') else '—'}
+
+Layer Targets:
+{format_list([
+  "- " + t['layer'] + ": " + t['goal'] + "\n  Actions:\n    - " + "\n    - ".join(t['actions'])
+  for t in plan.get('targets', [])
+], default="- none")}
+
+Quick Fixes:
+{format_list(plan.get('quick_fixes'), default="- none")}
+
+Notes:
+- Trend Suggestion: {plan[notes][trend_suggestion] if plan.get('notes') and plan['notes'].get('trend_suggestion') else '—'}

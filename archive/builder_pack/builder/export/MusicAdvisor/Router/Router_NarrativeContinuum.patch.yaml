@@ -1,0 +1,28 @@
+command:
+  name: "/story thread"
+  description: "Declare or inspect a narrative thread for callbacks (advisory)."
+  params:
+    - name: name
+      required: false
+  steps:
+    - set:
+        thread: "${args.name || context.meta.thread || 'Standalone'}"
+    - choose:
+        when: "${thread == 'Parallel Somewhere'}"
+        then:
+          set:
+            anchor: "fated longing / missed universe"
+            motifs: ["UV seam", "tear-light", "parallel hearts"]
+            next: "acceptance without forgetting"
+        else:
+          set:
+            anchor: "single-chapter"
+            motifs: []
+            next: null
+    - render:
+        template: "Templates/narrative/output_narrative_continuum.txt"
+        to: result
+    - print: "${result}"
+    - append:
+        to: advisor.notes[]
+        value: "Thread: ${thread} — anchor: ${anchor}; motifs: ${motifs.join(', ')}"

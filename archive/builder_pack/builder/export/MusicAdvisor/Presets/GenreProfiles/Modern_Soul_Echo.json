@@ -1,0 +1,26 @@
+{
+  "profile_id": "Modern_Soul_Echo",
+  "version": "1.0",
+  "description": "2020s pop/soul with 1980s soul lineage — warmth, vocal-forward catharsis, organic-meets-modern palette.",
+  "era_lineage": ["Y-40:soul_pop", "Y-30:neo_soul", "Y-10:gospel_pop"],
+  "emotional_palette": ["longing", "confession", "release", "devotion"],
+  "production_language": [
+    "piano/front",
+    "tape-warmth",
+    "sub-soft",
+    "bgv-stacks",
+    "room-air"
+  ],
+  "rhythmic_bias": ["slow_4", "6/8_sway", "laidback_pocket"],
+  "harmonic_tendencies": [
+    "I-vi-IV-V",
+    "minor6_colors",
+    "suspensions",
+    "gospel_turns"
+  ],
+  "vocal_shape": ["rasp_peak", "falsetto_whisper", "call_response_hint"],
+  "reference_frames": {
+    "artists": ["Adele", "Leon Bridges", "Hozier (ballads)"],
+    "eras": ["Ray Charles soul ballads", "80s Quiet Gospel crossover"]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "40. Miley Cyrus - Flowers_20251114_061527",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.48225753986196623,
+        "lo": 0.24334258412534063,
+        "mid": 0.2743998760126933
+      },
+      "value": 0.595787363714086
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.36801156499722637,
+        "lo": 0.30673861067895886,
+        "mid": 0.3252498243238147
+      },
+      "value": 0.5367824645453416
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/40. Miley Cyrus - Flowers/40. Miley Cyrus - Flowers_20251114_061527.features.json"
+}

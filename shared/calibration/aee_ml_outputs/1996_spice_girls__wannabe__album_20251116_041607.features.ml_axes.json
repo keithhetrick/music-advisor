@@ -1,0 +1,31 @@
+{
+  "audio_name": "1996_spice_girls__wannabe__album_20251116_041607",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.5025218805724743,
+        "lo": 0.19078009042770422,
+        "mid": 0.30669802899982157
+      },
+      "value": 0.6186486310720547
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4028887080664501,
+        "lo": 0.27524417045071126,
+        "mid": 0.3218671214828386
+      },
+      "value": 0.5584377966880442
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/1996_spice_girls__wannabe__album/1996_spice_girls__wannabe__album_20251116_041607.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "generated_at": "2025-11-07T06:04:21Z",
+  "track_id": "flower_ref",
+  "profile": "US_Pop_2025",
+  "lane": "radio_us",
+  "policy": {
+    "beta_audio": 1.0,
+    "cap_audio": 0.58,
+    "ttc_conf_gate": 0.6,
+    "lift_window_sec": 6.0,
+    "canonical_lane": "radio_us",
+    "seeds": [
+      42,
+      314,
+      2718
+    ],
+    "emit_run_cards": true
+  },
+  "metrics": {
+    "ttc_seconds": null,
+    "ttc_confidence": 0.55,
+    "chorus_lift_db": null
+  },
+  "dropped_features": [
+    "chorus_lift"
+  ],
+  "notes": {
+    "HCI": 0.58,
+    "smoke": true
+  }
+}

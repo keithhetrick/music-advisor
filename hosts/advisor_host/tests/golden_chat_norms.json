@@ -1,0 +1,15 @@
+[
+  {
+    "message": "analyze",
+    "payload": "hosts/advisor_host/tests/fixtures/sample_client.json",
+    "norms": "engines/recommendation_engine/recommendation_engine/tests/fixtures/market_norms_us_tier1_2024YE.json"
+  },
+  {
+    "message": "plan",
+    "expect_keys": ["reply", "ui_hints"]
+  },
+  {
+    "message": "more",
+    "expect_keys": ["reply", "ui_hints"]
+  }
+]

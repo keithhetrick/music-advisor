@@ -1,0 +1,8 @@
+Open Source Notices (Music Advisor)
+
+This application includes open-source components licensed under MIT. Notable packages:
+- music-advisor-config (MIT)
+- music-advisor-shared (MIT)
+- Other MIT-licensed dependencies (see NOTICE and LICENSE files)
+
+Full text of the licenses is available in the app bundle (NOTICE, LICENSE) and in the repository.

@@ -1,0 +1,81 @@
+{
+  "HCI_v1": {
+    "HCI_v1_score": 0.446
+  },
+  "Baseline": {
+    "id": null,
+    "note": "Baseline block unavailable; using safe default for tests.",
+    "MARKET_NORMS": {}
+  },
+  "Policy": {
+    "cap_audio": 0.58,
+    "ttc_conf_gate": 0.6,
+    "lift_window_sec": 6.0
+  },
+  "TTC_Gate": {
+    "ttc_seconds": null,
+    "ttc_confidence": null,
+    "lift_db": null,
+    "drop_features": [
+      "chorus_lift"
+    ],
+    "source": "absent"
+  },
+  "TTC": {
+    "seconds": null,
+    "confidence": null,
+    "lift_db": null,
+    "dropped": [],
+    "source": "absent"
+  },
+  "Structural_Gates": {
+    "drop": [
+      "chorus_lift",
+      "exposures"
+    ],
+    "notes": {
+      "struct_mode": "optional",
+      "struct_reliable": false,
+      "use_ttc": true,
+      "use_exposures": false,
+      "ttc_gate_threshold": 0.6,
+      "reasoning": "Subfeatures dropped due to structural eligibility, not numeric HCI logic."
+    }
+  },
+  "Structural": {
+    "drop": [
+      "chorus_lift",
+      "exposures"
+    ],
+    "notes": {
+      "struct_mode": "optional",
+      "struct_reliable": false,
+      "use_ttc": true,
+      "use_exposures": false,
+      "ttc_gate_threshold": 0.6,
+      "reasoning": "Subfeatures dropped due to structural eligibility, not numeric HCI logic."
+    }
+  },
+  "Goldilocks": {
+    "advisory": {
+      "target_market": 0.5,
+      "target_emotional": 0.5,
+      "delta_market": 0.02,
+      "delta_emotional": -0.17
+    },
+    "rationale": "Shift modestly toward market framing while tempering emotive claims.",
+    "safety": {
+      "note": "Goldilocks is advisory-only; HCI remains unchanged."
+    }
+  },
+  "Axes": {
+    "audio_axes": [
+      0.253,
+      0.0,
+      0.995,
+      0.429,
+      0.5,
+      0.5
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "1993_aerosmith__cryin__album_20251114_063113",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.15841481912405905,
+        "lo": 0.5011704659339447,
+        "mid": 0.3404147149419963
+      },
+      "value": 0.40509404691323736
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.35680321536046994,
+        "lo": 0.2935200400296298,
+        "mid": 0.34967674460990034
+      },
+      "value": 0.5368251133672756
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/02_echo_1990_94/1993_aerosmith__cryin__album/1993_aerosmith__cryin__album_20251114_063113.features.json"
+}

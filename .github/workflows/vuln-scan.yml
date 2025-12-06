@@ -1,0 +1,27 @@
+name: Vulnerability Scan
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  pip-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11.0"
+          cache: "pip"
+          cache-dependency-path: |
+            requirements.txt
+            requirements.lock
+            engines/**/requirements*.txt
+            engines/**/pyproject.toml
+            src/ma_config/pyproject.toml
+            shared/pyproject.toml
+      - name: Install pip-audit
+        run: python -m pip install pip-audit
+      - name: Run pip-audit (non-blocking)
+        run: pip-audit -r requirements.txt || true

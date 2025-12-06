@@ -1,0 +1,31 @@
+{
+  "audio_name": "1986_bon_jovi__livin_on_a_prayer__single_20251114_062600",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2851164425777555,
+        "lo": 0.38056096716529275,
+        "mid": 0.3343225902569517
+      },
+      "value": 0.4856224647526266
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3387465555430337,
+        "lo": 0.3322849046506826,
+        "mid": 0.32896853980628377
+      },
+      "value": 0.518875823044857
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/01_echo_1985_89/1986_bon_jovi__livin_on_a_prayer__single/1986_bon_jovi__livin_on_a_prayer__single_20251114_062600.features.json"
+}

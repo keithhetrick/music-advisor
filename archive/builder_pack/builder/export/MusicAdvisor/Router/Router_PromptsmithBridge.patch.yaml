@@ -1,0 +1,75 @@
+# Router/Router_PromptsmithBridge.patch.yaml
+# Adds a new command to emit a Promptsmith-ready prompt from the current pack/advisor context.
+
+router:
+  commands:
+    - name: promptsmith_export
+      patterns:
+        - "/promptsmith export"
+        - "/promptsmith_export"
+        - "/export promptsmith"
+      action: |
+        # PSEUDOCODE — adapt to your router runtime API
+
+        # Helpers
+        def safe(obj, *keys, default=""):
+          cur = obj
+          for k in keys:
+            if not isinstance(cur, dict) or k not in cur:
+              return default
+            cur = cur[k]
+          return cur
+
+        # Gather context
+        pack = context.get("current_pack") or {}
+        advisor = context.get("advisor_result") or {}
+        trend = context.get("current_trend_signals") or []
+
+        # Build summary
+        tp = pack.get("tonal_profile") or {}
+        tp_key = tp.get("key", "auto")
+        tp_mode = tp.get("mode", "auto")
+        tp_energy = tp.get("energy", "auto")
+
+        summary = {}
+        summary["market_notes"]   = safe(advisor, "market", "notes", default="N/A")
+        summary["cultural_notes"] = safe(advisor, "cultural", "notes", default="N/A")
+        summary["sonic_notes"]    = safe(advisor, "sonic", "notes", default="N/A")
+        summary["key_priorities"] = safe(advisor, "recommendations", "do", default="paid-stream share; radio legibility; strong hook")
+        summary["anti_patterns"]  = safe(advisor, "recommendations", "avoid", default="overlong intros; muddy vocals; unfocused drums")
+
+        echo_40 = float(safe(advisor, "historical", "echo_40", default=0.0))
+        echo_30 = float(safe(advisor, "historical", "echo_30", default=0.0))
+        echo_20 = float(safe(advisor, "historical", "echo_20", default=0.0))
+        echo_10 = float(safe(advisor, "historical", "echo_10", default=0.0))
+        summary["echo_cues"] = f"40:{echo_40:.2f}, 30:{echo_30:.2f}, 20:{echo_20:.2f}, 10:{echo_10:.2f}"
+
+        tags = []
+        for k in ("production_tags","lyric_motifs"):
+          if isinstance(pack.get(k), list):
+            tags.extend(pack[k])
+        if not tags:
+          for t in trend:
+            if isinstance(t, dict) and isinstance(t.get("tags"), list):
+              tags.extend(t["tags"])
+        summary["production_tags"] = ", ".join(sorted(set(tags))) or "N/A"
+
+        # Load template
+        tpl_path = "Templates/promptsmith_bridge_template_v1.txt"
+        template_text = read_text(tpl_path)  # your runtime should provide this file read helper
+
+        # Build template context
+        ctx = {
+          "current_pack": pack,
+          "advisor_result": advisor,
+          "trend_signals": trend,
+          "summary": summary,
+          "tp_key": tp_key,
+          "tp_mode": tp_mode,
+          "tp_energy": tp_energy,
+          "MARKET_NORMS": pack.get("MARKET_NORMS", {}),
+        }
+
+        # Render & print
+        out_text = render_template(template_text, ctx)  # use your router’s template renderer or a simple .format_map
+        print_block("PROMPTSMITH_BRIDGE", out_text)

@@ -1,0 +1,31 @@
+{
+  "audio_name": "5. Teddy Swims - Lose Control_20251114_060903",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.41978026832965964,
+        "lo": 0.25881517479330957,
+        "mid": 0.3214045568770309
+      },
+      "value": 0.5692785414773881
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3117048382335218,
+        "lo": 0.3975601130242901,
+        "mid": 0.29073504874218803
+      },
+      "value": 0.48982865947444554
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/5. Teddy Swims - Lose Control/5. Teddy Swims - Lose Control_20251114_060903.features.json"
+}

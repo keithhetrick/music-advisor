@@ -1,0 +1,8 @@
+{
+  "era.map": "Templates/era/output_era_intelligence.txt",
+  "listener.map": "Templates/listener/output_listener_archetypes.txt",
+  "emotion.scan": "Templates/emotion/output_emotional_physics.txt",
+  "biome.classify": "Templates/biome/output_sonic_biomes.txt",
+  "endurance.test": "Templates/endurance/output_endurance_check.txt",
+  "story.thread": "Templates/narrative/output_narrative_continuum.txt"
+}

@@ -1,0 +1,25 @@
+{
+  "scheme": "audio_v2_quantile_piecewise_v1",
+  "region": "US",
+  "profile": "Pop",
+  "set_name": "2025Q4_benchmark_100",
+  "source_db": "data/historical_echo/historical_echo.db",
+  "raw_stats": {
+    "count": 100,
+    "mean": 0.37523149999999994,
+    "std": 0.08678833782686474,
+    "min": 0.2118,
+    "p10": 0.253215,
+    "p25": 0.304975,
+    "p50": 0.38005,
+    "p75": 0.44045,
+    "p90": 0.46587000000000023,
+    "max": 0.5699
+  },
+  "breakpoints": {
+    "raw": [
+      0.2118, 0.253215, 0.304975, 0.38005, 0.44045, 0.46587000000000023, 0.5699
+    ],
+    "target": [0.3, 0.4, 0.55, 0.7, 0.82, 0.92, 0.98]
+  }
+}

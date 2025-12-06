@@ -1,0 +1,7 @@
+ERA MAP
+Title: {{title}}
+Lane:  {{lane}}
+Region: {{region}}
+
+Cycle:  {{lineage}}
+Advice: {{execution}}

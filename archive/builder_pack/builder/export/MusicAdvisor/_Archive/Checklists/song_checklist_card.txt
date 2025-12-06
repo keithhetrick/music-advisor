@@ -1,0 +1,6 @@
+Song QA (Universal)
+Structure: TTC target band; Runtime in band; Hook exposures ≥3; Tempo within band or justified.
+Hook: ≤9 syllables/bar; strong-beat alignment; unique-word ratio ≥0.55; ≤10-word payoff paraphrase.
+Title: overlap with hook <0.8; avoid generic 1-word; cadence fits downbeat.
+Sonics: −10..−12 LUFS; DR≥5; tuning drift <25 cents unless intentional.
+Emotion: energy–emotion |Δ| ≤0.25; catharsis ≥8s; bridge turn present.

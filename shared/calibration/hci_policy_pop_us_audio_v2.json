@@ -1,0 +1,28 @@
+{
+  "policy_id": "hci_policy_pop_us_audio_v2",
+  "version": 2,
+  "description": "Audio HCI_v2 policy for US Pop. Groups axes into structure, feel, and loudness and defines weights for each group.",
+  "groups": {
+    "structure": {
+      "axes": ["TempoFit", "RuntimeFit"],
+      "weight": 0.4
+    },
+    "feel": {
+      "axes": {
+        "Energy": 0.5,
+        "Danceability": 0.3,
+        "Valence": 0.2
+      },
+      "weight": 0.4
+    },
+    "loudness": {
+      "axis": "LoudnessFit",
+      "weight": 0.2,
+      "notes": "Gaussian around Pop loudness norm; used as a soft penalty, not a hard gate."
+    }
+  },
+  "raw_bounds": {
+    "min": 0.0,
+    "max": 1.0
+  }
+}

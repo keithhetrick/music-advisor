@@ -1,0 +1,31 @@
+{
+  "audio_name": "2004_green_day__american_idiot__album_20251114_065458",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.33574895904407964,
+        "lo": 0.38304771627428735,
+        "mid": 0.2812033246816331
+      },
+      "value": 0.5025978207831416
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.30418959164251275,
+        "lo": 0.3563967900920545,
+        "mid": 0.3394136182654328
+      },
+      "value": 0.49954732004726315
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/04_echo_2000_04/2004_green_day__american_idiot__album/2004_green_day__american_idiot__album_20251114_065458.features.json"
+}

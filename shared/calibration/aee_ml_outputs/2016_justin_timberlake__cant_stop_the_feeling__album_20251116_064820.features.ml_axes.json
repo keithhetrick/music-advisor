@@ -1,0 +1,31 @@
+{
+  "audio_name": "2016_justin_timberlake__cant_stop_the_feeling__album_20251116_064820",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.28496901275556624,
+        "lo": 0.3428075297897219,
+        "mid": 0.3722234574547118
+      },
+      "value": 0.4968968955275316
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3622287272499659,
+        "lo": 0.29293742371078124,
+        "mid": 0.34483384903925285
+      },
+      "value": 0.5388988274242537
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2016_justin_timberlake__cant_stop_the_feeling__album/2016_justin_timberlake__cant_stop_the_feeling__album_20251116_064820.features.json"
+}

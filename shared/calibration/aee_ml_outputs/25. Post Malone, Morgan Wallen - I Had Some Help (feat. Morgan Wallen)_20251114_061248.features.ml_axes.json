@@ -1,0 +1,31 @@
+{
+  "audio_name": "25. Post Malone, Morgan Wallen - I Had Some Help (feat. Morgan Wallen)_20251114_061248",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4152555344619979,
+        "lo": 0.2940861705989012,
+        "mid": 0.29065829493910084
+      },
+      "value": 0.5571135858820289
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3012152696732374,
+        "lo": 0.3883843249111543,
+        "mid": 0.3104004054156082
+      },
+      "value": 0.4889100469122868
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/25. Post Malone, Morgan Wallen - I Had Some Help (feat. Morgan Wallen)/25. Post Malone, Morgan Wallen - I Had Some Help (feat. Morgan Wallen)_20251114_061248.features.json"
+}

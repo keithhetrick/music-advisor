@@ -1,0 +1,40 @@
+{
+  "1985_pop": {
+    "tempo_bpm_typical": [108, 124],
+    "production": [
+      "analog_synths",
+      "gated_reverb",
+      "bright_chorus_guitar",
+      "dx7_keys"
+    ],
+    "rhythm": ["four_on_the_floor", "syncopated_offbeat_snare"],
+    "lyric": ["big_romance", "outsider_cool", "city_night"],
+    "tonal": ["major_bias", "relative_minor_ballads"]
+  },
+  "1995_rnb": {
+    "tempo_bpm_typical": [84, 96],
+    "production": [
+      "swing_hihat",
+      "warm_rhodes",
+      "vocal_stacks",
+      "boom_bap_kick"
+    ],
+    "rhythm": ["laid_back_swing"],
+    "lyric": ["intimate", "relationship_dialogue"],
+    "tonal": ["minor_bias", "soul_extensions"]
+  },
+  "2005_pop_punk": {
+    "tempo_bpm_typical": [150, 175],
+    "production": ["crunch_guitars", "tight_kick_snare", "gang_vocals"],
+    "rhythm": ["driving_eighths"],
+    "lyric": ["youth_rebellion", "suburban_escape"],
+    "tonal": ["major_bias", "modal_mix"]
+  },
+  "2015_trap_pop": {
+    "tempo_bpm_typical": [130, 150],
+    "production": ["808_sub", "trap_hats", "ambient_pads", "vocal_chops"],
+    "rhythm": ["half_time_trap"],
+    "lyric": ["flex", "late_night", "vulnerable_confessional"],
+    "tonal": ["minor_bias", "low_energy_verses_high_energy_hooks"]
+  }
+}

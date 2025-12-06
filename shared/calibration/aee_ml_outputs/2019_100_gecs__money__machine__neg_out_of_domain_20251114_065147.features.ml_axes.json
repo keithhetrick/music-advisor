@@ -1,0 +1,31 @@
+{
+  "audio_name": "2019_100_gecs__money__machine__neg_out_of_domain_20251114_065147",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4341894178368969,
+        "lo": 0.31148572098728106,
+        "mid": 0.25432486117582204
+      },
+      "value": 0.5585205799467297
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2702019304829277,
+        "lo": 0.4120019309548379,
+        "mid": 0.31779613856223443
+      },
+      "value": 0.4709700963825733
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/13_negatives_out_of_domain/2019_100_gecs__money__machine__neg_out_of_domain/2019_100_gecs__money__machine__neg_out_of_domain_20251114_065147.features.json"
+}

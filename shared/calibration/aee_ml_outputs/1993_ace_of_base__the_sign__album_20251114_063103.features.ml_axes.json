@@ -1,0 +1,31 @@
+{
+  "audio_name": "1993_ace_of_base__the_sign__album_20251114_063103",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.49341962014352353,
+        "lo": 0.2513978923602276,
+        "mid": 0.2551824874962489
+      },
+      "value": 0.597277499342165
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.37052153723772036,
+        "lo": 0.2837836940508358,
+        "mid": 0.3456947687114439
+      },
+      "value": 0.5445474298179513
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/02_echo_1990_94/1993_ace_of_base__the_sign__album/1993_ace_of_base__the_sign__album_20251114_063103.features.json"
+}

@@ -1,0 +1,54 @@
+## /audio — Audio Features Ingest (chat-native)
+
+/audio help
+• Show usage and schema fields (Schemas/audio_features.schema.json).
+• Example flow:
+  /audio import <JSON>
+  /audio map pack region=US profile=US_Pop_2025
+  /audio finalize → /advisor ingest → /advisor run full
+  /audio — Audio Features Ingest
+
+Flow
+  /audio import <JSON>
+  /audio map pack region=US profile=US_Pop_2025
+  /audio finalize → /advisor ingest → /advisor run full
+  /advisor export summary
+
+/audio map pack
+• Converts cached features → DATA_PACK candidate
+• Stores region/profile in session
+• Resolves MARKET_NORMS baseline and sets:
+  - baseline_profile.id
+  - baseline_changed_flag (one-time banner)
+  - baseline_block for exports
+
+Tips
+• Pinning a baseline for reproducibility:
+  /baseline pin US_Pop_2024Q4
+• Unpin to return to default:
+  /baseline unpin
+
+
+/audio import <JSON>
+• Validate against Schemas/audio_features.schema.json (lightweight).
+• Cache as state.audio_features.
+• Reply: "[/audio] features cached for '<track_title>' (source=<source>)"
+
+/audio map pack [region=<US|Global|LATAM|...>] [profile=<US_Pop_2025|...>]
+• Convert cached audio_features → DATA_PACK candidate:
+  - tempo_band_bpm = features.bpm
+  - runtime_sec    = clamp(features.duration_sec, 30..480)
+  - ttc_sec        = 10–14 if runtime<=150 else 14–22 (if unknown)
+  - exposures      = 3 (default)
+  - tonal_profile  = { key: features.key, mode: features.mode, energy: features.energy||0.75 }
+  - rhythm_profile = features.rhythm_profile||infer from bpm/tags (fallback null)
+  - production_tags = features.tags||[]
+  - lyric_motifs    = [] (unknown from audio)
+  - MARKET_NORMS.profile = provided profile or infer by region+tags
+  - reference_year = current year; reference_eras = [Y-40, Y-30, Y-20, Y-10]
+  - Known_Gaps += ["lyric_motifs unknown from audio"] as applicable
+• Print candidate JSON (no commentary)
+
+/audio finalize
+• Validate candidate → print final DATA_PACK JSON.
+• Next: /advisor ingest → /advisor run full → /advisor export summary

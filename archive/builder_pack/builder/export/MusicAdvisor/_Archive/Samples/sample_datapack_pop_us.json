@@ -1,0 +1,56 @@
+{
+  "DATA_PACK_META": {
+    "version": "1.2",
+    "generated_at": "2025-10-29",
+    "source_scope": ["Spotify", "YouTube", "Apple", "TikTok", "Press"],
+    "region": "US",
+    "notes": "Sample pack for Pop (US). MVP satisfied with Streaming_Pop_2025_US norms. Known Gaps: LUFS not measured; platform metrics left null by design."
+  },
+  "MARKET_NORMS": {
+    "profile": "Streaming_Pop_2025_US",
+    "ttc_sec": [15, 27],
+    "runtime_sec": [150, 180],
+    "exposures": [3, 4],
+    "tempo_band_bpm": [88, 110],
+    "updated": "2025-10-29"
+  },
+  "PLATFORM_METRICS": [
+    {
+      "track_id": "EXAMPLE_SPOTIFY_ID_POP",
+      "platform": "spotify",
+      "date": "2025-10-29",
+      "metrics": {
+        "streams": null,
+        "chart_pos": null,
+        "shorts_views": null,
+        "skip_rate": null
+      },
+      "region": "US",
+      "source_url": "https://open.spotify.com/track/EXAMPLE_SPOTIFY_ID_POP"
+    }
+  ],
+  "CULTURAL_MEMES": [
+    {
+      "phrase": "nostalgia-pop 2010s bounce",
+      "meaning": "Bright synths, side-chain bounce, and chant hooks re-entering editorial rotation.",
+      "period": { "start": "2025-06", "end": "2025-12" },
+      "q_score": null,
+      "citations": [
+        "Billboard trend pieces (mid-2025)",
+        "Editorial playlist curation notes"
+      ]
+    }
+  ],
+  "SLANG_DRIFT": [
+    {
+      "token": "main character energy",
+      "sense": "TikTok framing that influences lyrical POV and hook delivery in pop cuts.",
+      "q_score": null,
+      "regions": ["US", "Global"],
+      "examples": [
+        "Hook tags referencing 'main character'",
+        "Short-form edits captioned with the phrase"
+      ]
+    }
+  ]
+}

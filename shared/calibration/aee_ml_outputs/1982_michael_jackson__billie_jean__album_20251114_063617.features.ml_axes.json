@@ -1,0 +1,31 @@
+{
+  "audio_name": "1982_michael_jackson__billie_jean__album_20251114_063617",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.22482730317131233,
+        "lo": 0.4405617769991811,
+        "mid": 0.3346109198295066
+      },
+      "value": 0.446521023010205
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.35006674541501365,
+        "lo": 0.29848002187628303,
+        "mid": 0.35145323270870343
+      },
+      "value": 0.5329793543323699
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/10_golden_set_for_eval/1982_michael_jackson__billie_jean__album/1982_michael_jackson__billie_jean__album_20251114_063617.features.json"
+}

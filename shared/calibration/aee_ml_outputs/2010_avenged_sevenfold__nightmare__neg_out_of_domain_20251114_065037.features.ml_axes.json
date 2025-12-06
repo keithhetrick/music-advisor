@@ -1,0 +1,31 @@
+{
+  "audio_name": "2010_avenged_sevenfold__nightmare__neg_out_of_domain_20251114_065037",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.12353910018534307,
+        "lo": 0.513933411387092,
+        "mid": 0.362527488427565
+      },
+      "value": 0.38905866164874253
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3769185855297697,
+        "lo": 0.27215825451396963,
+        "mid": 0.35092315995626056
+      },
+      "value": 0.5502740285812284
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/13_negatives_out_of_domain/2010_avenged_sevenfold__nightmare__neg_out_of_domain/2010_avenged_sevenfold__nightmare__neg_out_of_domain_20251114_065037.features.json"
+}

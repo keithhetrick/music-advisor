@@ -1,0 +1,31 @@
+{
+  "audio_name": "2019_dua_lipa__dont_start_now__album_20251116_042241",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.45623380004245884,
+        "lo": 0.2314287835236331,
+        "mid": 0.31233741643390794
+      },
+      "value": 0.5902531949577706
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.34850702279015155,
+        "lo": 0.31548290823401465,
+        "mid": 0.3360100689758338
+      },
+      "value": 0.5273325855063487
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2019_dua_lipa__dont_start_now__album/2019_dua_lipa__dont_start_now__album_20251116_042241.features.json"
+}

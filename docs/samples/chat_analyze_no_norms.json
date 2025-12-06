@@ -1,0 +1,23 @@
+{
+  "message": "analyze",
+  "payload": {
+    "audio_name": "Example Track (no norms)",
+    "features_full": {
+      "tempo_bpm": 105.0,
+      "duration_sec": 185.0,
+      "loudness_LUFS": -10.5,
+      "energy": 0.55,
+      "danceability": 0.58,
+      "valence": 0.42
+    },
+    "audio_axes": {
+      "TempoFit": 0.62,
+      "RuntimeFit": 0.55,
+      "LoudnessFit": 0.6,
+      "Energy": 0.55,
+      "Danceability": 0.58,
+      "Valence": 0.42
+    },
+    "historical_echo_v1": null
+  }
+}

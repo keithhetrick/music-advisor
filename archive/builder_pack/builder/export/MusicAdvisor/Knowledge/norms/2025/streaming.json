@@ -1,0 +1,116 @@
+{
+  "norm_version": "2025.1",
+  "generated_at": "2025-10-29T20:27:19Z",
+  "platform": "Streaming",
+  "notes": "Starter norms. Replace ranges with dataset-derived values.",
+  "profiles": {
+    "US_Pop_2025": {
+      "tempo_band_bpm": {
+        "typical": [
+          90,
+          110
+        ],
+        "median": 98
+      },
+      "runtime_sec": {
+        "typical": [
+          160,
+          195
+        ],
+        "median": 180
+      },
+      "ttc_sec": {
+        "typical": [
+          12,
+          22
+        ],
+        "median": 18
+      },
+      "exposures": {
+        "typical": [
+          3,
+          4
+        ],
+        "median": 3
+      },
+      "weights": {
+        "skip_rate": 0.35,
+        "completion": 0.35,
+        "save_rate": 0.15,
+        "playlist_fit": 0.15
+      }
+    },
+    "Global_KPop_2025": {
+      "tempo_band_bpm": {
+        "typical": [
+          100,
+          130
+        ],
+        "median": 118
+      },
+      "runtime_sec": {
+        "typical": [
+          160,
+          190
+        ],
+        "median": 172
+      },
+      "ttc_sec": {
+        "typical": [
+          8,
+          16
+        ],
+        "median": 12
+      },
+      "exposures": {
+        "typical": [
+          3,
+          5
+        ],
+        "median": 4
+      },
+      "weights": {
+        "skip_rate": 0.32,
+        "completion": 0.33,
+        "save_rate": 0.2,
+        "playlist_fit": 0.15
+      }
+    },
+    "LATAM_Urban_2025": {
+      "tempo_band_bpm": {
+        "typical": [
+          85,
+          105
+        ],
+        "median": 94
+      },
+      "runtime_sec": {
+        "typical": [
+          150,
+          185
+        ],
+        "median": 168
+      },
+      "ttc_sec": {
+        "typical": [
+          10,
+          18
+        ],
+        "median": 14
+      },
+      "exposures": {
+        "typical": [
+          3,
+          4
+        ],
+        "median": 3
+      },
+      "weights": {
+        "skip_rate": 0.33,
+        "completion": 0.32,
+        "save_rate": 0.2,
+        "playlist_fit": 0.15
+      }
+    }
+  }
+}

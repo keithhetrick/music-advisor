@@ -1,0 +1,31 @@
+{
+  "audio_name": "1976_the_eagles__hotel_california__album_20251116_042525",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.18240148831627262,
+        "lo": 0.38952836959480164,
+        "mid": 0.4280701420889258
+      },
+      "value": 0.446982010032255
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.41461323265070227,
+        "lo": 0.22218165259166522,
+        "mid": 0.36320511475763256
+      },
+      "value": 0.5784601356502462
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/1976_the_eagles__hotel_california__album/1976_the_eagles__hotel_california__album_20251116_042525.features.json"
+}

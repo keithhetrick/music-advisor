@@ -1,0 +1,31 @@
+{
+  "audio_name": "1982_toto__africa__album_20251114_064351",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.0003504643296826901,
+        "lo": 0.9592545308920797,
+        "mid": 0.040395004778237646
+      },
+      "value": 0.21234630324776504
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.034387297943064624,
+        "lo": 0.7810240409172513,
+        "mid": 0.18458866113968397
+      },
+      "value": 0.2777283420048972
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/99_legacy_pop_eval/1982_toto__africa__album/1982_toto__africa__album_20251114_064351.features.json"
+}

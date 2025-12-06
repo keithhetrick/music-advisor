@@ -1,0 +1,33 @@
+{
+  "energy_feature": {
+    "column": "energy_feature",
+    "p_lo": 0.3,
+    "p_hi": 0.7,
+    "threshold_lo": 0.36070720044021787,
+    "threshold_hi": 0.37352944008543365,
+    "stats": {
+      "count": 100,
+      "min": 0.1468917578458786,
+      "max": 0.4018872087629089,
+      "mean": 0.3655586576805486
+    }
+  },
+  "danceability_feature": {
+    "column": "danceability_feature",
+    "p_lo": 0.3,
+    "p_hi": 0.7,
+    "threshold_lo": 0.367329320669707,
+    "threshold_hi": 0.5176852546926956,
+    "stats": {
+      "count": 100,
+      "min": 0.15580586962441823,
+      "max": 0.632775429691999,
+      "mean": 0.432982493756745
+    }
+  },
+  "meta": {
+    "source_csv": "calibration/aee_ml_reports/truth_vs_ml_v1_1.csv",
+    "created_utc": "2025-11-16T15:12:12.131510+00:00",
+    "notes": "Auto-generated band thresholds for ML sanity & HCI calibration."
+  }
+}

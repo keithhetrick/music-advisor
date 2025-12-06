@@ -1,0 +1,15 @@
+{
+  "tempo_band_bpm": [88, 104],
+  "arrangement": [
+    "beat intro",
+    "verse (rap)",
+    "pre (melodic)",
+    "chorus (sung hook)",
+    "verse 2",
+    "bridge (switch-up)",
+    "final chorus"
+  ],
+  "mix_focus": ["808 clarity", "hook brightness", "vocal presence"],
+  "lyric_motifs": ["resilience", "flex-with-heart", "city-to-global"],
+  "radio_legibility_target": 0.72
+}

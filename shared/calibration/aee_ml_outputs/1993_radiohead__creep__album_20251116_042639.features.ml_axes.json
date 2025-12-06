@@ -1,0 +1,31 @@
+{
+  "audio_name": "1993_radiohead__creep__album_20251116_042639",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.1371211990728752,
+        "lo": 0.47631146373545136,
+        "mid": 0.38656733719167335
+      },
+      "value": 0.4050989805548709
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.18606438592408064,
+        "lo": 0.5389785635894179,
+        "mid": 0.2749570504865015
+      },
+      "value": 0.40342896599660283
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/1993_radiohead__creep__album/1993_radiohead__creep__album_20251116_042639.features.json"
+}

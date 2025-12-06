@@ -1,0 +1,31 @@
+{
+  "audio_name": "49. Bad Bunny, Feid - PERRO NEGRO_20251114_061706",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.5233473309698066,
+        "lo": 0.2373834193978653,
+        "mid": 0.23926924963232804
+      },
+      "value": 0.6119565400200726
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.35623324162144504,
+        "lo": 0.3038755925041243,
+        "mid": 0.33989116587443075
+      },
+      "value": 0.5335189568162686
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/49. Bad Bunny, Feid - PERRO NEGRO/49. Bad Bunny, Feid - PERRO NEGRO_20251114_061706.features.json"
+}

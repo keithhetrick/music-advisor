@@ -1,0 +1,27 @@
+{
+  "cohort_id": "US_Pop_Cal_Baseline_2025Q4",
+  "baseline_id": "US_Pop_Baseline_2025",
+  "region": "US",
+  "profile": "Pop",
+  "effective_utc": "2025-11-03T08:09:45Z",
+  "note": "Auto-generated calibration cohort for US Pop",
+  "packs": [
+    "datahub/packs/pack_100-110_long_ballad.json",
+    "datahub/packs/pack_112-118_mid_synth.json",
+    "datahub/packs/pack_118-122_mid_clean.json",
+    "datahub/packs/pack_122-126_mid_pad.json",
+    "datahub/packs/pack_122-126_mid_fill.json",
+    "datahub/packs/pack_122-126_mid_fill_2.json",
+    "datahub/packs/pack_126-129_short_vocal.json",
+    "datahub/packs/pack_126-129_short_fill.json",
+    "datahub/packs/pack_120-129_mid_fill.json",
+    "datahub/packs/pack_120-129_mid_fill_10.json"
+  ],
+  "Baseline": {
+    "active_profile": "Pop",
+    "effective_utc": "2025-11-03T08:09:45Z",
+    "pinned": true,
+    "note": "Pinned reference for reproducibility"
+  },
+  "Known_Gaps": []
+}

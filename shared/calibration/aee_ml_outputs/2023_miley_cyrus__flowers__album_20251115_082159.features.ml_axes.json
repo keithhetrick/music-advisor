@@ -1,0 +1,31 @@
+{
+  "audio_name": "2023_miley_cyrus__flowers__album_20251115_082159",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.5191595088987127,
+        "lo": 0.18117415534859327,
+        "mid": 0.2996663357526941
+      },
+      "value": 0.6273535815099714
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.41595506795614984,
+        "lo": 0.2546397771896522,
+        "mid": 0.3294051548541979
+      },
+      "value": 0.5691923406277567
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_0/2023_miley_cyrus__flowers__album/2023_miley_cyrus__flowers__album_20251115_082159.features.json"
+}

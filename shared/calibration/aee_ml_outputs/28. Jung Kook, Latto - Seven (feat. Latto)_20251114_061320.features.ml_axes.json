@@ -1,0 +1,31 @@
+{
+  "audio_name": "28. Jung Kook, Latto - Seven (feat. Latto)_20251114_061320",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.43480538579027,
+        "lo": 0.27930649477314534,
+        "mid": 0.2858881194365847
+      },
+      "value": 0.568389936594651
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.31747439384498416,
+        "lo": 0.3647673326775939,
+        "mid": 0.31775827347742186
+      },
+      "value": 0.5016858380424662
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/28. Jung Kook, Latto - Seven (feat. Latto)/28. Jung Kook, Latto - Seven (feat. Latto)_20251114_061320.features.json"
+}

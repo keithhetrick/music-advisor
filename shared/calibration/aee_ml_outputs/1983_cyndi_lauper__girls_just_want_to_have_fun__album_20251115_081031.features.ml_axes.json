@@ -1,0 +1,31 @@
+{
+  "audio_name": "1983_cyndi_lauper__girls_just_want_to_have_fun__album_20251115_081031",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3760160738316128,
+        "lo": 0.2686968022822894,
+        "mid": 0.35528712388609773
+      },
+      "value": 0.5509965851563776
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3879383031634736,
+        "lo": 0.2725144421868177,
+        "mid": 0.3395472546497086
+      },
+      "value": 0.5540240734511703
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_0/1983_cyndi_lauper__girls_just_want_to_have_fun__album/1983_cyndi_lauper__girls_just_want_to_have_fun__album_20251115_081031.features.json"
+}

@@ -1,0 +1,149 @@
+{
+  "meta": {
+    "song_id": "wip_ill_be_there_worktape",
+    "title": "I'll Be There",
+    "artist": "Kong / Keith Hetrick",
+    "year": 2015
+  },
+  "audio": null,
+  "lyrics": {
+    "song_id": "wip_ill_be_there_worktape",
+    "title": "I'll Be There",
+    "artist": "Kong / Keith Hetrick",
+    "year": 2015,
+    "lane": {
+      "tier": null,
+      "era_bucket": "2015_2024"
+    },
+    "lci": {
+      "score": 0.2945799368790789,
+      "raw": 0.5689919176463315,
+      "calibration_profile": "lci_us_pop_v1",
+      "axes": {
+        "structure_fit": 0.7253787878787878,
+        "prosody_ttc_fit": 0.8811026936026938,
+        "rhyme_texture_fit": 0.2272727272727274,
+        "diction_style_fit": 0.8856360212292416,
+        "pov_fit": 0.5244821092278722,
+        "theme_fit": 0.17007916666666667
+      },
+      "percentiles": {
+        "overall": null
+      }
+    },
+    "ttc": {
+      "ttc_seconds_first_chorus": null,
+      "ttc_bar_position_first_chorus": null,
+      "estimation_method": "ttc_rule_based_v1",
+      "profile": "ttc_us_pop_v1",
+      "ttc_confidence": "low"
+    },
+    "neighbors": [
+      {
+        "song_id": "backseat___new boyz___2011___709a99c8",
+        "title": "Backseat",
+        "artist": "New Boyz",
+        "year": 2011,
+        "similarity": 0.9999237860381569
+      },
+      {
+        "song_id": "backseat___the cataracs___2011___c0e9c76c",
+        "title": "Backseat",
+        "artist": "The Cataracs",
+        "year": 2011,
+        "similarity": 0.9999237860381569
+      },
+      {
+        "song_id": "backseat___dev___2011___b72db7b2",
+        "title": "Backseat",
+        "artist": "Dev",
+        "year": 2011,
+        "similarity": 0.9999237860381569
+      },
+      {
+        "song_id": "don t wanna try___frankie j___2003___d9cc3140",
+        "title": "Don't Wanna Try",
+        "artist": "Frankie J",
+        "year": 2003,
+        "similarity": 0.9998935370688786
+      },
+      {
+        "song_id": "show stopper___danity kane___2006___74a1ff33",
+        "title": "Show Stopper",
+        "artist": "Danity Kane",
+        "year": 2006,
+        "similarity": 0.9998680359306995
+      },
+      {
+        "song_id": "show stopper___yung joc___2006___a5e839fd",
+        "title": "Show Stopper",
+        "artist": "Yung Joc",
+        "year": 2006,
+        "similarity": 0.9998680359306995
+      },
+      {
+        "song_id": "don t mind___kent jones___2016___c30c1eee",
+        "title": "Don't Mind",
+        "artist": "Kent Jones",
+        "year": 2016,
+        "similarity": 0.9998371071834548
+      },
+      {
+        "song_id": "cooler than me___mike posner___2010___b64b59f0",
+        "title": "cooler than me",
+        "artist": "mike posner",
+        "year": 2010,
+        "similarity": 0.9998310301144935
+      },
+      {
+        "song_id": "leave the night on___sam hunt___2014___14362b0c",
+        "title": "leave the night on",
+        "artist": "sam hunt",
+        "year": 2014,
+        "similarity": 0.9997840567755519
+      },
+      {
+        "song_id": "hey baby drop it to the floor___pitbull___2011___7b352798",
+        "title": "Hey Baby (Drop It to the Floor)",
+        "artist": "Pitbull",
+        "year": 2011,
+        "similarity": 0.9997710028951794
+      },
+      {
+        "song_id": "hey baby drop it to the floor___t pain___2011___43b2c025",
+        "title": "Hey Baby (Drop It to the Floor)",
+        "artist": "T-Pain",
+        "year": 2011,
+        "similarity": 0.9997710028951794
+      },
+      {
+        "song_id": "amnesia___5 seconds of summer___2014___36c38d73",
+        "title": "amnesia",
+        "artist": "5 seconds of summer",
+        "year": 2014,
+        "similarity": 0.9997694030035881
+      },
+      {
+        "song_id": "take it off___kesha___2010___063b7836",
+        "title": "Take It Off",
+        "artist": "Kesha",
+        "year": 2010,
+        "similarity": 0.9997689017543715
+      },
+      {
+        "song_id": "thinkin bout me___morgan wallen___2023___f292504d",
+        "title": "Thinkin' Bout Me",
+        "artist": "Morgan Wallen",
+        "year": 2023,
+        "similarity": 0.9997633499164057
+      },
+      {
+        "song_id": "black and yellow___wiz khalifa___2011___93c1f1b3",
+        "title": "black and yellow",
+        "artist": "wiz khalifa",
+        "year": 2011,
+        "similarity": 0.9997564082778255
+      }
+    ]
+  }
+}

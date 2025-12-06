@@ -1,0 +1,31 @@
+{
+  "audio_name": "2003_evanescence__bring_me_to_life__album_20251116_064735",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.21929102726913416,
+        "lo": 0.44331227977331455,
+        "mid": 0.3373966929575513
+      },
+      "value": 0.4437581756122026
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.31972654638829984,
+        "lo": 0.3061987504678094,
+        "mid": 0.3740747031438907
+      },
+      "value": 0.5200446660955621
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2003_evanescence__bring_me_to_life__album/2003_evanescence__bring_me_to_life__album_20251116_064735.features.json"
+}

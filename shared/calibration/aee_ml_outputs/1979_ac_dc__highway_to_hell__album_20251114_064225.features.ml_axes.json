@@ -1,0 +1,31 @@
+{
+  "audio_name": "1979_ac_dc__highway_to_hell__album_20251114_064225",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.25079040380840223,
+        "lo": 0.43670888394043456,
+        "mid": 0.31250071225116327
+      },
+      "value": 0.45676397615081044
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2843848091039795,
+        "lo": 0.3902204356062158,
+        "mid": 0.3253947552898047
+      },
+      "value": 0.48246855250452814
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/99_legacy_pop_eval/1979_ac_dc__highway_to_hell__album/1979_ac_dc__highway_to_hell__album_20251114_064225.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "1986_peter_gabriel__sledgehammer__album_20251114_062615",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.23117485932700604,
+        "lo": 0.44000121386000446,
+        "mid": 0.3288239268129895
+      },
+      "value": 0.44891083660645076
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3840833033865308,
+        "lo": 0.2562396230886884,
+        "mid": 0.35967707352478084
+      },
+      "value": 0.5575572692586792
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/01_echo_1985_89/1986_peter_gabriel__sledgehammer__album/1986_peter_gabriel__sledgehammer__album_20251114_062615.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2022_djo__end_of_beginning__album_20251116_043021",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.25513647140575474,
+        "lo": 0.4261619142341674,
+        "mid": 0.31870161436007793
+      },
+      "value": 0.46144919072176394
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.16808083837263904,
+        "lo": 0.5414570454276673,
+        "mid": 0.2904621161996937
+      },
+      "value": 0.39639117980212346
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2022_djo__end_of_beginning__album/2022_djo__end_of_beginning__album_20251116_043021.features.json"
+}

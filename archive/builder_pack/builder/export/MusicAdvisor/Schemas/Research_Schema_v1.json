@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Music Advisor RESEARCH_PACK (Light)",
+  "type": "object",
+  "required": ["seed", "sources", "aggregate", "confidence"],
+  "properties": {
+    "seed": {
+      "type": "object",
+      "required": ["query"],
+      "properties": {
+        "query": { "type": "string" },
+        "region": { "type": "string" },
+        "profile_hint": { "type": "string" }
+      }
+    },
+    "scan": {
+      "type": "object",
+      "properties": {
+        "depth": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "window_days": { "type": "integer" },
+        "platforms": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "url",
+          "domain",
+          "source_type",
+          "date",
+          "title",
+          "signals"
+        ],
+        "properties": {
+          "url": { "type": "string" },
+          "domain": { "type": "string" },
+          "source_type": {
+            "type": "string",
+            "enum": [
+              "press",
+              "spotify",
+              "tiktok",
+              "youtube",
+              "official",
+              "other"
+            ]
+          },
+          "date": { "type": "string" },
+          "title": { "type": "string" },
+          "notes": { "type": "string" },
+          "signals": {
+            "type": "object",
+            "properties": {
+              "bpm": { "type": ["number", "null"] },
+              "runtime_sec": { "type": ["number", "null"] },
+              "ttc_sec": { "type": ["number", "null"] },
+              "exposures": { "type": ["number", "null"] },
+              "tags": { "type": "array", "items": { "type": "string" } },
+              "motifs": { "type": "array", "items": { "type": "string" } },
+              "rhythm": { "type": ["string", "null"] },
+              "tonal_mode": { "type": ["string", "null"] }
+            }
+          },
+          "confidence": { "type": "number" }
+        }
+      }
+    },
+    "aggregate": {
+      "type": "object",
+      "properties": {
+        "tempo_band_bpm_est": { "type": ["number", "null"] },
+        "runtime_sec_est": { "type": ["number", "null"] },
+        "ttc_sec_est": { "type": ["number", "null"] },
+        "exposures_est": { "type": ["number", "null"] },
+        "production_tags": { "type": "array", "items": { "type": "string" } },
+        "lyric_motifs": { "type": "array", "items": { "type": "string" } },
+        "rhythm_profile": { "type": ["string", "null"] },
+        "tonal_profile": {
+          "type": "object",
+          "properties": { "mode": { "type": ["string", "null"] } }
+        }
+      }
+    },
+    "confidence": { "type": "number" }
+  }
+}

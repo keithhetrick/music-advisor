@@ -1,0 +1,26 @@
+# Lyric Emotional Intelligence — Advisory (mode: {{mode}})
+# (No scoring. Artist-safe guidance.)
+
+AUTHENTICITY
+- {{authenticity.observations[0]}}
+- {{authenticity.nudges|join('\n- ')}}
+
+CLARITY
+- {{clarity.observations[0]}}
+- {{clarity.nudges|join('\n- ')}}
+
+RESONANCE
+- {{resonance.observations[0]}}
+- {{resonance.nudges|join('\n- ')}}
+
+EMOTIONAL ARC
+- {{emotional_arc.observations[0]}}
+- {{emotional_arc.nudges|join('\n- ')}}
+
+MOTIFS
+- {{motifs.observations[0]}}
+- {{motifs.nudges|join('\n- ')}}
+
+LISTENER PROJECTION
+- {{listener_projection.observations[0]}}
+- {{listener_projection.nudges|join('\n- ')}}

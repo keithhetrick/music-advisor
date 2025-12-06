@@ -1,0 +1,31 @@
+{
+  "audio_name": "1990_sinead_oconnor__nothing_compares_2_u__single_20251114_062910",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4440190644097726,
+        "lo": 0.23925022850651012,
+        "mid": 0.31673070708371726
+      },
+      "value": 0.5836316039914674
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4566004550673054,
+        "lo": 0.22024155347605107,
+        "mid": 0.3231579914566435
+      },
+      "value": 0.5937376932307415
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/02_echo_1990_94/1990_sinead_oconnor__nothing_compares_2_u__single/1990_sinead_oconnor__nothing_compares_2_u__single_20251114_062910.features.json"
+}

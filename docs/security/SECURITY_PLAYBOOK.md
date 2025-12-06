@@ -1,0 +1,15 @@
+# SECURITY PLAYBOOK — How to use Codex as your Red-Team Advisor
+
+1. Load the meta-prompt: paste the “SECURITY RED-TEAM ADVISOR — META-PROMPT + FULL PLAYBOOK” into Codex so it knows the roles, tasks, and output style (Quick Overview → Top Risks → Hardening Playbook → Checklist).
+2. Declare scope and tasks: tell Codex which tasks to run (e.g., `PY1 + SH1` or `SCN2`) and which entrypoints to focus on (e.g., `automator.sh`, `tools/audio/ma_audio_features.py`, sidecars).
+3. Provide context: mention expected file types (audio only), main flows (drag-and-drop → automator → tempo sidecar → merge), and any constraints (timeouts, env vars like `SIDECAR_TIMEOUT_SECONDS`).
+4. Call out hot surfaces: ask for `SQL1` if DB routes are present; ask for `SCN1` to stress weird filenames/paths (very long, unicode/homoglyph, hidden script markers, `../` traversal); ask for `SCN2` to cover oversized/corrupt audio and enforce duration/size/timeouts.
+5. Config knobs: review `security/config.py` (`SECURITY_INGEST_ROOT`, `SECURITY_MAX_FILE_MB`, `SECURITY_ALLOWED_EXTS`, `SECURITY_SUBPROCESS_TIMEOUT`, `SECURITY_ALLOWED_BIN_ROOTS`) for trusted deploy-time overrides; feature code should use `security.paths/files/subprocess` helpers, not hard-coded paths.
+6. Review findings: Codex will return risks (R1, R2, …) with severities, locations, attack narratives, and defensive fixes. Apply suggested patches/tests in the repo, then rerun targeted tasks. For STT/tempo sidecars, bump timeouts/env as needed to avoid blocking legitimate long runs.
+7. Modules to reuse: Python (`security/paths.py`, `security/files.py`, `security/subprocess.py`, `security/config.py`) and shell (`scripts/lib_security.sh`). Centralize new path/size/format/subprocess rules there instead of ad hoc checks.
+8. Logging/privacy: enable `LOG_REDACT`/`LOG_REDACT_VALUES` or `--log-redact` flags on tools that process untrusted data; use sandbox scrubbing (`LOG_SANDBOX`/`--log-sandbox`) when logging payloads that may contain beats/neighbors or long strings.
+9. Temp/cache/macOS: keep temps under system temp with safe perms and clean up; avoid world-writable paths. For macOS wrappers, prefer Keychain/secure storage for any secrets and avoid logging full user paths.
+10. Smokes: run `scripts/smoke_audio_pipeline.sh` or `scripts/smoke_full_chain.sh` with LOG_REDACT/LOG_SANDBOX enabled after significant changes to validate end-to-end behavior.
+11. DB identifiers: validate table/column names via `security/db.py` helpers (`validate_table_name`, `safe_execute`); keep SQL values parameterized.
+12. macOS wrapper checklist: if/when adding a macOS GUI/Quick Action, (a) store secrets in Keychain (never flat files), (b) confine file access to user-selected files and repo roots, (c) avoid logging full user paths, (d) respect system temp for intermediates and clean them up.
+13. Temp/cache hygiene: keep temp dirs under system temp or repo cache dirs with safe permissions; trap/cleanup on exit for smokes/tests; avoid world-writable locations for caches.

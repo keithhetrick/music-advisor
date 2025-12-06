@@ -1,0 +1,13 @@
+routes:
+  - match: "^/hitcheck\\s+init(.*)$"
+    handler: "Advisor.commands.hitcheck_commands:cmd_hitcheck_init"
+
+  - match: "^/hitcheck\\s+run$"
+    handler: "Advisor.commands.hitcheck_commands:cmd_hitcheck_run"
+    args_from_context: "current_wip_features"
+
+  - match: "^/hitcheck\\s+export\\s+summary$"
+    handler: "Advisor.commands.hitcheck_commands:cmd_hitcheck_export"
+
+  - match: "^/hitcheck\\s+card$"
+    handler: "Advisor.commands.hitcheck_commands:cmd_hitcheck_card"

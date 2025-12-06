@@ -1,0 +1,31 @@
+{
+  "audio_name": "2017_ed_sheeran__shape_of_you__album_20251116_042149",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4237400683098594,
+        "lo": 0.2511831562727301,
+        "mid": 0.32507677541741054
+      },
+      "value": 0.5729540770266317
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.366621644268345,
+        "lo": 0.2827733085309213,
+        "mid": 0.35060504720073377
+      },
+      "value": 0.5434855829346443
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2017_ed_sheeran__shape_of_you__album/2017_ed_sheeran__shape_of_you__album_20251116_042149.features.json"
+}

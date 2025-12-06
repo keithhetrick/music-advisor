@@ -1,0 +1,31 @@
+{
+  "audio_name": "2002_nelly__hot_in_herre__album_20251114_065414",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4242958624515175,
+        "lo": 0.28714481244713513,
+        "mid": 0.28855932510134735
+      },
+      "value": 0.5623601081238906
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.38222335714069455,
+        "lo": 0.27555176100301193,
+        "mid": 0.34222488185629346
+      },
+      "value": 0.5511126466983395
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/04_echo_2000_04/2002_nelly__hot_in_herre__album/2002_nelly__hot_in_herre__album_20251114_065414.features.json"
+}

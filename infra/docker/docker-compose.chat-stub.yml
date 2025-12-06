@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: chat-redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+
+  chat-stub:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.chat
+    container_name: chat-stub
+    environment:
+      - HOST_PORT=8090
+      - HOST_FORCE_PORT=1
+      - HOST_SESSION_STORE=${HOST_SESSION_STORE:-file}
+      - HOST_SESSION_DIR=${HOST_SESSION_DIR:-/data/sessions}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - HOST_CORS_ALLOW_ORIGIN=${HOST_CORS_ALLOW_ORIGIN:-*}
+    ports:
+      - "8090:8090"
+    volumes:
+      - stub-data:/data
+    depends_on:
+      - redis
+
+volumes:
+  redis-data:
+  stub-data:

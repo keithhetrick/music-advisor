@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "musicadvisor-audiotools"
+version = "0.3.5"
+description = "Audio feature extraction and payload shaping for Music Advisor."
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{name = "Music Advisor", email = "dev@musicadvisor.app"}]
+
+dependencies = [
+  "numpy>=1.23",
+  "scipy>=1.9",
+  "scikit-learn>=1.3",
+  "numba>=0.56,<0.63",
+  "llvmlite>=0.45,<0.46",
+]
+
+[project.optional-dependencies]
+audio = [
+  "librosa>=0.10,<0.11",
+  "soundfile>=0.12",
+  "audioread>=3.0",
+  "soxr>=1.0.0",
+]
+stt = [
+  "openai-whisper>=20231117",
+]
+test = ["pytest>=8.1"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests", "hosts/advisor_host/tests", "engines/recommendation_engine/recommendation_engine/tests"]
+filterwarnings = [
+  "ignore:pkg_resources is deprecated:UserWarning",
+  "ignore:__audioread_load:FutureWarning",
+  "ignore:n_fft=1024 is too large:UserWarning",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ma_*", "ma_host", "ma_helper", "tools", "adapters", "aee_ml", "ma_audiotools"]

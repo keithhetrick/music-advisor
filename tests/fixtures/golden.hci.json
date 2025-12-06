@@ -1,0 +1,12 @@
+{
+  "HCI_v1_final_score": 0.65,
+  "HCI_v1_score": 0.64,
+  "HCI_v1_score_raw": 0.63,
+  "HCI_v1_final_tier": "WIP-B",
+  "HCI_v1_role": "unknown",
+  "feature_pipeline_meta": {
+    "source_hash": "abc123",
+    "config_fingerprint": "test",
+    "pipeline_version": "test"
+  }
+}

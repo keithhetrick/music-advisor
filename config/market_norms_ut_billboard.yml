@@ -1,0 +1,8 @@
+source:
+  name: "UT Austin rwd-billboard-data"
+  repo_url: "https://github.com/utdata/rwd-billboard-data"
+  hot100_csv: "https://raw.githubusercontent.com/utdata/rwd-billboard-data/main/data-out/hot-100-current.csv"
+  bb200_csv: "https://raw.githubusercontent.com/utdata/rwd-billboard-data/main/data-out/billboard-200-current.csv"
+  pinned_commit: "TODO-pin-commit"
+  notes: |
+    Academic/research chart spine from UT Austin. Underlying chart data is Billboard IP; use for internal advisory/research only.

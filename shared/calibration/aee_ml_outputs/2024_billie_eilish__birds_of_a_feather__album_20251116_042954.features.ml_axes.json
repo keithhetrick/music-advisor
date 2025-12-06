@@ -1,0 +1,31 @@
+{
+  "audio_name": "2024_billie_eilish__birds_of_a_feather__album_20251116_042954",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.49189866048183367,
+        "lo": 0.1972323732132742,
+        "mid": 0.3108689663048921
+      },
+      "value": 0.6129948192046595
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4335169827598788,
+        "lo": 0.23144858577118926,
+        "mid": 0.3350344314689319
+      },
+      "value": 0.5822963682346008
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2024_billie_eilish__birds_of_a_feather__album/2024_billie_eilish__birds_of_a_feather__album_20251116_042954.features.json"
+}

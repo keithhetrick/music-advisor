@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TTCAnnotations",
+  "type": "object",
+  "required": ["slug", "ttc_first_chorus_sec", "ttc_source", "ttc_method"],
+  "properties": {
+    "slug": { "type": "string" },
+    "track_id": { "type": ["string", "null"] },
+    "ttc_first_chorus_sec": { "type": "number" },
+    "ttc_first_chorus_beats": { "type": ["number", "null"] },
+    "ttc_first_chorus_bars": { "type": ["number", "null"] },
+    "ttc_ratio_runtime": { "type": ["number", "null"] },
+    "runtime_sec": { "type": ["number", "null"] },
+    "ttc_has_chorus": { "type": ["integer", "null"] },
+    "ttc_confidence": { "type": ["number", "null"] },
+    "ttc_source": { "type": "string" },
+    "ttc_method": { "type": "string" },
+    "annotator": { "type": ["string", "null"] },
+    "notes": { "type": ["string", "null"] },
+    "created_at": { "type": ["string", "null"] },
+    "updated_at": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

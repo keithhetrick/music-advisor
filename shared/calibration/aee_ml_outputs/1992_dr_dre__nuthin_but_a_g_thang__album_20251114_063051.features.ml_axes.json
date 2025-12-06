@@ -1,0 +1,31 @@
+{
+  "audio_name": "1992_dr_dre__nuthin_but_a_g_thang__album_20251114_063051",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3372457625875809,
+        "lo": 0.2938125928899357,
+        "mid": 0.36894164452248346
+      },
+      "value": 0.5298922390386727
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2760776960377856,
+        "lo": 0.4505292149458566,
+        "mid": 0.27339308901635784
+      },
+      "value": 0.461468429129468
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/02_echo_1990_94/1992_dr_dre__nuthin_but_a_g_thang__album/1992_dr_dre__nuthin_but_a_g_thang__album_20251114_063051.features.json"
+}

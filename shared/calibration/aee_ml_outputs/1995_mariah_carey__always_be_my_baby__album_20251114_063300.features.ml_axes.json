@@ -1,0 +1,31 @@
+{
+  "audio_name": "1995_mariah_carey__always_be_my_baby__album_20251114_063300",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3716867517233331,
+        "lo": 0.28572922684069757,
+        "mid": 0.34258402143596933
+      },
+      "value": 0.5443715950509573
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3511868028768877,
+        "lo": 0.34033080342089006,
+        "mid": 0.3084823937022223
+      },
+      "value": 0.5208161399806437
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/03_echo_1995_99/1995_mariah_carey__always_be_my_baby__album/1995_mariah_carey__always_be_my_baby__album_20251114_063300.features.json"
+}

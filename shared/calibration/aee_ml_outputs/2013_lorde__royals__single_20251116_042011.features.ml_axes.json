@@ -1,0 +1,31 @@
+{
+  "audio_name": "2013_lorde__royals__single_20251116_042011",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.488900108690073,
+        "lo": 0.2352554226175177,
+        "mid": 0.27584446869240925
+      },
+      "value": 0.6005384112562702
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3932022598361595,
+        "lo": 0.23869649766580844,
+        "mid": 0.36810124249803217
+      },
+      "value": 0.5660118416429133
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2013_lorde__royals__single/2013_lorde__royals__single_20251116_042011.features.json"
+}

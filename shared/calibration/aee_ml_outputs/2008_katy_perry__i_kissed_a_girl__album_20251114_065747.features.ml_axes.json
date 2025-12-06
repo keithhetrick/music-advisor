@@ -1,0 +1,31 @@
+{
+  "audio_name": "2008_katy_perry__i_kissed_a_girl__album_20251114_065747",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4392413967299559,
+        "lo": 0.2727068120271072,
+        "mid": 0.28805179124293684
+      },
+      "value": 0.5719224452473524
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3157858383477225,
+        "lo": 0.3716796811356815,
+        "mid": 0.31253448051659594
+      },
+      "value": 0.4990211390809984
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/05_echo_2005_09/2008_katy_perry__i_kissed_a_girl__album/2008_katy_perry__i_kissed_a_girl__album_20251114_065747.features.json"
+}

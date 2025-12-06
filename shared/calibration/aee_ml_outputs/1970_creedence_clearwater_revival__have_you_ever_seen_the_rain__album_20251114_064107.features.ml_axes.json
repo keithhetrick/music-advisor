@@ -1,0 +1,31 @@
+{
+  "audio_name": "1970_creedence_clearwater_revival__have_you_ever_seen_the_rain__album_20251114_064107",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.44345582523558463,
+        "lo": 0.2839238966488823,
+        "mid": 0.272620278115533
+      },
+      "value": 0.5700323698377899
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3036565177522965,
+        "lo": 0.37897170925621715,
+        "mid": 0.3173717729914864
+      },
+      "value": 0.49258826843643866
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/99_legacy_pop_eval/1970_creedence_clearwater_revival__have_you_ever_seen_the_rain__album/1970_creedence_clearwater_revival__have_you_ever_seen_the_rain__album_20251114_064107.features.json"
+}

@@ -1,0 +1,7 @@
+{
+  "logging": {
+    "json_printer": "plugins.logging.json_printer"
+  },
+  "sidecar": {},
+  "cache": {}
+}

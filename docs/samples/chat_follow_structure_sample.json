@@ -1,0 +1,7 @@
+{
+  "message": "structure",
+  "session": {
+    "session_id": "<replace-with-session-id-from-analyze>",
+    "host_profile_id": "producer_advisor_v1"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "1994_mariah_carey__all_i_want_for_christmas_is_you__album_20251114_063205",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2441374428342747,
+        "lo": 0.4524352995788509,
+        "mid": 0.3034272575868744
+      },
+      "value": 0.4497175151183409
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.36259535420907424,
+        "lo": 0.2734972173992661,
+        "mid": 0.36390742839165974
+      },
+      "value": 0.5448592087533962
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/02_echo_1990_94/1994_mariah_carey__all_i_want_for_christmas_is_you__album/1994_mariah_carey__all_i_want_for_christmas_is_you__album_20251114_063205.features.json"
+}

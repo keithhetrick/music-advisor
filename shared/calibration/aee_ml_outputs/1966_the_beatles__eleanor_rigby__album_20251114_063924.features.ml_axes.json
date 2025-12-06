@@ -1,0 +1,31 @@
+{
+  "audio_name": "1966_the_beatles__eleanor_rigby__album_20251114_063924",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.24509057893307767,
+        "lo": 0.4541375864167489,
+        "mid": 0.30077183465017343
+      },
+      "value": 0.44954042670155253
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.17652357859847634,
+        "lo": 0.5699596340496176,
+        "mid": 0.253516787351906
+      },
+      "value": 0.3907953622945814
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/10_golden_set_for_eval/1966_the_beatles__eleanor_rigby__album/1966_the_beatles__eleanor_rigby__album_20251114_063924.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "1995_mariah_carey__fantasy__album_20251116_041539",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3964433594744065,
+        "lo": 0.25321629727405337,
+        "mid": 0.35034034325154007
+      },
+      "value": 0.5627902866338262
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.433467792326842,
+        "lo": 0.22279088336425573,
+        "mid": 0.34374132430890236
+      },
+      "value": 0.584876462305118
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/1995_mariah_carey__fantasy__album/1995_mariah_carey__fantasy__album_20251116_041539.features.json"
+}

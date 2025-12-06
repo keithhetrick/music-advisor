@@ -1,0 +1,20 @@
+{
+  "essentia": {
+    "lower": 0.93,
+    "upper": 3.63,
+    "label_low": 1.10,
+    "label_high": 3.20
+  },
+  "madmom": {
+    "lower": 0.21,
+    "upper": 0.38,
+    "label_low": 0.23,
+    "label_high": 0.33
+  },
+  "librosa": {
+    "lower": 0.92,
+    "upper": 0.97,
+    "label_low": 0.93,
+    "label_high": 0.95
+  }
+}

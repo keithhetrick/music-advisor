@@ -1,0 +1,25 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system deps (optional: curl for health checks)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy minimal requirements for host/recommendation_engine
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy host and recommendation_engine code
+COPY hosts hosts
+COPY engines engines
+
+ENV PYTHONPATH=hosts:engines:engines/recommendation_engine
+ENV HOST_FORCE_PORT=1
+ENV HOST_PORT=8090
+ENV HOST_SESSION_STORE=memory
+
+EXPOSE 8090
+
+ENTRYPOINT ["python", "hosts/advisor_host/cli/http_stub.py"]

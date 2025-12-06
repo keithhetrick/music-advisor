@@ -1,0 +1,31 @@
+{
+  "audio_name": "20. Kendrick Lamar - Not Like Us_20251114_061153",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4330725587977229,
+        "lo": 0.26764065506442203,
+        "mid": 0.29928678613785503
+      },
+      "value": 0.5712831990598763
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4456653530677905,
+        "lo": 0.20741150566720043,
+        "mid": 0.34692314126500906
+      },
+      "value": 0.5937594218735666
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/20. Kendrick Lamar - Not Like Us/20. Kendrick Lamar - Not Like Us_20251114_061153.features.json"
+}

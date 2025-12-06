@@ -1,0 +1,31 @@
+{
+  "audio_name": "2010_adele__rolling_in_the_deep__album_20251115_081718",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.5066789647191625,
+        "lo": 0.17512242079999982,
+        "mid": 0.31819861448083775
+      },
+      "value": 0.624800911411707
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.47881717087146775,
+        "lo": 0.20039022899722678,
+        "mid": 0.3207926001313055
+      },
+      "value": 0.6074689411058456
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_0/2010_adele__rolling_in_the_deep__album/2010_adele__rolling_in_the_deep__album_20251115_081718.features.json"
+}

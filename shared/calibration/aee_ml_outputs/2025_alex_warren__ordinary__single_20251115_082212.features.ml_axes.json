@@ -1,0 +1,31 @@
+{
+  "audio_name": "2025_alex_warren__ordinary__single_20251115_082212",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.17735569233025147,
+        "lo": 0.47605750134322466,
+        "mid": 0.3465868063265239
+      },
+      "value": 0.4192572419126207
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2492158775512762,
+        "lo": 0.4256168304692468,
+        "mid": 0.325167291979477
+      },
+      "value": 0.4595405080021726
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_0/2025_alex_warren__ordinary__single/2025_alex_warren__ordinary__single_20251115_082212.features.json"
+}

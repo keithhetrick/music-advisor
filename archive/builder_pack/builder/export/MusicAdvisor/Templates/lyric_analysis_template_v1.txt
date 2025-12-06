@@ -1,0 +1,8 @@
+=== LYRIC ANALYSIS ===
+Lines: {r[lines]} | Words: {r[words]} | Avg/Line: {r[avg_words_per_line]}
+Sentiment: {r[sentiment]}
+Motifs Detected: {', '.join(r['motifs']) if r['motifs'] else '—'}
+Concrete Imagery Hits: {r[concrete_hits]}
+
+Suggestions:
+{format_list(r['suggestions'], default='- none')}

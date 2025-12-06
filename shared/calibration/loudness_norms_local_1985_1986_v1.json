@@ -1,0 +1,12 @@
+{
+  "cohort_id": "Local_Loudness_USPop_v1",
+  "note": "Local loudness norms for LoudnessFit, derived from .features.json via fit_loudness_norms_from_local_features.py",
+  "features_root": "features_output/2025/11/22",
+  "years": [
+    1985,
+    1986
+  ],
+  "n_tracks": 80,
+  "loudness_LUFS_mean": -18.671094062458756,
+  "loudness_LUFS_std": 1.2953432207384796
+}

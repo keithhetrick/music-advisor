@@ -1,0 +1,35 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "Spotify Data Bridge", "version": "1.0.0" },
+  "servers": [{ "url": "https://YOUR-WORKER-URL.workers.dev" }],
+  "paths": {
+    "/searchTrack": {
+      "get": {
+        "summary": "Search a track",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "Track meta" } }
+      }
+    },
+    "/audioFeatures": {
+      "get": {
+        "summary": "Track audio features",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "Features" } }
+      }
+    }
+  }
+}

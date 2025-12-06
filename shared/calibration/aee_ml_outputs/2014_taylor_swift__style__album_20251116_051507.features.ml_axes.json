@@ -1,0 +1,31 @@
+{
+  "audio_name": "2014_taylor_swift__style__album_20251116_051507",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.34725736711910227,
+        "lo": 0.3103866490285709,
+        "mid": 0.34235598385232685
+      },
+      "value": 0.5284240837831146
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3907243830541738,
+        "lo": 0.2511156767686452,
+        "mid": 0.35815994017718095
+      },
+      "value": 0.5614188310383672
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2014_taylor_swift__style__album/2014_taylor_swift__style__album_20251116_051507.features.json"
+}

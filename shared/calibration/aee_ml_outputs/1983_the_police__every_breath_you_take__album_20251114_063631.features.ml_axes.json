@@ -1,0 +1,31 @@
+{
+  "audio_name": "1983_the_police__every_breath_you_take__album_20251114_063631",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.39532124540702623,
+        "lo": 0.2993649639129172,
+        "mid": 0.3053137906800565
+      },
+      "value": 0.548552946718584
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.38419156052045933,
+        "lo": 0.2799613653716956,
+        "mid": 0.3358470741078451
+      },
+      "value": 0.5504786365706521
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/10_golden_set_for_eval/1983_the_police__every_breath_you_take__album/1983_the_police__every_breath_you_take__album_20251114_063631.features.json"
+}

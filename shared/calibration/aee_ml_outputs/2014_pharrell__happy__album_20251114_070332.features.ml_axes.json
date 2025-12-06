@@ -1,0 +1,31 @@
+{
+  "audio_name": "2014_pharrell__happy__album_20251114_070332",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.36745623774823144,
+        "lo": 0.29642647960878954,
+        "mid": 0.3361172826429791
+      },
+      "value": 0.5396817393292441
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3096778546745832,
+        "lo": 0.3895922278563683,
+        "mid": 0.3007299174690484
+      },
+      "value": 0.4915095807791936
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/06_echo_2010_14/2014_pharrell__happy__album/2014_pharrell__happy__album_20251114_070332.features.json"
+}

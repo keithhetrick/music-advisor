@@ -1,0 +1,230 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://yourdomain.com/schemas/datapack-v1.1.json",
+  "title": "MusicAdvisor DATA_PACK v1.1",
+  "description": "Validator for MusicAdvisor-compatible DATA_PACKs. Supports MVP-in-root (legacy) or nested MVP block; includes Baseline, Policies, HCI_v1, Advisory, Optimization_Layer, Policy_Effects.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["region", "generated_at", "MARKET_NORMS"],
+  "properties": {
+    "DATA_PACK_ID": { "type": "string" },
+    "region": { "type": "string", "minLength": 1 },
+    "generated_at": { "type": "string", "format": "date-time" },
+
+    "MARKET_NORMS": {
+      "type": "object",
+      "required": ["profile"],
+      "properties": {
+        "profile": { "type": "string" },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "Baseline": {
+      "type": "object",
+      "properties": {
+        "active_profile": { "type": "string" },
+        "effective_utc": { "type": "string", "format": "date-time" },
+        "previous_profile": { "type": ["string", "null"] },
+        "pinned": { "type": "boolean" },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "MVP": {
+      "type": "object",
+      "required": ["tempo_band_bpm", "runtime_sec", "ttc_sec", "exposures"],
+      "properties": {
+        "tempo_band_bpm": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[0-9]{2,3}-[0-9]{2,3}$" },
+            { "type": "number", "minimum": 40, "maximum": 220 }
+          ]
+        },
+        "runtime_sec": { "type": "number", "minimum": 20, "maximum": 480 },
+        "ttc_sec": { "type": ["number", "null"], "minimum": 0, "maximum": 60 },
+        "exposures": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 10
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "Policies": {
+      "type": "object",
+      "properties": {
+        "STRUCTURE_POLICY": {
+          "type": "object",
+          "properties": {
+            "mode": { "type": "string", "enum": ["optional", "strict"] },
+            "reliable": { "type": "boolean" },
+            "use_ttc": { "type": "boolean" },
+            "use_exposures": { "type": "boolean" }
+          },
+          "additionalProperties": true
+        },
+        "SCORING_GUARDS": {
+          "type": "object",
+          "properties": {
+            "active": { "type": "boolean" },
+            "caps": {
+              "type": "object",
+              "properties": {
+                "Market": { "type": "number", "minimum": 0, "maximum": 1 },
+                "Emotional": { "type": "number", "minimum": 0, "maximum": 1 }
+              },
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": true
+        },
+        "GOLDILOCKS_POLICY": {
+          "type": "object",
+          "properties": {
+            "active": { "type": "boolean" },
+            "priors": {
+              "type": "object",
+              "properties": {
+                "Market": { "type": "number", "minimum": 0, "maximum": 1 },
+                "Emotional": { "type": "number", "minimum": 0, "maximum": 1 }
+              },
+              "additionalProperties": true
+            },
+            "notes": { "type": "string" }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "HCI_v1": {
+      "type": "object",
+      "properties": {
+        "Historical": { "type": "number", "minimum": 0, "maximum": 1 },
+        "Cultural": { "type": "number", "minimum": 0, "maximum": 1 },
+        "Market": { "type": "number", "minimum": 0, "maximum": 1 },
+        "Emotional": { "type": "number", "minimum": 0, "maximum": 1 },
+        "Sonic": { "type": "number", "minimum": 0, "maximum": 1 },
+        "Creative": { "type": "number", "minimum": 0, "maximum": 1 },
+        "HCI_v1_mean": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": true
+    },
+
+    "Advisory": {
+      "type": "object",
+      "properties": {
+        "Strengths": { "type": "array", "items": { "type": "string" } },
+        "Weaknesses": { "type": "array", "items": { "type": "string" } },
+        "Optimization_Notes": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+
+    "Optimization_Layer": {
+      "type": "object",
+      "properties": {
+        "mode": { "type": "string" },
+        "focus_axes": { "type": "array", "items": { "type": "string" } },
+        "objective": { "type": "string" },
+        "effective_caps": { "type": "object" },
+        "equilibrium_shift": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+
+    "Policy_Effects": {
+      "type": "object",
+      "properties": {
+        "GOLDILOCKS_PRIORS": { "type": "object" },
+        "Guard_Caps": { "type": "object" },
+        "Adjustment_Notes": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "lyrics": { "type": "string" },
+    "genre": { "type": "string" },
+    "reference_year": { "type": "integer" },
+    "reference_eras": {
+      "type": "array",
+      "items": { "type": "integer" },
+      "minItems": 1
+    },
+    "production_tags": { "type": "array", "items": { "type": "string" } },
+    "lyric_motifs": { "type": "array", "items": { "type": "string" } },
+    "rhythm_profile": { "type": "string" },
+
+    "tonal_profile": {
+      "type": "object",
+      "properties": {
+        "key": { "type": "string" },
+        "mode": {
+          "type": "string",
+          "enum": ["major", "minor", "mixolydian", "dorian", "other"]
+        },
+        "energy": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": true
+    },
+
+    "Known_Gaps": {
+      "oneOf": [
+        { "type": "array", "items": { "type": "string" } },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["field", "severity", "note"],
+            "properties": {
+              "field": { "type": "string" },
+              "severity": {
+                "type": "string",
+                "enum": ["low", "medium", "high"]
+              },
+              "note": { "type": "string" }
+            },
+            "additionalProperties": true
+          }
+        }
+      ]
+    }
+  },
+
+  "allOf": [
+    {
+      "oneOf": [
+        {
+          "required": ["MVP"]
+        },
+        {
+          "required": ["tempo_band_bpm", "runtime_sec", "ttc_sec", "exposures"],
+          "properties": {
+            "tempo_band_bpm": {
+              "oneOf": [
+                { "type": "string", "pattern": "^[0-9]{2,3}-[0-9]{2,3}$" },
+                { "type": "number", "minimum": 40, "maximum": 220 }
+              ]
+            },
+            "runtime_sec": { "type": "number", "minimum": 20, "maximum": 480 },
+            "ttc_sec": {
+              "type": ["number", "null"],
+              "minimum": 0,
+              "maximum": 60
+            },
+            "exposures": {
+              "type": ["integer", "null"],
+              "minimum": 0,
+              "maximum": 10
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

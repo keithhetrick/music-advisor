@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["tempo_analysis_version", "lane_id", "song_bpm", "bin_width", "lane_stats", "song_bin", "neighbor_bins", "advisory_text"],
+  "properties": {
+    "tempo_analysis_version": { "type": "string" },
+    "lane_id": { "type": "string" },
+    "song_bpm": { "type": "number" },
+    "bin_width": { "type": "number" },
+    "lane_stats": {
+      "type": "object",
+      "required": ["median_bpm", "iqr_bpm", "peak_cluster_bpm_range", "total_hits"],
+      "properties": {
+        "median_bpm": { "type": "number" },
+        "iqr_bpm": { "type": "array" },
+        "peak_cluster_bpm_range": { "type": "array" },
+        "total_hits": { "type": "number" }
+      }
+    },
+    "song_bin": { "type": "object" },
+    "neighbor_bins": { "type": "array" },
+    "advisory_text": { "type": "string" }
+  }
+}

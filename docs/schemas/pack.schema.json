@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Pack",
+  "type": "object",
+  "required": ["source_audio", "audio_payload", "client_helpers", "meta"],
+  "properties": {
+    "source_audio": { "type": "string" },
+    "audio_payload": { "type": "object" },
+    "client_helpers": {
+      "type": "object",
+      "properties": {
+        "client": { "type": ["object", "null"] },
+        "hci": { "type": ["object", "null"] },
+        "neighbors": { "type": ["array", "null"] },
+        "rich_text": { "type": ["string", "null"] },
+        "qa": { "type": ["object", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "meta": {
+      "type": "object",
+      "required": ["pipeline_version", "config_fingerprint", "generated_at"],
+      "properties": {
+        "pipeline_version": { "type": "string" },
+        "config_fingerprint": { "type": "string" },
+        "generated_at": { "type": "string" },
+        "warnings": { "type": ["array", "null"], "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

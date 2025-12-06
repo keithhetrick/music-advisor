@@ -1,0 +1,31 @@
+{
+  "audio_name": "2001_u2__beautiful_day__album_20251114_065337",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.23298224042029966,
+        "lo": 0.4220360896790572,
+        "mid": 0.34498166990064316
+      },
+      "value": 0.4549329572433878
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.299428885927239,
+        "lo": 0.3873502494523756,
+        "mid": 0.31322086462038545
+      },
+      "value": 0.488595035238821
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/04_echo_2000_04/2001_u2__beautiful_day__album/2001_u2__beautiful_day__album_20251114_065337.features.json"
+}

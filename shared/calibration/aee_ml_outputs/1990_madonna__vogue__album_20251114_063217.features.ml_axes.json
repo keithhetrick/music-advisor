@@ -1,0 +1,31 @@
+{
+  "audio_name": "1990_madonna__vogue__album_20251114_063217",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.19944814776777964,
+        "lo": 0.45588460158973493,
+        "mid": 0.3446672506424855
+      },
+      "value": 0.4330414712418024
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.37265270176705073,
+        "lo": 0.2719211634299719,
+        "mid": 0.35542613480297736
+      },
+      "value": 0.5488520965894762
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/02_echo_1990_94/1990_madonna__vogue__album/1990_madonna__vogue__album_20251114_063217.features.json"
+}

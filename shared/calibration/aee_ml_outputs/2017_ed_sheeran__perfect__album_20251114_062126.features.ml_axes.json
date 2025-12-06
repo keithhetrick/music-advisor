@@ -1,0 +1,31 @@
+{
+  "audio_name": "2017_ed_sheeran__perfect__album_20251114_062126",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.41177786395388455,
+        "lo": 0.284865121388164,
+        "mid": 0.3033570146579515
+      },
+      "value": 0.5586627159674105
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4407982386957969,
+        "lo": 0.21676029931221663,
+        "mid": 0.34244146199198644
+      },
+      "value": 0.589251293749864
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/00_core_modern/2017_ed_sheeran__perfect__album/2017_ed_sheeran__perfect__album_20251114_062126.features.json"
+}

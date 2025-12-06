@@ -1,0 +1,11 @@
+numpy>=1.23,<2
+scipy>=1.9,<1.12
+librosa>=0.10,<0.11
+soundfile>=0.12
+pydub
+jinja2
+pyyaml
+# Optional but recommended for lyric sentiment features
+vaderSentiment>=3.3
+# Vendored host package; installs CLIs like music-advisor, music-advisor-smoke
+-e vendor/MusicAdvisor_BuilderPack/builder/export/MusicAdvisor

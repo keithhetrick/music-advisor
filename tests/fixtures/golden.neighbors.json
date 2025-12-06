@@ -1,0 +1,8 @@
+{
+  "neighbors": [
+    {
+      "tier": "tier1_modern",
+      "distance": 0.5
+    }
+  ]
+}

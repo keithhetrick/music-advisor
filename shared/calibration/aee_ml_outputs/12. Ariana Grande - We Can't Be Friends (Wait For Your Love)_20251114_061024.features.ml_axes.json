@@ -1,0 +1,31 @@
+{
+  "audio_name": "12. Ariana Grande - We Can't Be Friends (Wait For Your Love)_20251114_061024",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2878314954910476,
+        "lo": 0.3918389950557397,
+        "mid": 0.32032950945321276
+      },
+      "value": 0.48318932490514477
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.32369876592750785,
+        "lo": 0.34451380246001173,
+        "mid": 0.3317874316124805
+      },
+      "value": 0.5099404273366243
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/12. Ariana Grande - We Can't Be Friends (Wait For Your Love)/12. Ariana Grande - We Can't Be Friends (Wait For Your Love)_20251114_061024.features.json"
+}

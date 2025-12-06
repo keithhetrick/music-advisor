@@ -1,0 +1,31 @@
+{
+  "audio_name": "2022_steve_lacy__bad_habit__album_20251114_071125",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.39943700926602604,
+        "lo": 0.3139989311424191,
+        "mid": 0.28656405959155484
+      },
+      "value": 0.5456032739003833
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.40490098726167445,
+        "lo": 0.24167622718589837,
+        "mid": 0.35342278555242707
+      },
+      "value": 0.5692124773858165
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/08_echo_2020_24/2022_steve_lacy__bad_habit__album/2022_steve_lacy__bad_habit__album_20251114_071125.features.json"
+}

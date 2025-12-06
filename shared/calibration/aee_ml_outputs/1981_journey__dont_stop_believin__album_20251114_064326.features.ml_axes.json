@@ -1,0 +1,31 @@
+{
+  "audio_name": "1981_journey__dont_stop_believin__album_20251114_064326",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3107432216868824,
+        "lo": 0.355052061914316,
+        "mid": 0.3342047163988017
+      },
+      "value": 0.5022445090161141
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.36126669117334964,
+        "lo": 0.3098069417451929,
+        "mid": 0.3289263670814574
+      },
+      "value": 0.5335012593871145
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/99_legacy_pop_eval/1981_journey__dont_stop_believin__album/1981_journey__dont_stop_believin__album_20251114_064326.features.json"
+}

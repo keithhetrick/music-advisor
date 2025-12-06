@@ -1,0 +1,31 @@
+{
+  "audio_name": "2016_pinkfong__baby_shark__neg_novelty_20251114_064548",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.6091702969535068,
+        "lo": 0.18425163954330065,
+        "mid": 0.20657806350319244
+      },
+      "value": 0.6579341120707372
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2820757603756811,
+        "lo": 0.4163787853538762,
+        "mid": 0.30154545427044266
+      },
+      "value": 0.4738128805253255
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/14_negatives_novelty_eval/2016_pinkfong__baby_shark__neg_novelty/2016_pinkfong__baby_shark__neg_novelty_20251114_064548.features.json"
+}

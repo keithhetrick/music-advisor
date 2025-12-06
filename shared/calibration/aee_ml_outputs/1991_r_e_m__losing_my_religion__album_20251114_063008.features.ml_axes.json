@@ -1,0 +1,31 @@
+{
+  "audio_name": "1991_r_e_m__losing_my_religion__album_20251114_063008",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.26126148983174885,
+        "lo": 0.39606810321748515,
+        "mid": 0.34267040695076595
+      },
+      "value": 0.47262109047586653
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.34535176229131204,
+        "lo": 0.322776821104514,
+        "mid": 0.33187141660417396
+      },
+      "value": 0.524040070470605
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/02_echo_1990_94/1991_r_e_m__losing_my_religion__album/1991_r_e_m__losing_my_religion__album_20251114_063008.features.json"
+}

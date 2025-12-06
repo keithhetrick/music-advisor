@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MarketNormsSnapshot",
+  "type": "object",
+  "required": [
+    "region",
+    "tier",
+    "version",
+    "last_refreshed_at",
+    "tempo_bpm",
+    "duration_sec",
+    "loudness_LUFS",
+    "energy",
+    "danceability",
+    "valence",
+    "axes"
+  ],
+  "properties": {
+    "region": { "type": "string" },
+    "tier": { "type": "string" },
+    "version": { "type": "string" },
+    "last_refreshed_at": { "type": "string" },
+    "tempo_bpm": { "$ref": "#/definitions/percentiles" },
+    "duration_sec": { "$ref": "#/definitions/percentiles" },
+    "loudness_LUFS": { "$ref": "#/definitions/percentiles" },
+    "energy": { "$ref": "#/definitions/percentiles" },
+    "danceability": { "$ref": "#/definitions/percentiles" },
+    "valence": { "$ref": "#/definitions/percentiles" },
+    "axes": {
+      "type": "object",
+      "properties": {
+        "TempoFit": { "$ref": "#/definitions/percentiles" },
+        "RuntimeFit": { "$ref": "#/definitions/percentiles" },
+        "LoudnessFit": { "$ref": "#/definitions/percentiles" },
+        "Energy": { "$ref": "#/definitions/percentiles" },
+        "Danceability": { "$ref": "#/definitions/percentiles" },
+        "Valence": { "$ref": "#/definitions/percentiles" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "definitions": {
+    "percentiles": {
+      "type": "object",
+      "properties": {
+        "p10": { "type": "number" },
+        "p25": { "type": "number" },
+        "p50": { "type": "number" },
+        "p75": { "type": "number" },
+        "p90": { "type": "number" }
+      },
+      "additionalProperties": true
+    }
+  }
+}

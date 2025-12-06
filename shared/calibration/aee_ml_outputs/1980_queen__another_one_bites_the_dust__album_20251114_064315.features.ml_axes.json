@@ -1,0 +1,31 @@
+{
+  "audio_name": "1980_queen__another_one_bites_the_dust__album_20251114_064315",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3564241504241796,
+        "lo": 0.34960532893186574,
+        "mid": 0.29397052064395474
+      },
+      "value": 0.5198668539689031
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3325416348506278,
+        "lo": 0.32704858629279765,
+        "mid": 0.3404097788565746
+      },
+      "value": 0.5182749963098805
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/99_legacy_pop_eval/1980_queen__another_one_bites_the_dust__album/1980_queen__another_one_bites_the_dust__album_20251114_064315.features.json"
+}

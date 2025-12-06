@@ -1,0 +1,19 @@
+{
+  "Baseline": {
+    "canonical_hci": 0.62,
+    "canonical_hci_source": "audio_axes",
+    "hci_band": "target",
+    "axes": [
+      {"name": "Axis1", "value": 0.1, "level": "ok", "comment": "Synthetic"},
+      {"name": "Axis2", "value": 0.2, "level": "ok", "comment": "Synthetic"}
+    ],
+    "historical_echo": {
+      "nearest": ["Track A", "Track B"],
+      "comment": "Synthetic example only"
+    },
+    "advisory": {
+      "comment": "Mock advisory for fixture",
+      "warnings": []
+    }
+  }
+}

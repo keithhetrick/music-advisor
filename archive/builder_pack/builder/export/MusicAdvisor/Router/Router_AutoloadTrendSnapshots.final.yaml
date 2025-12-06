@@ -1,0 +1,51 @@
+# Router_AutoloadTrendSnapshots.final.yaml  (FINAL — single source of truth)
+# Use ONLY after you have fully migrated snapshots into Knowledge/TrendSnapshots/**
+
+router:
+  hooks:
+    advisor_ingest:
+      - name: load_trend_snapshots
+        params:
+          glob_paths:
+            - Knowledge/TrendSnapshots/**/*.yaml
+            - Knowledge/TrendSnapshots/**/*.json
+        action: |
+          def parse_version(v):
+            try:
+              v = str(v)
+              v_norm = v.replace("-", ".")
+              parts = [int(x) for x in v_norm.split(".") if x.isdigit()]
+              while len(parts) < 3:
+                parts.append(0)
+              return (parts[0], parts[1], parts[2])
+            except:
+              return (0,0,0)
+
+          current_trend_signals = []
+          index_by_id = {}
+
+          for each file in glob_paths:
+            obj = parse_yaml_or_json(file)
+            if not (obj and isinstance(obj, dict)):
+              continue
+
+            sid = obj.get("id") or file
+            ver_tuple = parse_version(obj.get("version") or "")
+
+            prev = index_by_id.get(sid)
+            if not prev or ver_tuple > prev["version_tuple"]:
+              index_by_id[sid] = {"obj": obj, "version_tuple": ver_tuple, "path": file}
+
+          for sid, rec in index_by_id.items():
+            current_trend_signals.append(rec["obj"])
+
+          context["current_trend_signals"] = current_trend_signals
+          context["trend_snapshots_loaded"] = len(current_trend_signals)
+
+  layers:
+    market:
+      inputs: [current_pack, current_trend_signals]
+    cultural:
+      inputs: [current_pack, current_trend_signals]
+    sonic:
+      inputs: [current_pack, current_trend_signals]

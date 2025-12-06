@@ -1,0 +1,31 @@
+{
+  "audio_name": "2012_pitbull_kesha__timber__album_20251114_070125",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3408077099641794,
+        "lo": 0.3386004348556103,
+        "mid": 0.3205918551802102
+      },
+      "value": 0.5177025680307796
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.30929292319915036,
+        "lo": 0.37684637129519266,
+        "mid": 0.313860705505657
+      },
+      "value": 0.4951986117311448
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/06_echo_2010_14/2012_pitbull_kesha__timber__album/2012_pitbull_kesha__timber__album_20251114_070125.features.json"
+}

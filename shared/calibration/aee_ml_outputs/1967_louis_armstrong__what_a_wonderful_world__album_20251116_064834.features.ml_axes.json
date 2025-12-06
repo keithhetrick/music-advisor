@@ -1,0 +1,31 @@
+{
+  "audio_name": "1967_louis_armstrong__what_a_wonderful_world__album_20251116_064834",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.05556886009496661,
+        "lo": 0.6997116768409529,
+        "mid": 0.24471946306408038
+      },
+      "value": 0.3095355979809524
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.1175862475822697,
+        "lo": 0.6177893206802391,
+        "mid": 0.2646244317374912
+      },
+      "value": 0.35581839044972263
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/1967_louis_armstrong__what_a_wonderful_world__album/1967_louis_armstrong__what_a_wonderful_world__album_20251116_064834.features.json"
+}

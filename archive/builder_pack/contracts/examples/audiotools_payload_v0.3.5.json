@@ -1,0 +1,13 @@
+{
+  "duration_sec": 176.07,
+  "audio_axes": [0.62, 0.63, 0.61, 0.6, 0.64, 0.62],
+  "TTC": {
+    "seconds": null,
+    "confidence": null,
+    "lift_db": null,
+    "dropped": ["chorus_lift"],
+    "source": "absent"
+  },
+  "tonal": { "confidence": 0.71 },
+  "tempo": { "bpm": 100.0, "band_10s": "100–109" }
+}

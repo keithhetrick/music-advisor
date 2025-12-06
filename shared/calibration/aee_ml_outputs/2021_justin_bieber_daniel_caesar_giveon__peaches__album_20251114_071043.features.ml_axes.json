@@ -1,0 +1,31 @@
+{
+  "audio_name": "2021_justin_bieber_daniel_caesar_giveon__peaches__album_20251114_071043",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4349163645789415,
+        "lo": 0.2950469615587479,
+        "mid": 0.2700366738623106
+      },
+      "value": 0.5637066391350052
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3714270479572248,
+        "lo": 0.2819006655362049,
+        "mid": 0.3466722865065704
+      },
+      "value": 0.5454292671241673
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/08_echo_2020_24/2021_justin_bieber_daniel_caesar_giveon__peaches__album/2021_justin_bieber_daniel_caesar_giveon__peaches__album_20251114_071043.features.json"
+}

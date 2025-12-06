@@ -1,0 +1,31 @@
+{
+  "audio_name": "11. Artemas - I Like The Way You Kiss Me_20251114_061015",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.40353734070376557,
+        "lo": 0.299071752434553,
+        "mid": 0.2973909068616815
+      },
+      "value": 0.5515165435159521
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.23587120238783282,
+        "lo": 0.49117187750595054,
+        "mid": 0.2729569201062167
+      },
+      "value": 0.43520335758395634
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/11. Artemas - I Like The Way You Kiss Me/11. Artemas - I Like The Way You Kiss Me_20251114_061015.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2021_farruko__pepas__album_20251114_064007",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.29689480198929624,
+        "lo": 0.35982180788242124,
+        "mid": 0.3432833901282824
+      },
+      "value": 0.49596663833152727
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.37521185812587843,
+        "lo": 0.2872946076879505,
+        "mid": 0.33749353418617106
+      },
+      "value": 0.5451357680376723
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/11_latincrossover_eval/2021_farruko__pepas__album/2021_farruko__pepas__album_20251114_064007.features.json"
+}

@@ -1,0 +1,16 @@
+{
+  "default": {
+    "clip_peak_threshold": 0.999,
+    "silence_ratio_threshold": 0.9,
+    "low_level_dbfs_threshold": -40.0
+  },
+  "lenient": {
+    "silence_ratio_threshold": 0.95,
+    "low_level_dbfs_threshold": -45.0
+  },
+  "strict": {
+    "clip_peak_threshold": 0.999,
+    "silence_ratio_threshold": 0.9,
+    "low_level_dbfs_threshold": -40.0
+  }
+}

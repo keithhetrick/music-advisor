@@ -1,0 +1,6 @@
+MAE_raw=0.22886243386243388
+MAE_cal=0.07776199548777635
+Spearman_song_raw=0.2212998670012049
+Spearman_song_cal=0.1405973498823945
+Spearman_anchor_raw=0.996965091635306
+Spearman_anchor_cal=1.0

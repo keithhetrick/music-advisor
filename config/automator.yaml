@@ -1,0 +1,14 @@
+features:
+  enable_beatlink: false
+  enable_asr: false
+
+thresholds:
+  bpm_tolerance: 2.0
+  lyric_confidence_min: 0.60
+  advisory_confidence_min: 0.60
+
+normalization:
+  tempo_band_size: 10
+
+provenance:
+  lyric_source_priority: [rights, licensed, embedded, cms, asr]

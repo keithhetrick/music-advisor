@@ -1,0 +1,30 @@
+{
+  "profile_id": "Modern_Americana_Echo",
+  "version": "1.0",
+  "description": "2020s folk-pop/Americana with 1980s heartland/rock lineage — narrative truth, acoustic texture, steady band feel.",
+  "era_lineage": ["Y-40:heartland", "Y-30:alt_country", "Y-10:folk_pop"],
+  "emotional_palette": [
+    "steadfast",
+    "porch-truth",
+    "tender_grit",
+    "earned_hope"
+  ],
+  "production_language": [
+    "acoustic_gtr",
+    "brush_kit",
+    "upright_or_round_bass",
+    "tape_room",
+    "fiddle_or_organ_color"
+  ],
+  "rhythmic_bias": ["train_beat", "half_time_lift", "backbeat_lazy"],
+  "harmonic_tendencies": [
+    "I-IV-V",
+    "mixolydian_colors",
+    "relative_minor_bridges"
+  ],
+  "vocal_shape": ["close_story", "low_register_truth", "unison_hook"],
+  "reference_frames": {
+    "artists": ["Chris Stapleton", "Kacey Musgraves", "Caamp"],
+    "eras": ["Petty/Heartland 80s", "Early alt-country 90s"]
+  }
+}

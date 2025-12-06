@@ -1,0 +1,11 @@
+{
+  "source_audio": "test.wav",
+  "duration_sec": 180.0,
+  "tempo_bpm": 120.0,
+  "key": "C",
+  "mode": "minor",
+  "loudness_LUFS": -12.0,
+  "energy": 0.5,
+  "danceability": 0.5,
+  "valence": 0.5
+}

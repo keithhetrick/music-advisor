@@ -1,0 +1,54 @@
+{
+  "norm_version": "2025.1",
+  "generated_at": "2025-10-29T20:27:19Z",
+  "platform": "TikTok",
+  "notes": "Starter norms. Replace with platform-derived trend windows.",
+  "profiles": {
+    "US_Pop_2025": {
+      "hook_window_sec": {
+        "typical": [
+          0,
+          15
+        ],
+        "median": 7
+      },
+      "clip_len_sec": {
+        "typical": [
+          12,
+          18
+        ],
+        "median": 15
+      },
+      "trend_half_life_days": 9,
+      "weights": {
+        "use_rate": 0.45,
+        "completion": 0.25,
+        "remixability": 0.2,
+        "repeat": 0.1
+      }
+    },
+    "Global_KPop_2025": {
+      "hook_window_sec": {
+        "typical": [
+          0,
+          12
+        ],
+        "median": 6
+      },
+      "clip_len_sec": {
+        "typical": [
+          12,
+          20
+        ],
+        "median": 15
+      },
+      "trend_half_life_days": 11,
+      "weights": {
+        "use_rate": 0.43,
+        "completion": 0.27,
+        "remixability": 0.2,
+        "repeat": 0.1
+      }
+    }
+  }
+}

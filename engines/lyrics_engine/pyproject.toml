@@ -1,0 +1,14 @@
+[project]
+name = "musicadvisor-lyrics-engine"
+version = "0.0.1"
+description = "Lyrics/STT pipeline for Music Advisor (relocated from ma_lyric_engine/ma_stt_engine)."
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+musicadvisor-lyric-wip = "ma_lyrics_engine.tools.lyric_wip_pipeline:main"
+musicadvisor-lyric-stt = "ma_lyrics_engine.tools.lyric_stt_sidecar:main"
+musicadvisor-lyric-neighbors = "ma_lyrics_engine.tools.lyric_neighbors:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}

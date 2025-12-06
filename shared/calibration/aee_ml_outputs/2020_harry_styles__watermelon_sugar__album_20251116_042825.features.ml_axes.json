@@ -1,0 +1,31 @@
+{
+  "audio_name": "2020_harry_styles__watermelon_sugar__album_20251116_042825",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.42160190296492656,
+        "lo": 0.276259003415225,
+        "mid": 0.3021390936198485
+      },
+      "value": 0.5646829650131568
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.34848695930936485,
+        "lo": 0.29571381999929774,
+        "mid": 0.3557992206913374
+      },
+      "value": 0.5332562897584884
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2020_harry_styles__watermelon_sugar__album/2020_harry_styles__watermelon_sugar__album_20251116_042825.features.json"
+}

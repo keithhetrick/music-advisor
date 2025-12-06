@@ -1,0 +1,7 @@
+LISTENER ARCHETYPE
+Archetype: {{archetype}}
+
+Lyric    : {{lyric}}
+Arrange  : {{arr}}
+Avoid    : {{avoid}}
+Spectrum : {{freq}}

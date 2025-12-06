@@ -1,0 +1,14 @@
+{
+  "tempo_band_bpm": [98, 118],
+  "arrangement": [
+    "intro (<=5s)",
+    "verse",
+    "pre",
+    "chorus (instantly memorable)",
+    "short bridge",
+    "double final chorus"
+  ],
+  "mix_focus": ["bright top", "controlled low end", "first hook < 10s"],
+  "lyric_motifs": ["optimism", "nostalgia", "summer imagery"],
+  "radio_legibility_target": 0.8
+}

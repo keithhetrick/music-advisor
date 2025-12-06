@@ -1,0 +1,31 @@
+{
+  "audio_name": "1989_madonna__like_a_prayer__single_20251114_063701",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.15332256007200046,
+        "lo": 0.498351751886345,
+        "mid": 0.3483256880416545
+      },
+      "value": 0.40415737045929667
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.38266674449331894,
+        "lo": 0.2598989790909409,
+        "mid": 0.3574342764157402
+      },
+      "value": 0.5559636668453793
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/10_golden_set_for_eval/1989_madonna__like_a_prayer__single/1989_madonna__like_a_prayer__single_20251114_063701.features.json"
+}

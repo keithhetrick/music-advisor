@@ -1,0 +1,31 @@
+{
+  "audio_name": "2024_sabrina_carpenter__please_please_please__album_20251116_042906",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3082267155907468,
+        "lo": 0.34359033613635037,
+        "mid": 0.3481829482729027
+      },
+      "value": 0.5048022496158562
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.32011547926348466,
+        "lo": 0.3430922061500635,
+        "mid": 0.33679231458645187
+      },
+      "value": 0.5091127558972006
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2024_sabrina_carpenter__please_please_please__album/2024_sabrina_carpenter__please_please_please__album_20251116_042906.features.json"
+}

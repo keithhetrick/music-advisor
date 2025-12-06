@@ -1,0 +1,5 @@
+# Ignore fetched data/artifacts and caches inside the vendored bundle
+Data/
+__pycache__/
+*.pyc
+MusicAdvisor/Data/HitCheck_Cohorts/*

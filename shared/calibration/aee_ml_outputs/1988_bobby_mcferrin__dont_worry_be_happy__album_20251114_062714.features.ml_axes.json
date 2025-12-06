@@ -1,0 +1,31 @@
+{
+  "audio_name": "1988_bobby_mcferrin__dont_worry_be_happy__album_20251114_062714",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 1.9834569723504636e-06,
+        "lo": 0.9949986618602943,
+        "mid": 0.004999354682733337
+      },
+      "value": 0.20150109565185204
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.003920975817351865,
+        "lo": 0.924190760643658,
+        "mid": 0.0718882635389903
+      },
+      "value": 0.22411511334297585
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/01_echo_1985_89/1988_bobby_mcferrin__dont_worry_be_happy__album/1988_bobby_mcferrin__dont_worry_be_happy__album_20251114_062714.features.json"
+}

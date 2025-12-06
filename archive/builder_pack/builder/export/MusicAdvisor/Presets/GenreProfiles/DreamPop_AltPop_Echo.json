@@ -1,0 +1,24 @@
+{
+  "profile_id": "DreamPop_AltPop_Echo",
+  "version": "1.0",
+  "description": "Dream/alt-pop with 1980s synth-pop lineage — atmosphere first, fragile vocal presence, hypnotic repetition.",
+  "era_lineage": ["Y-40:synth_pop", "Y-20:dream_pop", "Y-10:bedroom_pop"],
+  "emotional_palette": ["wistful", "weightless", "cinematic_melancholy"],
+  "production_language": [
+    "shimmer_pads",
+    "chorus_gtrs",
+    "tape_echo",
+    "sidechain_swells"
+  ],
+  "rhythmic_bias": ["motorik_soft", "four_on_floor_soft", "downtempo_ghost"],
+  "harmonic_tendencies": ["modal_drone", "add9_colors", "non_functional_loops"],
+  "vocal_shape": ["closelyric", "doubled_airy", "ghost_stacks"],
+  "reference_frames": {
+    "artists": [
+      "Beach House",
+      "M83 (soft mode)",
+      "Phoebe Bridgers (ambient edges)"
+    ],
+    "eras": ["The Cure/Cocteau Twins textures"]
+  }
+}

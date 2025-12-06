@@ -1,0 +1,31 @@
+{
+  "audio_name": "2004_kelly_clarkson__since_u_been_gone__album_20251114_065507",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3474433690810308,
+        "lo": 0.34551272100393626,
+        "mid": 0.307043909915033
+      },
+      "value": 0.5179513628771799
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2832710774661968,
+        "lo": 0.4076178849412358,
+        "mid": 0.3091110375925675
+      },
+      "value": 0.47685951163079815
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/04_echo_2000_04/2004_kelly_clarkson__since_u_been_gone__album/2004_kelly_clarkson__since_u_been_gone__album_20251114_065507.features.json"
+}

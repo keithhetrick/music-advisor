@@ -1,0 +1,31 @@
+{
+  "audio_name": "44. KAROL G, Peso Pluma - QLONA_20251114_061617",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.46894191825365344,
+        "lo": 0.23864550818421318,
+        "mid": 0.29241257356213346
+      },
+      "value": 0.5925360189335147
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.26516905732471535,
+        "lo": 0.45993470414425747,
+        "mid": 0.27489623853102707
+      },
+      "value": 0.4548287588203731
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/44. KAROL G, Peso Pluma - QLONA/44. KAROL G, Peso Pluma - QLONA_20251114_061617.features.json"
+}

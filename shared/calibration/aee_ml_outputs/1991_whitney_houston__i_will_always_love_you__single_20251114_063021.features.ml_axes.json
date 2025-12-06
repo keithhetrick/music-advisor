@@ -1,0 +1,31 @@
+{
+  "audio_name": "1991_whitney_houston__i_will_always_love_you__single_20251114_063021",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.39810871803780407,
+        "lo": 0.3083219445349061,
+        "mid": 0.2935693374272898
+      },
+      "value": 0.5468414679527596
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.472183777712523,
+        "lo": 0.1764133924156586,
+        "mid": 0.35140282987181826
+      },
+      "value": 0.6123403044746853
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/02_echo_1990_94/1991_whitney_houston__i_will_always_love_you__single/1991_whitney_houston__i_will_always_love_you__single_20251114_063021.features.json"
+}

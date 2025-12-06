@@ -1,0 +1,31 @@
+{
+  "audio_name": "2012_bruno_mars__locked_out_of_heaven__album_20251114_070029",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3715200535732573,
+        "lo": 0.30452896079355285,
+        "mid": 0.32395098563318986
+      },
+      "value": 0.5386733305125742
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3333460692183495,
+        "lo": 0.35200804793810236,
+        "mid": 0.31464588284354816
+      },
+      "value": 0.5110687098449916
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/06_echo_2010_14/2012_bruno_mars__locked_out_of_heaven__album/2012_bruno_mars__locked_out_of_heaven__album_20251114_070029.features.json"
+}

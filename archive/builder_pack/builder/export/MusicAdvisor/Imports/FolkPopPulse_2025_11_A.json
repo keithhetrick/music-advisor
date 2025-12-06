@@ -1,0 +1,31 @@
+{
+  "source": "spotify",
+  "playlist": "FolkPopPulse_2025_11_A",
+  "generated_at": "2025-10-31",
+  "tracks": [
+    {
+      "url": "https://open.spotify.com/track/7ouMYWpwJ422jRcDASZB7P",
+      "title": "Stick Season",
+      "artist": "Noah Kahan",
+      "release_date": "2022-10-14",
+      "explicit": false,
+      "notes": ["folk-pop", "acoustic"]
+    },
+    {
+      "url": "https://open.spotify.com/track/4Dg5moVCTgxAb6Yt9pC76t",
+      "title": "Lose Control",
+      "artist": "Teddy Swims",
+      "release_date": "2023-06-30",
+      "explicit": false,
+      "notes": ["soul-pop", "emotional"]
+    },
+    {
+      "url": "https://open.spotify.com/track/1kuGVB7EU95pJObxwvfwKS",
+      "title": "vampire",
+      "artist": "Olivia Rodrigo",
+      "release_date": "2023-06-30",
+      "explicit": true,
+      "notes": ["pop"]
+    }
+  ]
+}

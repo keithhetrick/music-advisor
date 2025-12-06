@@ -1,0 +1,76 @@
+{
+  "out_dir": "/Users/keithhetrick/music-advisor/tests/fixtures",
+  "pipeline_version": "unknown",
+  "versions": {
+    "numpy": "1.26.4",
+    "scipy": "1.11.4",
+    "librosa": "0.10.1"
+  },
+  "warnings": [],
+  "artifacts": {
+    "features": {
+      "path": "/Users/keithhetrick/music-advisor/tests/fixtures/golden.features.json",
+      "bytes": 540,
+      "source_audio": "~/audio/test.wav",
+      "tempo_bpm": 120.0,
+      "key": "C",
+      "mode": "minor",
+      "loudness_LUFS": -12.0,
+      "tempo_backend": "stub",
+      "feature_pipeline_meta": {
+        "source_hash": "abc123",
+        "config_fingerprint": "test",
+        "pipeline_version": "test"
+      },
+      "tempo_backend_detail": null
+    },
+    "sidecar": {
+      "path": "/Users/keithhetrick/music-advisor/tests/fixtures/golden.sidecar.json",
+      "bytes": 122
+    },
+    "merged": {
+      "path": "/Users/keithhetrick/music-advisor/tests/fixtures/golden.merged.json",
+      "bytes": 197
+    },
+    "hci": {
+      "path": "/Users/keithhetrick/music-advisor/tests/fixtures/golden.hci.json",
+      "bytes": 272,
+      "HCI_v1_final_score": 0.65,
+      "HCI_v1_role": "unknown",
+      "feature_pipeline_meta": {
+        "source_hash": "abc123",
+        "config_fingerprint": "test",
+        "pipeline_version": "test"
+      },
+      "historical_echo_v1": {},
+      "historical_echo_meta": {}
+    },
+    "client_rich": {
+      "path": "/Users/keithhetrick/music-advisor/tests/fixtures/golden.client.rich.txt",
+      "bytes": 188,
+      "text": "# header\n/audio import {\n  \"historical_echo_v1\": {},\n  \"historical_echo_meta\": {},\n  \"feature_pipeline_meta\": {},\n  \"features\": {\"runtime_sec\": 1},\n  \"features_full\": {\"runtime_sec\": 1}\n}\n",
+      "hci_score": null,
+      "philosophy": null,
+      "echo_summary": null,
+      "audio_json": {
+        "historical_echo_v1": {},
+        "historical_echo_meta": {},
+        "feature_pipeline_meta": {},
+        "features": {
+          "runtime_sec": 1
+        },
+        "features_full": {
+          "runtime_sec": 1
+        }
+      }
+    },
+    "neighbors": {
+      "path": "/Users/keithhetrick/music-advisor/tests/fixtures/golden.neighbors.json",
+      "bytes": 89,
+      "count": 1
+    }
+  },
+  "source_hash": "abc123",
+  "sidecar_status": null,
+  "sidecar_attempts": null
+}

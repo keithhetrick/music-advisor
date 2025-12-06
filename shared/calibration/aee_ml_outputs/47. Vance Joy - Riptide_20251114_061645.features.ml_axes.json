@@ -1,0 +1,31 @@
+{
+  "audio_name": "47. Vance Joy - Riptide_20251114_061645",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4149609614460981,
+        "lo": 0.29819621796079254,
+        "mid": 0.28684282059310934
+      },
+      "value": 0.5557774711178967
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.35900140921812446,
+        "lo": 0.30576650169506536,
+        "mid": 0.33523208908681024
+      },
+      "value": 0.533920542717824
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/47. Vance Joy - Riptide/47. Vance Joy - Riptide_20251114_061645.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "21. Mitski - My Love Mine All Mine_20251114_061208",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.40550989592949604,
+        "lo": 0.3195467033678455,
+        "mid": 0.2749434007026585
+      },
+      "value": 0.54606445256497
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2701501153211165,
+        "lo": 0.42623979960490477,
+        "mid": 0.30361008507397885
+      },
+      "value": 0.4666806004809194
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/21. Mitski - My Love Mine All Mine/21. Mitski - My Love Mine All Mine_20251114_061208.features.json"
+}

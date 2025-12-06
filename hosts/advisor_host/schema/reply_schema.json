@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "required": ["session_id", "reply", "ui_hints"],
+  "properties": {
+    "session_id": { "type": "string" },
+    "reply": { "type": "string" },
+    "ui_hints": {
+      "type": "object",
+      "required": ["show_cards", "quick_actions", "tone", "primary_slices"],
+      "properties": {
+        "show_cards": { "type": "array", "items": { "type": "string" } },
+        "quick_actions": { "type": "array", "items": { "type": "object" } },
+        "tone": { "type": "string" },
+        "primary_slices": { "type": "array", "items": { "type": "string" } },
+        "highlight_axes": { "type": "array", "items": { "type": "string" } },
+        "_more": { "type": "boolean" },
+        "warnings": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "market_norms_used": { "type": ["object", "null"] },
+    "rec_version": { "type": ["string", "null"] },
+    "advisor_mode": { "type": ["string", "null"] }
+  }
+}

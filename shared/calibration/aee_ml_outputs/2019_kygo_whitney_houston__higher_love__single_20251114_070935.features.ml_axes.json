@@ -1,0 +1,31 @@
+{
+  "audio_name": "2019_kygo_whitney_houston__higher_love__single_20251114_070935",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2308376183333416,
+        "lo": 0.46091411118740633,
+        "mid": 0.3082482704792521
+      },
+      "value": 0.44251893306044765
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3035433694648232,
+        "lo": 0.35285832941208845,
+        "mid": 0.34359830112308826
+      },
+      "value": 0.5003826804890614
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/07_echo_2015_19/2019_kygo_whitney_houston__higher_love__single/2019_kygo_whitney_houston__higher_love__single_20251114_070935.features.json"
+}

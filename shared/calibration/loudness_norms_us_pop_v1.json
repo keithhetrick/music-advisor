@@ -1,0 +1,29 @@
+{
+  "version": "us_pop_loudness_v1",
+  "created_utc": "2025-11-22T00:00:00Z",
+  "note": "Initial loudness calibration for US Pop based on the 1985–1986 Billboard US Year-End Hot 100 Top 40 cohort, using Spotify->Logic Pro X capture compared to offline Spotify (Kaggle) audio features.",
+  "capture_profile": {
+    "id": "spotify_to_logic_lufs_capture_v1",
+    "description": "Tracks streamed from Spotify, recorded into Logic Pro X, normalized/mixed by Keith, then exported; loudness_LUFS measured via music-advisor.",
+    "known_offset_vs_spotify_db": -8.65
+  },
+  "reference_sample": {
+    "years": [1985, 1986],
+    "cohort": "Billboard US Year-End Hot 100 Top 40 (per year)",
+    "num_tracks": 79,
+    "spotify_offline_stats": {
+      "loudness_mean_db": -10.01,
+      "loudness_std_db": 3.06
+    },
+    "local_extractor_stats": {
+      "approx_mean_lufs": -18.66,
+      "approx_std_lufs": 3.0
+    }
+  },
+  "market_norms_for_axes": {
+    "loudness_mean_lufs": -18.6,
+    "loudness_std_lufs": 2.5,
+    "intended_use": "Copy loudness_mean_lufs into MARKET_NORMS.loudness_mean and loudness_std_lufs into MARKET_NORMS.loudness_std inside calibration/market_norms_us_pop.json for the LoudnessFit axis in hci_axes.compute_axes.",
+    "future_notes": "When the calibration set expands beyond 1985–1986 (e.g., full 1985–present Top 40), recompute mean/std and bump version to us_pop_loudness_v2, keeping this file for reproducibility."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2008_kings_of_leon__use_somebody__album_20251114_065756",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.33739988675601373,
+        "lo": 0.3233888645434956,
+        "mid": 0.33921124870049074
+      },
+      "value": 0.5210733010015561
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.334994122249559,
+        "lo": 0.3568670600885298,
+        "mid": 0.3081388176619112
+      },
+      "value": 0.5101878247607867
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/05_echo_2005_09/2008_kings_of_leon__use_somebody__album/2008_kings_of_leon__use_somebody__album_20251114_065756.features.json"
+}

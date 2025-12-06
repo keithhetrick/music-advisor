@@ -1,0 +1,31 @@
+{
+  "audio_name": "1985_tears_for_fears__everybody_wants_to_rule_the_world__single_20251116_041357",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.266899852677848,
+        "lo": 0.34772286040019973,
+        "mid": 0.38537728692195233
+      },
+      "value": 0.4890980903171869
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.37868120088804547,
+        "lo": 0.2778434402470669,
+        "mid": 0.3434753588648876
+      },
+      "value": 0.5491853882366958
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/1985_tears_for_fears__everybody_wants_to_rule_the_world__single/1985_tears_for_fears__everybody_wants_to_rule_the_world__single_20251116_041357.features.json"
+}

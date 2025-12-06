@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ma-hf-a12"
+version = "0.1.7"
+description = "Music Advisor host package with CLI (smoke & advisor)."
+requires-python = ">=3.10"
+readme = { text = "Music Advisor host package with CLI entrypoints.", content-type = "text/plain" }
+authors = [{ name = "Keith Hetrick" }]
+license = { text = "Proprietary" }
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+
+[project.scripts]
+music-advisor = "CLI.advisor_cli:main"
+music-advisor-smoke = "Tools.smoke_end_to_end:main"

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2016_bruno_mars__thats_what_i_like__album_20251114_070547",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.37278565883166065,
+        "lo": 0.3194049666141561,
+        "mid": 0.3078093745541832
+      },
+      "value": 0.5346534906068344
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.31003682753235445,
+        "lo": 0.37111299321287655,
+        "mid": 0.31885017925476894
+      },
+      "value": 0.4971789916724611
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/07_echo_2015_19/2016_bruno_mars__thats_what_i_like__album/2016_bruno_mars__thats_what_i_like__album_20251114_070547.features.json"
+}

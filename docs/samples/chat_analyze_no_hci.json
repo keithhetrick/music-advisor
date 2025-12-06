@@ -1,0 +1,38 @@
+{
+  "message": "analyze",
+  "payload": {
+    "audio_name": "Example Track (no HCI)",
+    "features_full": {
+      "tempo_bpm": 95.0,
+      "duration_sec": 210.0,
+      "loudness_LUFS": -8.7,
+      "energy": 0.62,
+      "danceability": 0.52,
+      "valence": 0.48
+    },
+    "audio_axes": {
+      "TempoFit": 0.7,
+      "RuntimeFit": 0.65,
+      "LoudnessFit": 0.68,
+      "Energy": 0.62,
+      "Danceability": 0.52,
+      "Valence": 0.48
+    },
+    "historical_echo_v1": {
+      "primary_decade": "2005–2014",
+      "primary_decade_neighbor_count": 4,
+      "top_neighbor": {
+        "year": 2010,
+        "artist": "Sample Artist",
+        "title": "Sample Song",
+        "distance": 0.55
+      }
+    }
+  },
+  "norms": {
+    "region": "US",
+    "tier": "Tier1_Hot100_Top40",
+    "version": "2024-YE",
+    "last_refreshed_at": "2025-01-15T00:00:00Z"
+  }
+}

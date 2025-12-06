@@ -1,0 +1,31 @@
+{
+  "audio_name": "2021_olivia_rodrigo__drivers_license__album_20251114_062337",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.25373661329461705,
+        "lo": 0.4018855545207441,
+        "mid": 0.3443778321846389
+      },
+      "value": 0.4682421482968928
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.29486105227768794,
+        "lo": 0.3976895986078031,
+        "mid": 0.30744934911450894
+      },
+      "value": 0.48389448871484986
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/00_core_modern/2021_olivia_rodrigo__drivers_license__album/2021_olivia_rodrigo__drivers_license__album_20251114_062337.features.json"
+}

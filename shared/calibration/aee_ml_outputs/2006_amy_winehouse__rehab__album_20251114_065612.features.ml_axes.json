@@ -1,0 +1,31 @@
+{
+  "audio_name": "2006_amy_winehouse__rehab__album_20251114_065612",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.47990395073021164,
+        "lo": 0.2505622692521978,
+        "mid": 0.2695337800175906
+      },
+      "value": 0.5927977019799148
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4035951398033091,
+        "lo": 0.2568619879126096,
+        "mid": 0.3395428722840813
+      },
+      "value": 0.5641997025573753
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/05_echo_2005_09/2006_amy_winehouse__rehab__album/2006_amy_winehouse__rehab__album_20251114_065612.features.json"
+}

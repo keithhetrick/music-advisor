@@ -1,0 +1,31 @@
+{
+  "audio_name": "2021_doja_cat__woman__album_20251114_071034",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.488584474101089,
+        "lo": 0.25512259849809543,
+        "mid": 0.25629292740081544
+      },
+      "value": 0.5944677863859524
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.341572022891953,
+        "lo": 0.32578833494620524,
+        "mid": 0.33263964216184183
+      },
+      "value": 0.521813707528322
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/08_echo_2020_24/2021_doja_cat__woman__album/2021_doja_cat__woman__album_20251114_071034.features.json"
+}

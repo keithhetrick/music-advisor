@@ -1,0 +1,31 @@
+{
+  "audio_name": "35. Dasha - Austin (Boots Stop Workin')_20251114_061434",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3004136302671575,
+        "lo": 0.4043446803316517,
+        "mid": 0.2952416894011907
+      },
+      "value": 0.4838413664940096
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.26203612279495636,
+        "lo": 0.4246178942115855,
+        "mid": 0.31334598299345817
+      },
+      "value": 0.4643272747147591
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/35. Dasha - Austin (Boots Stop Workin')/35. Dasha - Austin (Boots Stop Workin')_20251114_061434.features.json"
+}

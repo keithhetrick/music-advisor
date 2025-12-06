@@ -1,0 +1,31 @@
+{
+  "audio_name": "2010_katy_perry__firework__album_20251116_062030",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4535237052492017,
+        "lo": 0.20330698063138375,
+        "mid": 0.34316931411941454
+      },
+      "value": 0.5977412026478055
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.43154336279777955,
+        "lo": 0.2448131337359484,
+        "mid": 0.3236435034662722
+      },
+      "value": 0.5775962368584384
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2010_katy_perry__firework__album/2010_katy_perry__firework__album_20251116_062030.features.json"
+}

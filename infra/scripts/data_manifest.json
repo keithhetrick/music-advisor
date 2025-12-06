@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "name": "market_norms_us_pop",
+      "target_path": "data/public/market_norms/market_norms_us_pop.json",
+      "url": "https://music-advisor-data-external-database-resources.s3.amazonaws.com/v1/data/public/current/market_norms/market_norms_us_pop.json",
+      "sha256": "bc337d7666af4503e43e8286e85ff45f8464908bbc03ed6e16bcc3da0bb127ac",
+      "optional": false
+    },
+    {
+      "name": "spine_master",
+      "target_path": "data/public/spine/spine_master.csv",
+      "url": "https://music-advisor-data-external-database-resources.s3.amazonaws.com/v1/data/public/current/spine/spine_master.csv",
+      "sha256": "d0854acf63fe67f8cb9390c57b7f2cc143d1039afb3a23971a769259cb23cfcc",
+      "optional": false
+    },
+    {
+      "name": "spine_core_tracks_v1",
+      "target_path": "data/public/spine/spine_core_tracks_v1.csv",
+      "url": "https://music-advisor-data-external-database-resources.s3.amazonaws.com/v1/data/public/current/spine/spine_core_tracks_v1.csv",
+      "sha256": "11a7421882c326481639ffa20212714353aea48c00675387df4b150273208133",
+      "optional": false
+    },
+    {
+      "name": "spine_audio_spotify_v1",
+      "target_path": "data/public/spine/spine_audio_spotify_v1.csv",
+      "url": "https://music-advisor-data-external-database-resources.s3.amazonaws.com/v1/data/public/current/spine/spine_audio_spotify_v1.csv",
+      "sha256": "a8086af1848380c547b2c1eabcd4b9d8a34cd16cbea2e13f6cdcfdc53a57de86",
+      "optional": false
+    },
+    {
+      "name": "spine_audio_spotify_v1_enriched",
+      "target_path": "data/public/spine/spine_audio_spotify_v1_enriched.csv",
+      "url": "https://music-advisor-data-external-database-resources.s3.amazonaws.com/v1/data/public/current/spine/spine_audio_spotify_v1_enriched.csv",
+      "sha256": "89a319c677b7b7d995318e4ed5aa55db9a72c70acdeb51bb661029e440104a30",
+      "optional": false
+    },
+    {
+      "name": "spine_unmatched_billboard_v1",
+      "target_path": "data/public/spine/spine_unmatched_billboard_v1.csv",
+      "url": "https://music-advisor-data-external-database-resources.s3.amazonaws.com/v1/data/public/current/spine/spine_unmatched_billboard_v1.csv",
+      "sha256": "03079e93d171ddc0977ec983c5d098c389507490163b528ba1aa8991b5a44794",
+      "optional": true
+    },
+    {
+      "name": "market_norms_us_tier1_2024YE",
+      "target_path": "data/public/market_norms/market_norms_us_tier1_2024YE.json",
+      "url": "https://music-advisor-data-external-database-resources.s3.amazonaws.com/v1/data/public/current/market_norms/market_norms_us_tier1_2024YE.json",
+      "sha256": "bc337d7666af4503e43e8286e85ff45f8464908bbc03ed6e16bcc3da0bb127ac",
+      "optional": true
+    },
+    {
+      "name": "market_norms_us_billboardtop100_2025_01",
+      "target_path": "data/public/market_norms/US_BillboardTop100_2025-01.json",
+      "url": "https://music-advisor-data-external-database-resources.s3.amazonaws.com/v1/data/public/current/market_norms/US_BillboardTop100_2025-01.json",
+      "sha256": "f741332b8cbbda1ec6e092a0e93344a5ed23e56122fa4e88019ab3c91db188c2",
+      "optional": true
+    },
+    {
+      "name": "public_readme",
+      "target_path": "data/public/README.md",
+      "url": "https://music-advisor-data-external-database-resources.s3.amazonaws.com/v1/data/public/current/README.md",
+      "sha256": "a818a822d7e86398486c065cd023adcc345754bf4ed38bd9cc80ceb3e4066479",
+      "optional": true
+    }
+  ]
+}

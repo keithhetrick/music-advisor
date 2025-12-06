@@ -1,0 +1,31 @@
+{
+  "audio_name": "2021_kid_laroi_justin_bieber__stay__album_20251114_062328",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.48015112473583604,
+        "lo": 0.27671724101413225,
+        "mid": 0.24313163425003187
+      },
+      "value": 0.585037721353303
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3308311214106984,
+        "lo": 0.3292362017683481,
+        "mid": 0.3399326768209534
+      },
+      "value": 0.51702003196324
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/00_core_modern/2021_kid_laroi_justin_bieber__stay__album/2021_kid_laroi_justin_bieber__stay__album_20251114_062328.features.json"
+}

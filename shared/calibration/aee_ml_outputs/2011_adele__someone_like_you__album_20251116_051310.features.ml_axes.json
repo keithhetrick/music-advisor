@@ -1,0 +1,31 @@
+{
+  "audio_name": "2011_adele__someone_like_you__album_20251116_051310",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.37583896073461887,
+        "lo": 0.26476782871014276,
+        "mid": 0.3593932105552383
+      },
+      "value": 0.5521132876440737
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4054762584656272,
+        "lo": 0.24424474191161358,
+        "mid": 0.35027899962275927
+      },
+      "value": 0.5686432678894855
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2011_adele__someone_like_you__album/2011_adele__someone_like_you__album_20251116_051310.features.json"
+}

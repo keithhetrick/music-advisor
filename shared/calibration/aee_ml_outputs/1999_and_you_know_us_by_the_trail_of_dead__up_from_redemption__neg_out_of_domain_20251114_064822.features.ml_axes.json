@@ -1,0 +1,31 @@
+{
+  "audio_name": "1999_and_you_know_us_by_the_trail_of_dead__up_from_redemption__neg_out_of_domain_20251114_064822",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.7953310865126755,
+        "lo": 0.07264170441268121,
+        "mid": 0.13202720907464338
+      },
+      "value": 0.7565733689556321
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.40200076967316434,
+        "lo": 0.3071705283658641,
+        "mid": 0.29082870196097155
+      },
+      "value": 0.5485491108758482
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/13_negatives_out_of_domain/1999_and_you_know_us_by_the_trail_of_dead__up_from_redemption__neg_out_of_domain/1999_and_you_know_us_by_the_trail_of_dead__up_from_redemption__neg_out_of_domain_20251114_064822.features.json"
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "1997_third_eye_blind__semi_charmed_life__album_20251114_063424",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.27633328935527135,
+        "lo": 0.4002673446484638,
+        "mid": 0.32339936599626484
+      },
+      "value": 0.47663644787980586
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.37447963529712575,
+        "lo": 0.2728714750473178,
+        "mid": 0.3526488896555564
+      },
+      "value": 0.5492064298397986
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/03_echo_1995_99/1997_third_eye_blind__semi_charmed_life__album/1997_third_eye_blind__semi_charmed_life__album_20251114_063424.features.json"
+}

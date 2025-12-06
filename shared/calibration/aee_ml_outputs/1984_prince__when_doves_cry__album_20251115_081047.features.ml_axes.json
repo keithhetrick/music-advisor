@@ -1,0 +1,31 @@
+{
+  "audio_name": "1984_prince__when_doves_cry__album_20251115_081047",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.017629253646365573,
+        "lo": 0.7422884363238631,
+        "mid": 0.24008231002977148
+      },
+      "value": 0.2834837078790691
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.19254298086033225,
+        "lo": 0.458043518309655,
+        "mid": 0.3494135008300128
+      },
+      "value": 0.4299769878082198
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_0/1984_prince__when_doves_cry__album/1984_prince__when_doves_cry__album_20251115_081047.features.json"
+}

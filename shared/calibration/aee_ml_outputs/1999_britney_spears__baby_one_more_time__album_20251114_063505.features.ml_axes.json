@@ -1,0 +1,31 @@
+{
+  "audio_name": "1999_britney_spears__baby_one_more_time__album_20251114_063505",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3329976370033007,
+        "lo": 0.37775578577858493,
+        "mid": 0.2892465772181144
+      },
+      "value": 0.5032224372175798
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3395970251021018,
+        "lo": 0.30866643045274955,
+        "mid": 0.3517365444451486
+      },
+      "value": 0.5262590296499108
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/03_echo_1995_99/1999_britney_spears__baby_one_more_time__album/1999_britney_spears__baby_one_more_time__album_20251114_063505.features.json"
+}

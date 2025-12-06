@@ -1,0 +1,23 @@
+RESULT SUMMARY
+Project: [Title — Artist] • Region: [US/Global] • Date: [YYYY-MM-DD]
+HCI: Raw [##.#] → Adjusted [##.#] • Decision: [Go|Revise] (Tentative? y/n)
+
+Layer Highlights
+- Historical: […]
+- Cultural: […]
+- Market: […]
+- Emotional: […]
+- Sonic: […]
+- Creative: […]
+
+Top Prescriptions
+1) […]
+2) […]
+3) […]
+
+Key Metrics vs Norms
+TTC [s] vs [min–max] • Runtime [s] vs [min–max] • Exposures [n] vs [min–max]
+Tempo [BPM] vs [min–max] • LUFS [val] • Hook syll/bar [n] • Title overlap [0.00–1.00]
+
+Flags & Risks: […]
+Next Run Trigger: apply [edits] → re-run full.

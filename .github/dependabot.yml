@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    ignore:
+      - dependency-name: "librosa"
+      - dependency-name: "soundfile"
+  - package-ecosystem: "pip"
+    directory: "/engines/audio_engine"
+    schedule:
+      interval: "monthly"
+    ignore:
+      - dependency-name: "librosa"
+      - dependency-name: "soundfile"

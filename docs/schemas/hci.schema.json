@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HCI",
+  "type": "object",
+  "required": ["audio_axes", "hci_score", "feature_pipeline_meta"],
+  "properties": {
+    "audio_axes": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 6,
+      "maxItems": 6
+    },
+    "hci_score": {
+      "type": "object",
+      "properties": {
+        "raw": { "type": "number" },
+        "calibrated": { "type": "number" },
+        "final": { "type": "number" }
+      },
+      "additionalProperties": true
+    },
+    "historical_echo_v1": {
+      "type": "object",
+      "properties": {
+        "primary_decade": { "type": "string" },
+        "closest": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "artist": { "type": "string" },
+              "score": { "type": "number" },
+              "decade": { "type": "string" },
+              "tier": { "type": "string" }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "feature_pipeline_meta": {
+      "type": "object",
+      "properties": {
+        "tempo_backend_detail": { "type": "string" },
+        "sidecar_status": { "type": "string" },
+        "config_fingerprint": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

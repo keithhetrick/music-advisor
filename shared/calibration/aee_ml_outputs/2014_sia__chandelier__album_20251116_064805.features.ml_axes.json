@@ -1,0 +1,31 @@
+{
+  "audio_name": "2014_sia__chandelier__album_20251116_064805",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.1514650916518438,
+        "lo": 0.5220701008261371,
+        "mid": 0.32646480752201906
+      },
+      "value": 0.3963917518303042
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.23799918102919193,
+        "lo": 0.4168932978590733,
+        "mid": 0.3451075211117347
+      },
+      "value": 0.4582317240024951
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2014_sia__chandelier__album/2014_sia__chandelier__album_20251116_064805.features.json"
+}

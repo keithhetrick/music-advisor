@@ -1,0 +1,31 @@
+{
+  "audio_name": "1977_electric_light_orchestra__mr_blue_sky__album_20251114_064208",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.10690017218301026,
+        "lo": 0.5345576205457045,
+        "mid": 0.3585422072712853
+      },
+      "value": 0.37704777410034224
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.23003170484735022,
+        "lo": 0.48742950064054485,
+        "mid": 0.28253879451210506
+      },
+      "value": 0.43428224650440916
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/99_legacy_pop_eval/1977_electric_light_orchestra__mr_blue_sky__album/1977_electric_light_orchestra__mr_blue_sky__album_20251114_064208.features.json"
+}

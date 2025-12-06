@@ -1,0 +1,8 @@
+{
+  "mapping": "EchoTarget_v2 \u2248 a * HCI_v1_score + b",
+  "a": 0.009949264518355719,
+  "b": 0.4380652421777848,
+  "pearson_r": 0.006928784825733094,
+  "n_songs": 80,
+  "source_compare_csv": "calibration/comparisons/1985_1986/hci_v1_vs_targets_1985_1986_20251122_161132.csv"
+}

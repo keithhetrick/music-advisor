@@ -1,0 +1,13 @@
+{
+  "audio_axes": [0.5, 0.52, 0.48, 0.5, 0.5, 0.5],
+  "TTC": {
+    "seconds": null,
+    "confidence": null,
+    "lift_db": null,
+    "dropped": [],
+    "source": "absent"
+  },
+  "MARKET_NORMS": {
+    "profile": "US_Pop_2025"
+  }
+}

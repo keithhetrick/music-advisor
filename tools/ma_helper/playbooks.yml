@@ -1,0 +1,10 @@
+playbooks:
+  pipeline-dev:
+    - python -m ma_helper doctor
+    - python -m ma_helper smoke pipeline
+  host-dev:
+    - python -m ma_helper doctor
+    - python -m ma_helper smoke full
+  sidecar-dev:
+    - python -m ma_helper doctor
+    - python -m ma_helper watch audio_engine

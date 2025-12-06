@@ -1,0 +1,16 @@
+# Deep Research Playbook v1.0
+Goal: Build DATA_PACKs from web+press when user provides topic/timeframe/region.
+Process:
+  1) Define scope: topic, timeframe, region.
+  2) Source mix: Billboard, SpotifyCharts, Apple Music charts, YouTube stats pages, reputable press (Billboard/Variety/Forbes), playlist signals (editorial names only), culture essays.
+  3) Extract: surface metrics (ranks, public counts), memes, slang drift, aesthetics, notable syncs.
+  4) Normalize into DATA_PACK:
+     - Fill DATA_PACK_META (notes include scope + citations summary, not raw links).
+     - MARKET_NORMS: choose Streaming_[GENRE]_2025_[REGION] or Radio profile, set bands.
+     - PLATFORM_METRICS: create rows with platform + source_url; leave metrics.* null if unknown.
+     - CULTURAL_MEMES & SLANG_DRIFT: phrase, meaning, period, citations (text names, not URLs).
+  5) Validate MVP; log nulls; finalize.
+Commands (namespaced with /research):
+  run "<topic/timeframe/region>"
+Notes:
+  Do not fabricate plays/streams. If conflicting press, note “disputed” in notes.

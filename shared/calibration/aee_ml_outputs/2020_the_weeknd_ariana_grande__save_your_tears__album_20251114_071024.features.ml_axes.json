@@ -1,0 +1,31 @@
+{
+  "audio_name": "2020_the_weeknd_ariana_grande__save_your_tears__album_20251114_071024",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.36211642708954844,
+        "lo": 0.33509134161627124,
+        "mid": 0.3027922312941803
+      },
+      "value": 0.5262133469964605
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.31378895427938563,
+        "lo": 0.3657776028325355,
+        "mid": 0.32043344288807885
+      },
+      "value": 0.5000928531480243
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/08_echo_2020_24/2020_the_weeknd_ariana_grande__save_your_tears__album/2020_the_weeknd_ariana_grande__save_your_tears__album_20251114_071024.features.json"
+}

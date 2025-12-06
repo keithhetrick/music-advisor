@@ -1,0 +1,22 @@
+# Trend Advisor Spec v1.0
+Input: One DATA_PACK JSON (validated).
+Output: HCI Raw/Adjusted + layer insights + prescriptions + flags + weights.
+
+Pipeline:
+- Host Orchestrator → L1..L6 modules (loosely coupled) → Aggregator → Sanity
+Layers:
+  L1 Historical Analyst: compare structure/tempo/title patterns vs cycles/eras (Top 40 echoes).
+  L2 Cultural Decoder: map meme/slang/aesthetic fit; surface cultural anchors.
+  L3 Market Strategist: norms fit (TTC/runtime/exposures/tempo); platform routing hints.
+  L4 Emotional Forecaster: arc/catharsis/bridge shift; energy–emotion balance.
+  L5 Sonic Architect: bpm/key/timbre/readability; LUFS & dynamic range sanity.
+  L6 Creative Director: title/hook distinctiveness; payoff clarity; packaging.
+Weights (default):
+  L1:15 L2:15 L3:25 L4:15 L5:15 L6:15 → sum 100. Adjust ±5–10 based on data completeness.
+Core metrics:
+  HCI_raw = Σ(weight_i * score_i); HCI_adj = HCI_raw * completeness_factor (0.6–1.0).
+Sanity flags:
+  tempo_out_of_band, runtime_too_short_for_exposures, exposures_dense, title_overlap_high, hook_density_low, loudness_hot, gaps_present.
+Commands (namespaced with /advisor):
+  ingest | run full | view sanity | view weights | export summary
+Result Summary format: (Project, HCI, Layer Highlights, Top 3 Prescriptions, Key Metrics vs Norms, Flags & Risks, Next Run Trigger)

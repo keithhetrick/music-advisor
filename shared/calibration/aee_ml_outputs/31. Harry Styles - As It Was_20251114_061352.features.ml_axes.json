@@ -1,0 +1,31 @@
+{
+  "audio_name": "31. Harry Styles - As It Was_20251114_061352",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4798844387125698,
+        "lo": 0.22749938442949247,
+        "mid": 0.2926161768579378
+      },
+      "value": 0.5997097382205516
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.26771746055991624,
+        "lo": 0.4620325934613976,
+        "mid": 0.2702499459786862
+      },
+      "value": 0.45509133315755146
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/31. Harry Styles - As It Was/31. Harry Styles - As It Was_20251114_061352.features.json"
+}

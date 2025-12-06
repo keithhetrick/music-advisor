@@ -1,0 +1,8 @@
+EMOTIONAL PHYSICS
+Title: {{title}} | Lane: {{lane}}
+
+Balance:
+{{JSON.stringify(bal, null, 2)}}
+
+Advisory:
+{{advisory.length ? advisory.join('\n') : 'Reads musical; protect intimacy over theater.'}}

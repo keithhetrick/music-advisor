@@ -1,0 +1,31 @@
+{
+  "audio_name": "2015_justin_bieber__love_yourself__album_20251114_070449",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.5091326415592379,
+        "lo": 0.22410489865971964,
+        "mid": 0.26676245978104246
+      },
+      "value": 0.6109649549478173
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.44341304362607126,
+        "lo": 0.2189451464367754,
+        "mid": 0.33764180993715337
+      },
+      "value": 0.5895110213380923
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/07_echo_2015_19/2015_justin_bieber__love_yourself__album/2015_justin_bieber__love_yourself__album_20251114_070449.features.json"
+}

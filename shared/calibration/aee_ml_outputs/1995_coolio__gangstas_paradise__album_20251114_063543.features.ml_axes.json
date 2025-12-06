@@ -1,0 +1,31 @@
+{
+  "audio_name": "1995_coolio__gangstas_paradise__album_20251114_063543",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.37560441449959814,
+        "lo": 0.33251162626434666,
+        "mid": 0.29188395923605515
+      },
+      "value": 0.5317080571955554
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.40993597892579137,
+        "lo": 0.23166488605212815,
+        "mid": 0.3583991350220806
+      },
+      "value": 0.5739781268083886
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/03_echo_1995_99/1995_coolio__gangstas_paradise__album/1995_coolio__gangstas_paradise__album_20251114_063543.features.json"
+}

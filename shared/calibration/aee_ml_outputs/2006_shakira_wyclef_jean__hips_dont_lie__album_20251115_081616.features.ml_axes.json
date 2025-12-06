@@ -1,0 +1,31 @@
+{
+  "audio_name": "2006_shakira_wyclef_jean__hips_dont_lie__album_20251115_081616",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.5554409047993528,
+        "lo": 0.1593703280103381,
+        "mid": 0.2851887671903091
+      },
+      "value": 0.646593218276672
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.47833275450099066,
+        "lo": 0.19258729462684865,
+        "mid": 0.32907995087216063
+      },
+      "value": 0.6096402756872921
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_0/2006_shakira_wyclef_jean__hips_dont_lie__album/2006_shakira_wyclef_jean__hips_dont_lie__album_20251115_081616.features.json"
+}

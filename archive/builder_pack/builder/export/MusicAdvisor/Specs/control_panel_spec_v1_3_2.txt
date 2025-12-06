@@ -1,0 +1,26 @@
+# Control Panel Spec v1.3.2 (Core)
+Purpose: Build/edit DATA_PACKs via presets, validation, null-handling, and exports.
+Commands (namespaced with /cp in Unified router):
+  start | presets | use "<name>" [+merge] | edit k=v | mode simple|advanced
+  missing | autofill | assume k=v | unset k | strict on|off
+  check structure|hook|title | preview | export minimal|standard|verbose
+  finalize [--force]
+Field rules:
+  bpm 50–200, runtime 90–300s, lufs −20..−6, ttc 6–45s, exposures 2–6, region=US|Global|US+Global.
+MVP required:
+  META.region, META.generated_at, NORMS.profile, NORMS.ttc_sec, NORMS.runtime_sec, NORMS.exposures, NORMS.tempo_band_bpm.
+Null policy:
+  Non-MVP fields may be null; list in missing_fields; append "Known Gaps" note on finalize; --force allowed.
+Auto-preset:
+  Editing genre/region auto-applies matching preset norms (does not overwrite title/artist/hook).
+Presets:
+  Country-Rap Streaming Single (US), Pop Streaming Single (US), Afrobeats Global Single,
+  EDM Festival Cut, AC Ballad (US), TikTok-First Teaser.
+Checks:
+  structure → warn if bpm > band±10 | runtime < ttc+60 | exposures>4 & runtime<150
+  hook → syllables≤9 | unique-word≥0.55
+  title → overlap<0.8 | avoid 1-word generics
+Schema outline:
+  DATA_PACK_META {version:"1.2", generated_at, region, source_scope, notes}
+  MARKET_NORMS {profile, ttc_sec[min,max], runtime_sec[min,max], exposures[min,max], tempo_band_bpm[min,max], updated}
+  PLATFORM_METRICS [], CULTURAL_MEMES [], SLANG_DRIFT []

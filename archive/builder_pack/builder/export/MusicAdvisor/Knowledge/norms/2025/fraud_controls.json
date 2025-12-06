@@ -1,0 +1,34 @@
+{
+  "version": "2025.10",
+  "notes": "Global anti-fraud context for DSPs and chart providers; adjust Market optimism accordingly.",
+  "dsp_controls": [
+    {
+      "platform": "Spotify",
+      "status": "ongoing",
+      "notes": "Automated + manual bot sweeps; playlist quality checks"
+    },
+    {
+      "platform": "Apple Music",
+      "status": "ongoing",
+      "notes": "Fraud/anomaly detection; private heuristics"
+    },
+    {
+      "platform": "YouTube",
+      "status": "ongoing",
+      "notes": "View spam filters; Music Premium weighting differences"
+    }
+  ],
+  "chart_controls": [
+    {
+      "provider": "Billboard/Luminate",
+      "status": "active",
+      "notes": "Audits; paid > free stream weighting; recurrent rules"
+    }
+  ],
+  "market_layer_adjustments": {
+    "paid_streams_weight_hint": 0.35,
+    "ad_supported_weight_hint": 0.2,
+    "programmed_weight_hint": 0.15,
+    "fraud_sensitivity": 0.2
+  }
+}

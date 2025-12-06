@@ -1,0 +1,31 @@
+{
+  "audio_name": "33. The Weeknd, Daft Punk - Starboy_20251114_061410",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4136238050922729,
+        "lo": 0.2857073928066183,
+        "mid": 0.30066880210110886
+      },
+      "value": 0.5590561139403101
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.36493502583204623,
+        "lo": 0.3039164478495356,
+        "mid": 0.3311485263184182
+      },
+      "value": 0.5365523246863555
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/33. The Weeknd, Daft Punk - Starboy/33. The Weeknd, Daft Punk - Starboy_20251114_061410.features.json"
+}

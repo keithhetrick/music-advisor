@@ -1,0 +1,227 @@
+# Router_AllAdvisories_v1_1.patch.yaml
+# Adds advisory-only modules (v1.1-safe) and enforces lyric non-scoring fix.
+# Assumes the following files exist (namespaced templates + knowledge):
+# - Templates/era/output_era_intelligence.txt
+# - Templates/listener/output_listener_archetypes.txt
+# - Templates/emotion/output_emotional_physics.txt
+# - Templates/biome/output_sonic_biomes.txt
+# - Templates/endurance/output_endurance_check.txt
+# - Templates/narrative/output_narrative_continuum.txt      # optional
+# - Knowledge/era_fingerprints.json
+# - Knowledge/listener_archetypes.json
+# - Knowledge/sonic_biomes.json
+# - Knowledge/emotional_axes.json
+
+meta:
+  id: router_all_advisories_v1_1
+  description: "MusicAdvisor v1.1 advisory modules + lyric hotfix (non-scoring)."
+  version: "1.1.0"
+
+guards:
+  # Ensure the expected files are present (fail fast if not)
+  assert_files_exist:
+    - Templates/era/output_era_intelligence.txt
+    - Templates/listener/output_listener_archetypes.txt
+    - Templates/emotion/output_emotional_physics.txt
+    - Templates/biome/output_sonic_biomes.txt
+    - Templates/endurance/output_endurance_check.txt
+    - Knowledge/era_fingerprints.json
+    - Knowledge/listener_archetypes.json
+    - Knowledge/sonic_biomes.json
+    - Knowledge/emotional_axes.json
+
+# -------------------------------
+# 1) ERA INTELLIGENCE (advisory)
+# -------------------------------
+patch:
+  - type: command_add
+    name: "/era map"
+    description: "Place track in cyclical lineage; translate era, don't mimic."
+    unique: true
+    steps:
+      - load_json: { from: "Knowledge/era_fingerprints.json", as: ERA }
+      - set:
+          title: "${args.title || context.meta.title}"
+          lane:  "${args.lane  || context.meta.lane  || 'Neon Heart Pop'}"
+          region: "${args.region || context.meta.region || 'US'}"
+      - choose:
+          when: "${lane == 'Porch Gospel'}"
+          then:
+            set:
+              lineage: "${ERA.porch_gospel.lineage}"
+              execution: "Lean timeless; room honesty; avoid shiny reverb."
+          else:
+            set:
+              lineage: "${ERA.default.lineage}"
+              execution: "Modern transient control; avoid hype edges; translate era."
+      - render: { template: "Templates/era/output_era_intelligence.txt", to: result }
+      - print: "${result}"
+      - append: { to: advisor.notes[], value: "Era lineage: ${lineage} — ${execution}" }
+
+# ---------------------------------
+# 2) LISTENER ARCHETYPES (advisory)
+# ---------------------------------
+  - type: command_add
+    name: "/listener map"
+    description: "Map to human listener archetype; arrangement & lyric guidance."
+    unique: true
+    steps:
+      - load_json: { from: "Knowledge/listener_archetypes.json", as: LA }
+      - set:
+          arch: "${args.archetype || context.meta.listener_archetype || 'Late-Night Thinker'}"
+      - choose:
+          when: "${LA[arch] != null}"
+          then:
+            set:
+              archetype: "${arch}"
+              lyric: "${LA[arch].lyric}"
+              arr: "${LA[arch].arr}"
+              avoid: "${LA[arch].avoid}"
+              freq: "${LA[arch].freq}"
+          else:
+            set:
+              archetype: "Late-Night Thinker"
+              lyric: "${LA['Late-Night Thinker'].lyric}"
+              arr: "${LA['Late-Night Thinker'].arr}"
+              avoid: "${LA['Late-Night Thinker'].avoid}"
+              freq: "${LA['Late-Night Thinker'].freq}"
+      - render: { template: "Templates/listener/output_listener_archetypes.txt", to: result }
+      - print: "${result}"
+      - append:
+          to: advisor.notes[]
+          value: "Target listener: ${archetype} — lyric: ${lyric}; arr: ${arr}; avoid: ${avoid}"
+
+# --------------------------------
+# 3) EMOTIONAL PHYSICS (advisory)
+# --------------------------------
+  - type: command_add
+    name: "/emotion scan"
+    description: "Treat emotions like forces; report axial balance (advisory-only)."
+    unique: true
+    steps:
+      - load_json: { from: "Knowledge/emotional_axes.json", as: AX }
+      - set:
+          title: "${context.meta.title}"
+          lane:  "${context.meta.lane || 'Neon Heart Pop'}"
+          bal:   "${AX.defaults}"
+      - choose:
+          when: "${title && title.contains('Ultraviolet')}"
+          then:
+            set:
+              bal.Vulnerability: 92
+              bal.Memory: 90
+              bal.Presence: 60
+      - choose:
+          when: "${lane == 'Porch Gospel'}"
+          then:
+            set:
+              bal.Intimacy: 92
+              bal.Theater: 50
+      - set: { advisory: [] }
+      - choose:
+          when: "${bal.Memory > 85 && bal.Presence < 65}"
+          then:
+            append: { to: advisory[], value: "Add one present-moment image in V2 to ground memory weight." }
+      - render: { template: "Templates/emotion/output_emotional_physics.txt", to: result }
+      - print: "${result}"
+      - append: { to: advisor.notes[], value: "Emotional balance: ${JSON.stringify(bal)}" }
+      - if:
+          cond: "${advisory.length > 0}"
+          then:
+            append: { to: advisor.optimization[], value: "${advisory[0]}" }
+
+# ---------------------------
+# 4) SONIC BIOMES (advisory)
+# ---------------------------
+  - type: command_add
+    name: "/biome classify"
+    description: "Classify sonic biome; suggest neighbors & palette (advisory)."
+    unique: true
+    steps:
+      - load_json: { from: "Knowledge/sonic_biomes.json", as: SB }
+      - set:
+          lane: "${context.meta.lane || 'Neon Heart Pop'}"
+          neighbors: "${SB.neighbors[lane] || ['Bedroom Whisper']}"
+          palette:   "${SB.palette[lane]   || ['tasteful minimal synths']}"
+          space:     "${SB.space}"
+          note:      "${lane.contains('Neon') ? 'Avoid maximal drums; intimacy is the currency.' : 'Keep room honesty; resist shiny reverb.'}"
+      - render: { template: "Templates/biome/output_sonic_biomes.txt", to: result }
+      - print: "${result}"
+      - append:
+          to: advisor.notes[]
+          value: "Biome ${lane} → neighbors ${neighbors.join(', ')}; palette ${palette.join(', ')}; ${note}"
+
+# -----------------------------------
+# 5) NARRATIVE CONTINUUM (OPTIONAL)
+# -----------------------------------
+  - type: command_add
+    name: "/story thread"
+    description: "Declare/inspect a narrative thread for callbacks (advisory)."
+    unique: true
+    steps:
+      - set:
+          thread: "${args.name || context.meta.thread || 'Standalone'}"
+      - choose:
+          when: "${thread == 'Parallel Somewhere'}"
+          then:
+            set:
+              anchor: "fated longing / missed universe"
+              motifs: ["UV seam","tear-light","parallel hearts"]
+              next: "acceptance without forgetting"
+          else:
+            set:
+              anchor: "single-chapter"
+              motifs: []
+              next: null
+      - render: { template: "Templates/narrative/output_narrative_continuum.txt", to: result }
+      - print: "${result}"
+      - append:
+          to: advisor.notes[]
+          value: "Thread: ${thread} — anchor: ${anchor}; motifs: ${motifs.join(', ')}"
+
+# ----------------------------
+# 6) ENDURANCE CHECK (advisory)
+# ----------------------------
+  - type: command_add
+    name: "/endurance test"
+    description: "Time-skip survivability (unplugged, universality, gimmick risk)."
+    unique: true
+    steps:
+      - set:
+          lane: "${context.meta.lane || 'Neon Heart Pop'}"
+          unplugged: "${(lane == 'Porch Gospel' || lane == 'Canyon Folk') ? 1.0 : 0.8}"
+          universality: 0.9
+          gimmick: 0.1
+          pass_note: "${ (0.1 > 0.4) ? 'FLAG' : 'PASS' }"
+      - render: { template: "Templates/endurance/output_endurance_check.txt", to: result }
+      - print: "${result}"
+      - append:
+          to: advisor.notes[]
+          value: "Endurance: ${pass_note}; unplugged=${unplugged}, universality=${universality}, gimmick=${gimmick}"
+      - if:
+          cond: "${pass_note == 'PASS'}"
+          then:
+            append:
+              to: advisor.optimization[]
+              value: "Print an unplugged variant to lock endurance."
+
+# ---------------------------------------
+# 7) LYRIC ADVISORY HOTFIX (NON-SCORING)
+# ---------------------------------------
+  - type: patch_modify
+    applies_to: "Router_HCI_LyricIntegration.patch.yaml"
+    applies_after:  # enforce order to run after the original patch is loaded
+      - "Router_HCI_LyricIntegration.patch.yaml"
+    actions:
+      - find: "LyricScore:"
+        ensure_after:
+          - set: advisor.lyric.score = LyricScore
+          - set: advisor.lyric.notes  = LyricNotes
+      - remove_lines:
+          contains:
+            - "advisor.setdefault(\"emotional\", {})[\"score\"]"
+            - "advisor.setdefault(\"creative\",  {})[\"score\"]"
+            - "advisor.setdefault(\"market\",    {})[\"score\"]"
+      - append:
+          to: advisor.notes[]
+          value: "Lyric advisory (non-scoring): ${LyricNotes}"

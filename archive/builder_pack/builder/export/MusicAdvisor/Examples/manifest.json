@@ -1,0 +1,22 @@
+{
+  "artifacts": [
+    {
+      "name": "sample_payload_minimal.json",
+      "path": "Examples/sample_payload_minimal.json",
+      "checksum_sha256": "ef7d086491f0e5b8b356cd0bc4b0b22aba13f9e3f83010411ea04dc52c15ae2b",
+      "notes": "Minimal payload for music-advisor-smoke (axes + MARKET_NORMS + TTC stub)."
+    },
+    {
+      "name": "minimal_pack.json",
+      "path": "Examples/minimal_pack.json",
+      "checksum_sha256": "feaf5518086dda64b9ee707350fc4452f8407b05a3b38262781ea0bf5656ff01",
+      "notes": "Compact pack for ingest; expected HCI_v1 present, baseline set."
+    },
+    {
+      "name": "minimal_pack_dance.json",
+      "path": "Examples/minimal_pack_dance.json",
+      "checksum_sha256": "3b2dda283b36370dad4fa743fac1fb0446057e19e903531b79b37e3f185448c7",
+      "notes": "Dance-leaning compact pack; Sonic/Market layers should be stronger."
+    }
+  ]
+}

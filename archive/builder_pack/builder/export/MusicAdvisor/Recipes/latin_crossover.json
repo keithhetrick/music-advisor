@@ -1,0 +1,13 @@
+{
+  "tempo_band_bpm": [92, 108],
+  "arrangement": [
+    "intro hook tag",
+    "verse",
+    "pre",
+    "chorus (bilingual)",
+    "post-chorus riff"
+  ],
+  "mix_focus": ["lead vocal upfront", "perc clarity", "sub tight"],
+  "lyric_motifs": ["romance", "city nightlife", "dance"],
+  "radio_legibility_target": 0.75
+}

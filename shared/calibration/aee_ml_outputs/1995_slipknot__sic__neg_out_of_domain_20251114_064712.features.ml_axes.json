@@ -1,0 +1,31 @@
+{
+  "audio_name": "1995_slipknot__sic__neg_out_of_domain_20251114_064712",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2249727608766669,
+        "lo": 0.4481196483178529,
+        "mid": 0.3269075908054803
+      },
+      "value": 0.44430457181147764
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.25651252416247644,
+        "lo": 0.44212794871736,
+        "mid": 0.3013595271201635
+      },
+      "value": 0.4571409988416587
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/13_negatives_out_of_domain/1995_slipknot__sic__neg_out_of_domain/1995_slipknot__sic__neg_out_of_domain_20251114_064712.features.json"
+}

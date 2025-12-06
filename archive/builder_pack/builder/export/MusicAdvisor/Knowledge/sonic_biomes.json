@@ -1,0 +1,28 @@
+{
+  "neighbors": {
+    "Neon Heart Pop": ["Bedroom Whisper", "Cathedral Cinema"],
+    "Porch Gospel": ["Canyon Folk", "Bedroom Whisper"],
+    "Cinematic Reverie": ["Ultraviolet Dream", "Cathedral Cinema"]
+  },
+  "palette": {
+    "Neon Heart Pop": [
+      "Juno pads",
+      "DX7 plucks",
+      "low-glow verb",
+      "delay glitter"
+    ],
+    "Porch Gospel": [
+      "fingerpicked acoustic",
+      "B3 pad",
+      "room air",
+      "brush kit"
+    ],
+    "Cinematic Reverie": [
+      "wide pads",
+      "sub sighs",
+      "vocoder ghosts",
+      "gated lift"
+    ]
+  },
+  "space": "wide-not-loud"
+}

@@ -1,0 +1,8 @@
+{
+  "scheme": "zscore_linear_v1",
+  "raw_mean": 0.3474200000000001,
+  "raw_std": 0.09433072916418309,
+  "target_mean": 0.7,
+  "target_std": 0.18,
+  "cohort_root": "/Users/keithhetrick/music-advisor/features_output/2025/11/17"
+}

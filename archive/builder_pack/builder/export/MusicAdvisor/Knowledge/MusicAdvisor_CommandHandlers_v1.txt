@@ -1,0 +1,103 @@
+# Music Advisor — Command Handlers (Internal Logic)
+
+This file defines how each slash-command behaves.  
+The Custom GPT executes these logic blocks natively in-chat.
+
+──────────────────────────────
+## /cp — Control Panel
+
+/cp start
+• Create a new `current_pack` with ISO timestamp id.
+• Fields: region, genre, tempo_band_bpm, runtime_sec, ttc_sec, exposures, MARKET_NORMS.profile, Known_Gaps[], reference_year (now), reference_eras [Y-40, Y-30, Y-20, Y-10], production_tags[], lyric_motifs[], rhythm_profile, tonal_profile{key,mode,energy}, router_version v2.6.0.
+/cp edit key=value
+• Parse key=value, cast numeric fields, support MARKET_NORMS.profile via dot-path.
+# /cp presets
+# • List available profiles from uploaded 2025 norm JSONs.
+/cp preview
+• Validate MVP + ranges and print short “OK/FAIL” summary.
+/cp finalize
+• Infer missing MARKET_NORMS.profile (US_Pop_2025 default).
+• Autofill medians from norms for null tempo/runtime/ttc/exposures.
+• Ensure reference_year + reference_eras.
+• Output validated DATA_PACK JSON.
+
+# /cp presets
+# Reads available preset profiles from Knowledge/Presets_ProfileCatalog_v1.json
+# and prints them in a structured, compact table.
+# fallback: if file missing, print "No presets catalog found — using norm medians only."
+/cp presets
+• Load Presets_ProfileCatalog_v1.json
+• For each profile, print:
+    id | region | genre | bpm | runtime | ttc | exposures
+• Note: /cp start + /cp edit region=... genre=... may auto-suggest matching preset.
+• If user selects a preset explicitly, apply its defaults as initial candidate values.
+
+──────────────────────────────
+## /advisor — Trend Advisor
+
+/advisor ingest
+• Stage the current DATA_PACK.
+/advisor run full
+• Load era_fingerprints.json + norms.
+• Compute Historical Echo Coefficient (HEC) per era [Y-40, Y-30, Y-20, Y-10]:
+
+ signals = tempo fit + production overlap + rhythm fit + lyric overlap + tonal fit  
+ HEC = 0.25 tempo + 0.30 production + 0.15 rhythm + 0.20 lyric + 0.10 tonal  
+ Historical = 0.50 HEC₄₀ + 0.20 HEC₃₀ + 0.20 HEC₂₀ + 0.10 HEC₁₀  
+
+• Compute other layers (Cultural, Market, Emotional, Sonic, Creative).  
+• HCI = mean(all 6 layers).  
+• If HEC₄₀ ≥ 0.75 and Market ≥ 0.70, HCI += 0.02 (cap 1.0).  
+• Output JSON:
+
+{
+ "HCI": …,  
+ "layers": {…},  
+ "historical_echo": { "reference_year": Y, "eras": [{year, HEC, signals…}] },  
+ "router_version": "v2.6.0", "norm_version": "2025.1"
+}
+
+/advisor export summary
+• Print 6-row table + JSON stub { "HCI": "<see run full>" }.
+
+──────────────────────────────
+## /dashboard — Validation & Compare
+
+/dashboard validate
+• Inline-check MVP keys + ranges; print “OK” or errors.
+/dashboard compare
+• Given two pasted DATA_PACKs, diff: region, genre, profile, tempo_band_bpm, runtime_sec, ttc_sec, exposures, reference_eras, HCI.
+
+──────────────────────────────
+## /datahub — Emulated Storage
+
+/datahub save "<label>"
+• Generate ID DPK-####; store pack in session map { id → pack }; echo ID.
+/datahub list
+• Show IDs with region/genre/profile + timestamp.
+/datahub load <id>
+• Retrieve pack into current_pack.
+
+──────────────────────────────
+
+Command Handlers (v1)
+
+New Baseline Commands
+/baseline pin <profile_id>
+/baseline unpin
+/baseline status
+
+Behavior:
+- Pin: persists profile id; no auto-refresh until unpinned.
+- Status: prints active profile, pinned flag, and effective timestamp.
+
+──────────────────────────────
+## /help
+
+/help
+• Print concise list:
+  /cp start | edit | finalize  
+  /advisor ingest | run full | export summary  
+  /dashboard validate | compare  
+  /datahub save | list | load
+──────────────────────────────

@@ -1,0 +1,22 @@
+{
+  "region": "US",
+  "generated_at": "2025-11-02T19:10:00Z",
+  "MARKET_NORMS": { "profile": "Pop" },
+
+  "MVP": {
+    "tempo_band_bpm": "120-129",
+    "runtime_sec": 176.07,
+    "ttc_sec": null,
+    "exposures": null
+  },
+
+  "Baseline": {
+    "active_profile": "Pop",
+    "effective_utc": "2025-11-02T19:10:00Z",
+    "previous_profile": null,
+    "pinned": true,
+    "note": "Autofix: pinned for reproducibility"
+  },
+
+  "Known_Gaps": []
+}

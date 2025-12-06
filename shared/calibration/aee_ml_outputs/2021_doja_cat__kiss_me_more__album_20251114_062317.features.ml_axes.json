@@ -1,0 +1,31 @@
+{
+  "audio_name": "2021_doja_cat__kiss_me_more__album_20251114_062317",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4645083559195002,
+        "lo": 0.2602626083949963,
+        "mid": 0.2752290356855034
+      },
+      "value": 0.5844991420533261
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.37389122773791156,
+        "lo": 0.2893937406953746,
+        "mid": 0.3367150315667138
+      },
+      "value": 0.5440438074996566
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/00_core_modern/2021_doja_cat__kiss_me_more__album/2021_doja_cat__kiss_me_more__album_20251114_062317.features.json"
+}

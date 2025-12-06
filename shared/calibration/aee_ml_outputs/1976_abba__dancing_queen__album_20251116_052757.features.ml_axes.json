@@ -1,0 +1,31 @@
+{
+  "audio_name": "1976_abba__dancing_queen__album_20251116_052757",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4521944907406397,
+        "lo": 0.21093234247142087,
+        "mid": 0.33687316678793927
+      },
+      "value": 0.5949883690177975
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4602783381761853,
+        "lo": 0.20992668783755822,
+        "mid": 0.3297949739862564
+      },
+      "value": 0.5981194120103973
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/1976_abba__dancing_queen__album/1976_abba__dancing_queen__album_20251116_052757.features.json"
+}

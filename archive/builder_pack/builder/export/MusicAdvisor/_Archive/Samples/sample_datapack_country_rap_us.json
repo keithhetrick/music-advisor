@@ -1,0 +1,69 @@
+{
+  "DATA_PACK_META": {
+    "version": "1.2",
+    "generated_at": "2025-10-29",
+    "source_scope": ["Spotify", "YouTube", "Apple", "TikTok", "Press"],
+    "region": "US",
+    "notes": "Sample pack for Country-Rap (US). MVP satisfied using norms_table_2025 bands. Known Gaps: no LUFS, TTC/exposures not measured from stems, no verified stream counts."
+  },
+  "MARKET_NORMS": {
+    "profile": "Streaming_CountryRap_2025_US",
+    "ttc_sec": [12, 22],
+    "runtime_sec": [150, 185],
+    "exposures": [3, 4],
+    "tempo_band_bpm": [85, 105],
+    "updated": "2025-10-29"
+  },
+  "PLATFORM_METRICS": [
+    {
+      "track_id": "EXAMPLE_SPOTIFY_ID",
+      "platform": "spotify",
+      "date": "2025-10-29",
+      "metrics": {
+        "streams": null,
+        "chart_pos": null,
+        "shorts_views": null,
+        "skip_rate": null
+      },
+      "region": "US",
+      "source_url": "https://open.spotify.com/track/EXAMPLE_SPOTIFY_ID"
+    },
+    {
+      "track_id": "EXAMPLE_YOUTUBE_ID",
+      "platform": "youtube",
+      "date": "2025-10-29",
+      "metrics": {
+        "streams": null,
+        "chart_pos": null,
+        "shorts_views": null,
+        "skip_rate": null
+      },
+      "region": "Global",
+      "source_url": "https://www.youtube.com/watch?v=EXAMPLE_YOUTUBE_ID"
+    }
+  ],
+  "CULTURAL_MEMES": [
+    {
+      "phrase": "y’allternative / cowboy-core",
+      "meaning": "Gen-Z cowboy aesthetics fused with pop/hip-hop sensibilities fueling dance content.",
+      "period": { "start": "2024-08", "end": "2025-12" },
+      "q_score": null,
+      "citations": [
+        "Time (feature on yeehaw agenda)",
+        "Editorial playlists noting cowboy/country-rap crossover"
+      ]
+    }
+  ],
+  "SLANG_DRIFT": [
+    {
+      "token": "hick-hop",
+      "sense": "Fan/press label for country-rap hybrids; used in playlist tags.",
+      "q_score": null,
+      "regions": ["US"],
+      "examples": [
+        "User playlists on Spotify labeled 'hick-hop'",
+        "Festival blurbs using term 'country rap'"
+      ]
+    }
+  ]
+}

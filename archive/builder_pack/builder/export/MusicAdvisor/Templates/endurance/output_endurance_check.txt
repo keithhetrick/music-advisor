@@ -1,0 +1,11 @@
+ENDURANCE CHECK
+Unplugged survivability : {{unplugged}}
+Universality            : {{universality}}
+Gimmick dependence      : {{gimmick}}
+Result                  : {{pass_note}}
+
+Advisory:
+{{ pass_note === 'PASS'
+  ? 'Likely to age well; prioritize arrangement variants.'
+  : 'Reduce production dependence; test unplugged and lean arrangement.'
+}}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2024_sabrina_carpenter__espresso__album_20251116_042849",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.5461076492609966,
+        "lo": 0.16537413621028643,
+        "mid": 0.28851821452871695
+      },
+      "value": 0.641525436378263
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.42987668216694075,
+        "lo": 0.24862159459558375,
+        "mid": 0.32150172323747556
+      },
+      "value": 0.5758703603797541
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2024_sabrina_carpenter__espresso__album/2024_sabrina_carpenter__espresso__album_20251116_042849.features.json"
+}

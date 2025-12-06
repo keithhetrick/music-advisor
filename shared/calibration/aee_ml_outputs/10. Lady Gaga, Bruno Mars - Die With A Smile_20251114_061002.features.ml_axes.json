@@ -1,0 +1,31 @@
+{
+  "audio_name": "10. Lady Gaga, Bruno Mars - Die With A Smile_20251114_061002",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3395083678861841,
+        "lo": 0.30742090087087015,
+        "mid": 0.3530707312429458
+      },
+      "value": 0.5266016584989034
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.33638203566023667,
+        "lo": 0.36280871425526134,
+        "mid": 0.300809250084502
+      },
+      "value": 0.5088910982045044
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/10. Lady Gaga, Bruno Mars - Die With A Smile/10. Lady Gaga, Bruno Mars - Die With A Smile_20251114_061002.features.json"
+}

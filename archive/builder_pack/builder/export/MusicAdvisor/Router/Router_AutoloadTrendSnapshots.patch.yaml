@@ -1,0 +1,72 @@
+# Router_AutoloadTrendSnapshots.patch.yaml  (MIGRATION WINDOW)
+# Loads snapshots from BOTH the new canonical path AND the legacy path.
+# De-dupes by `id` and selects the latest by `version`. New path takes priority.
+
+router:
+  hooks:
+    advisor_ingest:
+      - name: load_trend_snapshots
+        params:
+          glob_paths:
+            # NEW canonical (Option A)
+            - Knowledge/TrendSnapshots/**/*.yaml
+            - Knowledge/TrendSnapshots/**/*.json
+            # LEGACY (temporary migration window; remove after cutover)
+            - industry_data/trend_snapshots/**/*.yaml
+            - industry_data/trend_snapshots/**/*.json
+        action: |
+          # PSEUDOCODE — adapt to your router's scripting runtime.
+          def parse_version(v):
+            # Accept "YYYY.MM.DD" or "YYYY-MM-DD" or fallback numeric
+            try:
+              v = str(v)
+              v_norm = v.replace("-", ".")
+              parts = [int(x) for x in v_norm.split(".") if x.isdigit()]
+              while len(parts) < 3:
+                parts.append(0)
+              return (parts[0], parts[1], parts[2])
+            except:
+              return (0,0,0)
+
+          current_trend_signals = []
+          index_by_id = {}   # id -> {obj, version_tuple, path}
+
+          for each file in glob_paths:
+            obj = parse_yaml_or_json(file)
+            if not (obj and isinstance(obj, dict)):
+              continue
+
+            sid = obj.get("id") or file
+            version = obj.get("version") or ""  # optional
+            ver_tuple = parse_version(version)
+
+            # Priority: keep the NEW path first when same version/id collides
+            existing = index_by_id.get(sid)
+            if not existing:
+              index_by_id[sid] = {"obj": obj, "version_tuple": ver_tuple, "path": file}
+            else:
+              old_ver = existing["version_tuple"]
+              if ver_tuple > old_ver:
+                index_by_id[sid] = {"obj": obj, "version_tuple": ver_tuple, "path": file}
+              elif ver_tuple == old_ver:
+                # If same version, prefer NEW canonical path
+                is_new = file.startswith("Knowledge/TrendSnapshots/")
+                is_old = existing["path"].startswith("industry_data/trend_snapshots/")
+                if is_new and is_old:
+                  index_by_id[sid] = {"obj": obj, "version_tuple": ver_tuple, "path": file}
+                # else keep existing
+
+          # Materialize results
+          for sid, rec in index_by_id.items():
+            current_trend_signals.append(rec["obj"])
+
+          context["current_trend_signals"] = current_trend_signals
+          context["trend_snapshots_loaded"] = len(current_trend_signals)
+
+  layers:
+    market:
+      inputs: [current_pack, current_trend_signals]
+    cultural:
+      inputs: [current_pack, current_trend_signals]
+    sonic:
+      inputs: [current_pack, current_trend_signals]

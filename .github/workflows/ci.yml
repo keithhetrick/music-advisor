@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quick-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: |
+            requirements.txt
+            requirements.lock
+            engines/audio_engine/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --no-build-isolation -r requirements.lock || python -m pip install --no-build-isolation -r requirements.txt
+          python -m pip install --no-build-isolation -r engines/audio_engine/requirements.txt || true
+          python -m pip install --no-build-isolation -e engines/audio_engine -e engines/lyrics_engine -e engines/ttc_engine -e engines/recommendation_engine -e hosts/advisor_host_core -e hosts/advisor_host
+
+      - name: Run quick check
+        run: |
+          chmod +x infra/scripts/quick_check.sh
+          ./infra/scripts/quick_check.sh
+
+      - name: Helper self-checks
+        run: |
+          chmod +x tests/helper/run_helper_tests.sh
+          tests/helper/run_helper_tests.sh

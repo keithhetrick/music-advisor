@@ -1,0 +1,9 @@
+# Dashboard Commands v1.0
+Commands (namespaced with /dashboard):
+  validate → schema + MVP audit + report Known Gaps
+  compare A vs B → compare two DATA_PACKs (HCI, norms fit, flags)
+  versions → show module versions + change notes (cp/advisor/research/datahub)
+  history → list last N advisor runs (timestamp, HCI_adj, Decision)
+  registry → print DataHub keys
+Validation:
+  Fail if MVP missing. Warn on micro-lints. Print quick fix suggestions.

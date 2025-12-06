@@ -1,0 +1,39 @@
+{
+  "message": "analyze",
+  "payload": {
+    "audio_name": "Example Track",
+    "features_full": {
+      "tempo_bpm": 120.0,
+      "duration_sec": 200.0,
+      "loudness_LUFS": -9.0,
+      "energy": 0.7,
+      "danceability": 0.65,
+      "valence": 0.5
+    },
+    "audio_axes": {
+      "TempoFit": 0.8,
+      "RuntimeFit": 0.7,
+      "LoudnessFit": 0.75,
+      "Energy": 0.7,
+      "Danceability": 0.65,
+      "Valence": 0.5
+    },
+    "HCI_v1_final_score": 0.82,
+    "historical_echo_v1": {
+      "primary_decade": "2015–2024",
+      "primary_decade_neighbor_count": 3,
+      "top_neighbor": {
+        "year": 2018,
+        "artist": "Example Artist",
+        "title": "Example Hit",
+        "distance": 0.42
+      }
+    }
+  },
+  "norms": {
+    "region": "US",
+    "tier": "Tier1_Hot100_Top40",
+    "version": "2024-YE",
+    "last_refreshed_at": "2025-01-15T00:00:00Z"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "2006_justin_timberlake__sexy_back__album_20251114_065646",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3002788862284915,
+        "lo": 0.3860877076752608,
+        "mid": 0.3136334060962477
+      },
+      "value": 0.4892712978773938
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3314209971399817,
+        "lo": 0.3284170358420718,
+        "mid": 0.34016196701794643
+      },
+      "value": 0.517472238246372
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/05_echo_2005_09/2006_justin_timberlake__sexy_back__album/2006_justin_timberlake__sexy_back__album_20251114_065646.features.json"
+}

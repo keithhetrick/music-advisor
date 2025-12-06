@@ -1,0 +1,17 @@
+patch:
+  id: fix_lyric_advisory_only_v1_1
+  description: "v1.1: Lyric heuristics advisory-only; do NOT alter HCI/Advisor base scores"
+  applies_to: "Router_HCI_LyricIntegration.patch.yaml"
+  actions:
+    - find: "LyricScore:"
+      ensure_after:
+        - set: advisor.lyric.score = LyricScore
+        - set: advisor.lyric.notes  = LyricNotes
+    - remove_lines:
+        contains:
+          - 'advisor.setdefault("emotional", {})["score"]'
+          - 'advisor.setdefault("creative",  {})["score"]'
+          - 'advisor.setdefault("market",    {})["score"]'
+    - append:
+        to: advisor.notes[]
+        value: "Lyric advisory (non-scoring): ${LyricNotes}"

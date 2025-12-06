@@ -1,0 +1,101 @@
+audio_name,artist,title,year,tempo_feel_bpm_truth,runtime_band_truth,loudness_lufs_band_truth,energy_band_truth,dance_band_truth,valence_band_truth,notes
+1966_the_beatles__eleanor_rigby__album,The Beatles,Eleanor Rigby,1966,68,mid,mid,mid,lo,lo,String-driven chamber pop; low danceability; somber narrative.
+1967_louis_armstrong__what_a_wonderful_world__album,Louis Armstrong,What a Wonderful World,1967,72,short,mid,lo,lo,hi,"Slow jazz-pop standard; gentle low energy and non-dance but very warm, hopeful high-valence tone."
+1969_the_beatles__here_comes_the_sun__album,The Beatles,Here Comes the Sun,1969,129,mid,mid,mid,mid,hi,Bright acoustic pop; gentle steady groove; very positive tone.
+1971_bill_withers__aint_no_sunshine__single,Bill Withers,Ain't No Sunshine,1971,79,short,mid,lo,lo,lo,Minimal soul ballad; sparse arrangement clearly low energy and non-dance emotionally heavy.
+1972_bill_withers__lean_on_me__album,Bill Withers,Lean on Me,1972,72,long,mid,mid,lo,hi,"Soul/gospel ballad; slow supportive groove, emotionally uplifting with big singalong chorus but not a dance record."
+1976_abba__dancing_queen__album,ABBA,Dancing Queen,1976,100,mid,mid,hi,hi,hi,Archetypal disco-pop; joyful very danceable clearly high energy/high valence.
+1976_the_eagles__hotel_california__album,Eagles,Hotel California,1976,74,long,mid,mid,lo,mid,Classic rock epic; long-running structure; bittersweet mood.
+1978_earth_wind_and_fire__september__album,"Earth, Wind & Fire",September,1978,126,mid,mid,hi,hi,hi,Classic disco-funk; relentlessly upbeat and danceable archetypal hi-energy/hi-dance/hi-valence party cut.
+1979_bee_gees__stayin_alive__album,Bee Gees,Stayin' Alive,1979,104,long,mid,hi,hi,mid,Signature 70s disco groove; relentless pulse very strong dance feel.
+1982_michael_jackson__billie_jean__album,Michael Jackson,Billie Jean,1982,117,mid,mid,hi,mid,mid,Groove-based pop; archetypal mid-tempo hit.
+1982_toto__africa__album,Toto,Africa,1982,92,long,mid,mid,mid,mid,Classic soft-rock/pop; steady groove not hyper or sleepy—very “true mid” on both energy and dance.
+1983_cyndi_lauper__girls_just_want_to_have_fun__album,Cyndi Lauper,Girls Just Want to Have Fun,1983,120,mid,mid,hi,hi,hi,Iconic 80s pop; very high-energy high-valence dance track.
+1984_prince__when_doves_cry__album,Prince,When Doves Cry,1984,120,mid,mid,hi,mid,mid,Sparse experimental but huge mainstream hit.
+1985_a_ha__take_on_me__single,a-ha,Take On Me,1985,169,mid,mid,hi,hi,mid,Fast 80s synth-pop; perceived ~84.5 in half-time.
+1985_tears_for_fears__everybody_wants_to_rule_the_world__single,Tears for Fears,Everybody Wants to Rule the World,1985,112,mid,mid,mid,mid,mid,Laid-back 80s pop-rock; mid energy mid danceability reflective tone.
+1986_bon_jovi__livin_on_a_prayer__single,Bon Jovi,Livin' on a Prayer,1986,123,mid,mid,hi,mid,mid,Arena rock anthem; big chorus lift.
+1987_guns_n_roses__sweet_child_o_mine__album,Guns N' Roses,Sweet Child o' Mine,1987,125,long,mid,hi,mid,mid,Rock hit with iconic riff; long-form structure.
+1987_u2__with_or_without_you__single,U2,With or Without You,1987,110,long,mid,mid,lo,mid,Slow-building rock ballad; hypnotic groove; yearning tone.
+1987_whitney_houston__i_wanna_dance_with_somebody_who_loves_me__album,Whitney Houston,I Wanna Dance With Somebody (Who Loves Me),1987,119,mid,mid,hi,hi,hi,High-energy high-valence dance-pop.
+1989_madonna__like_a_prayer__album,Madonna,Like a Prayer,1989,113,mid,mid,hi,mid,mid,Gospel-infused pop; emotional but uplifting; album version used in benchmark.
+1990_roxette__it_must_have_been_love__album,Roxette,It Must Have Been Love,1990,84,mid,mid,mid,lo,lo,Power ballad; slow tempo; emotionally heavy; not dance-focused.
+1990_sinead_oconnor__nothing_compares_2_u__single,Sinéad O'Connor,Nothing Compares 2 U,1990,60,long,mid,lo,lo,lo,"Iconic heartbreak ballad; extremely sparse and emotionally heavy. Archetypal low-energy, low-dance, low-valence reference."
+1991_bonnie_raitt__i_cant_make_you_love_me__album,Bonnie Raitt,I Can't Make You Love Me,1991,72,long,mid,lo,lo,lo,"Piano-led adult-contemporary ballad; extremely intimate, low-energy, non-dance and emotionally devastating."
+1991_nirvana__smells_like_teen_spirit__single,Nirvana,Smells Like Teen Spirit,1991,116,long,mid,hi,mid,mid,Grunge rock anthem; very high energy with mid danceability and brooding anthemic tone.
+1992_boyz_ii_men__end_of_the_road__album,Boyz II Men,End of the Road,1992,63,long,mid,mid,lo,lo,Early-90s R&B slow jam; big vocal swells but overall slow sway-not-dance heartbreak-heavy.
+1993_radiohead__creep__album,Radiohead,Creep,1993,92,mid,mid,mid,lo,lo,Alt-rock ballad; quiet loud dynamic; emotionally dark and self-loathing.
+1994_mariah_carey__hero__album,Mariah Carey,Hero,1994,62,mid,mid,mid,lo,mid,Big vocal power ballad; slow tempo; inspirational but solemn tone.
+1995_mariah_carey__fantasy__album,Mariah Carey,Fantasy,1995,102,mid,mid,mid,mid,hi,Mid-tempo R&B-pop; sweet upbeat feel.
+1995_oasis__wonderwall__album,Oasis,Wonderwall,1995,87,mid,mid,mid,mid,mid,Anthemic Britpop; strummy mid-energy.
+1996_spice_girls__wannabe__album,Spice Girls,Wannabe,1996,110,short,mid,hi,hi,hi,Bouncy girl-group pop; short hooky.
+1997_celine_dion__my_heart_will_go_on__album,Celine Dion,My Heart Will Go On,1997,60,long,mid,mid,lo,mid,Titanic power ballad; very slow big emotional build.
+1998_brandy_and_monica__the_boy_is_mine__album,Brandy & Monica,The Boy Is Mine,1998,92,mid,mid,mid,mid,mid,Late-90s R&B-pop duet; mid tempo groove-based emotionally tense but not dark.
+1998_britney_spears__baby_one_more_time__album,Britney Spears,...Baby One More Time,1998,93,mid,mid,mid,mid,mid,Turn-of-era teen pop; strong hook mid-tempo.
+1999_backstreet_boys__i_want_it_that_way__album,Backstreet Boys,I Want It That Way,1999,99,mid,mid,mid,mid,mid,Boy-band ballad-ish pop; mid energy big chorus.
+1999_tlc__no_scrubs__album,TLC,No Scrubs,1999,93,mid,mid,mid,mid,mid,R&B-pop crossover; groove-led.
+2000_coldplay__yellow__album,Coldplay,Yellow,2000,88,mid,mid,mid,lo,mid,Alt-pop ballad; steady build emotional.
+2002_avril_lavigne__complicated__album,Avril Lavigne,Complicated,2002,78,mid,mid,mid,mid,mid,Early-2000s pop-rock; strummy mid-tempo more head-bob than dancefloor emotionally neutral-to-bittersweet.
+2003_beyonce_jay_z__crazy_in_love__album,Beyoncé feat. JAY-Z,Crazy in Love,2003,99,mid,mid,hi,hi,hi,Horn-driven R&B-pop; very high energy and danceability.
+2003_evanescence__bring_me_to_life__album,Evanescence,Bring Me to Life,2003,95,mid,mid,hi,lo,lo,"Rock/nu-metal crossover; big dynamic hits and high energy with a clear groove but dark, dramatic low-valence mood."
+2003_outkast__hey_ya__album,Outkast,Hey Ya!,2003,160,mid,mid,hi,hi,hi,Quirky funk-pop; very fast but feels infectious and fun.
+2004_kelly_clarkson__since_u_been_gone__album,Kelly Clarkson,Since U Been Gone,2004,130,mid,mid,hi,mid,mid,Pop-rock belter; high energy breakup anthem.
+2004_usher_lil_jon_ludacris__yeah__album,Usher feat. Lil Jon & Ludacris,Yeah!,2004,105,mid,mid,hi,hi,mid,Club R&B; heavy low-end and high danceability.
+2006_shakira_wyclef_jean__hips_dont_lie__album,Shakira feat. Wyclef Jean,Hips Don't Lie,2006,100,mid,mid,hi,hi,hi,Latin-pop crossover; high groove and danceability; 2006 album version in benchmark.
+2007_rihanna_jay_z__umbrella__album,Rihanna feat. JAY-Z,Umbrella,2007,87,mid,mid,mid,mid,mid,Dark mid-tempo R&B-pop; big chorus hook.
+2008_coldplay__viva_la_vida__album,Coldplay,Viva La Vida,2008,138,mid,mid,mid,mid,mid,Anthemic orchestral pop; rolling rhythm but emotionally bittersweet mid-valence.
+2008_lady_gaga__pokerface__album,Lady Gaga,Poker Face,2008,120,mid,mid,hi,hi,mid,Electro-pop banger; club-oriented energy.
+2008_rihanna__disturbia__album,Rihanna,Disturbia,2008,124,mid,mid,hi,hi,lo,"Dark electro-pop club track; very high energy and danceability but eerie, tense low-valence feel."
+2009_black_eyed_peas__i_gotta_feeling__album,Black Eyed Peas,I Gotta Feeling,2009,128,long,mid,hi,hi,hi,Huge party anthem; very high energy and danceability; feel-good chorus.
+2010_adele__rolling_in_the_deep__album,Adele,Rolling in the Deep,2010,105,mid,mid,mid,mid,mid,Bluesy pop; strong vocal stomping groove.
+2010_katy_perry__firework__album,Katy Perry,Firework,2010,124,mid,mid,hi,hi,hi,"Anthemic pop; big builds and explosive chorus, clearly hi-energy/hi-dance/hi-valence empowerment record."
+2011_adele__someone_like_you__album,Adele,Someone Like You,2011,67,long,mid,lo,lo,lo,Piano/vocal breakup ballad; archetypal low energy very low danceability emotionally devastating.
+2011_gotye__somebody_that_i_used_to_know__album,Gotye feat. Kimbra,Somebody That I Used to Know,2011,129,mid,mid,mid,mid,lo,Sparse indie-pop ballad; mid energy but emotionally downbeat and melancholic.
+2012_bruno_mars__when_i_was_your_man__album,Bruno Mars,When I Was Your Man,2012,74,mid,mid,mid,lo,lo,Piano ballad; sparse arrangement; emotionally regretful; non-dance.
+2012_carly_rae_jepsen__call_me_maybe__single,Carly Rae Jepsen,Call Me Maybe,2012,120,mid,mid,hi,hi,hi,Modern bubblegum pop classic; bouncy and bright obvious hi-energy/hi-dance.
+2013_daft_punk_pharrell_williams__get_lucky__single,Daft Punk feat. Pharrell Williams,Get Lucky,2013,116,mid,mid,hi,hi,hi,Sleek disco-funk; smooth but absolutely a dancefloor record strong steady groove.
+2013_lorde__royals__single,Lorde,Royals,2013,85,mid,mid,lo,lo,lo,Minimalist alt-pop; very sparse low-band energy.
+2013_the_neighbourhood__sweater_weather__album,The Neighbourhood,Sweater Weather,2013,124,mid,mid,mid,mid,mid,Alt-pop mid-tempo groove; moody tone; subtly danceable.
+2014_ariana_grande__one_last_time__album,Ariana Grande,One Last Time,2014,125,mid,mid,mid,mid,mid,Mid-tempo EDM-pop ballad; big chorus but not a club banger sits comfortably in the middle.
+2014_mark_ronson_bruno_mars__uptown_funk__album,Mark Ronson feat. Bruno Mars,Uptown Funk,2014,115,long,mid,hi,hi,mid,Retro-funk pastiche; long but massive groove.
+2014_pharrell_williams__happy__single,Pharrell Williams,Happy,2014,160,mid,mid,hi,hi,hi,Uptempo feel-good soul-pop; very high valence.
+2014_sam_smith__stay_with_me__album,Sam Smith,Stay With Me,2014,84,mid,mid,mid,lo,lo,Gospel-tinged ballad; slow emotional delivery; low danceability.
+2014_sia__chandelier__album,Sia,Chandelier,2014,87,mid,mid,hi,mid,lo,Soaring pop ballad over trap-influenced drums; vocally intense high energy but emotionally heavy with low-valence subject matter.
+2014_taylor_swift__shake_it_off__album,Taylor Swift,Shake It Off,2014,160,mid,mid,hi,hi,hi,Maximalist pop; very high energy and valence.
+2014_taylor_swift__style__album,Taylor Swift,Style,2014,95,mid,mid,mid,mid,mid,"Cool mid-tempo pop; driving but not a club banger, strong mid-band reference."
+2015_adele__hello__album,Adele,Hello,2015,79,mid,mid,mid,lo,lo,Piano-led power ballad; slow build; heavy emotional weight; non-dance.
+2015_justin_bieber__love_yourself__album,Justin Bieber,Love Yourself,2015,100,mid,mid,lo,mid,mid,Minimal acoustic pop; low energy and danceability with lightly snarky tone.
+2016_drake__one_dance__album,Drake,One Dance,2016,104,mid,mid,mid,hi,mid,Afro-dancehall-inflected pop; mid energy very danceable moody but not dark.
+2016_justin_timberlake__cant_stop_the_feeling__album,Justin Timberlake,CAN'T STOP THE FEELING!,2016,113,mid,mid,hi,hi,hi,"Uplifting disco-funk pop; designed as a feel-good family dance track with clearly high energy, high danceability and high valence."
+2016_the_chainsmokers_ft_halsey__closer__single,The Chainsmokers feat. Halsey,Closer,2016,95,mid,mid,mid,mid,mid,EDM-pop with mellow energy; streaming-era staple.
+2017_daniel_caesar_h_e_r__best_part__album,Daniel Caesar feat. H.E.R.,Best Part,2017,74,mid,mid,lo,lo,mid,Modern neo-soul slow jam; intimate super low energy and dance but warm/mid valence rather than tragic.
+2017_ed_sheeran__shape_of_you__album,Ed Sheeran,Shape of You,2017,96,mid,mid,mid,hi,mid,Caribbean-inflected pop; heavy on groove with mid valence.
+2017_imagine_dragons__believer__album,Imagine Dragons,Believer,2017,125,mid,mid,hi,mid,mid,"Arena/pop rock anthem; very high energy with a strong but not club-focused groove, emotionally intense but ultimately uplifting."
+2017_luis_fonsi_daddy_yankee_ft_justin_bieber__despacito__single,Luis Fonsi & Daddy Yankee feat. Justin Bieber,Despacito (Remix),2017,89,mid,mid,mid,hi,mid,Reggaeton-pop crossover; rhythmic sensual.
+2018_calvin_harris_dua_lipa__one_kiss__album,Calvin Harris & Dua Lipa,One Kiss,2018,124,mid,mid,hi,hi,mid,House-pop; club-focused hi-dance cut with a cool mid-valence feel.
+2018_marshmello_bastille__happier__single,Marshmello & Bastille,Happier,2018,100,mid,mid,mid,mid,lo,Sad-pop mid-tempo; bounce in the drums but emotional tone is clearly down strong “mid” energy with low-ish valence.
+2018_post_malone__better_now__album,Post Malone,Better Now,2018,145,mid,mid,mid,mid,mid,Mid-tempo emo-rap pop; steady groove; bittersweet reflective tone.
+2019_billie_eilish__bad_guy__album,Billie Eilish,bad guy,2019,135,mid,mid,mid,mid,mid,Minimal off-kilter pop; quirky cool rather than bright.
+2019_dua_lipa__dont_start_now__album,Dua Lipa,Don't Start Now,2019,124,mid,mid,hi,hi,mid,Nu-disco pop; high-energy and very danceable.
+2019_lewis_capaldi__someone_you_loved__album,Lewis Capaldi,Someone You Loved,2019,110,mid,mid,mid,lo,lo,Piano ballad; emotionally raw vocal; minimal groove; non-dance.
+2020_bts__dynamite__single,BTS,Dynamite,2020,114,mid,mid,hi,hi,hi,Disco-pop; very bright high-valence.
+2020_dua_lipa__levitating__album,Dua Lipa,Levitating,2020,103,mid,mid,hi,hi,mid,Another nu-disco cut; strong groove and fun tone.
+2020_harry_styles__watermelon_sugar__album,Harry Styles,Watermelon Sugar,2020,96,mid,mid,hi,hi,hi,Summery retro-pop; bright high-energy feel; very singalong and fun.
+2020_the_weeknd__blinding_lights__album,The Weeknd,Blinding Lights,2020,171,mid,mid,hi,hi,mid,Feels like ~85.5 BPM double-time; retro synthwave pop.
+2021_doja_cat__kiss_me_more__album,Doja Cat feat. SZA,Kiss Me More,2021,111,mid,mid,hi,hi,hi,Playful disco-pop; high energy very danceable bright flirtatious tone.
+2021_farruko__pepas__album,Farruko,Pepas,2021,128,mid,mid,hi,hi,hi,"EDM/reggaeton party anthem; archetypal festival hi-energy, hi-dance, euphoric feel."
+2021_olivia_rodrigo__drivers_license__album,Olivia Rodrigo,drivers license,2021,74,long,mid,mid,lo,lo,Slow emotional ballad; breakup narrative.
+2022_djo__end_of_beginning__album,Djo,End of Beginning,2022,159,mid,mid,mid,mid,mid,Indie pop rock; driving mid energy; nostalgic bittersweet feel.
+2022_glass_animals__heat_waves__album,Glass Animals,Heat Waves,2022,81,mid,mid,mid,mid,mid,Alt-pop slow-burn; hazy mid valence.
+2022_harry_styles__as_it_was__album,Harry Styles,As It Was,2022,174,mid,mid,mid,mid,mid,Feels like ~87 BPM double-time; bittersweet pop.
+2022_steve_lacy__bad_habit__album,Steve Lacy,Bad Habit,2022,169,mid,mid,mid,mid,mid,Laid-back alt R&B; loping mid energy; strong head-nod groove.
+2023_miley_cyrus__flowers__album,Miley Cyrus,Flowers,2023,118,mid,mid,mid,mid,mid,Mid-tempo self-empowerment pop; steady groove.
+2023_teddy_swims__lose_control__album,Teddy Swims,Lose Control,2023,146,mid,mid,hi,mid,mid,Soulful belter; strong vocal intensity; mid-tempo band groove.
+2023_tyla__water__single,Tyla,Water,2023,130,mid,mid,hi,hi,mid,Afro-pop club track; very danceable; sensual mid-valence tone.
+2024_billie_eilish__birds_of_a_feather__album,Billie Eilish,BIRDS OF A FEATHER,2024,172,mid,mid,mid,mid,mid,Dreamy indie-pop; floating mid energy; mid danceability and mood.
+2024_hoizer__too_sweet__album,Hozier,Too Sweet,2024,150,mid,mid,mid,mid,mid,Groovy alt-soul; swung mid energy; subtly danceable; wry tone.
+2024_kendrick_lamar__not_like_us__single,Kendrick Lamar,Not Like Us,2024,96,mid,mid,hi,hi,mid,West Coast club rap; very high energy; very danceable; aggressive but fun.
+2024_sabrina_carpenter__espresso__album,Sabrina Carpenter,Espresso,2024,121,mid,mid,hi,hi,hi,Uptempo pop; very punchy groove; playful high-valence tone.
+2024_sabrina_carpenter__please_please_please__album,Sabrina Carpenter,Please Please Please,2024,109,mid,mid,mid,mid,mid,Mid-tempo pop; steady rhythmic feel; playful yet slightly tense mood.
+2024_taylor_swift_post_malone__fortnight__album,Taylor Swift feat. Post Malone,Fortnight,2024,96,mid,mid,mid,mid,lo,Moody synth-pop; mid energy; low-valence bittersweet tone; subtle groove.
+2025_alex_warren__ordinary__single,Alex Warren,Ordinary,2025,112,mid,mid,mid,lo,mid,"Heartfelt 2025 summer ballad; moderate tempo, steady build, emotionally romantic but more intimate than euphoric."

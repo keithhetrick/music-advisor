@@ -1,0 +1,19 @@
+[
+  {
+    "message": "analyze",
+    "payload": "hosts/advisor_host/tests/fixtures/sample_client.json",
+    "norms": null
+  },
+  {
+    "message": "groove?",
+    "expect_keys": ["reply", "ui_hints"]
+  },
+  {
+    "message": "compare",
+    "expect_keys": ["reply", "ui_hints"]
+  },
+  {
+    "message": "more",
+    "expect_keys": ["reply", "ui_hints"]
+  }
+]

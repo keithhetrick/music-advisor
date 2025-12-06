@@ -1,0 +1,31 @@
+{
+  "audio_name": "2019_lewis_capaldi__someone_you_loved__album_20251116_042814",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.47279517654476594,
+        "lo": 0.22445542204100855,
+        "mid": 0.30274940141422546
+      },
+      "value": 0.5981416851783654
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3739313884003255,
+        "lo": 0.28698493664694336,
+        "mid": 0.33908367495273123
+      },
+      "value": 0.544780504946031
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2019_lewis_capaldi__someone_you_loved__album/2019_lewis_capaldi__someone_you_loved__album_20251116_042814.features.json"
+}

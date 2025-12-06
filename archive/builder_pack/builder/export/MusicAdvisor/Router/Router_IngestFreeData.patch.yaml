@@ -1,0 +1,95 @@
+# Router/Router_IngestFreeData.patch.yaml
+router:
+  commands:
+    - name: ingest_help
+      patterns: ["/ingest help"]
+      action: |
+        txt = read_text("Templates/ingest_help.txt")
+        print_block("INGEST_HELP", txt)
+
+    - name: ingest_json
+      patterns: ["/ingest json"]
+      action: |
+        # Paste a JSON array/object in the next user message; router will capture last block
+        payload = context.get("clipboard_json") or context.get("clipboard_text")
+        if not payload:
+          print_block("INGEST_JSON", "Paste JSON right after this command."); return
+        import json
+        try:
+          data = json.loads(payload)
+        except Exception as e:
+          print_block("INGEST_JSON", f"Invalid JSON: {e}"); return
+
+        # Normalize into in-memory 'warehouse' buckets
+        wh = context.get("warehouse") or {"fact_daily_metrics":[], "fact_audio_features":[], "fact_lyrics_features":[], "fact_chart_positions":[], "fact_playlists":[]}
+        def ensure_list(x): return x if isinstance(x, list) else [x]
+        for obj in ensure_list(data):
+          if isinstance(obj, dict) and "metric_date" in obj and "streams" in obj:
+            wh["fact_daily_metrics"].append(obj)
+          elif isinstance(obj, dict) and "bpm" in obj and "key" in obj:
+            wh["fact_audio_features"].append(obj)
+          elif isinstance(obj, dict) and "lyrics" in obj:
+            wh["fact_lyrics_features"].append(obj)
+          elif isinstance(obj, dict) and "chart_name" in obj and "position" in obj:
+            wh["fact_chart_positions"].append(obj)
+          elif isinstance(obj, dict) and "playlist_id" in obj and "track_id" in obj:
+            wh["fact_playlists"].append(obj)
+        context["warehouse"] = wh
+        print_block("INGEST_JSON", f"Ingested into buckets: " + ", ".join([f"{k}:{len(v)}" for k,v in wh.items()]))
+
+    - name: ingest_csv
+      patterns: ["/ingest csv"]
+      action: |
+        # Paste CSV in the next message; header-driven mapping using schemas/free_connectors.mapping.json
+        csv_text = context.get("clipboard_text")
+        if not csv_text or "," not in csv_text:
+          print_block("INGEST_CSV", "Paste CSV with headers right after this command."); return
+
+        import csv, io, json
+        mapping = {}
+        try:
+          mapping = json.loads(read_text("schemas/free_connectors.mapping.json"))
+        except:
+          mapping = {}
+
+        # Detect target fact from header keys
+        head = csv_text.splitlines()[0].lower()
+        target = None
+        for fact, keys in mapping.get("header_signatures", {}).items():
+          if all(k.lower() in head for k in keys):
+            target = fact; break
+        if not target:
+          print_block("INGEST_CSV", "Unknown CSV header; run /ingest help and match a template."); return
+
+        reader = csv.DictReader(io.StringIO(csv_text))
+        rows = [dict(r) for r in reader]
+
+        # Optional column remap
+        colmap = mapping.get("column_maps", {}).get(target, {})
+        norm = []
+        for r in rows:
+          nr = {}
+          for k, v in r.items():
+            nk = colmap.get(k, k)
+            nr[nk] = v
+          norm.append(nr)
+
+        wh = context.get("warehouse") or {"fact_daily_metrics":[], "fact_audio_features":[], "fact_lyrics_features":[], "fact_chart_positions":[], "fact_playlists":[]}
+        wh.setdefault(target, []).extend(norm)
+        context["warehouse"] = wh
+        print_block("INGEST_CSV", f"Ingested {len(norm)} rows into {target}")
+
+    - name: ingest_status
+      patterns: ["/ingest status", "/warehouse status"]
+      action: |
+        wh = context.get("warehouse") or {}
+        if not wh:
+          print_block("WAREHOUSE", "No data ingested yet. Try /ingest help"); return
+        lines = [f"- {k}: {len(v)} rows" for k,v in wh.items()]
+        print_block("WAREHOUSE", "Current in-memory warehouse:\n" + "\n".join(lines))
+
+    - name: ingest_clear
+      patterns: ["/ingest clear", "/warehouse clear"]
+      action: |
+        context["warehouse"] = {}
+        print_block("WAREHOUSE", "Cleared in-memory warehouse.")

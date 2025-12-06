@@ -1,0 +1,157 @@
+{
+  "shared_config": {
+    "path": "shared/config",
+    "tests": ["shared/config/tests"],
+    "description": "Configuration resolution helpers and path utilities.",
+    "type": "shared",
+    "deps": []
+  },
+  "shared_calibration": {
+    "path": "shared/calibration",
+    "tests": [],
+    "description": "Calibration assets and helpers.",
+    "type": "shared",
+    "deps": []
+  },
+  "shared_core": {
+    "path": "shared/core",
+    "tests": ["shared/core/tests"],
+    "description": "Shared primitives used across engines and hosts.",
+    "type": "shared",
+    "deps": []
+  },
+  "shared_security": {
+    "path": "shared/security",
+    "tests": ["shared/security/tests"],
+    "description": "Security helpers and policies.",
+    "type": "shared",
+    "deps": []
+  },
+  "shared_utils": {
+    "path": "shared/utils",
+    "tests": ["shared/utils/tests"],
+    "description": "Shared utility helpers (re-exported shared core).",
+    "type": "shared",
+    "deps": []
+  },
+  "audio_engine": {
+    "path": "engines/audio_engine",
+    "tests": ["engines/audio_engine/tests"],
+    "description": "Core audio/HCI/TTC pipeline (ma_audio_engine + adapters).",
+    "type": "engine",
+    "deps": [
+      "shared_config",
+      "shared_calibration",
+      "shared_core",
+      "shared_security",
+      "shared_utils"
+    ],
+    "run": [
+      "./infra/scripts/with_repo_env.sh",
+      "-m",
+      "ma_audio_engine.pipe_cli",
+      "--help"
+    ]
+  },
+  "lyrics_engine": {
+    "path": "engines/lyrics_engine",
+    "tests": ["engines/lyrics_engine/tests"],
+    "description": "Lyric/STT components (ma_lyrics_engine, ma_stt_engine).",
+    "type": "engine",
+    "deps": [
+      "shared_config",
+      "shared_calibration",
+      "shared_core",
+      "shared_security",
+      "shared_utils"
+    ],
+    "run": [
+      "./infra/scripts/with_repo_env.sh",
+      "engines/lyrics_engine/tools/lyric_wip_pipeline.py",
+      "--help"
+    ]
+  },
+  "recommendation_engine": {
+    "path": "engines/recommendation_engine",
+    "tests": [
+      "engines/recommendation_engine/tests",
+      "engines/recommendation_engine/recommendation_engine/tests"
+    ],
+    "description": "Deterministic recommendation/advisory layer.",
+    "type": "engine",
+    "deps": [
+      "shared_config",
+      "shared_calibration",
+      "shared_core",
+      "shared_security",
+      "shared_utils"
+    ],
+    "run": [
+      "./infra/scripts/with_repo_env.sh",
+      "-m",
+      "recommendation_engine.service",
+      "--help"
+    ]
+  },
+  "ttc_engine": {
+    "path": "engines/ttc_engine",
+    "tests": ["engines/ttc_engine/tests"],
+    "description": "Tempo/TTC helpers (ma_ttc_engine).",
+    "type": "engine",
+    "deps": [
+      "shared_config",
+      "shared_calibration",
+      "shared_core",
+      "shared_security",
+      "shared_utils"
+    ],
+    "run": ["./infra/scripts/with_repo_env.sh", "-m", "ma_ttc_engine", "--help"]
+  },
+  "advisor_host_core": {
+    "path": "hosts/advisor_host_core",
+    "tests": ["hosts/advisor_host_core/tests"],
+    "description": "Host contracts/helpers (ma_host) used across projects.",
+    "type": "host_core",
+    "deps": [
+      "shared_config",
+      "shared_calibration",
+      "shared_core",
+      "shared_security",
+      "shared_utils"
+    ]
+  },
+  "advisor_host": {
+    "path": "hosts/advisor_host",
+    "tests": ["hosts/advisor_host/tests"],
+    "description": "Host/chat shell for payloads.",
+    "type": "host",
+    "deps": [
+      "advisor_host_core",
+      "shared_config",
+      "shared_calibration",
+      "shared_core",
+      "shared_security",
+      "shared_utils"
+    ],
+    "run": ["./infra/scripts/run_chat_host.sh"]
+  },
+  "root_integration": {
+    "path": "tests",
+    "tests": ["tests"],
+    "description": "Integration + pipeline coverage that exercises the full stack.",
+    "type": "integration",
+    "deps": [
+      "audio_engine",
+      "lyrics_engine",
+      "ttc_engine",
+      "recommendation_engine",
+      "advisor_host_core",
+      "advisor_host",
+      "shared_config",
+      "shared_calibration",
+      "shared_core",
+      "shared_security",
+      "shared_utils"
+    ]
+  }
+}

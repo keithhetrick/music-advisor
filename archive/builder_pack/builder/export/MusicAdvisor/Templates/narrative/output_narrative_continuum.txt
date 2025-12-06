@@ -1,0 +1,5 @@
+NARRATIVE THREAD
+Name  : {{thread}}
+Anchor: {{anchor}}
+Motifs: {{motifs.join(', ') || '—'}}
+Next  : {{next || '—'}}

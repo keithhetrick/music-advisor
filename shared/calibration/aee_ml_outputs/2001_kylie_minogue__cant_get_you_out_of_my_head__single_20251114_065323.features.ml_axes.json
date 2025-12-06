@@ -1,0 +1,31 @@
+{
+  "audio_name": "2001_kylie_minogue__cant_get_you_out_of_my_head__single_20251114_065323",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.43689525512494437,
+        "lo": 0.2669739171310813,
+        "mid": 0.2961308277439743
+      },
+      "value": 0.5728211641544061
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3716857494674636,
+        "lo": 0.29936086555408953,
+        "mid": 0.328953384978447
+      },
+      "value": 0.5402817526473854
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/04_echo_2000_04/2001_kylie_minogue__cant_get_you_out_of_my_head__single/2001_kylie_minogue__cant_get_you_out_of_my_head__single_20251114_065323.features.json"
+}

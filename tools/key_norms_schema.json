@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["key_analysis_version", "lane_id", "song_key", "lane_stats", "song_placement", "advisory"],
+  "properties": {
+    "key_analysis_version": { "type": "string" },
+    "lane_id": { "type": "string" },
+    "song_key": {
+      "type": "object",
+      "required": ["root_name", "mode", "full_name", "pitch_class"],
+      "properties": {
+        "root_name": { "type": "string" },
+        "mode": { "type": "string" },
+        "full_name": { "type": "string" },
+        "pitch_class": { "type": "number" }
+      }
+    },
+    "lane_stats": {
+      "type": "object",
+      "required": ["total_hits", "mode_counts", "top_keys", "primary_family", "key_counts", "historical_hit_medium"],
+      "properties": {
+        "total_hits": { "type": "number" },
+        "mode_counts": { "type": "object" },
+        "key_counts": { "type": "object" },
+        "top_keys": { "type": "array" },
+        "primary_family": { "type": "array" },
+        "historical_hit_medium": { "type": "array" }
+      }
+    },
+    "song_placement": { "type": "object" },
+    "advisory": { "type": "object" }
+  }
+}

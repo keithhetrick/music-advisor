@@ -1,0 +1,9 @@
+[project]
+name = "musicadvisor-ttc-engine"
+version = "0.0.1"
+description = "TTC (tempo/chorus) engine for Music Advisor."
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.setuptools]
+package-dir = {"" = "src"}

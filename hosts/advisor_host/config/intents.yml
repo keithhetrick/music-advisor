@@ -1,0 +1,60 @@
+summarize:
+  - summarize
+  - summary
+expand:
+  - expand
+  - details
+  - deeper
+tutorial:
+  - help
+  - tutorial
+  - guide
+  - how to
+health:
+  - health
+  - status
+compare:
+  - compare
+  - previous
+  - diff
+structure:
+  - tempo
+  - bpm
+  - runtime
+  - length
+  - structure
+  - form
+groove:
+  - groove
+  - dance
+  - beat
+  - rhythm
+  - swing
+loudness:
+  - loud
+  - lufs
+  - volume
+  - master
+  - level
+mood:
+  - mood
+  - valence
+  - happy
+  - sad
+  - bright
+  - dark
+historical:
+  - neighbor
+  - decade
+  - echo
+  - historical
+optimize:
+  - improve
+  - optimize
+  - recommend
+  - fix
+plan:
+  - plan
+  - future
+  - roadmap
+general: []

@@ -1,0 +1,31 @@
+{
+  "audio_name": "1992_boyz_ii_men__end_of_the_road__album_20251114_063034",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.2573096218258518,
+        "lo": 0.3554910656158425,
+        "mid": 0.38719931255830575
+      },
+      "value": 0.4834110479542954
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.41554876830854354,
+        "lo": 0.2525484515220344,
+        "mid": 0.33190278016942204
+      },
+      "value": 0.56967753345138
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/02_echo_1990_94/1992_boyz_ii_men__end_of_the_road__album/1992_boyz_ii_men__end_of_the_road__album_20251114_063034.features.json"
+}

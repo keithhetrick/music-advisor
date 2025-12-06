@@ -1,0 +1,76 @@
+{
+  "message": "analyze",
+  "payload": {
+    "audio_name": "Rich Historical Echo Track",
+    "features_full": {
+      "tempo_bpm": 122.0,
+      "duration_sec": 215.0,
+      "loudness_LUFS": -8.2,
+      "energy": 0.72,
+      "danceability": 0.66,
+      "valence": 0.55
+    },
+    "audio_axes": {
+      "TempoFit": 0.78,
+      "RuntimeFit": 0.72,
+      "LoudnessFit": 0.8,
+      "Energy": 0.72,
+      "Danceability": 0.66,
+      "Valence": 0.55
+    },
+    "HCI_v1_final_score": 0.8,
+    "historical_echo_v1": {
+      "primary_decade": "2005–2014",
+      "primary_decade_neighbor_count": 5,
+      "decade_counts": {
+        "1995–2004": 2,
+        "2005–2014": 5,
+        "2015–2024": 3
+      },
+      "top_neighbor": {
+        "year": 2012,
+        "artist": "Echo Artist",
+        "title": "Echo Song",
+        "distance": 0.38,
+        "tempo": 122.5,
+        "valence": 0.57,
+        "energy": 0.7
+      },
+      "neighbors": [
+        {
+          "year": 2012,
+          "artist": "Echo Artist",
+          "title": "Echo Song",
+          "distance": 0.38,
+          "tempo": 122.5,
+          "valence": 0.57,
+          "energy": 0.7
+        },
+        {
+          "year": 2010,
+          "artist": "Second Neighbor",
+          "title": "Second Echo",
+          "distance": 0.52,
+          "tempo": 120.0,
+          "valence": 0.5,
+          "energy": 0.65
+        },
+        {
+          "year": 2018,
+          "artist": "Modern Neighbor",
+          "title": "Modern Echo",
+          "distance": 0.6,
+          "tempo": 124.0,
+          "valence": 0.58,
+          "energy": 0.68
+        }
+      ]
+    }
+  },
+  "norms": {
+    "region": "US",
+    "tier": "Tier1_Hot100_Top40",
+    "version": "2024-YE",
+    "last_refreshed_at": "2025-01-15T00:00:00Z"
+  }
+}

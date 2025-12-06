@@ -1,0 +1,4 @@
+{
+  "algorithm": "sha256",
+  "chunk_size": 65536
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "1983_eurythmics__sweet_dreams__album_20251114_064405",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.40454814363136515,
+        "lo": 0.2882295171724482,
+        "mid": 0.30722233919618674
+      },
+      "value": 0.5551229951192433
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.35341719707320596,
+        "lo": 0.32575246645820355,
+        "mid": 0.32083033646859055
+      },
+      "value": 0.5259702790381611
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/99_legacy_pop_eval/1983_eurythmics__sweet_dreams__album/1983_eurythmics__sweet_dreams__album_20251114_064405.features.json"
+}

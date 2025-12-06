@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Music Advisor AUDIO_FEATURES",
+  "type": "object",
+  "required": ["source", "track_title", "features"],
+  "properties": {
+    "source": {
+      "type": "string",
+      "description": "manual | librosa | essentia | spotify_api | other"
+    },
+    "track_title": { "type": "string" },
+    "artist": { "type": ["string", "null"] },
+    "notes": { "type": ["string", "null"] },
+    "features": {
+      "type": "object",
+      "required": ["bpm", "mode", "duration_sec"],
+      "properties": {
+        "bpm": { "type": "number" },
+        "mode": { "type": "string", "enum": ["major", "minor", "unknown"] },
+        "key": { "type": ["string", "null"] },
+        "duration_sec": { "type": "number" },
+        "loudness_lufs": { "type": ["number", "null"] },
+        "energy": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "danceability": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "valence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "rhythm_profile": { "type": ["string", "null"] },
+        "tags": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

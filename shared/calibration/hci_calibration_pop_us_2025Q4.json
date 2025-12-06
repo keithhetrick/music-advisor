@@ -1,0 +1,67 @@
+{
+  "cap_min": 0.05,
+  "cap_max": 0.98,
+  "anchors": {
+    "00_core_modern": {
+      "target_mean": 0.697,
+      "scale": 1.0,
+      "offset": 0.22262499999999996,
+      "raw_mean": 0.474375
+    },
+    "01_echo_1985_89": {
+      "target_mean": 0.671,
+      "scale": 1.0,
+      "offset": 0.23269230769230775,
+      "raw_mean": 0.4383076923076923
+    },
+    "02_echo_1990_94": {
+      "target_mean": 0.668,
+      "scale": 1.0,
+      "offset": 0.23461111111111116,
+      "raw_mean": 0.4333888888888889
+    },
+    "03_echo_1995_99": {
+      "target_mean": 0.664,
+      "scale": 1.0,
+      "offset": 0.23861538461538467,
+      "raw_mean": 0.42538461538461536
+    },
+    "04_echo_2000_04": {
+      "target_mean": 0.66,
+      "scale": 1.0,
+      "offset": 0.2405714285714286,
+      "raw_mean": 0.41942857142857143
+    },
+    "05_echo_2005_09": {
+      "target_mean": 0.668,
+      "scale": 1.0,
+      "offset": 0.23553333333333337,
+      "raw_mean": 0.43246666666666667
+    },
+    "06_echo_2010_14": {
+      "target_mean": 0.665,
+      "scale": 1.0,
+      "offset": 0.23506451612903229,
+      "raw_mean": 0.42993548387096775
+    },
+    "07_echo_2015_19": {
+      "target_mean": 0.688,
+      "scale": 1.0,
+      "offset": 0.21673333333333328,
+      "raw_mean": 0.47126666666666667
+    },
+    "08_echo_2020_24": {
+      "target_mean": 0.721,
+      "scale": 1.0,
+      "offset": 0.2082666666666666,
+      "raw_mean": 0.5127333333333334
+    },
+    "99_legacy_pop_eval": {
+      "target_mean": 0.677,
+      "scale": 1.0,
+      "offset": 0.23100000000000004,
+      "raw_mean": 0.446
+    }
+  },
+  "notes": "Built from allowlist with explicit targets."
+}

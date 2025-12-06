@@ -1,0 +1,31 @@
+{
+  "audio_name": "1979_bee_gees__stayin_alive__album_20251116_052740",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.2752472935219566,
+        "lo": 0.32596140881491853,
+        "mid": 0.39879129766312477
+      },
+      "value": 0.4985481300882092
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4360270310187096,
+        "lo": 0.21949763870111413,
+        "mid": 0.3444753302801763
+      },
+      "value": 0.5867601692462141
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/1979_bee_gees__stayin_alive__album/1979_bee_gees__stayin_alive__album_20251116_052740.features.json"
+}

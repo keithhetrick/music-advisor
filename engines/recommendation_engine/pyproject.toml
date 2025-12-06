@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "recommendation-engine"
+version = "0.0.1"
+description = "Deterministic recommendation/optimization engine for Music Advisor (uses HCI/audio axes + market norms)."
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{name = "Music Advisor", email = "dev@musicadvisor.app"}]
+
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["recommendation_engine*"]

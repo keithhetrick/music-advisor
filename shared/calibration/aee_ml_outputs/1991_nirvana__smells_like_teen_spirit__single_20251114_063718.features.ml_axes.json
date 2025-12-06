@@ -1,0 +1,31 @@
+{
+  "audio_name": "1991_nirvana__smells_like_teen_spirit__single_20251114_063718",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.1645920133290796,
+        "lo": 0.5002801004003883,
+        "mid": 0.33512788627053214
+      },
+      "value": 0.40752317454506143
+    },
+    "Energy": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3319363435142692,
+        "lo": 0.32066312450998846,
+        "mid": 0.3474005319757422
+      },
+      "value": 0.5199787828769976
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/10_golden_set_for_eval/1991_nirvana__smells_like_teen_spirit__single/1991_nirvana__smells_like_teen_spirit__single_20251114_063718.features.json"
+}

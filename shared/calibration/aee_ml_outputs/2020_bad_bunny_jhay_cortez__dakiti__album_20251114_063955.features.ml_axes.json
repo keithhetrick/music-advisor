@@ -1,0 +1,31 @@
+{
+  "audio_name": "2020_bad_bunny_jhay_cortez__dakiti__album_20251114_063955",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.25982996493782357,
+        "lo": 0.43543253719371156,
+        "mid": 0.3047374978684648
+      },
+      "value": 0.46031072657012473
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.28859325919059525,
+        "lo": 0.38274780133120884,
+        "mid": 0.3286589394781959
+      },
+      "value": 0.4861833003173457
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/11_latincrossover_eval/2020_bad_bunny_jhay_cortez__dakiti__album/2020_bad_bunny_jhay_cortez__dakiti__album_20251114_063955.features.json"
+}

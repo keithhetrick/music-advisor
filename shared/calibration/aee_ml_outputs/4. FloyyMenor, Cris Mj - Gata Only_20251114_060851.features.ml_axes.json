@@ -1,0 +1,31 @@
+{
+  "audio_name": "4. FloyyMenor, Cris Mj - Gata Only_20251114_060851",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4760374986898249,
+        "lo": 0.2567984608575796,
+        "mid": 0.2671640404525954
+      },
+      "value": 0.5895735862841648
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.39875752104865164,
+        "lo": 0.25789894280483466,
+        "mid": 0.34334353614651364
+      },
+      "value": 0.5621954495255777
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/4. FloyyMenor, Cris Mj - Gata Only/4. FloyyMenor, Cris Mj - Gata Only_20251114_060851.features.json"
+}

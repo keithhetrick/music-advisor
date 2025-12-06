@@ -1,0 +1,31 @@
+{
+  "audio_name": "1969_the_beatles__here_comes_the_sun__album_20251116_042505",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.3460442346738542,
+        "lo": 0.3016361093458704,
+        "mid": 0.35231965598027537
+      },
+      "value": 0.5306246493320879
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3118758514937725,
+        "lo": 0.36631576665786497,
+        "mid": 0.3218083818483626
+      },
+      "value": 0.49926181802546094
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/1969_the_beatles__here_comes_the_sun__album/1969_the_beatles__here_comes_the_sun__album_20251116_042505.features.json"
+}

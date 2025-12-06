@@ -1,0 +1,31 @@
+{
+  "audio_name": "2008_meshuggah__bleed__neg_out_of_domain_20251114_064939",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.06601402586231359,
+        "lo": 0.5883059781203496,
+        "mid": 0.3456799960173369
+      },
+      "value": 0.3466131156157049
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4095959106002935,
+        "lo": 0.224242987504679,
+        "mid": 0.3661611018950275
+      },
+      "value": 0.576085672458699
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/13_negatives_out_of_domain/2008_meshuggah__bleed__neg_out_of_domain/2008_meshuggah__bleed__neg_out_of_domain_20251114_064939.features.json"
+}

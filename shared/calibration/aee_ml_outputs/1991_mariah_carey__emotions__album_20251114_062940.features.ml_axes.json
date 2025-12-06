@@ -1,0 +1,31 @@
+{
+  "audio_name": "1991_mariah_carey__emotions__album_20251114_062940",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.3180952463837342,
+        "lo": 0.36513970029297566,
+        "mid": 0.3167650533232902
+      },
+      "value": 0.5017914261464143
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3521096665747085,
+        "lo": 0.3039646428594997,
+        "mid": 0.3439256905657919
+      },
+      "value": 0.5320489904432981
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/02_echo_1990_94/1991_mariah_carey__emotions__album/1991_mariah_carey__emotions__album_20251114_062940.features.json"
+}

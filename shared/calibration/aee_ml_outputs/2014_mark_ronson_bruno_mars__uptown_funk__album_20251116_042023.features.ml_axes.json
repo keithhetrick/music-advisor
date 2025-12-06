@@ -1,0 +1,31 @@
+{
+  "audio_name": "2014_mark_ronson_bruno_mars__uptown_funk__album_20251116_042023",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.40872393428427317,
+        "lo": 0.22994622659031536,
+        "mid": 0.3613298391254114
+      },
+      "value": 0.574069509022401
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.4590541594947887,
+        "lo": 0.20504928162742406,
+        "mid": 0.3358965588777872
+      },
+      "value": 0.5991541713349489
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_1/2014_mark_ronson_bruno_mars__uptown_funk__album/2014_mark_ronson_bruno_mars__uptown_funk__album_20251116_042023.features.json"
+}

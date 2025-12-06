@@ -1,0 +1,74 @@
+{
+  "defaults": {
+    "target_hci_floor": 0.8,
+    "historical_threshold": 0.78,
+    "market_threshold": 0.78,
+    "cultural_threshold": 0.78,
+    "sonic_threshold": 0.78,
+    "emotional_threshold": 0.78,
+    "creative_threshold": 0.78,
+    "ttc_sec": { "min": 5, "max": 12, "fallback": 8 },
+    "runtime_sec": {
+      "tighten_if_over": 210,
+      "target_min": 165,
+      "target_max": 195
+    },
+    "loudness_lufs_short_term": { "min": -9.5, "max": -7.5, "target": -8.5 },
+    "echo_bpm_corridor": 5
+  },
+  "profiles": {
+    "US_Pop_2025": {
+      "ttc_sec": { "min": 5, "max": 12, "fallback": 8 },
+      "runtime_sec": {
+        "tighten_if_over": 210,
+        "target_min": 165,
+        "target_max": 195
+      },
+      "loudness_lufs_short_term": { "min": -9.5, "max": -7.5, "target": -8.5 },
+      "echo_bpm_corridor": 5
+    }
+  },
+  "genres": {
+    "Pop": {
+      "ttc_sec": { "min": 6, "max": 14, "fallback": 9 },
+      "runtime_sec": {
+        "tighten_if_over": 220,
+        "target_min": 170,
+        "target_max": 205
+      }
+    },
+    "Hip-Hop": {
+      "ttc_sec": { "min": 4, "max": 10, "fallback": 7 },
+      "runtime_sec": {
+        "tighten_if_over": 240,
+        "target_min": 150,
+        "target_max": 200
+      },
+      "loudness_lufs_short_term": { "min": -10.0, "max": -7.0, "target": -8.0 }
+    },
+    "Country": {
+      "ttc_sec": { "min": 6, "max": 16, "fallback": 10 },
+      "runtime_sec": {
+        "tighten_if_over": 230,
+        "target_min": 175,
+        "target_max": 215
+      }
+    },
+    "Latin": {
+      "ttc_sec": { "min": 5, "max": 12, "fallback": 8 },
+      "runtime_sec": {
+        "tighten_if_over": 220,
+        "target_min": 170,
+        "target_max": 205
+      }
+    },
+    "Christian": {
+      "ttc_sec": { "min": 8, "max": 18, "fallback": 12 },
+      "runtime_sec": {
+        "tighten_if_over": 250,
+        "target_min": 180,
+        "target_max": 230
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "header_signatures": {
+    "fact_daily_metrics": ["metric_date", "platform", "track_id", "streams"],
+    "fact_audio_features": ["track_id", "bpm", "key", "mode"],
+    "fact_lyrics_features": ["track_id", "lyrics"],
+    "fact_chart_positions": ["chart_name", "metric_date", "position"],
+    "fact_playlists": ["playlist_id", "track_id", "date_added"]
+  },
+  "column_maps": {
+    "fact_daily_metrics": { "paid_stream_ratio": "paid_ratio" },
+    "fact_audio_features": {},
+    "fact_lyrics_features": {},
+    "fact_chart_positions": {},
+    "fact_playlists": {}
+  }
+}

@@ -1,0 +1,45 @@
+command:
+  name: "/emotion scan"
+  description: "Treat emotions like forces; report axial balance (advisory-only)."
+  steps:
+    - load_json:
+        from: "Knowledge/emotional_axes.json"
+        as: AX
+    - set:
+        title: "${context.meta.title}"
+        lane: "${context.meta.lane || 'Neon Heart Pop'}"
+        bal: "${AX.defaults}"
+    - choose:
+        when: "${title && title.contains('Ultraviolet')}"
+        then:
+          set:
+            bal.Vulnerability: 92
+            bal.Memory: 90
+            bal.Presence: 60
+    - choose:
+        when: "${lane == 'Porch Gospel'}"
+        then:
+          set:
+            bal.Intimacy: 92
+            bal.Theater: 50
+    - set:
+        advisory: []
+    - choose:
+        when: "${bal.Memory > 85 && bal.Presence < 65}"
+        then:
+          append:
+            to: advisory[]
+            value: "Add one present-moment image in V2 to ground memory weight."
+    - render:
+        template: "Templates/emotion/output_emotional_physics.txt"
+        to: result
+    - print: "${result}"
+    - append:
+        to: advisor.notes[]
+        value: "Emotional balance: ${JSON.stringify(bal)}"
+    - if:
+        cond: "${advisory.length > 0}"
+        then:
+          append:
+            to: advisor.optimization[]
+            value: "${advisory[0]}"

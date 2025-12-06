@@ -1,0 +1,31 @@
+{
+  "audio_name": "2022_glass_animals__heat_waves__album_20251115_082135",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.16896760823865012,
+        "lo": 0.49033217542005136,
+        "mid": 0.3407002163412983
+      },
+      "value": 0.4120390102575121
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.20147850972901554,
+        "lo": 0.47638549178600614,
+        "mid": 0.32213599848497826
+      },
+      "value": 0.42760183086935355
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/15/Benchmark_Set_v1_0/2022_glass_animals__heat_waves__album/2022_glass_animals__heat_waves__album_20251115_082135.features.json"
+}

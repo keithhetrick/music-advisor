@@ -1,0 +1,31 @@
+{
+  "audio_name": "6. Djo - End of Beginning_20251114_060914",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.304243225913029,
+        "lo": 0.3801639932210851,
+        "mid": 0.3155927808658859
+      },
+      "value": 0.4924359311032346
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.2012368363766138,
+        "lo": 0.5373947076791131,
+        "mid": 0.2613684559442731
+      },
+      "value": 0.4092144804280809
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/6. Djo - End of Beginning/6. Djo - End of Beginning_20251114_060914.features.json"
+}

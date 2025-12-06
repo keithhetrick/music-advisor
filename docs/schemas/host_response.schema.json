@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HostResponse",
+  "type": "object",
+  "required": ["reply", "session"],
+  "properties": {
+    "reply": {
+      "type": "object",
+      "required": ["session_id", "reply", "ui_hints"],
+      "properties": {
+        "session_id": { "type": "string" },
+        "reply": { "type": "string" },
+        "ui_hints": {
+          "type": "object",
+          "properties": {
+            "show_cards": {
+              "type": ["array", "null"],
+              "items": { "type": "string" }
+            },
+            "quick_actions": {
+              "type": ["array", "null"],
+              "items": {
+                "type": "object",
+                "properties": {
+                  "label": { "type": "string" },
+                  "intent": { "type": "string" }
+                },
+                "additionalProperties": true
+              }
+            },
+            "highlight_axes": {
+              "type": ["array", "null"],
+              "items": { "type": "string" }
+            },
+            "tone": { "type": ["string", "null"] },
+            "primary_slices": {
+              "type": ["array", "null"],
+              "items": { "type": "string" }
+            },
+            "warnings": {
+              "type": ["array", "null"],
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "session": { "type": "object" },
+    "user": { "type": ["object", "null"] }
+  },
+  "additionalProperties": true
+}

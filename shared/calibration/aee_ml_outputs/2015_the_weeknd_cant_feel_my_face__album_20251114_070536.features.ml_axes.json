@@ -1,0 +1,31 @@
+{
+  "audio_name": "2015_the_weeknd_cant_feel_my_face__album_20251114_070536",
+  "axes_ml": {
+    "Danceability": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3884618643589191,
+        "lo": 0.31455443471632233,
+        "mid": 0.29698370092475856
+      },
+      "value": 0.541595322110725
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.3579217738133521,
+        "lo": 0.305927955909969,
+        "mid": 0.3361502702766789
+      },
+      "value": 0.5334942340616825
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/07_echo_2015_19/2015_the_weeknd_cant_feel_my_face__album/2015_the_weeknd_cant_feel_my_face__album_20251114_070536.features.json"
+}

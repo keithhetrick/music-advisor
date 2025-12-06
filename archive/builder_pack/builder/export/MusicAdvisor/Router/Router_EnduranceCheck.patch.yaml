@@ -1,0 +1,23 @@
+command:
+  name: "/endurance test"
+  description: "Time-skip survivability check (unplugged, universality, gimmick risk)."
+  steps:
+    - set:
+        lane: "${context.meta.lane || 'Neon Heart Pop'}"
+        unplugged: "${(lane == 'Porch Gospel' || lane == 'Canyon Folk') ? 1.0 : 0.8}"
+        universality: 0.9
+        gimmick: 0.1
+        pass_note: "${ (0.1 > 0.4) ? 'FLAG' : 'PASS' }"
+    - render:
+        template: "Templates/endurance/output_endurance_check.txt"
+        to: result
+    - print: "${result}"
+    - append:
+        to: advisor.notes[]
+        value: "Endurance: ${pass_note}; unplugged=${unplugged}, universality=${universality}, gimmick=${gimmick}"
+    - if:
+        cond: "${pass_note == 'PASS'}"
+        then:
+          append:
+            to: advisor.optimization[]
+            value: "Print an unplugged variant to lock endurance."

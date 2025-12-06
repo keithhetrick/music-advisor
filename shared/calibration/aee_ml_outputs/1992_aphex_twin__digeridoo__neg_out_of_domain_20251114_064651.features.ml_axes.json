@@ -1,0 +1,31 @@
+{
+  "audio_name": "1992_aphex_twin__digeridoo__neg_out_of_domain_20251114_064651",
+  "axes_ml": {
+    "Danceability": {
+      "band": "mid",
+      "probs": {
+        "hi": 0.20491707430298267,
+        "lo": 0.37395052152424724,
+        "mid": 0.42113240417277
+      },
+      "value": 0.4595358195487697
+    },
+    "Energy": {
+      "band": "hi",
+      "probs": {
+        "hi": 0.48482355128479176,
+        "lo": 0.1873180160662832,
+        "mid": 0.3278584326489249
+      },
+      "value": 0.6134928381297922
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/13_negatives_out_of_domain/1992_aphex_twin__digeridoo__neg_out_of_domain/1992_aphex_twin__digeridoo__neg_out_of_domain_20251114_064651.features.json"
+}

@@ -1,0 +1,41 @@
+{
+  "source": "spotify",
+  "playlist": "HitPulse_YYYY_MM_Tag",
+  "generated_at": "YYYY-MM-DD",
+  "tracks": [
+    {
+      "title": "Stick Season",
+      "artist": "Noah Kahan",
+      "url": "https://open.spotify.com/track/7ouMYWpwJ422jRcDASZB7P",
+      "notes": ["folk-pop", "narrative truth", "acoustic-forward"]
+    },
+    {
+      "title": "Lose Control",
+      "artist": "Teddy Swims",
+      "url": "https://open.spotify.com/track/4Dg5moVCTgxAb6Yt9pC76t",
+      "notes": ["soul-pop", "emotional belt", "gospel warmth"]
+    },
+    {
+      "title": "vampire",
+      "artist": "Olivia Rodrigo",
+      "url": "https://open.spotify.com/track/1kuGVB7EU95pJObxwvfwKS",
+      "notes": ["dark-pop", "dramatic lift", "Gen-Z confession"]
+    }
+  ],
+  "region": "US",
+  "MARKET_NORMS": { "profile": "Pop" },
+  "MVP": {
+    "tempo_band_bpm": "120-129",
+    "runtime_sec": 176.07,
+    "ttc_sec": null,
+    "exposures": null
+  },
+  "Baseline": {
+    "active_profile": "Pop",
+    "effective_utc": "2025-11-03T05:52:31Z",
+    "previous_profile": null,
+    "pinned": true,
+    "note": "Autofix: pinned for reproducibility"
+  },
+  "Known_Gaps": []
+}

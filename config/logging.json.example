@@ -1,0 +1,11 @@
+{
+  "prefix": "ma",
+  "redact": true,
+  "secrets": ["/Users/keithhetrick"],
+  "sandbox": {
+    "enabled": false,
+    "drop_beats": false,
+    "drop_neighbors": false,
+    "max_chars": null
+  }
+}

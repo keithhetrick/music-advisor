@@ -1,0 +1,14 @@
+title,artist,year,label,role,tempo_bpm,key,mode,runtime_sec,loudness_lufs,notes
+Rolling in the Deep,Adele,2011,XL/Columbia,High,,,,,,
+Uptown Funk,Mark Ronson ft. Bruno Mars,2015,RCA,High,,,,,,
+Shape of You,Ed Sheeran,2017,Atlantic,High,,,,,,
+Old Town Road (Remix),Lil Nas X ft. Billy Ray Cyrus,2019,Columbia,High,,,,,,
+Blinding Lights,The Weeknd,2020,Republic,High,,,,,,
+Levitating,Dua Lipa,2021,Warner,High,,,,,,
+As It Was,Harry Styles,2022,Columbia,High,,,,,,
+Flowers,Miley Cyrus,2023,Columbia,High,,,,,,
+Shut Up and Dance,Walk the Moon,2014,RCA,Mid,,,,,,
+Diamonds,Rihanna,2012,Def Jam,Mid,,,,,,
+Heat Waves,Glass Animals,2020,Polydor/Republic,Mid,,,,,,
+Thinking Out Loud,Ed Sheeran,2014,Atlantic,Mid,,,,,,
+# Add your negatives (private) here with role=Negative

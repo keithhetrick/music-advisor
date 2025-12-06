@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Research Source Domain Weights",
+  "description": "Confidence weighting for /research scan sources.",
+  "version": "v1.0.0",
+  "domains": {
+    "official": 1.0,
+    "billboard.com": 0.95,
+    "rollingstone.com": 0.95,
+    "pitchfork.com": 0.9,
+    "nme.com": 0.85,
+    "mtv.com": 0.85,
+    "ifpi.org": 0.9,
+    "spotifycharts.com": 0.95,
+    "spotify.com": 0.9,
+    "tiktok.com": 0.85,
+    "youtube.com": 0.85,
+    "soundcloud.com": 0.8,
+    "genius.com": 0.8,
+    "complex.com": 0.8,
+    "reddit.com": 0.7,
+    "tumblr.com": 0.6,
+    "weverse.io": 0.8,
+    "naver.com": 0.8,
+    "melon.com": 0.9,
+    "daum.net": 0.8,
+    "vulture.com": 0.85,
+    "newyorktimes.com": 0.85,
+    "guardian.co.uk": 0.85,
+    "blogspot.com": 0.5,
+    "medium.com": 0.7,
+    "fan_forum": 0.4,
+    "default": 0.75
+  },
+  "notes": {
+    "0.9+": "Tier 1 media or official channels",
+    "0.7–0.89": "Established secondary sources or analytic platforms",
+    "0.5–0.69": "Community or aggregator data (lower confidence)",
+    "<0.5": "Unverified or rumor sources — use for context only"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "audio_name": "15. Tate McRae - Greedy_20251114_061102",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.35277195938949363,
+        "lo": 0.3737002998342234,
+        "mid": 0.27352774077628295
+      },
+      "value": 0.5113600958360558
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.24364607772843994,
+        "lo": 0.44799322836019795,
+        "mid": 0.3083606939113623
+      },
+      "value": 0.4508781586968947
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Hit_List_Blueprint/15. Tate McRae - Greedy/15. Tate McRae - Greedy_20251114_061102.features.json"
+}

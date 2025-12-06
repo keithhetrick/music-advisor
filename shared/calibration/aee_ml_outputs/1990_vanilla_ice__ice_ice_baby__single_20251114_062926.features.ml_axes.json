@@ -1,0 +1,31 @@
+{
+  "audio_name": "1990_vanilla_ice__ice_ice_baby__single_20251114_062926",
+  "axes_ml": {
+    "Danceability": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.0058625930564612395,
+        "lo": 0.8764695747072662,
+        "mid": 0.11766783223627268
+      },
+      "value": 0.23911103515758164
+    },
+    "Energy": {
+      "band": "lo",
+      "probs": {
+        "hi": 0.0835806172880402,
+        "lo": 0.6699839679828936,
+        "mid": 0.24643541472906608
+      },
+      "value": 0.3282580256559459
+    }
+  },
+  "meta": {
+    "aee_ml_version": "aee_ml_v0.1",
+    "created_from_manifest": "2025-11-16T07:22:47.037554Z",
+    "features_root_for_training": "/Users/keithhetrick/music-advisor/features_output",
+    "truth_csv": "/Users/keithhetrick/music-advisor/calibration/benchmark_truth_v1_1.csv"
+  },
+  "mode": "ml_calibrated",
+  "source_features_path": "/Users/keithhetrick/music-advisor/features_output/2025/11/14/Calibration_Songs_2025Q4/02_echo_1990_94/1990_vanilla_ice__ice_ice_baby__single/1990_vanilla_ice__ice_ice_baby__single_20251114_062926.features.json"
+}
