@@ -7,6 +7,9 @@
 - Docs updated (README + docs/tools/helper_cli.md) to spotlight the helper, optional deps (rich/prompt_toolkit/tmux), git requirements, state location, artifact metadata, and new git commands. Bootstrap echoes next steps to run `ma help`/`ma quickstart`.
 - Added git convenience commands: `ma git-branch`, `ma git-status`, `ma git-upstream`, `ma git-rebase`, `ma git-pull-check`; clean-tree/preflight/safe-run enforcement toggles defaultable via env.
 - Helper tmux workflow documented (live dashboard split, commands, optional config template at docs/tools/tmux.conf.sample); added `ma completion zsh|bash` to emit shell completions and made `test-all` robust in parallel/serial paths.
+- Added Codex review entrypoint (`make review` / `scripts/review.sh`) to run helper github-check/preflight/verify/ci-plan.
+- Added Codex optimize entrypoint (`make optimize`) for report-only lint (ruff), mypy, and CI plan.
+- Added `make optimize-fix` (ruff --fix + mypy + CI plan) and CI workflow `.github/workflows/codex.yml` to mirror Codex gates in GitHub Actions.
 
 - Key/tempo overlays: richer sidecars (lane_shape, fifths_chain, rationale-tagged targets) and legends; overlays surface new fields.
 - Chat package added under `tools/chat/` with intents for tempo/key/neighbors/HCI/TTC/QA/status/metadata/lane summary/targets/compare/why/artifacts/help/legend/context, summary/verbose toggles, caching, truncated outputs, optional intent model hook, and optional paraphrase hook (env `CHAT_PARAPHRASE_ENABLED`).

@@ -95,6 +95,14 @@
     - Detach: `Ctrl-b d`; close pane: `Ctrl-b x`
   - Completions: `ma completion zsh` or `ma completion bash` prints a completion script; source it in your shell (e.g., `eval "$(python -m ma_helper completion zsh)"`) for helper command completion.
 
+## Codex entrypoints (review/optimize)
+
+- Review gate (readiness): `make review` or `./scripts/review.sh` (runs `ma_helper github-check --require-clean --preflight --verify --ci-plan --base origin/main`).
+- Optimize (report-only): `make optimize` (ruff lint, mypy, CI plan; no auto-fix).
+- Optimize (auto-fix lint): `make optimize-fix` (ruff --fix, mypy, CI plan).
+- CI mirror: `.github/workflows/codex.yml` runs `make review` and `make optimize` on push/PR.
+- Codex environment hint: set the run command to `make review` (or `make optimize` / `make optimize-fix` when you want lint fixes); setup script should install venv + editable deps as in the repo README.
+
 ## Optional extras
 
 - Fuzzy/select: `pip install prompt_toolkit`

@@ -71,6 +71,9 @@ music-advisor/
 - 🔒 Privacy: _once cloned and data bootstrapped, everything runs locally; no audio or artifacts leave your machine - EVER._
 - 🚧 Troubleshooting bootstrap: if downloads/build deps are blocked, rerun installs with `--no-build-isolation` (see Makefile/Taskfile) and ensure you can reach the data manifest URLs.
 - 🖥️ Helper + tmux: see `docs/tools/helper_cli.md` for helper commands, live dashboard splits, tmux shortcuts, and optional tmux config (`docs/tools/tmux.conf.sample`).
+- 🧭 Codex review entrypoint: `make review` or `scripts/review.sh` (runs helper github-check/preflight/verify/ci-plan vs origin/main).
+- 🚀 Codex optimize (report-only): `make optimize` for lint (ruff, no fix), mypy, and CI plan.
+- 🛠️ Codex optimize-fix (auto-fix lint): `make optimize-fix` (ruff --fix, mypy, CI plan).
 
 ## Root essentials (what to look at first)
 

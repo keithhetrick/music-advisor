@@ -1,6 +1,7 @@
 .PHONY: smoke smoke-no-norms calibrate-core freeze-baseline eval-golden eval-negatives
 .PHONY: test lint typecheck
 .PHONY: check
+.PHONY: review optimize optimize-fix
 .PHONY: smoke-audio-engine smoke-lyrics-engine smoke-ttc-engine smoke-host-core smoke-host
 .PHONY: run-audio-cli run-lyrics-cli run-ttc-cli run-reco-cli run-advisor-host
 .PHONY: install-audio install-lyrics install-ttc install-reco install-host install-host-core
@@ -51,6 +52,18 @@ typecheck:
 
 check: lint typecheck test
 
+review:
+	$(PYTHON) -m ma_helper github-check --require-clean --preflight --verify --ci-plan --base origin/main
+
+optimize:
+	./infra/scripts/with_repo_env.sh -m ruff check hosts/advisor_host engines/recommendation_engine/recommendation_engine tools ma_helper
+	./infra/scripts/with_repo_env.sh -m mypy --config-file hosts/advisor_host/pyproject.toml hosts/advisor_host
+	$(PYTHON) -m ma_helper ci-plan --base origin/main
+
+optimize-fix:
+	./infra/scripts/with_repo_env.sh -m ruff check --fix hosts/advisor_host engines/recommendation_engine/recommendation_engine tools ma_helper
+	./infra/scripts/with_repo_env.sh -m mypy --config-file hosts/advisor_host/pyproject.toml hosts/advisor_host
+	$(PYTHON) -m ma_helper ci-plan --base origin/main
 PYTHON ?= python3
 ORCH ?= tools/ma_orchestrator.py
 
