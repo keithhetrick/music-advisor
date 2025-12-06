@@ -28,6 +28,7 @@
 - Added MIT LICENSE files under `src/ma_config/` and `shared/` for publishability.
 - Added SBOM helper/docs (`docs/sbom/README.md`, `make sbom`, `SBOM` workflow) and non-blocking pip-audit workflow (`Vulnerability Scan`) for compliance hygiene.
 - Added UI-friendly open-source notice snippet (`docs/ui_open_source_notices_snippet.txt`) for embedding in app UI/legal screens.
+- macOS host (SwiftUI) QoL: segmented JSON/stdout/stderr viewer, “Run defaults” button, quote-aware command parsing, per-run log at `/tmp/macos_app_cmd.log`, and helper scripts for local build/run/log reset; README updated with dependency pin guidance.
 - Host/chat loaders and helpers: `overlay_sidecar_loader` for sidecars; chat summaries and dispatcher for app-tailored responses.
 - Chat routing supports “details” replay, context reporting, help/legend, and artifact/status checks.
 - Monorepo cleanup: root shims removed; legacy packages archived under `archive/legacy_src/`; console scripts now point at `ma_audio_engine.*`.
