@@ -383,7 +383,7 @@ PY
     else
       echo "[key_overlay] skipped (missing sidecar or client rich)"
     fi
-    # Prune extras not part of the 10-file payload
+    # Prune extras not part of the 12-file payload
     find "$OUT_DIR" -maxdepth 1 -name "*.client.rich.json" -delete 2>/dev/null || true
     find "$OUT_DIR" -maxdepth 1 -name "*.pack.json" -delete 2>/dev/null || true
   fi

@@ -70,6 +70,13 @@ music-advisor/
 - 🧵 Isolation/headless smokes: `docs/COMMANDS.md` + `docs/Makefile.sparse-smoke` (chat/sidecars/engines can be run in isolation after sparse pulls).
 - 🔒 Privacy: _once cloned and data bootstrapped, everything runs locally; no audio or artifacts leave your machine - EVER._
 - 🚧 Troubleshooting bootstrap: if downloads/build deps are blocked, rerun installs with `--no-build-isolation` (see Makefile/Taskfile) and ensure you can reach the data manifest URLs.
+
+## Root essentials (what to look at first)
+
+- Top-level files: `README.md` (this), `Makefile`/`Taskfile.yml` (bootstrap/commands), `CHANGELOG.md`, `LICENSE`, `SECURITY.md`.
+- Helper entry: `ma` → `python -m ma_helper` (see `docs/tools/helper_cli.md`).
+- Core dirs: `docs/`, `infra/`, `tools/`, `engines/`, `hosts/`, `shared/`, `tests/`, `ma_helper/`.
+- Data/logs/caches stay ignored under `data/`, `logs/`, `.ma_cache/` (helper state defaults to `MA_HELPER_HOME` outside the repo).
 - 💾 External storage: cloning/running from an external drive is fine; keep the venv on that drive and use `MA_DATA_ROOT` to point data elsewhere if desired.
 
 ## Clone → bootstrap → (optional) sparse → smoke
@@ -220,31 +227,31 @@ audio file
 
 - Pack: `docs/schemas/pack.schema.json`
 - Engine audit: `docs/schemas/engine_audit.schema.json`
-- Run summary: `docs/schemas/run_summary.schema.json`
-- HCI: `docs/schemas/hci.schema.json`; Neighbors: `docs/schemas/neighbors.schema.json`
-- TTC annotations: `docs/schemas/ttc_annotations.schema.json`
-- Host response: `docs/schemas/host_response.schema.json`
-- Market norms: `docs/schemas/market_norms.schema.json`
+- Run summary: [docs/schemas/run_summary.schema.json](docs/schemas/run_summary.schema.json)
+- HCI: [docs/schemas/hci.schema.json](docs/schemas/hci.schema.json); Neighbors: [docs/schemas/neighbors.schema.json](docs/schemas/neighbors.schema.json)
+- TTC annotations: [docs/schemas/ttc_annotations.schema.json](docs/schemas/ttc_annotations.schema.json)
+- Host response: [docs/schemas/host_response.schema.json](docs/schemas/host_response.schema.json)
+- Market norms: [docs/schemas/market_norms.schema.json](docs/schemas/market_norms.schema.json)
 
 ## UI wireframes (host/chat)
 
-- Desktop overview: `docs/host_chat/ui_mock/macos_ma_desktop_wireframe.png`
-- Track detail: `docs/host_chat/ui_mock/macos_ma_track_detail_full_analysis_wireframe.png`
-- Historical echo: `docs/host_chat/ui_mock/macos_ma_historical_echo_wireframe.png`
-- Optimization card/pagination: `docs/host_chat/ui_mock/macos_ma_optimization_card_and_pagination_wireframe.png`
-- Norms manager: `docs/host_chat/ui_mock/macos_ma_norms_manager_wireframe.png`
-- Onboarding/help: `docs/host_chat/ui_mock/macos_ma_first_run_onboarding_window_wireframe.png`, `docs/host_chat/ui_mock/macos_ma_help_guided_tour_window_wireframe.png`
+- Desktop overview: [docs/host_chat/ui_mock/macos_ma_desktop_wireframe.png](docs/host_chat/ui_mock/macos_ma_desktop_wireframe.png)
+- Track detail: [docs/host_chat/ui_mock/macos_ma_track_detail_full_analysis_wireframe.png](docs/host_chat/ui_mock/macos_ma_track_detail_full_analysis_wireframe.png)
+- Historical echo: [docs/host_chat/ui_mock/macos_ma_historical_echo_wireframe.png](docs/host_chat/ui_mock/macos_ma_historical_echo_wireframe.png)
+- Optimization card/pagination: [docs/host_chat/ui_mock/macos_ma_optimization_card_and_pagination_wireframe.png](docs/host_chat/ui_mock/macos_ma_optimization_card_and_pagination_wireframe.png)
+- Norms manager: [docs/host_chat/ui_mock/macos_ma_norms_manager_wireframe.png](docs/host_chat/ui_mock/macos_ma_norms_manager_wireframe.png)
+- Onboarding/help: [docs/host_chat/ui_mock/macos_ma_first_run_onboarding_window_wireframe.png](docs/host_chat/ui_mock/macos_ma_first_run_onboarding_window_wireframe.png), [docs/host_chat/ui_mock/macos_ma_help_guided_tour_window_wireframe.png](docs/host_chat/ui_mock/macos_ma_help_guided_tour_window_wireframe.png)
 
 ## Docs map
 
-- Pipeline + artifacts: `docs/pipeline/README_ma_audio_features.md`, `docs/pipeline/PIPELINE_DRIVER.md`
-- HCI: `docs/hci/hci_spec.md`
-- Host/chat: `docs/host_chat/frontend_contracts.md`, `docs/host_chat/http_stub.md`, `docs/host_chat/host_response_schema.md`, `docs/host_chat/ui_mock/mock1.md`
-- Norms: `docs/norms/market_norms.md`
-- Calibration/sidecar: `docs/calibration/README_CALIBRATION.md`, `docs/calibration/sidecar_tempo_key.md`
-- Ops/runbooks: `docs/ops/operations.md`, `docs/ops/commands.md`, `docs/ops/tutorials.md`
-- Spine/TTC quickstart: `docs/ops/spine_ttc_quickstart.md`
-- Architecture: `docs/architecture/README.md`, `docs/architecture/file_tree.md`, `docs/architecture/modularity_map.md`
+- Pipeline + artifacts: [docs/pipeline/README_ma_audio_features.md](docs/pipeline/README_ma_audio_features.md), [docs/pipeline/PIPELINE_DRIVER.md](docs/pipeline/PIPELINE_DRIVER.md)
+- HCI: [docs/hci/hci_spec.md](docs/hci/hci_spec.md)
+- Host/chat: [docs/host_chat/frontend_contracts.md](docs/host_chat/frontend_contracts.md), [docs/host_chat/http_stub.md](docs/host_chat/http_stub.md), [docs/host_chat/host_response_schema.md](docs/host_chat/host_response_schema.md), [docs/host_chat/ui_mock/mock1.md](docs/host_chat/ui_mock/mock1.md)
+- Norms: [docs/norms/market_norms.md](docs/norms/market_norms.md)
+- Calibration/sidecar: [docs/calibration/README_CALIBRATION.md](docs/calibration/README_CALIBRATION.md), [docs/calibration/sidecar_tempo_key.md](docs/calibration/sidecar_tempo_key.md)
+- Ops/runbooks: [docs/ops/operations.md](docs/ops/operations.md), [docs/ops/commands.md](docs/ops/commands.md), [docs/ops/tutorials.md](docs/ops/tutorials.md)
+- Spine/TTC quickstart: [docs/ops/spine_ttc_quickstart.md](docs/ops/spine_ttc_quickstart.md)
+- Architecture: [docs/architecture/README.md](docs/architecture/README.md), [docs/architecture/file_tree.md](docs/architecture/file_tree.md), [docs/architecture/modularity_map.md](docs/architecture/modularity_map.md)
 
 ## What’s inside
 

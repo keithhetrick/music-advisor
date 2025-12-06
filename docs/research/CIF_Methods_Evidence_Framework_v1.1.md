@@ -13,7 +13,7 @@ organization:
   program: "Music Advisor (Creative Intelligence Framework)"
   type: "Independent R&D / Production Studio"
 contact:
-  email: "info@bellweatherstudios.com"
+email: "keith@bellweatherstudios.com"
   website: "https://www.bellwetherstudios.com"
 license: "CIF Methodology License v1.1"
 status: "Peer-Review Ready Draft"

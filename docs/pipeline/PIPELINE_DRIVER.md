@@ -1,6 +1,6 @@
 # Pipeline Driver (`ma_audio_engine.tools.pipeline_driver`)
 
-Status: ✅ Last verified with 11-file payload (adds tempo_norms sidecar + tempo overlay; Automator sidecar non-timestamped, HCI/TTC timestamped).
+Status: ✅ Last verified with 12-file payload (adds tempo_norms sidecar + tempo overlay; Automator sidecar non-timestamped, HCI/TTC timestamped).
 
 Unified runner for Automator and CLI flows that stitches together feature extraction, merging, packing, and optional HCI/client post-processing. This script exists to keep shell wrappers thin and to centralize profile/timeout defaults.
 
@@ -26,7 +26,7 @@ Unified runner for Automator and CLI flows that stitches together feature extrac
 
 Default output root is `features_output/<YYYY>/<MM>/<stem>/` when `--out-dir` is not provided. All filenames are timestamped except compatibility copies (rich/HCI/client). Canonical entrypoint: `python -m ma_audio_engine.tools.pipeline_driver`; `ma-pipe` remains as a shim for compatibility.
 
-**Outputs per mode (naming, current 11-file payload with tempo norms):**
+**Outputs per mode (naming, current 12-file payload with tempo norms):**
 
 - Timestamped: `<stem>_<ts>.features.json`, `<stem>_<ts>.merged.json`, `<stem>_<ts>.hci.json`, `<stem>_<ts>.ttc.json`, `<stem>_<ts>.pack.json` (full only).
 - Compatibility (non-timestamped): `<stem>.sidecar.json`, `<stem>.tempo_norms.json`, `<stem>.client.txt`, `<stem>.client.json`, `<stem>.client.rich.txt`, `<stem>.client.rich.json`, `<stem>.neighbors.json`, `run_summary.json` (builder).

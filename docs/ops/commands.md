@@ -18,11 +18,11 @@ pip install -r requirements.txt
 - Drag-and-drop: `automator.sh /path/to/song.wav` (12-file payload under `data/features_output/...`, adds `<stem>.tempo_norms.json` + `<stem>.key_norms.json` + TEMPO/KEY overlays in `.client.rich.txt`)
 - Data bootstrap: `python infra/scripts/data_bootstrap.py --manifest infra/scripts/data_manifest.json`
 
-## Critical flows (last verified: 11-file payload)
+## Critical flows (last verified: 12-file payload)
 
 - **Drag-and-drop / Quick Action (HCI-only default)**  
   `automator.sh /path/to/song.wav` → `tools/pipeline_driver.py --mode hci-only --extras --audio <file>`  
-  Outputs (11-file payload): `<ts>.features.json`, `<stem>.sidecar.json`, `<stem>.tempo_norms.json`, `<ts>.merged.json`, `<ts>.hci.json`, `<ts>.ttc.json`, `.neighbors.json`, `.client(.json/.rich.txt/.rich.json with TEMPO LANE OVERLAY)`, `run_summary.json` under `data/features_output/YYYY/MM/DD/<stem>/`.
+  Outputs (12-file payload): `<ts>.features.json`, `<stem>.sidecar.json`, `<stem>.tempo_norms.json`, `<ts>.merged.json`, `<ts>.hci.json`, `<ts>.ttc.json`, `.neighbors.json`, `.client(.json/.rich.txt/.rich.json with TEMPO LANE OVERLAY)`, `run_summary.json` under `data/features_output/YYYY/MM/DD/<stem>/`.
 - **Full pipeline (pack + engine audit)**  
   `tools/pipeline_driver.py --mode full --extras --audio <file> --out-dir <dir>` → adds `<ts>.pack.json` + `engine_audit.json`.
 - **Audio metadata probe (read-only)**  
@@ -72,14 +72,14 @@ pip install -r requirements.txt
 - Start stub: `make chat-stub` (file-backed) or `make chat-stub-redis` (Redis); Docker: `make chat-stub-docker`.
 - Engine service: `make rec-engine-service` (POST /recommendation on port 8100; remote via `REC_ENGINE_MODE=remote`).
 
-## Validation & debugging (last verified: 11-file payload)
+## Validation & debugging (last verified: 12-file payload)
 
 - Validate artifacts: `python tools/validate_io.py --root <out_dir>` or `--file <artifact>`; schemas in `schemas/`, field refs in `docs/EXTRACT_PAYLOADS.md` and `docs/pipeline/README_ma_audio_features.md`.
 - Debugging playbook: `docs/ops/operations.md` (failure signatures, rerun patterns, robustness, testing).
 - Logs: `logs/automator_*.log` (drag/drop), `logs/pipeline_*.log` (full/engine).
 - Samples: see `docs/samples/README.md` for ready-to-post chat payloads; use `make chat-analyze` or POST to `/chat`.
 - Artifact map: `docs/ops/operations.md` includes a glossary; packs/audits/run summaries are explained in `docs/pipeline/PIPELINE_DRIVER.md` and `docs/pipeline/README_ma_audio_features.md`.
-- Schemas: `docs/schemas/pack_readme.md` (pack/audit/run_summary/HCI/neighbors/ttc/host response); norms schema: `docs/schemas/market_norms.schema.json`. Pack/run_summary sections align with the current 11-file payload (tempo_norms sidecar + tempo overlay).
+- Schemas: `docs/schemas/pack_readme.md` (pack/audit/run_summary/HCI/neighbors/ttc/host response); norms schema: `docs/schemas/market_norms.schema.json`. Pack/run_summary sections align with the current 12-file payload (tempo_norms sidecar + tempo overlay).
 
 ## Flags and env knobs
 

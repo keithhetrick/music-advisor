@@ -9,3 +9,5 @@
 | CLEAN_FORCE         | unset                | Set `1` to skip prompt for `make deep-clean` (git clean -xfd).        |
 | PYTHON              | `python3`            | Python interpreter used by Make targets.                              |
 | BASE_REF            | `origin/main`        | Git ref used by `infra/scripts/test_affected.sh` for changed files.   |
+| MA_CONTACT_EMAIL    | `keith@bellweatherstudios.com` | Primary contact email (overrides in tooling/docs).           |
+| MA_CONTACT_ALT_EMAIL| `info@bellweatherstudios.com`  | Alternate/general inbox (overrides in tooling/docs).        |

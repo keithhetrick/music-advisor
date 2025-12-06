@@ -1,12 +1,12 @@
 # Operations Whitepaper (First-Time User Guide)
 
-Status: ✅ Last verified with Automator 11-file payload (tempo_norms sidecar + tempo overlay) and current quick-check/e2e smoke.
+Status: ✅ Last verified with Automator 12-file payload (tempo_norms sidecar + tempo overlay) and current quick-check/e2e smoke.
 
 End-to-end, reader-first guide for installing, running, validating, and hardening the MusicAdvisor backend. Answers what each part does, how to run it, and where to look when something breaks. Use this with `docs/ops/commands.md` for quick commands.
 
 ## 1) Install & Environment
 
-Status: current with Automator 11-file payload and quick-check/e2e smokes.
+Status: current with Automator 12-file payload and quick-check/e2e smokes.
 
 - **Python/venv:** Python 3.11. `python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.lock`.
 - **Paths:** repo root on `PYTHONPATH` (Automator/scripts export this): `export PYTHONPATH=$REPO:$REPO/src:$PYTHONPATH`.

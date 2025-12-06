@@ -11,7 +11,7 @@ Machine-readable references for common artifacts. Draft-07 JSON Schema; flexible
 - `host_response.schema.json` — `/chat` response shape (reply/ui_hints/session).
 - `market_norms.schema.json` — norms snapshot shape (region/tier/version/percentiles/axes).
 
-Current artifact set (11-file payload emitted by Automator/pipeline; adds tempo_norms + tempo overlay):
+Current artifact set (12-file payload emitted by Automator/pipeline; adds tempo_norms + tempo overlay):
 
 - `<stem>_<ts>.features.json`
 - `<stem>.sidecar.json`

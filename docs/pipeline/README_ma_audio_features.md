@@ -1,6 +1,6 @@
 # 🎧 Music Advisor — Local Audio → JSON Extractors
 
-Status: ✅ Last verified with 11-file payload (tempo_norms sidecar + tempo overlay) + Automator echo inject.
+Status: ✅ Last verified with 12-file payload (tempo_norms sidecar + tempo overlay) + Automator echo inject.
 
 Convert audio files **locally** into structured JSON for the Music Advisor ecosystem.  
 **No cloud uploads • No NDA risk • No label leaks**
@@ -46,7 +46,7 @@ Both extractors compute the same **core musical features**:
 > 🧠 For HCI scoring & calibration, **only the flat pipeline schema matters**.  
 > For client prompts and “nice” structured payloads, the nested schema is more convenient. New helpers use the neutral `client` token; client helpers remain available as aliases.
 
-### Outputs (current 11-file payload: adds tempo_norms sidecar + tempo overlay injection)
+### Outputs (current 12-file payload: adds tempo_norms sidecar + tempo overlay injection)
 
 Automator/pipeline runs emit a consistent payload under `data/features_output/YYYY/MM/DD/<stem>/`:
 
