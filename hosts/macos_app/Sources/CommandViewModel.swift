@@ -30,6 +30,20 @@ final class CommandViewModel: ObservableObject {
         envText = defaults.extraEnv.map { "\($0.key)=\($0.value)" }.sorted().joined(separator: "\n")
     }
 
+    func setWorkingDirectory(_ path: String) {
+        workingDirectory = path
+    }
+
+    func insertAudioPath(_ path: String) {
+        var parts = splitCommand(commandText)
+        if let idx = parts.firstIndex(of: "--audio"), parts.indices.contains(idx + 1) {
+            parts[idx + 1] = shellEscape(path)
+        } else {
+            parts.append(contentsOf: ["--audio", shellEscape(path)])
+        }
+        commandText = parts.joined(separator: " ")
+    }
+
     func run() {
         let parsedCommand = splitCommand(commandText)
         let env = parseEnv(envText)
@@ -89,6 +103,12 @@ final class CommandViewModel: ObservableObject {
         }
         if !current.isEmpty { args.append(current) }
         return args
+    }
+
+    private func shellEscape(_ value: String) -> String {
+        guard value.contains(where: { $0.isWhitespace }) else { return value }
+        let escaped = value.replacingOccurrences(of: "\"", with: "\\\"")
+        return "\"\(escaped)\""
     }
 
     private func parseEnv(_ text: String) -> [String: String] {

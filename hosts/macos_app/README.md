@@ -33,19 +33,25 @@ Reset logs / clean builds
 ./scripts/reset_run_log.sh      # remove last command log
 ```
 
+Pin Python deps to expected ranges
+```bash
+./scripts/pin_python_deps.sh
+```
+
 Design/architecture notes
 - UI: SwiftUI for native macOS host.
 - Engines: Python remains the brain (Historical Echo, HCI, TTC, Lyric). Add IPC/CLI bindings later.
 - Audio: Use AVAudioEngine or the future JUCE plug-in for in-DAW probes; keep real-time DSP out of the UI thread.
-- CLI runner defaults to the Python feature CLI:
-  - Command: `/usr/bin/python3 tools/cli/ma_audio_features.py --audio /path/to/audio.wav --out /tmp/out.json`
-  - Working dir: empty (fill it in the UI or via env)
-  - Extra env: empty
+- CLI runner defaults are pre-filled for this repo/machine:
+  - Command: `/usr/local/bin/python3 /Users/keithhetrick/music-advisor/engines/audio_engine/tools/cli/ma_audio_features.py --audio /Users/keithhetrick/Downloads/lola.mp3 --out /tmp/ma_features.json`
+  - Working dir: `/Users/keithhetrick/music-advisor`
+  - Extra env: (add `PYTHONPATH=/Users/keithhetrick/music-advisor` if needed)
   - Override via env (picked up at app launch):
-    - `MA_APP_CMD="/usr/bin/python3"` (default cmd)
-    - `MA_APP_ARGS="tools/cli/ma_audio_features.py --audio tone.wav --out /tmp/out.json"` (default args)
-    - `MA_APP_WORKDIR="/Users/you/music-advisor"`
-    - `MA_APP_ENV_FOO=bar` (extra env; prefix keys with `MA_APP_ENV_`)
+    - `MA_APP_CMD="/usr/local/bin/python3"`
+    - `MA_APP_ARGS="/Users/keithhetrick/music-advisor/engines/audio_engine/tools/cli/ma_audio_features.py --audio /Users/keithhetrick/Downloads/lola.mp3 --out /tmp/ma_features.json"`
+    - `MA_APP_WORKDIR="/Users/keithhetrick/music-advisor"`
+    - `MA_APP_ENV_PYTHONPATH="/Users/keithhetrick/music-advisor"`
+    - Other env: `MA_APP_ENV_FOO=bar` (prefix with `MA_APP_ENV_`)
 
 UI behavior
 - “Run defaults” refills fields from env/defaults and executes.

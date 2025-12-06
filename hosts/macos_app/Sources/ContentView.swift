@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct ContentView: View {
     @StateObject private var viewModel = CommandViewModel()
@@ -31,12 +32,26 @@ struct ContentView: View {
     private var commandInputs: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Command").font(.headline)
-            TextField("/usr/bin/python3 tools/cli/ma_audio_features.py --audio /path/to/audio.wav --out /tmp/out.json", text: $viewModel.commandText)
-                .textFieldStyle(.roundedBorder)
+            HStack(spacing: 8) {
+                TextField("/usr/bin/python3 tools/cli/ma_audio_features.py --audio /path/to/audio.wav --out /tmp/out.json", text: $viewModel.commandText)
+                    .textFieldStyle(.roundedBorder)
+                Button("Pick audio…") {
+                    if let url = pickFile() {
+                        viewModel.insertAudioPath(url.path)
+                    }
+                }
+            }
 
             Text("Working directory (optional)").font(.headline)
-            TextField("e.g. /Users/you/music-advisor", text: $viewModel.workingDirectory)
-                .textFieldStyle(.roundedBorder)
+            HStack(spacing: 8) {
+                TextField("e.g. /Users/you/music-advisor", text: $viewModel.workingDirectory)
+                    .textFieldStyle(.roundedBorder)
+                Button("Browse…") {
+                    if let url = pickDirectory() {
+                        viewModel.setWorkingDirectory(url.path)
+                    }
+                }
+            }
 
             Text("Extra env (KEY=VALUE per line)").font(.headline)
             TextEditor(text: $viewModel.envText)
@@ -155,5 +170,26 @@ enum ResultPane: Hashable {
         case .stdout: return .green
         case .stderr: return .red
         }
+    }
+}
+
+// MARK: - Pickers
+extension ContentView {
+    private func pickFile() -> URL? {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.canChooseFiles = true
+        let response = panel.runModal()
+        return response == .OK ? panel.urls.first : nil
+    }
+
+    private func pickDirectory() -> URL? {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        let response = panel.runModal()
+        return response == .OK ? panel.urls.first : nil
     }
 }
