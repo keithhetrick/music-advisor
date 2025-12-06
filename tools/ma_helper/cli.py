@@ -1320,10 +1320,12 @@ def cmd_dashboard() -> int:
             from rich.text import Text
             from rich.panel import Panel
             from rich.layout import Layout
-            from time import sleep
+            from time import sleep, monotonic
             interval = getattr(cmd_dashboard, "interval", 1.0)
+            duration = getattr(cmd_dashboard, "duration", 0.0)
             with Live(refresh_per_second=4) as live:
-                for _ in range(60):
+                start = monotonic()
+                while True:
                     payload = _dashboard_payload()
                     layout = Layout()
                     layout.split_row(
@@ -1365,6 +1367,8 @@ def cmd_dashboard() -> int:
                         layout["right"].update(Panel("n/a", title="Details"))
                     live.update(layout)
                     sleep(interval)
+                    if duration > 0 and (monotonic() - start) >= duration:
+                        break
             return 0
         except Exception:
             pass
@@ -1858,8 +1862,47 @@ def cmd_tour() -> int:
         print("Tour: run doctor, map, playbooks, smokes interactively. Install rich for a nicer tour experience.")
         return 0
 
-def cmd_shell() -> int:
-    """Simple REPL loop for helper commands."""
+def cmd_completion(shell: str) -> int:
+    """Emit a simple completion script for bash/zsh."""
+    cmds = [
+        "list","tasks","test","test-all","affected","run","deps","select","watch","ci-plan","info","playbook","shell",
+        "registry","map","dashboard","tui","doctor","check","guard","preflight","github-check","hook","precommit",
+        "chat-dev","git-branch","git-status","git-upstream","git-rebase","git-pull-check","welcome","help",
+        "quickstart","tour","palette","sparse","scaffold","smoke","verify","ci-env","lint","typecheck","format",
+        "rerun-last","history","logs","cache","favorites","profile","completion"
+    ]
+    if shell == "bash":
+        words = " ".join(cmds)
+        print(f'''_ma_helper() {{
+    local cur prev
+    COMPREPLY=()
+    cur="${{COMP_WORDS[COMP_CWORD]}}"
+    prev="${{COMP_WORDS[COMP_CWORD-1]}}"
+    if [[ $COMP_CWORD -eq 1 ]]; then
+        COMPREPLY=( $(compgen -W "{words}" -- "$cur") )
+        return 0
+    fi
+}}
+complete -F _ma_helper ma_helper
+complete -F _ma_helper ma
+''')
+    else:  # zsh
+        words = " ".join(cmds)
+        print(f'''#compdef ma ma_helper
+_ma_helper() {{
+  local -a cmds
+  cmds=({words})
+  _arguments "1:command:->cmds" "*::arg:->args"
+  case $state in
+    cmds) _describe 'command' cmds ;;
+  esac
+}}
+_ma_helper "$@"
+''')
+    return 0
+
+def cmd_shell(with_dash: bool = False, interval: float = 1.0) -> int:
+    """Simple REPL loop for helper commands. Optionally pin a live dashboard in the same terminal."""
     print("Entering ma_helper shell. Type 'help' to list shortcuts, 'exit' to quit.")
     print("Shortcuts: help, list, tasks, dashboard, map, select, repeat (last), exit.")
     command_palette = {
@@ -1877,21 +1920,60 @@ def cmd_shell() -> int:
     last_cmd: List[str] = []
     try:
         from prompt_toolkit import prompt
+        from prompt_toolkit.patch_stdout import patch_stdout
     except Exception:
         prompt = None  # type: ignore
+        patch_stdout = None  # type: ignore
+    # Fuzzy prompts via prompt_toolkit when available (if dash is on, still allow prompt_toolkit now that dash is separate pane).
+
+    dash_live = None
+    stop_dash = False
+    pause_dash = False
+    def print_status():
+        try:
+            payload = _dashboard_payload()
+            git_meta = ""
+            if payload.get("git"):
+                git_meta = f"branch={payload['git'].get('branch','?')} dirty={payload['git'].get('dirty_count','?')} ahead/behind={payload['git'].get('ahead','?')}/{payload['git'].get('behind','?')}"
+            meta = f"types:{', '.join([f'{t}:{c}' for t,c in sorted(payload['types'].items())]) or 'n/a'} | cache:{payload['cache_hit_rate']*100:.1f}% | last_base:{payload.get('last_base','')}"
+            last_status = ""
+            if payload.get("last", {}).get("results"):
+                rows = []
+                for r in payload["last"]["results"]:
+                    status = "C" if r.get("cached") else ("P" if r.get("rc") == 0 else "F")
+                    rows.append(f"{r.get('project')}:{status}/{r.get('duration',0):.2f}s")
+                last_status = " last[" + "; ".join(rows) + "]"
+            print(f"[ma status] {meta} | git[{git_meta or 'n/a'}]{last_status}")
+        except Exception:
+            pass
+    if with_dash:
+        print(f"[ma] Status updates enabled; refreshed after each command (interval hint: {interval}s).")
+        print_status()
+
     while True:
         try:
+            if dash_live:
+                pause_dash = True
             if prompt:
                 line = prompt("ma> ").strip()
             else:
                 line = input("ma> ").strip()
         except (EOFError, KeyboardInterrupt):
             print("\nBye.")
+            stop_dash = True
+            if dash_live:
+                dash_live.join(timeout=1)
             return 0
+        finally:
+            if dash_live:
+                pause_dash = False
         if not line:
             continue
         if line in ("exit", "quit"):
             print("Bye.")
+            stop_dash = True
+            if dash_live:
+                dash_live.join(timeout=1)
             return 0
         if line == "help":
             print("Shortcuts: list, tasks, dashboard, map, select, test <proj>, run <proj>, affected --base origin/main, verify, repeat (last), exit.")
@@ -1911,6 +1993,9 @@ def cmd_shell() -> int:
         except SystemExit:
             # avoid exiting the shell
             pass
+        finally:
+            if with_dash:
+                print_status()
 
 
 def cmd_tui(interval: float, duration: int) -> int:
@@ -2292,7 +2377,12 @@ def build_parser() -> argparse.ArgumentParser:
     playbook.add_argument("name", choices=["pipeline-dev", "host-dev", "sidecar-dev"], help="Playbook name")
     playbook.add_argument("--dry-run", action="store_true", help="Print commands without running")
 
-    sub.add_parser("shell", help="Interactive REPL-style shell for helper commands")
+    shell_p = sub.add_parser("shell", help="Interactive REPL-style shell for helper commands")
+    shell_p.add_argument("--dash", action="store_true", help="Show a pinned live dashboard while in shell (Rich)")
+    shell_p.add_argument("--interval", type=float, default=1.0, help="Dashboard refresh interval when --dash is set (seconds)")
+
+    comp = sub.add_parser("completion", help="Emit shell completion script")
+    comp.add_argument("shell", choices=["bash", "zsh"], help="Target shell")
 
     registry = sub.add_parser("registry", help="Inspect or edit project_map.json")
     reg_sub = registry.add_subparsers(dest="reg_action", required=True)
@@ -2321,8 +2411,9 @@ def build_parser() -> argparse.ArgumentParser:
     dash = sub.add_parser("dashboard", help="Show a quick monorepo dashboard (counts, last results, base)")
     dash.add_argument("--json", action="store_true", help="Emit JSON")
     dash.add_argument("--html", action="store_true", help="Emit HTML")
-    dash.add_argument("--live", action="store_true", help="Live refresh (Rich only, ~30s)")
+    dash.add_argument("--live", action="store_true", help="Live refresh (Rich)")
     dash.add_argument("--interval", type=float, default=1.0, help="Live refresh interval seconds (default 1.0)")
+    dash.add_argument("--duration", type=float, default=0.0, help="Seconds to run live (0 = until you quit)")
 
     tui = sub.add_parser("tui", help="Rich split-pane view (dashboard + last results)")
     tui.add_argument("--interval", type=float, default=1.0, help="Refresh interval seconds (default 1.0)")
@@ -2495,23 +2586,16 @@ def main(argv=None) -> int:
         _log_event({"cmd": f"test {proj.name}", "rc": rc})
         return rc
     if args.command == "test-all":
-        if args.parallel and args.parallel > 0:
-            names = topo_sort(projects, [n for n, p in projects.items() if p.tests])
-            if dry_run:
-                print(f"[ma] dry-run: would run tests for: {', '.join(names)}")
-                return 0
-        rc, results = run_projects_parallel(projects, names, args.parallel, getattr(args, "cache", "off"), getattr(args, "retries", 0))
-        _print_summary(results, "test-all (parallel)")
-        record_results(results, "test-all")
-        _log_event({"cmd": "test-all", "rc": rc})
-        return rc
+        names = topo_sort(projects, [n for n, p in projects.items() if p.tests])
         if dry_run:
-            names = topo_sort(projects, [n for n, p in projects.items() if p.tests])
             print(f"[ma] dry-run: would run tests for: {', '.join(names)}")
             return 0
-        names = topo_sort(projects, [n for n, p in projects.items() if p.tests])
-        rc, results = run_projects_serial(projects, names, getattr(args, "cache", "off"), getattr(args, "retries", 0))
-        _print_summary(results, "test-all")
+        if args.parallel and args.parallel > 0:
+            rc, results = run_projects_parallel(projects, names, args.parallel, getattr(args, "cache", "off"), getattr(args, "retries", 0))
+            _print_summary(results, "test-all (parallel)")
+        else:
+            rc, results = run_projects_serial(projects, names, getattr(args, "cache", "off"), getattr(args, "retries", 0))
+            _print_summary(results, "test-all")
         record_results(results, "test-all")
         _log_event({"cmd": "test-all", "rc": rc})
         return rc
@@ -2743,6 +2827,7 @@ def main(argv=None) -> int:
         cmd_dashboard.as_html = getattr(args, "html", False)
         cmd_dashboard.live = getattr(args, "live", False)
         cmd_dashboard.interval = getattr(args, "interval", 1.0)
+        cmd_dashboard.duration = getattr(args, "duration", 0.0)
         return cmd_dashboard()
     if args.command == "tui":
         return cmd_tui(getattr(args, "interval", 1.0), getattr(args, "duration", 60))
@@ -2755,7 +2840,9 @@ def main(argv=None) -> int:
     if args.command == "cache":
         return cmd_cache(args)
     if args.command == "shell":
-        return cmd_shell()
+        return cmd_shell(with_dash=getattr(args, "dash", False), interval=getattr(args, "interval", 1.0))
+    if args.command == "completion":
+        return cmd_completion(args.shell)
     if args.command == "git-branch":
         return cmd_git_branch(args)
     if args.command == "chat-dev":

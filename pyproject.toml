@@ -37,6 +37,10 @@ filterwarnings = [
   "ignore:pkg_resources is deprecated:UserWarning",
   "ignore:__audioread_load:FutureWarning",
   "ignore:n_fft=1024 is too large:UserWarning",
+  "ignore:'aifc' is deprecated and slated for removal:DeprecationWarning",
+  "ignore:'audioop' is deprecated and slated for removal:DeprecationWarning",
+  "ignore:'sunau' is deprecated and slated for removal:DeprecationWarning",
+  "ignore:PySoundFile failed. Trying audioread instead.:UserWarning",
 ]
 
 [tool.setuptools.packages.find]

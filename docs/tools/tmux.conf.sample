@@ -1,0 +1,24 @@
+# Basic tmux config for Music Advisor helper (optional)
+#
+# Usage:
+#   cp docs/tools/tmux.conf.sample ~/.tmux.conf
+#   tmux kill-server   # restart tmux to apply
+#
+# Truecolor + proper term
+set -g default-terminal "tmux-256color"
+set -ga terminal-overrides ",*:Tc"
+
+# Mouse support (click/drag to resize panes, select panes)
+set -g mouse on
+
+# UI styling (adjust colors to taste)
+set -g status on
+set -g status-style fg=white,bg=colour237
+set -g pane-border-style fg=colour240
+set -g pane-active-border-style fg=colour45
+
+# Vi-style copy mode (optional)
+setw -g mode-keys vi
+
+# macOS clipboard copy from copy-mode (optional; remove if not on macOS)
+bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "pbcopy"

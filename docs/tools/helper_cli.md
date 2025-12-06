@@ -65,6 +65,36 @@
 - Safe run enforcement: set `MA_REQUIRE_SAFE_RUN=1` (or use strict/confirm env) to prompt if a run target is missing.
 - State dir override: set `MA_HELPER_HOME` to relocate helper prefs/logs/cache if home is unwritable.
 
+## Live dashboard + tmux split
+
+- Minimal two-terminal setup (no tmux required):
+  - Terminal A: `python -m ma_helper shell`
+  - Terminal B: `python -m ma_helper dashboard --live --duration 0 --interval 2` (Ctrl-C to stop)
+- tmux split (keeps shell + live dash in one window; uses a dedicated socket so it won’t collide with other sessions):
+  ```bash
+  cd ~/music-advisor && source .venv/bin/activate && \
+  tmux -L mahelper new-session -s mahelper 'python -m ma_helper shell' \; \
+    split-window -h 'python -m ma_helper dashboard --live --duration 0 --interval 2' \; \
+    select-pane -t 0
+  ```
+- Pane switch: `Ctrl-b` + arrows; detach: `Ctrl-b d`; kill all: `tmux -L mahelper kill-server`.
+- If you auto-start tmux in `.zshrc`, guard it to avoid unexpected attaches:
+  ```sh
+  if [ -z "$TMUX" ]; then
+    # tmux attach -t default || tmux new -s default
+    :
+  fi
+  ```
+  - Optional config template: `docs/tools/tmux.conf.sample` (copy to `~/.tmux.conf`, then `tmux kill-server` to restart).
+  - Handy tmux commands (mahelper socket):
+    - List sessions: `tmux -L mahelper ls` (errors if none, that is fine)
+    - Kill helper server: `tmux -L mahelper kill-server`
+    - Kill one session: `tmux -L mahelper kill-session -t mahelper`
+    - Reattach: `tmux -L mahelper attach -t mahelper`
+    - Pane switch: `Ctrl-b` + arrows; show numbers: `Ctrl-b q` then number
+    - Detach: `Ctrl-b d`; close pane: `Ctrl-b x`
+  - Completions: `ma completion zsh` or `ma completion bash` prints a completion script; source it in your shell (e.g., `eval "$(python -m ma_helper completion zsh)"`) for helper command completion.
+
 ## Optional extras
 
 - Fuzzy/select: `pip install prompt_toolkit`
