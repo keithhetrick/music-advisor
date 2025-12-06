@@ -5,8 +5,8 @@ Purpose
 - Keep concerns separated: SwiftUI UI + IPC/CLI to Python engines; JUCE optional later (for audio UI or shared DSP).
 
 What’s included
-- SwiftPM app at `hosts/macos_app/` targeting macOS 12+, Swift 5.9.
-- Simple SwiftUI window; no external deps.
+- SwiftPM app at `hosts/macos_app/` targeting macOS 12+, Swift 5.7+.
+- SwiftUI shell with a configurable CLI runner (call your Python pipeline or a mock). No external deps.
 
 Build/run (CLI)
 ```bash
@@ -21,10 +21,43 @@ cd hosts/macos_app
 open Package.swift
 ```
 
+Local build/run helper (uses local HOME + scratch path; tolerates locked global SwiftPM caches)
+```bash
+cd hosts/macos_app
+./scripts/swift_run_local.sh
+```
+
+Reset logs / clean builds
+```bash
+./scripts/clean_builds.sh       # wipe app build artifacts
+./scripts/reset_run_log.sh      # remove last command log
+```
+
 Design/architecture notes
 - UI: SwiftUI for native macOS host.
 - Engines: Python remains the brain (Historical Echo, HCI, TTC, Lyric). Add IPC/CLI bindings later.
 - Audio: Use AVAudioEngine or the future JUCE plug-in for in-DAW probes; keep real-time DSP out of the UI thread.
+- CLI runner defaults to the Python feature CLI:
+  - Command: `/usr/bin/python3 tools/cli/ma_audio_features.py --audio /path/to/audio.wav --out /tmp/out.json`
+  - Working dir: empty (fill it in the UI or via env)
+  - Extra env: empty
+  - Override via env (picked up at app launch):
+    - `MA_APP_CMD="/usr/bin/python3"` (default cmd)
+    - `MA_APP_ARGS="tools/cli/ma_audio_features.py --audio tone.wav --out /tmp/out.json"` (default args)
+    - `MA_APP_WORKDIR="/Users/you/music-advisor"`
+    - `MA_APP_ENV_FOO=bar` (extra env; prefix keys with `MA_APP_ENV_`)
+
+UI behavior
+- “Run defaults” refills fields from env/defaults and executes.
+- Results use a segmented view (JSON/stdout/stderr) with parsed JSON prettified when possible.
+- Each run logs to `/tmp/macos_app_cmd.log` for quick debugging.
+
+Dependency note (Python CLI)
+- If you see warnings about numpy/scipy/librosa versions, you can pin to the expected ranges in the same Python you run from the app:
+  ```bash
+  cd /Users/keithhetrick/music-advisor
+  PYTHONPATH=$PWD /usr/local/bin/python3 -m pip install "numpy<2" "scipy<1.12" "librosa>=0.10,<0.11"
+  ```
 
 Next steps (when ready)
 - Add IPC/CLI bridge to the Python pipeline (local calls; no network).

@@ -5,7 +5,7 @@ Why this exists
 - Keeps JUCE optional: plug-ins/DSP can arrive later without entangling the host UI.
 
 Location
-- `hosts/macos_app/` (SwiftPM package, macOS 12+, Swift 5.9).
+- `hosts/macos_app/` (SwiftPM package, macOS 12+, Swift 5.7+).
 
 How to run
 ```bash
@@ -15,8 +15,17 @@ swift run
 # or open Package.swift in Xcode
 ```
 
+Local helper (uses local HOME + scratch path)
+```bash
+cd hosts/macos_app
+./scripts/swift_run_local.sh
+# or manually:
+# HOME=$PWD/build/home swift build --scratch-path $PWD/build/.swiftpm
+# HOME=$PWD/build/home swift run   --scratch-path $PWD/build/.swiftpm
+```
+
 What it does today
-- Shows a minimal SwiftUI window stating it’s the macOS host shell.
+- Shows a SwiftUI window with a configurable CLI runner (defaults to echo a JSON string).
 - No external deps; good for proving the Swift toolchain is ready.
 
 Intended architecture
@@ -27,4 +36,10 @@ Intended architecture
 Next integration steps
 - Add IPC/CLI hooks to the Python pipeline (local-only).
 - Render real feature outputs/sidecars in the UI.
-- Add local logging/telemetry if needed (no network).***
+- Add local logging/telemetry if needed (no network).
+
+CLI runner env overrides
+- `MA_APP_CMD="/usr/bin/python3"` (default cmd)
+- `MA_APP_ARGS="tools/cli/ma_audio_features.py --audio tone.wav --out /tmp/out.json"` (default args)
+- `MA_APP_WORKDIR="/Users/you/music-advisor"`
+- `MA_APP_ENV_FOO=bar` (extra env; prefix keys with `MA_APP_ENV_`)***

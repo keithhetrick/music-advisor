@@ -1,35 +1,159 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var viewModel = CommandViewModel()
+    @State private var selectedPane: ResultPane = .json
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Music Advisor macOS host")
-                .font(.title.bold())
-            Text("This SwiftUI shell is decoupled from JUCE. The Python engines stay external; we can add IPC/CLI hooks later.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 14) {
+            header
             Divider()
-            VStack(alignment: .leading, spacing: 8) {
-                Label("SwiftUI UI shell", systemImage: "rectangle.3.offgrid")
-                Label("Audio/dsp remains in pipeline or future JUCE plug-ins", systemImage: "waveform")
-                Label("Future: wire CLI/IPC to Python engine", systemImage: "externaldrive.connected.to.line.below")
-            }
-            .padding(10)
-            .background(.quaternary.opacity(0.4))
-            .cornerRadius(8)
+            commandInputs
+            runButtons
+            Divider()
+            results
             Spacer()
-            HStack {
-                Spacer()
-                Text("macOS 12+, SwiftUI, SwiftPM")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
         }
         .padding(20)
-        .frame(minWidth: 480, minHeight: 320)
+        .frame(minWidth: 580, minHeight: 400)
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Music Advisor macOS host")
+                .font(.title.bold())
+            Text("SwiftUI shell; external engines stay decoupled. Configure any local CLI (Python pipeline, mock, etc.) below.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var commandInputs: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Command").font(.headline)
+            TextField("/usr/bin/python3 tools/cli/ma_audio_features.py --audio /path/to/audio.wav --out /tmp/out.json", text: $viewModel.commandText)
+                .textFieldStyle(.roundedBorder)
+
+            Text("Working directory (optional)").font(.headline)
+            TextField("e.g. /Users/you/music-advisor", text: $viewModel.workingDirectory)
+                .textFieldStyle(.roundedBorder)
+
+            Text("Extra env (KEY=VALUE per line)").font(.headline)
+            TextEditor(text: $viewModel.envText)
+                .font(.system(.body, design: .monospaced))
+                .frame(minHeight: 80)
+                .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.2)))
+        }
+    }
+
+    private var runButtons: some View {
+        HStack {
+            Button(action: { viewModel.run() }) {
+                if viewModel.isRunning {
+                    ProgressView().progressViewStyle(.circular)
+                } else {
+                    Text("Run CLI")
+                }
+            }
+            .disabled(viewModel.isRunning)
+
+            Button("Run defaults") {
+                viewModel.loadDefaults()
+                viewModel.run()
+            }
+            .disabled(viewModel.isRunning)
+
+            if !viewModel.status.isEmpty {
+                Text(viewModel.status)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+        }
+    }
+
+    private var results: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Result").font(.headline)
+            Picker("", selection: $selectedPane) {
+                Text("JSON").tag(ResultPane.json)
+                Text("stdout").tag(ResultPane.stdout)
+                Text("stderr").tag(ResultPane.stderr)
+            }
+            .pickerStyle(.segmented)
+            .onChange(of: viewModel.parsedJSON, perform: { _ in
+                if selectedPane == .json && viewModel.parsedJSON.isEmpty {
+                    selectedPane = .stdout
+                }
+            })
+
+            resultBlock(title: selectedPane.title,
+                        text: paneText(selectedPane),
+                        color: selectedPane.color)
+
+            Text("Exit code: \(viewModel.exitCode)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func resultBlock(title: String, text: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title).font(.subheadline.bold())
+            ScrollView {
+                Text(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "(empty)" : text.trimmingCharacters(in: .whitespacesAndNewlines))
+                    .font(.system(.body, design: .monospaced))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(8)
+                    .background(color.opacity(0.05))
+                    .cornerRadius(6)
+            }
+            .frame(minHeight: 80)
+        }
+    }
+
+    private func prettyJSON(_ dict: [String: AnyHashable]) -> String {
+        guard let data = try? JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted]),
+              let str = String(data: data, encoding: .utf8) else {
+            return dict.description
+        }
+        return str
+    }
+
+    private func paneText(_ pane: ResultPane) -> String {
+        switch pane {
+        case .json:
+            return viewModel.parsedJSON.isEmpty ? "(no JSON parsed)" : prettyJSON(viewModel.parsedJSON)
+        case .stdout:
+            return viewModel.stdout
+        case .stderr:
+            return viewModel.stderr
+        }
     }
 }
 
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
+}
+
+enum ResultPane: Hashable {
+    case json, stdout, stderr
+
+    var title: String {
+        switch self {
+        case .json: return "parsed JSON"
+        case .stdout: return "stdout"
+        case .stderr: return "stderr"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .json: return .blue
+        case .stdout: return .green
+        case .stderr: return .red
+        }
+    }
 }
