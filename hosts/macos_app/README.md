@@ -68,8 +68,10 @@ Default overrides for other machines (env)
 
 UI behavior
 - “Run defaults” refills fields from env/defaults and executes.
+- “Run smoke” calls `scripts/smoke_default.sh` headless to verify the default CLI and sidecar.
 - Results use a segmented view (JSON/stdout/stderr) with parsed JSON prettified when possible.
 - Each run logs to `/tmp/macos_app_cmd.log` for quick debugging.
+- Inline helpers: copy JSON to clipboard; reveal sidecar in Finder; summary metrics (tempo/key/duration/LUFS/peak/crest); last run time + duration shown in the header.
 
 Dependency note (Python CLI)
 - If you see warnings about numpy/scipy/librosa versions, you can pin to the expected ranges in the same Python you run from the app:

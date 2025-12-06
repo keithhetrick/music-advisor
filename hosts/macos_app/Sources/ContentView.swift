@@ -78,9 +78,21 @@ struct ContentView: View {
             }
             .disabled(viewModel.isRunning)
 
+            Button("Run smoke") {
+                viewModel.runSmoke()
+            }
+            .disabled(viewModel.isRunning)
+
             if !viewModel.status.isEmpty {
                 Text(viewModel.status)
                     .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+
+            if let last = viewModel.lastRunTime {
+                let durationText = viewModel.lastDuration.map { String(format: " (%.2fs)", $0) } ?? ""
+                Text("Last run: \(last.formatted(date: .omitted, time: .standard))\(durationText)")
+                    .font(.caption)
                     .foregroundStyle(.secondary)
             }
             Spacer()
@@ -118,8 +130,25 @@ struct ContentView: View {
                             revealSidecar(path: path)
                         }
                     }
+                    if let path = viewModel.sidecarPath {
+                        Button("Reveal sidecar") {
+                            revealSidecar(path: path)
+                        }
+                        Button("Copy path") {
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(path, forType: .string)
+                        }
+                    }
                     Spacer()
                 }
+            }
+
+            HStack(spacing: 12) {
+                Button("Copy JSON") {
+                    copyJSON()
+                }
+                .disabled(viewModel.parsedJSON.isEmpty)
+                Spacer()
             }
 
             resultBlock(title: selectedPane.title,
@@ -216,5 +245,12 @@ extension ContentView {
     private func revealSidecar(path: String) {
         let url = URL(fileURLWithPath: path)
         NSWorkspace.shared.activateFileViewerSelecting([url])
+    }
+
+    private func copyJSON() {
+        let jsonString = viewModel.parsedJSON.isEmpty ? "" : prettyJSON(viewModel.parsedJSON)
+        guard !jsonString.isEmpty else { return }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(jsonString, forType: .string)
     }
 }

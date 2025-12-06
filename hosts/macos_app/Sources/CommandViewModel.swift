@@ -14,6 +14,8 @@ final class CommandViewModel: ObservableObject {
     @Published var parsedJSON: [String: AnyHashable] = [:]
     @Published var sidecarPath: String?
     @Published var summaryMetrics: [Metric] = []
+    @Published var lastRunTime: Date?
+    @Published var lastDuration: TimeInterval?
 
     private let runner = CommandRunner()
     private let initialConfig: AppConfig
@@ -61,17 +63,21 @@ final class CommandViewModel: ObservableObject {
         stdout = ""
         stderr = ""
         summaryMetrics = []
+        lastDuration = nil
 
         Task {
+            let start = Date()
             let result = runner.run(command: parsedCommand,
                                     workingDirectory: workingDirectory.isEmpty ? nil : workingDirectory,
                                     extraEnv: env)
+            lastDuration = Date().timeIntervalSince(start)
             stdout = result.stdout
             stderr = result.stderr
             exitCode = result.exitCode
             status = "Done (exit \(result.exitCode))"
             parsedJSON = parseJSON(result.stdout)
             summaryMetrics = extractMetrics(from: parsedJSON)
+            lastRunTime = Date()
             isRunning = false
         }
     }
@@ -165,7 +171,45 @@ final class CommandViewModel: ObservableObject {
         if let dur = getDouble("duration_sec") {
             metrics.append(Metric(label: "Duration", value: String(format: "%.1f s", dur)))
         }
+        if let lufs = getDouble("loudness_integrated_lufs") {
+            metrics.append(Metric(label: "LUFS", value: String(format: "%.1f LUFS", lufs)))
+        }
+        if let peak = getDouble("peak_db") {
+            metrics.append(Metric(label: "Peak", value: String(format: "%.1f dB", peak)))
+        }
+        if let crest = getDouble("crest_factor_db") {
+            metrics.append(Metric(label: "Crest", value: String(format: "%.1f dB", crest)))
+        }
         return metrics
+    }
+
+    func runSmoke() {
+        let env = parseEnv(envText)
+        let base = workingDirectory.isEmpty ? (initialConfig.workingDirectory ?? FileManager.default.currentDirectoryPath) : workingDirectory
+        let scriptPath = "\(base)/hosts/macos_app/scripts/smoke_default.sh"
+
+        isRunning = true
+        status = "Running smoke..."
+        stdout = ""
+        stderr = ""
+        summaryMetrics = []
+        lastDuration = nil
+
+        Task {
+            let start = Date()
+            let result = runner.run(command: ["/bin/zsh", scriptPath],
+                                    workingDirectory: base,
+                                    extraEnv: env)
+            lastDuration = Date().timeIntervalSince(start)
+            stdout = result.stdout
+            stderr = result.stderr
+            exitCode = result.exitCode
+            status = "Smoke done (exit \(result.exitCode))"
+            parsedJSON = [:]
+            sidecarPath = "/tmp/ma_features.json"
+            lastRunTime = Date()
+            isRunning = false
+        }
     }
 }
 
