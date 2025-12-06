@@ -193,8 +193,9 @@ yarn-error.log*
 *.mp3.tmp
 *.flac.tmp
 
-# Data / databases (keep folder docs/markers only)
-data/
+# Data / databases (ignore contents, keep folder + markers)
+data/**
+!data/
 !data/.gitkeep
 !data/README.md
 # Global DB artifacts
