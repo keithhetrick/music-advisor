@@ -11,7 +11,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from advisor_host.adapter import chat_backend_adapter, recommendation_adapter as rec_adapter
+from advisor_host.adapter import chat_backend_adapter
+from advisor_host.adapter import recommendation_adapter as rec_adapter
 from advisor_host.host.formatters import format_slice
 from advisor_host.intents.intents import detect_intent, sanitize_quick_actions
 from advisor_host.logging.logger import log_event
@@ -75,7 +76,7 @@ def handle_message(
         try:
             session.backend_client_path = Path(client_rich_path).expanduser()
             chat_backend_adapter.configure_backend_session(
-                session, client_path=session.backend_client_path, max_length=MAX_REPLY_BYTES
+                session, client_path=str(session.backend_client_path), max_length=MAX_REPLY_BYTES
             )
         except Exception:
             session.backend_client_path = None
@@ -104,7 +105,7 @@ def handle_message(
             inferred_path = client_rich_path
         if inferred_path and backend_mode != "off":
             chat_backend_adapter.configure_backend_session(
-                session, client_path=inferred_path, max_length=MAX_REPLY_BYTES
+                session, client_path=str(inferred_path), max_length=MAX_REPLY_BYTES
             )
         session.history.append({"role": "user", "content": message})
         session.history.append({"role": "assistant", "content": "analysis_generated"})
@@ -175,7 +176,7 @@ def handle_message(
         backend_reply = chat_backend_adapter.route_backend_message(
             session,
             message,
-            client_path=session.backend_client_path,
+            client_path=str(session.backend_client_path) if session.backend_client_path else None,
             tone=tone,
         )
         if backend_reply:

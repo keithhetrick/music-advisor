@@ -39,7 +39,10 @@ def run(payload: Dict[str, Any], norms: Optional[Dict[str, Any]] = None) -> Dict
             raise RuntimeError("REC_ENGINE_URL is required when REC_ENGINE_MODE=remote")
         resp = _post_remote(url, payload, norms)
     else:
-        resp = run_recommendation(payload, norms)
+        if norms is None:
+            resp = run_advisory(payload)
+        else:
+            resp = run_recommendation(payload, norms)
     validate_engine_response(resp)
     return resp
 

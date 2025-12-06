@@ -21,7 +21,9 @@ def session_to_dict(session: "ChatSession") -> Dict:
         "last_intent": session.last_intent,
         "offsets": session.offsets,
         "history": session.history,
-        "backend_client_path": str(session.backend_client_path) if getattr(session, "backend_client_path", None) else None,
+        "backend_client_path": (
+            str(session.backend_client_path) if getattr(session, "backend_client_path", None) else None
+        ),
     }
 
 

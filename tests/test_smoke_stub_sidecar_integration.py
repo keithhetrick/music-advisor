@@ -23,6 +23,10 @@ def test_smoke_full_chain_with_stub_sidecar(tmp_path):
     repo = Path(__file__).resolve().parents[1]
     tone = tmp_path / "tone.wav"
     _make_tone(tone)
+    db_path = repo / "data" / "private" / "local_assets" / "historical_echo" / "historical_echo.db"
+    if not db_path.exists():
+        import pytest
+        pytest.skip(f"historical_echo.db not available at {db_path}")
     env = os.environ.copy()
     env.update({"LOG_JSON": "0", "MA_SIDECAR_PLUGIN": "stub", "PYTHONPATH": f"{repo}:{repo/'src'}"})
     cmd = ["zsh", str(repo / "infra" / "scripts" / "smoke_full_chain.sh"), str(tone)]

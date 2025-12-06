@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import sys
 
-import ma_orchestrator
+from tools import ma_orchestrator
 
 
 def main(argv: list[str] | None = None) -> int:

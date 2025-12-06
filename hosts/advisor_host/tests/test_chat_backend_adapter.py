@@ -1,7 +1,4 @@
-import os
 from pathlib import Path
-
-import pytest
 
 from advisor_host.adapter import chat_backend_adapter
 from advisor_host.host.chat import ChatSession

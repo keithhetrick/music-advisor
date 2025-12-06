@@ -56,7 +56,7 @@ def _kill_port_listeners(port: int) -> None:
 
 
 class Handler(BaseHTTPRequestHandler):
-    store = InMemorySessionStore()
+    store: Any = InMemorySessionStore()
     rate_window_secs = int(os.getenv("HOST_RATE_WINDOW_SECS", "60"))
     rate_limit = int(os.getenv("HOST_RATE_LIMIT", "120"))  # requests per IP per window
     ip_hits: Dict[str, list[float]] = {}
@@ -179,6 +179,7 @@ class Handler(BaseHTTPRequestHandler):
 
         # Optional auth: Google ID token or static bearer
         # Auth provider selection
+        provider: Any
         if self.google_client_id:
             verify_sig = os.getenv("HOST_VERIFY_GOOGLE_SIG", "").lower() in ("1", "true", "yes")
             provider = GoogleAuthProvider(self.google_client_id, verify_sig=verify_sig)

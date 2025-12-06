@@ -12,6 +12,9 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+BackendSession: Optional[type[Any]]
+backend_route_message: Optional[Any]
+
 try:
     from tools.chat.chat_context import ChatSession as BackendSession  # type: ignore
     from tools.chat.chat_router import route_message as backend_route_message  # type: ignore
@@ -65,7 +68,11 @@ def route_backend_message(
     if backend is None or backend.client_path is None:
         return None
     reply_text = backend_route_message(backend, message, client_path=backend.client_path)
-    return {"session_id": host_session.session_id, "reply": reply_text, "ui_hints": {"show_cards": [], "quick_actions": [], "tone": tone}}
+    return {
+        "session_id": host_session.session_id,
+        "reply": reply_text,
+        "ui_hints": {"show_cards": [], "quick_actions": [], "tone": tone},
+    }
 
 
 __all__ = ["backend_enabled", "configure_backend_session", "route_backend_message"]
