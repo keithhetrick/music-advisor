@@ -102,6 +102,26 @@ struct ContentView: View {
                 }
             })
 
+            if !viewModel.summaryMetrics.isEmpty || viewModel.sidecarPath != nil {
+                HStack(spacing: 12) {
+                    ForEach(viewModel.summaryMetrics) { metric in
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(metric.label).font(.caption).foregroundStyle(.secondary)
+                            Text(metric.value).font(.body)
+                        }
+                        .padding(8)
+                        .background(Color.secondary.opacity(0.08))
+                        .cornerRadius(6)
+                    }
+                    if let path = viewModel.sidecarPath {
+                        Button("Reveal sidecar") {
+                            revealSidecar(path: path)
+                        }
+                    }
+                    Spacer()
+                }
+            }
+
             resultBlock(title: selectedPane.title,
                         text: paneText(selectedPane),
                         color: selectedPane.color)
@@ -191,5 +211,10 @@ extension ContentView {
         panel.canChooseFiles = false
         let response = panel.runModal()
         return response == .OK ? panel.urls.first : nil
+    }
+
+    private func revealSidecar(path: String) {
+        let url = URL(fileURLWithPath: path)
+        NSWorkspace.shared.activateFileViewerSelecting([url])
     }
 }

@@ -22,14 +22,16 @@ struct AppConfig {
     }
 
     private static func defaultPythonFeatures() -> (command: [String], args: [String], workingDirectory: String?, extraEnv: [String: String]) {
-        // Best-effort sensible defaults for Keith’s machine; avoids empty cwd/env.
-        let repoRoot = "/Users/keithhetrick/music-advisor"
-        let cmd = "/usr/local/bin/python3"
-        let script = "\(repoRoot)/engines/audio_engine/tools/cli/ma_audio_features.py"
-        let audioPlaceholder = "/Users/keithhetrick/Downloads/lola.mp3"
-        let outPlaceholder = "/tmp/ma_features.json"
+        // Best-effort sensible defaults; can be overridden via env.
+        let env = ProcessInfo.processInfo.environment
+        let repoRoot = env["MA_APP_DEFAULT_WORKDIR"] ?? "/Users/keithhetrick/music-advisor"
+        let cmd = env["MA_APP_DEFAULT_CMD"] ?? "/usr/local/bin/python3"
+        let script = env["MA_APP_DEFAULT_SCRIPT"] ?? "\(repoRoot)/engines/audio_engine/tools/cli/ma_audio_features.py"
+        let audioPlaceholder = env["MA_APP_DEFAULT_AUDIO"] ?? "/Users/keithhetrick/Downloads/lola.mp3"
+        let outPlaceholder = env["MA_APP_DEFAULT_OUT"] ?? "/tmp/ma_features.json"
         let args = [script, "--audio", audioPlaceholder, "--out", outPlaceholder]
-        let extraEnv = ["PYTHONPATH": repoRoot]
+        let pythonPath = env["MA_APP_ENV_PYTHONPATH"] ?? repoRoot
+        let extraEnv = ["PYTHONPATH": pythonPath]
         return (command: [cmd], args: args, workingDirectory: repoRoot, extraEnv: extraEnv)
     }
 }

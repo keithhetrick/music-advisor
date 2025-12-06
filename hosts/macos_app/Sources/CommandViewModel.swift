@@ -12,6 +12,8 @@ final class CommandViewModel: ObservableObject {
     @Published var exitCode: Int32 = 0
     @Published var isRunning: Bool = false
     @Published var parsedJSON: [String: AnyHashable] = [:]
+    @Published var sidecarPath: String?
+    @Published var summaryMetrics: [Metric] = []
 
     private let runner = CommandRunner()
     private let initialConfig: AppConfig
@@ -53,10 +55,12 @@ final class CommandViewModel: ObservableObject {
             return
         }
 
+        sidecarPath = extractOutPath(from: parsedCommand)
         isRunning = true
         status = "Running..."
         stdout = ""
         stderr = ""
+        summaryMetrics = []
 
         Task {
             let result = runner.run(command: parsedCommand,
@@ -67,6 +71,7 @@ final class CommandViewModel: ObservableObject {
             exitCode = result.exitCode
             status = "Done (exit \(result.exitCode))"
             parsedJSON = parseJSON(result.stdout)
+            summaryMetrics = extractMetrics(from: parsedJSON)
             isRunning = false
         }
     }
@@ -92,7 +97,9 @@ final class CommandViewModel: ObservableObject {
                 inDouble.toggle()
             case "'" where !inDouble:
                 inSingle.toggle()
-            case " ", "\t", "\n" where !inSingle && !inDouble:
+            case " " where !inSingle && !inDouble,
+                 "\t" where !inSingle && !inDouble,
+                 "\n" where !inSingle && !inDouble:
                 if !current.isEmpty {
                     args.append(current)
                     current = ""
@@ -132,4 +139,38 @@ final class CommandViewModel: ObservableObject {
         }
         return [:]
     }
+
+    private func extractOutPath(from args: [String]) -> String? {
+        if let idx = args.firstIndex(of: "--out"), args.indices.contains(idx + 1) {
+            return args[idx + 1].trimmingCharacters(in: .init(charactersIn: "\""))
+        }
+        return nil
+    }
+
+    private func extractMetrics(from dict: [String: AnyHashable]) -> [Metric] {
+        func getDouble(_ key: String) -> Double? {
+            dict[key] as? Double
+        }
+        func getString(_ key: String) -> String? {
+            dict[key] as? String
+        }
+        var metrics: [Metric] = []
+        if let tempo = getDouble("tempo_bpm") {
+            metrics.append(Metric(label: "Tempo", value: String(format: "%.2f bpm", tempo)))
+        }
+        if let key = getString("key") {
+            let mode = getString("mode") ?? ""
+            metrics.append(Metric(label: "Key", value: "\(key) \(mode)".trimmingCharacters(in: .whitespaces)))
+        }
+        if let dur = getDouble("duration_sec") {
+            metrics.append(Metric(label: "Duration", value: String(format: "%.1f s", dur)))
+        }
+        return metrics
+    }
+}
+
+struct Metric: Identifiable, Hashable {
+    let id = UUID()
+    let label: String
+    let value: String
 }

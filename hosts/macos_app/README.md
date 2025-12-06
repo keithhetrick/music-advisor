@@ -38,6 +38,11 @@ Pin Python deps to expected ranges
 ./scripts/pin_python_deps.sh
 ```
 
+Smoke test the default CLI (headless)
+```bash
+./scripts/smoke_default.sh
+```
+
 Design/architecture notes
 - UI: SwiftUI for native macOS host.
 - Engines: Python remains the brain (Historical Echo, HCI, TTC, Lyric). Add IPC/CLI bindings later.
@@ -52,6 +57,14 @@ Design/architecture notes
     - `MA_APP_WORKDIR="/Users/keithhetrick/music-advisor"`
     - `MA_APP_ENV_PYTHONPATH="/Users/keithhetrick/music-advisor"`
     - Other env: `MA_APP_ENV_FOO=bar` (prefix with `MA_APP_ENV_`)
+
+Default overrides for other machines (env)
+- `MA_APP_DEFAULT_CMD` (e.g., `/usr/bin/python3`)
+- `MA_APP_DEFAULT_SCRIPT` (e.g., `/path/to/cli.py`)
+- `MA_APP_DEFAULT_AUDIO` (e.g., `/path/to/audio.wav`)
+- `MA_APP_DEFAULT_OUT` (e.g., `/tmp/ma_features.json`)
+- `MA_APP_DEFAULT_WORKDIR`
+- `MA_APP_ENV_PYTHONPATH`
 
 UI behavior
 - “Run defaults” refills fields from env/defaults and executes.
