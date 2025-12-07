@@ -41,7 +41,12 @@ Pin Python deps to expected ranges
 Smoke test the default CLI (headless)
 ```bash
 ./scripts/smoke_default.sh
+# or for CI hooks: ./scripts/run_smoke_ci.sh
 ```
+
+Config overrides (no code edits)
+- Optional `.env.local` (copy from `.env.local.example`) and/or JSON config at `config/defaults.json` (override path via `MA_APP_CONFIG_FILE`).
+- Env has highest priority (`MA_APP_DEFAULT_*`, `MA_APP_ENV_*`, `MA_APP_CMD/ARGS/WORKDIR`), then JSON config, then code fallback.
 
 Design/architecture notes
 - UI: SwiftUI for native macOS host.
@@ -65,6 +70,7 @@ Default overrides for other machines (env)
 - `MA_APP_DEFAULT_OUT` (e.g., `/tmp/ma_features.json`)
 - `MA_APP_DEFAULT_WORKDIR`
 - `MA_APP_ENV_PYTHONPATH`
+- Optional `.env.local` (copied from `.env.local.example`) can set these without shell exports. Override file path with `MA_APP_ENV_FILE`.
 
 UI behavior
 - “Run defaults” refills fields from env/defaults and executes.

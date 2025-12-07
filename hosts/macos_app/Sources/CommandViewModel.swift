@@ -16,6 +16,9 @@ final class CommandViewModel: ObservableObject {
     @Published var summaryMetrics: [Metric] = []
     @Published var lastRunTime: Date?
     @Published var lastDuration: TimeInterval?
+    @Published var sidecarPreview: String = ""
+    @Published var profiles: [AppConfig.Profile] = []
+    @Published var selectedProfile: String = ""
 
     private let runner = CommandRunner()
     private let initialConfig: AppConfig
@@ -25,6 +28,8 @@ final class CommandViewModel: ObservableObject {
         self.commandText = config.command.joined(separator: " ")
         self.workingDirectory = config.workingDirectory ?? ""
         self.envText = config.extraEnv.map { "\($0.key)=\($0.value)" }.sorted().joined(separator: "\n")
+        self.profiles = config.profiles
+        self.selectedProfile = config.profiles.first?.name ?? ""
     }
 
     func loadDefaults() {
@@ -48,6 +53,14 @@ final class CommandViewModel: ObservableObject {
         commandText = parts.joined(separator: " ")
     }
 
+    func applySelectedProfile() {
+        guard let profile = profiles.first(where: { $0.name == selectedProfile }) else { return }
+        commandText = profile.command.joined(separator: " ")
+        workingDirectory = profile.workingDirectory ?? ""
+        let mergedEnv = profile.extraEnv.map { "\($0.key)=\($0.value)" }.sorted().joined(separator: "\n")
+        envText = mergedEnv
+    }
+
     func run() {
         let parsedCommand = splitCommand(commandText)
         let env = parseEnv(envText)
@@ -64,6 +77,7 @@ final class CommandViewModel: ObservableObject {
         stderr = ""
         summaryMetrics = []
         lastDuration = nil
+        sidecarPreview = ""
 
         Task {
             let start = Date()
@@ -194,6 +208,7 @@ final class CommandViewModel: ObservableObject {
         stderr = ""
         summaryMetrics = []
         lastDuration = nil
+        sidecarPreview = ""
 
         Task {
             let start = Date()
@@ -210,6 +225,41 @@ final class CommandViewModel: ObservableObject {
             lastRunTime = Date()
             isRunning = false
         }
+    }
+
+    func loadSidecarPreview() {
+        guard let path = sidecarPath else {
+            sidecarPreview = "(no sidecar path)"
+            return
+        }
+        let url = URL(fileURLWithPath: path)
+        guard let data = try? Data(contentsOf: url) else {
+            sidecarPreview = "(sidecar not found)"
+            return
+        }
+        if let obj = try? JSONSerialization.jsonObject(with: data, options: []),
+           let dict = obj as? [String: Any] {
+            let limited = limitedDict(dict, maxItems: 12)
+            if let previewData = try? JSONSerialization.data(withJSONObject: limited, options: [.prettyPrinted]),
+               let previewString = String(data: previewData, encoding: .utf8) {
+                sidecarPreview = previewString
+                return
+            }
+        }
+        if let text = String(data: data, encoding: .utf8) {
+            sidecarPreview = text
+        } else {
+            sidecarPreview = "(sidecar unreadable)"
+        }
+    }
+
+    private func limitedDict(_ dict: [String: Any], maxItems: Int) -> [String: Any] {
+        let keys = Array(dict.keys).sorted().prefix(maxItems)
+        var result: [String: Any] = [:]
+        for k in keys {
+            result[k] = dict[k]
+        }
+        return result
     }
 }
 

@@ -6,7 +6,7 @@ struct ContentView: View {
     @State private var selectedPane: ResultPane = .json
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: MAStyle.Spacing.md) {
             header
             Divider()
             commandInputs
@@ -15,23 +15,40 @@ struct ContentView: View {
             results
             Spacer()
         }
-        .padding(20)
-        .frame(minWidth: 580, minHeight: 400)
+        .padding(MAStyle.Spacing.lg)
+        .frame(minWidth: 620, minHeight: 420)
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
             Text("Music Advisor macOS host")
-                .font(.title.bold())
+                .font(MAStyle.Typography.title.bold())
             Text("SwiftUI shell; external engines stay decoupled. Configure any local CLI (Python pipeline, mock, etc.) below.")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(MAStyle.ColorToken.muted)
         }
     }
 
     private var commandInputs: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Command").font(.headline)
+        VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
+            if !viewModel.profiles.isEmpty {
+                HStack(spacing: MAStyle.Spacing.sm) {
+                    Text("Profile").font(MAStyle.Typography.headline)
+                    Picker("Profile", selection: $viewModel.selectedProfile) {
+                        ForEach(viewModel.profiles.map { $0.name }, id: \.self) { name in
+                            Text(name).tag(name)
+                        }
+                    }
+                    .labelsHidden()
+                    Button("Apply profile") {
+                        viewModel.applySelectedProfile()
+                    }
+                    .disabled(viewModel.selectedProfile.isEmpty)
+                    Spacer()
+                }
+            }
+
+            Text("Command").font(MAStyle.Typography.headline)
             HStack(spacing: 8) {
                 TextField("/usr/bin/python3 tools/cli/ma_audio_features.py --audio /path/to/audio.wav --out /tmp/out.json", text: $viewModel.commandText)
                     .textFieldStyle(.roundedBorder)
@@ -42,7 +59,7 @@ struct ContentView: View {
                 }
             }
 
-            Text("Working directory (optional)").font(.headline)
+            Text("Working directory (optional)").font(MAStyle.Typography.headline)
             HStack(spacing: 8) {
                 TextField("e.g. /Users/you/music-advisor", text: $viewModel.workingDirectory)
                     .textFieldStyle(.roundedBorder)
@@ -53,11 +70,11 @@ struct ContentView: View {
                 }
             }
 
-            Text("Extra env (KEY=VALUE per line)").font(.headline)
+            Text("Extra env (KEY=VALUE per line)").font(MAStyle.Typography.headline)
             TextEditor(text: $viewModel.envText)
                 .font(.system(.body, design: .monospaced))
                 .frame(minHeight: 80)
-                .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.2)))
+                .overlay(RoundedRectangle(cornerRadius: MAStyle.Radius.sm).stroke(MAStyle.ColorToken.border))
         }
     }
 
@@ -85,23 +102,23 @@ struct ContentView: View {
 
             if !viewModel.status.isEmpty {
                 Text(viewModel.status)
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                    .font(MAStyle.Typography.body)
+                    .foregroundStyle(MAStyle.ColorToken.muted)
             }
 
             if let last = viewModel.lastRunTime {
                 let durationText = viewModel.lastDuration.map { String(format: " (%.2fs)", $0) } ?? ""
                 Text("Last run: \(last.formatted(date: .omitted, time: .standard))\(durationText)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(MAStyle.Typography.caption)
+                    .foregroundStyle(MAStyle.ColorToken.muted)
             }
             Spacer()
         }
     }
 
     private var results: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Result").font(.headline)
+        VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
+            Text("Result").font(MAStyle.Typography.headline)
             Picker("", selection: $selectedPane) {
                 Text("JSON").tag(ResultPane.json)
                 Text("stdout").tag(ResultPane.stdout)
@@ -117,18 +134,11 @@ struct ContentView: View {
             if !viewModel.summaryMetrics.isEmpty || viewModel.sidecarPath != nil {
                 HStack(spacing: 12) {
                     ForEach(viewModel.summaryMetrics) { metric in
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(metric.label).font(.caption).foregroundStyle(.secondary)
-                            Text(metric.value).font(.body)
+                        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
+                            Text(metric.label).font(MAStyle.Typography.caption).foregroundStyle(MAStyle.ColorToken.muted)
+                            Text(metric.value).font(MAStyle.Typography.body)
                         }
-                        .padding(8)
-                        .background(Color.secondary.opacity(0.08))
-                        .cornerRadius(6)
-                    }
-                    if let path = viewModel.sidecarPath {
-                        Button("Reveal sidecar") {
-                            revealSidecar(path: path)
-                        }
+                        .maMetric()
                     }
                     if let path = viewModel.sidecarPath {
                         Button("Reveal sidecar") {
@@ -137,6 +147,9 @@ struct ContentView: View {
                         Button("Copy path") {
                             NSPasteboard.general.clearContents()
                             NSPasteboard.general.setString(path, forType: .string)
+                        }
+                        Button("Preview sidecar") {
+                            viewModel.loadSidecarPreview()
                         }
                     }
                     Spacer()
@@ -148,6 +161,12 @@ struct ContentView: View {
                     copyJSON()
                 }
                 .disabled(viewModel.parsedJSON.isEmpty)
+                if let path = viewModel.sidecarPath {
+                    Button("Copy sidecar path") {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(path, forType: .string)
+                    }
+                }
                 Spacer()
             }
 
@@ -155,22 +174,29 @@ struct ContentView: View {
                         text: paneText(selectedPane),
                         color: selectedPane.color)
 
+            if !viewModel.sidecarPreview.isEmpty {
+                resultBlock(title: "sidecar preview",
+                            text: viewModel.sidecarPreview,
+                            color: .purple)
+            }
+
             Text("Exit code: \(viewModel.exitCode)")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(MAStyle.Typography.caption)
+                .foregroundStyle(MAStyle.ColorToken.muted)
         }
+        .maCard(padding: MAStyle.Spacing.md)
     }
 
     private func resultBlock(title: String, text: String, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title).font(.subheadline.bold())
+        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
+            Text(title).font(MAStyle.Typography.headline)
             ScrollView {
                 Text(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "(empty)" : text.trimmingCharacters(in: .whitespacesAndNewlines))
-                    .font(.system(.body, design: .monospaced))
+                    .font(MAStyle.Typography.bodyMono)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(8)
+                    .padding(MAStyle.Spacing.sm)
                     .background(color.opacity(0.05))
-                    .cornerRadius(6)
+                    .cornerRadius(MAStyle.Radius.sm)
             }
             .frame(minHeight: 80)
         }

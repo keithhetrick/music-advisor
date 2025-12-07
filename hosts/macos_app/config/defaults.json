@@ -1,0 +1,35 @@
+{
+  "default_cmd": "/usr/local/bin/python3",
+  "default_script": "/Users/keithhetrick/music-advisor/engines/audio_engine/tools/cli/ma_audio_features.py",
+  "default_audio": "/Users/keithhetrick/Downloads/lola.mp3",
+  "default_out": "/tmp/ma_features.json",
+  "default_workdir": "/Users/keithhetrick/music-advisor",
+  "default_args": null,
+  "env": {
+    "PYTHONPATH": "/Users/keithhetrick/music-advisor"
+  },
+  "profiles": {
+    "pipeline": {
+      "cmd": ["/usr/local/bin/python3"],
+      "args": ["/Users/keithhetrick/music-advisor/engines/audio_engine/tools/cli/ma_audio_features.py", "--audio", "/Users/keithhetrick/Downloads/lola.mp3", "--out", "/tmp/ma_features.json"],
+      "workdir": "/Users/keithhetrick/music-advisor",
+      "env": {
+        "PYTHONPATH": "/Users/keithhetrick/music-advisor"
+      }
+    },
+    "mock": {
+      "cmd": ["/bin/echo"],
+      "args": ["{\"status\":\"ok\",\"message\":\"mock\"}"],
+      "workdir": "/",
+      "env": {}
+    },
+    "essentia": {
+      "cmd": ["/usr/local/bin/python3"],
+      "args": ["/Users/keithhetrick/music-advisor/tools/cli/essentia_features.py", "--audio", "/Users/keithhetrick/Downloads/lola.mp3", "--out", "/tmp/essentia_features.json"],
+      "workdir": "/Users/keithhetrick/music-advisor",
+      "env": {
+        "PYTHONPATH": "/Users/keithhetrick/music-advisor"
+      }
+    }
+  }
+}
