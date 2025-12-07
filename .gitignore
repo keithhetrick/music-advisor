@@ -114,6 +114,15 @@ xcuserdata/
 *.dmg
 *.pkg
 *.ipa
+*.xcresult
+
+# SwiftPM build outputs (app + design system)
+.build/
+.swiftpm/
+**/.build/
+**/.swiftpm/
+hosts/macos_app/build/
+hosts/macos_app/build/.swiftpm/
 
 # Docker / containers
 .docker/

@@ -23,8 +23,9 @@ final class CommandViewModel: ObservableObject {
     @Published var selectedProfile: String = ""
     @Published var queueVM = JobQueueViewModel()
     @Published var currentJobID: UUID?
+    private var stopAfterCurrent: Bool = false
 
-    private let runner = CommandRunner()
+    private let runnerService = RunnerService()
     private let initialConfig: AppConfig
 
     init(config: AppConfig = .fromEnv()) {
@@ -120,9 +121,9 @@ final class CommandViewModel: ObservableObject {
 
         Task.detached {
             let start = Date()
-            let result = await self.runner.run(command: parsedCommand,
-                                               workingDirectory: self.workingDirectory.isEmpty ? nil : self.workingDirectory,
-                                               extraEnv: env)
+            let result = await self.runnerService.run(command: parsedCommand,
+                                                      workingDirectory: self.workingDirectory.isEmpty ? nil : self.workingDirectory,
+                                                      extraEnv: env)
             let duration = Date().timeIntervalSince(start)
             // Parse heavy-ish work off the main actor.
             let parsed = await self.parseJSON(result.stdout)
@@ -269,9 +270,9 @@ final class CommandViewModel: ObservableObject {
 
         Task {
             let start = Date()
-            let result = runner.run(command: ["/bin/zsh", scriptPath],
-                                    workingDirectory: base,
-                                    extraEnv: env)
+            let result = await runnerService.run(command: ["/bin/zsh", scriptPath],
+                                                 workingDirectory: base,
+                                                 extraEnv: env)
             lastDuration = Date().timeIntervalSince(start)
             stdout = result.stdout
             stderr = result.stderr
@@ -331,28 +332,69 @@ final class CommandViewModel: ObservableObject {
 
     // MARK: - Queue
     func enqueue(files: [URL]) {
-        queueVM.addJobs(urls: files)
+        // Precompute per-job command/out to avoid per-run string editing.
+        let baseParts = splitCommand(commandText)
+        let baseOut = extractOutPath(from: baseParts)
+        let newJobs: [Job] = files.map { url in
+            let outPath = baseOut ?? makeSidecarPath(for: url)
+            var parts = baseParts
+            if let idx = parts.firstIndex(of: "--audio"), parts.indices.contains(idx + 1) {
+                parts[idx + 1] = shellEscape(url.path)
+            } else {
+                parts.append(contentsOf: ["--audio", shellEscape(url.path)])
+            }
+            if let outIdx = parts.firstIndex(of: "--out"), parts.indices.contains(outIdx + 1) {
+                parts[outIdx + 1] = shellEscape(outPath)
+            } else {
+                parts.append(contentsOf: ["--out", shellEscape(outPath)])
+            }
+            return Job(fileURL: url,
+                       displayName: url.lastPathComponent,
+                       status: .pending,
+                       sidecarPath: outPath,
+                       errorMessage: nil,
+                       preparedCommand: parts,
+                       preparedOutPath: outPath)
+        }
+        queueVM.addPrecomputed(newJobs)
+    }
+
+    func startQueue() {
+        stopAfterCurrent = false
         processNextJobIfNeeded()
     }
 
+    func stopQueue() {
+        stopAfterCurrent = true
+        // Clear pending jobs but let the current one finish.
+        queueVM.clearPending()
+    }
+
     private func processNextJobIfNeeded() {
+        guard !stopAfterCurrent else { return }
         guard !isRunning else { return }
         guard let next = queueVM.jobs.first(where: { $0.status == .pending }) else { return }
         currentJobID = next.id
 
-        let sidecarPathForJob = makeSidecarPath(for: next.fileURL)
+        let sidecarPathForJob = next.preparedOutPath ?? makeSidecarPath(for: next.fileURL)
 
         // Replace --audio with the next file
-        var parts = splitCommand(commandText)
-        if let idx = parts.firstIndex(of: "--audio"), parts.indices.contains(idx + 1) {
-            parts[idx + 1] = shellEscape(next.fileURL.path)
+        let parts: [String]
+        if let prepared = next.preparedCommand {
+            parts = prepared
         } else {
-            parts.append(contentsOf: ["--audio", shellEscape(next.fileURL.path)])
-        }
-        if let outIdx = parts.firstIndex(of: "--out"), parts.indices.contains(outIdx + 1) {
-            parts[outIdx + 1] = shellEscape(sidecarPathForJob)
-        } else {
-            parts.append(contentsOf: ["--out", shellEscape(sidecarPathForJob)])
+            var tmp = splitCommand(commandText)
+            if let idx = tmp.firstIndex(of: "--audio"), tmp.indices.contains(idx + 1) {
+                tmp[idx + 1] = shellEscape(next.fileURL.path)
+            } else {
+                tmp.append(contentsOf: ["--audio", shellEscape(next.fileURL.path)])
+            }
+            if let outIdx = tmp.firstIndex(of: "--out"), tmp.indices.contains(outIdx + 1) {
+                tmp[outIdx + 1] = shellEscape(sidecarPathForJob)
+            } else {
+                tmp.append(contentsOf: ["--out", shellEscape(sidecarPathForJob)])
+            }
+            parts = tmp
         }
         commandText = parts.joined(separator: " ")
         sidecarPath = sidecarPathForJob

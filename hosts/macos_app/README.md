@@ -27,6 +27,13 @@ cd hosts/macos_app
 ./scripts/swift_run_local.sh
 ```
 
+Package a release .app (unsigned zip for sharing)
+```bash
+cd hosts/macos_app
+./scripts/package_release.sh
+# outputs dist/MusicAdvisorMacApp.app and dist/MusicAdvisorMacApp.zip
+```
+
 Reset logs / clean builds
 ```bash
 ./scripts/clean_builds.sh       # wipe app build artifacts

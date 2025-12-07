@@ -13,6 +13,8 @@ struct TrackListView: View {
                 Spacer()
                 Button("Add dummy") { viewModel.addDummy() }
                     .maButton(.secondary)
+                Button("Clear") { viewModel.clearAll() }
+                    .maButton(.ghost)
             }
             if !viewModel.error.isEmpty {
                 Text(viewModel.error).maBadge(.danger)
@@ -25,8 +27,7 @@ struct TrackListView: View {
                                 get: { titleEdits[track.id] ?? track.title },
                                 set: { titleEdits[track.id] = $0 }
                             ))
-                            .textFieldStyle(.roundedBorder)
-                            .foregroundColor(.primary)
+                            .maInput()
 
                             TextField("Artist", text: Binding(
                                 get: {
@@ -35,8 +36,7 @@ struct TrackListView: View {
                                 },
                                 set: { artistEdits[track.id] = $0 }
                             ))
-                            .textFieldStyle(.roundedBorder)
-                            .foregroundColor(.primary)
+                            .maInput()
                             .font(.caption)
                         }
                         Spacer()
@@ -53,8 +53,10 @@ struct TrackListView: View {
                         }
                         .buttonStyle(.plain)
                     }
+                    .modifier(ListRowStyling())
                 }
             }
+            .modifier(ListBackgroundStyling())
             .frame(height: 200)
         }
         .maCard()

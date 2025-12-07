@@ -85,4 +85,16 @@ final class TrackListViewModel: ObservableObject {
             self.error = "Ingest failed: \(error)"
         }
     }
+
+    func clearAll() {
+        do {
+            let existing = try trackStore.listTracks()
+            for t in existing {
+                try trackStore.delete(id: t.id)
+            }
+            load()
+        } catch {
+            self.error = "Clear failed: \(error)"
+        }
+    }
 }

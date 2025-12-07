@@ -3,26 +3,17 @@ import AppKit
 import MAStyle
 
 struct ContentView: View {
-    @StateObject private var viewModel = CommandViewModel()
-    @State private var selectedPane: ResultPane = .json
-    private enum Tab: String, CaseIterable { case run = "Pipeline", history = "History" }
-    @State private var selectedTab: Tab = .run
-    @AppStorage("useDarkTheme") private var useDarkTheme: Bool = true
-    @State private var promptText: String = ""
-    @State private var messages: [String] = ["Welcome to Music Advisor!"]
-    @State private var showAdvanced: Bool = false
-    @State private var historyItems: [SidecarItem] = []
+    @StateObject private var store: AppStore
+    @ObservedObject private var viewModel: CommandViewModel
+    private let trackVM: TrackListViewModel?
     @State private var historyReloadWork: DispatchWorkItem?
-    @State private var historyPreviews: [String: HistoryPreview] = [:]
-    @State private var previewCache: [String: HistoryPreview] = [:]
-    private let mockTrackTitle = "Track Title — Artist"
-    private let quickActions: [(title: String, symbol: String)] = [
-        ("Warnings", "exclamationmark.triangle.fill"),
-        ("Quick Actions", "bolt.fill"),
-        ("Norms", "chart.bar.doc.horizontal.fill")
-    ]
-    private let sections = ["HCI", "Axes", "Historical Echo", "Optimization / Plan"]
-    @State private var trackVM: TrackListViewModel?
+    @State private var confirmClearHistory: Bool = false
+    init() {
+        let s = AppStore()
+        _store = StateObject(wrappedValue: s)
+        _viewModel = ObservedObject(wrappedValue: s.commandVM)
+        self.trackVM = s.trackVM
+    }
 
     var body: some View {
         ZStack {
@@ -37,22 +28,40 @@ struct ContentView: View {
                 .ignoresSafeArea()
             VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
                 HeaderView()
-                    .maSheen(isActive: viewModel.isRunning, duration: 4.5)
+                    .maSheen(isActive: store.commandVM.isRunning, duration: 4.5)
                 Divider()
-                SettingsView(useDarkTheme: $useDarkTheme, statusText: viewModel.status)
+                SettingsView(useDarkTheme: Binding(get: { store.state.useDarkTheme },
+                                                  set: { store.dispatch(.setTheme($0)) }),
+                             statusText: store.commandVM.status)
                 Divider()
-                Picker("Tab", selection: $selectedTab) {
-                    ForEach(Tab.allCases, id: \.self) { tab in
+                Picker("Tab", selection: Binding(get: { store.state.selectedTab },
+                                                 set: { store.dispatch(.setTab($0)) })) {
+                    ForEach(AppTab.allCases, id: \.self) { tab in
                         Text(tab.rawValue).tag(tab)
                     }
                 }
                 .pickerStyle(.segmented)
                 ScrollView {
-                    if selectedTab == .run {
-                        mainSplit
+                    if store.state.selectedTab == .run {
+                        RunPanelView(
+                            store: store,
+                            viewModel: viewModel,
+                            trackVM: trackVM,
+                            mockTrackTitle: store.state.mockTrackTitle,
+                            quickActions: store.state.quickActions,
+                            sections: store.state.sections,
+                            pickFile: { pickFile() },
+                            pickDirectory: { pickDirectory() },
+                            revealSidecar: revealSidecar(path:),
+                            copyJSON: copyJSON,
+                            onPreviewRich: { path in loadHistoryPreview(path: path) }
+                        )
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    } else if store.state.selectedTab == .history {
+                        historyPane
                             .frame(maxWidth: .infinity, alignment: .leading)
                     } else {
-                        historyPane
+                        MAStyleShowcase()
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
@@ -60,18 +69,15 @@ struct ContentView: View {
             .padding(MAStyle.Spacing.lg)
             .frame(minWidth: 640, minHeight: 420)
         }
-        .preferredColorScheme(useDarkTheme ? .dark : .light)
+        .preferredColorScheme(store.state.useDarkTheme ? .dark : .light)
         .onAppear {
-            applyTheme(useDarkTheme)
-            if trackVM == nil {
-                trackVM = makeTrackViewModel()
-            }
+            applyTheme(store.state.useDarkTheme)
             reloadHistory()
         }
-        .onChange(of: useDarkTheme) { isDark in
+        .onChange(of: store.state.useDarkTheme) { isDark in
             applyTheme(isDark)
         }
-        .onReceive(viewModel.queueVM.objectWillChange) { _ in
+        .onReceive(store.commandVM.queueVM.objectWillChange) { _ in
             scheduleHistoryReload()
         }
     }
@@ -97,10 +103,11 @@ struct ContentView: View {
             HStack(spacing: MAStyle.Spacing.sm) {
                 Text("Theme")
                     .maText(.caption)
-                Toggle("", isOn: $useDarkTheme)
+                Toggle("", isOn: Binding(get: { store.state.useDarkTheme },
+                                         set: { store.dispatch(.setTheme($0)) }))
                     .toggleStyle(.switch)
                     .labelsHidden()
-                    .onChange(of: useDarkTheme) { newValue in
+                    .onChange(of: store.state.useDarkTheme) { newValue in
                         if newValue {
                             MAStyle.useDarkTheme()
                         } else {
@@ -122,8 +129,8 @@ struct ContentView: View {
             leftColumn
                 .frame(maxWidth: 260)
             VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
-            TrackHeaderView(title: mockTrackTitle, badgeText: "Norms Badge")
-                .maSheen(isActive: viewModel.isRunning, duration: 5.5, highlight: Color.white.opacity(0.12))
+                TrackHeaderView(title: store.state.mockTrackTitle, badgeText: "Norms Badge")
+                    .maSheen(isActive: viewModel.isRunning, duration: 5.5, highlight: Color.white.opacity(0.12))
             DropZoneView { urls in
                 viewModel.enqueue(files: urls)
                 trackVM?.ingestDropped(urls: urls)
@@ -137,14 +144,15 @@ struct ContentView: View {
                     viewModel.currentJobID = nil
                 }
             )
-            QuickActionsView(actions: quickActions)
-            SectionsView(sections: sections)
+            QuickActionsView(actions: store.state.quickActions)
+            SectionsView(sections: store.state.sections)
             if let trackVM {
                 TrackListView(viewModel: trackVM)
             }
                 CommandInputsView(
                     profiles: viewModel.profiles,
-                    selectedProfile: $viewModel.selectedProfile,
+                    selectedProfile: Binding(get: { viewModel.selectedProfile },
+                                             set: { viewModel.selectedProfile = $0 }),
                     onApplyProfile: {
                         Task { @MainActor in
                             viewModel.applySelectedProfile()
@@ -155,10 +163,14 @@ struct ContentView: View {
                             viewModel.reloadConfig()
                         }
                     },
-                    showAdvanced: $showAdvanced,
-                    commandText: $viewModel.commandText,
-                    workingDirectory: $viewModel.workingDirectory,
-                    envText: $viewModel.envText,
+                    showAdvanced: Binding(get: { store.state.showAdvanced },
+                                          set: { store.dispatch(.setShowAdvanced($0)) }),
+                    commandText: Binding(get: { viewModel.commandText },
+                                         set: { viewModel.commandText = $0 }),
+                    workingDirectory: Binding(get: { viewModel.workingDirectory },
+                                              set: { viewModel.workingDirectory = $0 }),
+                    envText: Binding(get: { viewModel.envText },
+                                     set: { viewModel.envText = $0 }),
                     onPickAudio: {
                         if let url = pickFile() {
                             viewModel.insertAudioPath(url.path)
@@ -189,7 +201,8 @@ struct ContentView: View {
                     }
                 )
                 ResultsView(
-                    selectedPane: $selectedPane,
+                    selectedPane: Binding(get: { store.state.selectedPane },
+                                          set: { store.dispatch(.setPane($0)) }),
                     parsedJSON: viewModel.parsedJSON,
                     stdout: viewModel.stdout,
                     stderr: viewModel.stderr,
@@ -217,27 +230,42 @@ struct ContentView: View {
     }
 
     private var historyPane: some View {
-        HistoryView(
-            items: historyItems,
+        HistoryPanelView(
+            items: store.state.historyItems,
+            previews: store.state.historyPreviews,
             onRefresh: reloadHistory,
             onReveal: revealSidecar(path:),
             onPreview: { path in
                 loadHistoryPreview(path: path)
             },
-            previews: historyPreviews
+            onClear: {
+                confirmClearHistory = true
+            }
         )
+        .alert("Clear history?", isPresented: $confirmClearHistory) {
+            Button("Cancel", role: .cancel) {}
+            Button("Clear", role: .destructive) {
+                store.dispatch(.clearHistory)
+                try? SpecialActions.clearSidecarsOnDisk()
+                reloadHistory()
+            }
+        } message: {
+            Text("This will remove saved sidecars from disk and clear in-memory history.")
+        }
     }
 
     private var leftColumn: some View {
         VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
-            ConsoleView(messages: messages)
-            PromptView(text: $promptText, onSend: sendMessage)
+            ConsoleView(messages: store.state.messages)
+            PromptView(text: Binding(get: { store.state.promptText },
+                                     set: { store.dispatch(.setPrompt($0)) }),
+                       onSend: sendMessage)
         }
     }
 
     private var trackHeader: some View {
         HStack {
-            Text(mockTrackTitle)
+            Text(store.state.mockTrackTitle)
                 .maText(.headline)
             Spacer()
             Text("Norms Badge")
@@ -254,7 +282,7 @@ struct ContentView: View {
                 Spacer()
             }
             HStack(spacing: MAStyle.Spacing.sm) {
-                ForEach(quickActions, id: \.title) { action in
+            ForEach(store.state.quickActions, id: \.title) { action in
                     Label(action.title, systemImage: action.symbol)
                         .maChip(style: .outline, color: MAStyle.ColorToken.primary)
                 }
@@ -266,7 +294,7 @@ struct ContentView: View {
 
     private var sectionCards: some View {
         VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
-            ForEach(sections, id: \.self) { section in
+            ForEach(store.state.sections, id: \.self) { section in
                 HStack {
                     Text(section)
                         .maText(.body)
@@ -381,15 +409,16 @@ struct ContentView: View {
     private var results: some View {
         VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
             Text("Result").maText(.headline)
-            Picker("", selection: $selectedPane) {
+            Picker("", selection: Binding(get: { store.state.selectedPane },
+                                          set: { store.dispatch(.setPane($0)) })) {
                 Text("JSON").tag(ResultPane.json)
                 Text("stdout").tag(ResultPane.stdout)
                 Text("stderr").tag(ResultPane.stderr)
             }
             .pickerStyle(.segmented)
             .onChange(of: viewModel.parsedJSON, perform: { _ in
-                if selectedPane == .json && viewModel.parsedJSON.isEmpty {
-                    selectedPane = .stdout
+                if store.state.selectedPane == .json && viewModel.parsedJSON.isEmpty {
+                    store.dispatch(.setPane(.stdout))
                 }
             })
 
@@ -437,9 +466,9 @@ struct ContentView: View {
                 Spacer()
             }
 
-            resultBlock(title: selectedPane.title,
-                        text: paneText(selectedPane),
-                        color: selectedPane.color)
+            resultBlock(title: store.state.selectedPane.title,
+                        text: paneText(store.state.selectedPane),
+                        color: store.state.selectedPane.color)
 
             if !viewModel.sidecarPreview.isEmpty {
                 resultBlock(title: "sidecar preview",
@@ -478,10 +507,10 @@ struct ContentView: View {
     }
 
     private func sendMessage() {
-        let trimmed = promptText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = store.state.promptText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
-        messages.append(trimmed)
-        promptText = ""
+        store.dispatch(.appendMessage(trimmed))
+        store.dispatch(.setPrompt(""))
     }
 
     private func trackStorePaths() -> (trackURL: URL, artistURL: URL) {
@@ -504,10 +533,16 @@ struct ContentView: View {
         case .json:
             return viewModel.parsedJSON.isEmpty ? "(no JSON parsed)" : prettyJSON(viewModel.parsedJSON)
         case .stdout:
-            return viewModel.stdout
+            return truncated(viewModel.stdout, label: "stdout")
         case .stderr:
-            return viewModel.stderr
+            return truncated(viewModel.stderr, label: "stderr")
         }
+    }
+
+    private func truncated(_ text: String, label: String, limit: Int = 8000) -> String {
+        guard text.count > limit else { return text }
+        let tail = text.suffix(limit)
+        return "[\(label) truncated to last \(limit) chars]\n\(tail)"
     }
 }
 
@@ -582,7 +617,7 @@ extension ContentView {
         let supportDir = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let sidecarDir = supportDir.appendingPathComponent("MusicAdvisorMacApp/sidecars", isDirectory: true)
         guard let urls = try? fm.contentsOfDirectory(at: sidecarDir, includingPropertiesForKeys: [.contentModificationDateKey], options: [.skipsHiddenFiles]) else {
-            historyItems = []
+            store.dispatch(.setHistoryItems([]))
             return
         }
         let items: [SidecarItem] = urls.compactMap { url in
@@ -590,7 +625,7 @@ extension ContentView {
             let mod = attrs?.contentModificationDate ?? Date.distantPast
             return SidecarItem(path: url.path, name: url.lastPathComponent, modified: mod)
         }
-        historyItems = items.sorted { $0.modified > $1.modified }
+        store.dispatch(.setHistoryItems(items.sorted { $0.modified > $1.modified }))
     }
 
     private func scheduleHistoryReload() {
@@ -601,8 +636,8 @@ extension ContentView {
     }
 
     private func loadHistoryPreview(path: String) {
-        if let cached = previewCache[path] {
-            historyPreviews[path] = cached
+        if let cached = store.state.previewCache[path] {
+            store.dispatch(.setHistoryPreview(path: path, preview: cached.0))
             return
         }
         Task.detached {
@@ -635,30 +670,32 @@ extension ContentView {
                 }
                 let repoRoot = URL(fileURLWithPath: "/Users/keithhetrick/music-advisor")
                 let featuresRoot = repoRoot.appendingPathComponent("data/features_output")
-                if let enumerator = fm.enumerator(at: featuresRoot, includingPropertiesForKeys: nil) {
-                    for case let url as URL in enumerator {
-                        for candidate in candidates {
-                            if url.lastPathComponent == "\(candidate).client.rich.txt",
-                               let data = try? Data(contentsOf: url),
-                               let txt = String(data: data, encoding: .utf8) {
-                                richText = txt
-                                richFound = true
-                                richPathUsed = url.path
-                                break
-                            }
+            if let enumerator = fm.enumerator(at: featuresRoot, includingPropertiesForKeys: nil) {
+                for case let url as URL in enumerator {
+                    for candidate in candidates {
+                        if url.lastPathComponent == "\(candidate).client.rich.txt",
+                           let data = try? Data(contentsOf: url),
+                           let txt = String(data: data, encoding: .utf8) {
+                            richText = txt
+                            richFound = true
+                            richPathUsed = url.path
+                            break
                         }
-                        if richFound { break }
                     }
+                    if richFound { break }
                 }
             }
+            }
             let preview = HistoryPreview(sidecar: sidecarText, rich: richText, richFound: richFound, richPath: richPathUsed)
+            let mtime = (try? fm.attributesOfItem(atPath: path)[.modificationDate] as? Date) ?? nil
             await MainActor.run {
-                var cacheCopy = previewCache
-                cacheCopy[path] = preview
-                previewCache = cacheCopy
-                var historyCopy = historyPreviews
-                historyCopy[path] = preview
-                historyPreviews = historyCopy
+                // Cache with mtime so we can reuse until file changes.
+                store.dispatch(.setPreviewCache(path: path, preview: preview))
+                store.dispatch(.setHistoryPreview(path: path, preview: preview))
+                // Store cache with mtime directly on state to avoid extra dispatch plumbing.
+                var cache = store.state.previewCache
+                cache[path] = (preview, mtime)
+                store.state.previewCache = cache
             }
         }
     }

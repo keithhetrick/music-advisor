@@ -96,9 +96,38 @@ public enum MAStyle {
     )
 
     public static var theme = defaultDark
+    public static var reduceMotionEnabled: Bool = false
 
     // Optional light theme (if needed)
     public static let darkTheme = defaultDark
+    public static let highContrastTheme: Theme = Theme(
+        colors: ColorTokens(
+            background: Color(red: 0.02, green: 0.02, blue: 0.05),
+            panel: Color(red: 0.06, green: 0.07, blue: 0.12),
+            border: Color.white.opacity(0.2),
+            primary: Color(red: 0.12, green: 0.9, blue: 0.8),
+            success: Color(red: 0.45, green: 0.95, blue: 0.65),
+            warning: Color(red: 1.0, green: 0.75, blue: 0.35),
+            danger: Color(red: 1.0, green: 0.35, blue: 0.5),
+            info: Color(red: 0.55, green: 0.75, blue: 1.0),
+            muted: Color.white,
+            metricBG: Color.white.opacity(0.12)
+        ),
+        spacing: SpacingTokens(xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 28),
+        radius: RadiusTokens(sm: 6, md: 10, lg: 14, pill: 999),
+        typography: TypographyTokens(
+            bodyMono: Font.system(size: 13, weight: .regular, design: .monospaced),
+            body: Font.system(size: 14, weight: .medium),
+            caption: Font.system(size: 12, weight: .semibold),
+            headline: Font.system(size: 16, weight: .semibold),
+            title: Font.system(size: 20, weight: .bold)
+        ),
+        shadows: ShadowTokens(
+            sm: Shadow(color: Color.black.opacity(0.45), radius: 12, x: 0, y: 7),
+            md: Shadow(color: Color.black.opacity(0.55), radius: 20, x: 0, y: 12)
+        ),
+        borders: BorderTokens(thin: 1.2, regular: 1.6)
+    )
 
     public enum ColorToken {
         public static var background: Color { MAStyle.theme.colors.background }
@@ -149,8 +178,12 @@ public enum MAStyle {
 
     public struct Card: ViewModifier {
         var padding: CGFloat = Spacing.sm
+        var isDisabled: Bool = false
+        var isInteractive: Bool = false
+        @State private var hovering = false
+
         public func body(content: Content) -> some View {
-            content
+            let base = content
                 .padding(padding)
                 .background(
                     ZStack {
@@ -162,12 +195,10 @@ public enum MAStyle {
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
-                        // Subtle inner glow to lift the surface.
                         RoundedRectangle(cornerRadius: Radius.md)
                             .stroke(Color.white.opacity(0.06), lineWidth: 1)
                             .blur(radius: 1.2)
                             .blendMode(.screen)
-                        // Light sheen across the top.
                         LinearGradient(
                             colors: [
                                 Color.white.opacity(0.10),
@@ -184,7 +215,6 @@ public enum MAStyle {
                 )
                 .cornerRadius(Radius.md)
                 .overlay(
-                    // Dual-tone border for depth.
                     RoundedRectangle(cornerRadius: Radius.md)
                         .stroke(
                             LinearGradient(
@@ -198,7 +228,6 @@ public enum MAStyle {
                             lineWidth: Borders.thin
                         )
                 )
-                // Inner shadow for depth.
                 .overlay(
                     RoundedRectangle(cornerRadius: Radius.md)
                         .stroke(Color.black.opacity(0.25), lineWidth: 1)
@@ -208,9 +237,14 @@ public enum MAStyle {
                             RoundedRectangle(cornerRadius: Radius.md)
                         )
                 )
-                // Layered shadows for 3D lift with a soft accent halo.
                 .shadow(color: Color.black.opacity(0.42), radius: 18, x: 0, y: 12)
                 .shadow(color: ColorToken.primary.opacity(0.12), radius: 26, x: 0, y: 18)
+                .opacity(isDisabled ? 0.6 : 1.0)
+
+            return base
+                .scaleEffect(isInteractive && hovering ? 1.01 : 1.0)
+                .animation(.easeOut(duration: 0.12), value: hovering)
+                .onHover { hovering = $0 && isInteractive && !isDisabled }
         }
     }
 
@@ -300,41 +334,79 @@ public enum MAStyle {
         }
     }
 
-    public struct ButtonStyle: ViewModifier {
-        public enum Variant { case primary, secondary, ghost }
+    public struct InteractiveButtonStyle: ButtonStyle {
+        public enum Variant { case primary, secondary, ghost, busy }
         public var variant: Variant = .primary
-        @ViewBuilder
-        public func body(content: Content) -> some View {
-            let base = content
-                .font(Typography.body)
-                .padding(.vertical, Spacing.sm)
-                .padding(.horizontal, Spacing.md)
-                .cornerRadius(Radius.md)
-            switch variant {
-            case .primary:
-                base
-                    .background(
-                        LinearGradient(
-                            colors: [
-                                ColorToken.primary.opacity(0.95),
-                                ColorToken.primary.opacity(0.80)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+        public var hoverScale: CGFloat = 1.02
+        public var isBusy: Bool = false
+
+        public func makeBody(configuration: Configuration) -> some View {
+            HoverButton(configuration: configuration, variant: variant, hoverScale: hoverScale, isBusy: isBusy)
+        }
+
+        private struct HoverButton: View {
+            let configuration: Configuration
+            let variant: Variant
+            let hoverScale: CGFloat
+            let isBusy: Bool
+            @State private var hovering = false
+
+            var body: some View {
+                let base = configuration.label
+                    .font(MAStyle.Typography.body)
+                    .padding(.vertical, MAStyle.Spacing.sm)
+                    .padding(.horizontal, MAStyle.Spacing.md)
+                    .cornerRadius(MAStyle.Radius.md)
+
+                let styled: AnyView = {
+                    switch variant {
+                    case .primary, .busy:
+                        return AnyView(
+                            base
+                                .background(
+                                    LinearGradient(
+                                        colors: [
+                                            MAStyle.ColorToken.primary.opacity(0.95),
+                                            MAStyle.ColorToken.primary.opacity(0.80)
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .foregroundColor(.white)
+                                .shadow(color: Color.black.opacity(0.35), radius: 12, x: 0, y: 6)
+                                .shadow(color: MAStyle.ColorToken.primary.opacity(0.20), radius: 16, x: 0, y: 10)
                         )
-                    )
-                    .foregroundColor(.white)
-                    // Tighter, richer shadow for a premium pill look.
-                    .shadow(color: Color.black.opacity(0.35), radius: 12, x: 0, y: 6)
-                    .shadow(color: ColorToken.primary.opacity(0.20), radius: 16, x: 0, y: 10)
-            case .secondary:
-                base
-                    .background(ColorToken.panel)
-                    .overlay(RoundedRectangle(cornerRadius: Radius.md).stroke(ColorToken.border, lineWidth: Borders.thin))
-                    .foregroundColor(ColorToken.primary)
-            case .ghost:
-                base
-                    .foregroundColor(ColorToken.primary)
+                    case .secondary:
+                        return AnyView(
+                            base
+                                .background(MAStyle.ColorToken.panel)
+                                .overlay(RoundedRectangle(cornerRadius: MAStyle.Radius.md).stroke(MAStyle.ColorToken.border, lineWidth: MAStyle.Borders.thin))
+                                .foregroundColor(MAStyle.ColorToken.primary)
+                        )
+                    case .ghost:
+                        return AnyView(
+                            base
+                                .foregroundColor(MAStyle.ColorToken.primary)
+                        )
+                    }
+                }()
+
+                return styled
+                    .overlay(alignment: .leading) {
+                        if variant == .busy && isBusy {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                                .scaleEffect(0.6)
+                                .padding(.leading, MAStyle.Spacing.xs)
+                        }
+                    }
+                    .opacity(configuration.isPressed ? 0.88 : (isBusy ? 0.85 : 1.0))
+                    .scaleEffect(configuration.isPressed ? 0.98 : (hovering ? hoverScale : 1.0))
+                    .animation(.spring(response: 0.18, dampingFraction: 0.8), value: configuration.isPressed)
+                    .animation(.easeOut(duration: 0.12), value: hovering)
+                    .onHover { hovering = $0 }
+                    .disabled(isBusy)
             }
         }
     }
@@ -377,22 +449,35 @@ public enum MAStyle {
         public enum Style { case solid, outline }
         public var style: Style = .solid
         public var color: Color = ColorToken.primary
+        public var isDisabled: Bool = false
+        @State private var hovering = false
         public func body(content: Content) -> some View {
             let base = content
                 .font(Typography.caption)
                 .padding(.horizontal, Spacing.sm)
                 .padding(.vertical, Spacing.xs)
                 .cornerRadius(Radius.pill)
-            switch style {
-            case .solid:
-                base
-                    .background(color.opacity(0.15))
-                    .foregroundColor(color)
-            case .outline:
-                base
-                    .overlay(RoundedRectangle(cornerRadius: Radius.pill).stroke(color, lineWidth: Borders.thin))
-                    .foregroundColor(color)
-            }
+                .opacity(isDisabled ? 0.5 : 1.0)
+            let styled: AnyView = {
+                switch style {
+                case .solid:
+                    return AnyView(
+                        base
+                            .background(color.opacity(isDisabled ? 0.10 : 0.15))
+                            .foregroundColor(color)
+                    )
+                case .outline:
+                    return AnyView(
+                        base
+                            .overlay(RoundedRectangle(cornerRadius: Radius.pill).stroke(color, lineWidth: Borders.thin))
+                            .foregroundColor(color)
+                    )
+                }
+            }()
+            return styled
+                .scaleEffect(isDisabled ? 1.0 : (hovering ? 1.03 : 1.0))
+                .animation(.easeOut(duration: 0.12), value: hovering)
+                .onHover { hovering = $0 && !isDisabled }
         }
     }
 
@@ -416,6 +501,127 @@ public enum MAStyle {
                 .background(toneColor.opacity(0.12))
                 .foregroundColor(toneColor)
                 .cornerRadius(Radius.pill)
+        }
+    }
+
+    public struct InputField: ViewModifier {
+        public enum State { case normal, error, disabled }
+        var state: State = .normal
+        public func body(content: Content) -> some View {
+            content
+                .disabled(state == .disabled)
+                .padding(.vertical, Spacing.xs)
+                .padding(.horizontal, Spacing.sm)
+                .background(ColorToken.panel.opacity(state == .disabled ? 0.3 : 0.5))
+                .overlay(
+                    RoundedRectangle(cornerRadius: Radius.sm)
+                        .stroke(borderColor, lineWidth: Borders.thin)
+                )
+                .cornerRadius(Radius.sm)
+                .opacity(state == .disabled ? 0.6 : 1.0)
+        }
+        private var borderColor: Color {
+            switch state {
+            case .normal: return ColorToken.border
+            case .error: return ColorToken.danger.opacity(0.8)
+            case .disabled: return ColorToken.border.opacity(0.5)
+            }
+        }
+    }
+
+    public struct TextArea: ViewModifier {
+        var state: InputField.State = .normal
+        public func body(content: Content) -> some View {
+            content
+                .disabled(state == .disabled)
+                .padding(Spacing.sm)
+                .background(ColorToken.panel.opacity(state == .disabled ? 0.3 : 0.5))
+                .overlay(
+                    RoundedRectangle(cornerRadius: Radius.sm)
+                        .stroke(borderColor, lineWidth: Borders.thin)
+                )
+                .cornerRadius(Radius.sm)
+                .font(Typography.bodyMono)
+                .opacity(state == .disabled ? 0.6 : 1.0)
+        }
+        private var borderColor: Color {
+            switch state {
+            case .normal: return ColorToken.border
+            case .error: return ColorToken.danger.opacity(0.8)
+            case .disabled: return ColorToken.border.opacity(0.5)
+            }
+        }
+    }
+
+    public struct PickerStyleModifier: ViewModifier {
+        public func body(content: Content) -> some View {
+            content
+                .padding(.horizontal, Spacing.sm)
+                .padding(.vertical, Spacing.xs)
+                .background(ColorToken.panel.opacity(0.6))
+                .overlay(RoundedRectangle(cornerRadius: Radius.sm).stroke(ColorToken.border, lineWidth: Borders.thin))
+                .cornerRadius(Radius.sm)
+        }
+    }
+
+    public struct ProgressStyleModifier: ViewModifier {
+        public func body(content: Content) -> some View {
+            content
+                .tint(ColorToken.primary)
+                .padding(.vertical, Spacing.xs)
+        }
+    }
+
+    public struct ListRowStyleModifier: ViewModifier {
+        @State private var hovering = false
+        public var isSelected: Bool = false
+        public var isDisabled: Bool = false
+        public var isFocused: Bool = false
+        public func body(content: Content) -> some View {
+            content
+                .padding(.vertical, Spacing.xs)
+                .padding(.horizontal, Spacing.sm)
+                .background(rowColor)
+                .cornerRadius(Radius.sm)
+                .opacity(isDisabled ? 0.5 : 1.0)
+                .overlay(
+                    RoundedRectangle(cornerRadius: Radius.sm)
+                        .stroke(isFocused ? ColorToken.primary.opacity(0.8) : Color.clear, lineWidth: isFocused ? 2 : 0)
+                )
+                .onHover { hovering = $0 && !isDisabled }
+        }
+        private var rowColor: Color {
+            if isDisabled { return ColorToken.panel.opacity(0.15) }
+            if isSelected { return ColorToken.primary.opacity(0.18) }
+            if hovering { return ColorToken.panel.opacity(0.45) }
+            return ColorToken.panel.opacity(0.3)
+        }
+    }
+
+    public struct StripedRowStyleModifier: ViewModifier {
+        public var index: Int
+        public var isSelected: Bool = false
+        public var isDisabled: Bool = false
+        public var isFocused: Bool = false
+        @State private var hovering = false
+        public func body(content: Content) -> some View {
+            content
+                .padding(.vertical, Spacing.xs)
+                .padding(.horizontal, Spacing.sm)
+                .background(rowColor)
+                .cornerRadius(Radius.sm)
+                .opacity(isDisabled ? 0.5 : 1.0)
+                .overlay(
+                    RoundedRectangle(cornerRadius: Radius.sm)
+                        .stroke(isFocused ? ColorToken.primary.opacity(0.8) : Color.clear, lineWidth: isFocused ? 2 : 0)
+                )
+                .onHover { hovering = $0 && !isDisabled }
+        }
+        private var rowColor: Color {
+            if isDisabled { return ColorToken.panel.opacity(0.12) }
+            if isSelected { return ColorToken.primary.opacity(0.2) }
+            if hovering { return ColorToken.panel.opacity(0.5) }
+            return index % 2 == 0 ? ColorToken.panel.opacity(0.32) : ColorToken.panel.opacity(0.25)
         }
     }
 
@@ -453,11 +659,38 @@ public enum MAStyle {
             )
         }
     }
+
+    public static func useHighContrastTheme() {
+        theme = highContrastTheme
+    }
+
+    /// Adjust spacing density (e.g., compact = 0.85, regular = 1.0).
+    public static func applyDensity(scale: CGFloat) {
+        theme = Theme(
+            colors: theme.colors,
+            spacing: SpacingTokens(
+                xs: theme.spacing.xs * scale,
+                sm: theme.spacing.sm * scale,
+                md: theme.spacing.md * scale,
+                lg: theme.spacing.lg * scale,
+                xl: theme.spacing.xl * scale,
+                xxl: theme.spacing.xxl * scale
+            ),
+            radius: theme.radius,
+            typography: theme.typography,
+            shadows: theme.shadows,
+            borders: theme.borders
+        )
+    }
 }
 
 extension View {
     public func maCard(padding: CGFloat = MAStyle.Spacing.sm) -> some View {
         modifier(MAStyle.Card(padding: padding))
+    }
+
+    public func maCardInteractive(padding: CGFloat = MAStyle.Spacing.sm, isDisabled: Bool = false) -> some View {
+        modifier(MAStyle.Card(padding: padding, isDisabled: isDisabled, isInteractive: true))
     }
 
     public func maMetric() -> some View {
@@ -468,8 +701,8 @@ extension View {
         self.shadow(color: shadow.color, radius: shadow.radius, x: shadow.x, y: shadow.y)
     }
 
-    public func maButton(_ variant: MAStyle.ButtonStyle.Variant = .primary) -> some View {
-        modifier(MAStyle.ButtonStyle(variant: variant))
+    public func maButton(_ variant: MAStyle.InteractiveButtonStyle.Variant = .primary, isBusy: Bool = false) -> some View {
+        self.buttonStyle(MAStyle.InteractiveButtonStyle(variant: variant, isBusy: isBusy))
     }
 
     public func maText(_ kind: MAStyle.TextStyle.Kind) -> some View {
@@ -484,8 +717,8 @@ extension View {
         modifier(MAStyle.Margin(top: top, leading: leading, bottom: bottom, trailing: trailing))
     }
 
-    public func maChip(style: MAStyle.Chip.Style = .solid, color: Color = MAStyle.ColorToken.primary) -> some View {
-        modifier(MAStyle.Chip(style: style, color: color))
+    public func maChip(style: MAStyle.Chip.Style = .solid, color: Color = MAStyle.ColorToken.primary, isDisabled: Bool = false) -> some View {
+        modifier(MAStyle.Chip(style: style, color: color, isDisabled: isDisabled))
     }
 
     public func maBadge(_ tone: MAStyle.Badge.Tone = .neutral) -> some View {
@@ -494,5 +727,29 @@ extension View {
 
     public func maSheen(isActive: Bool = true, duration: Double = 5.5, highlight: Color = Color.white.opacity(0.16)) -> some View {
         modifier(MAStyle.Sheen(isActive: isActive, duration: duration, highlight: highlight))
+    }
+
+    public func maInput(state: MAStyle.InputField.State = .normal) -> some View {
+        modifier(MAStyle.InputField(state: state))
+    }
+
+    public func maTextArea(state: MAStyle.InputField.State = .normal) -> some View {
+        modifier(MAStyle.TextArea(state: state))
+    }
+
+    public func maPickerStyle() -> some View {
+        modifier(MAStyle.PickerStyleModifier())
+    }
+
+    public func maProgressStyle() -> some View {
+        modifier(MAStyle.ProgressStyleModifier())
+    }
+
+    public func maListRowStyle(isSelected: Bool = false, isDisabled: Bool = false, isFocused: Bool = false) -> some View {
+        modifier(MAStyle.ListRowStyleModifier(isSelected: isSelected, isDisabled: isDisabled, isFocused: isFocused))
+    }
+
+    public func maStripedRowStyle(index: Int, isSelected: Bool = false, isDisabled: Bool = false, isFocused: Bool = false) -> some View {
+        modifier(MAStyle.StripedRowStyleModifier(index: index, isSelected: isSelected, isDisabled: isDisabled, isFocused: isFocused))
     }
 }

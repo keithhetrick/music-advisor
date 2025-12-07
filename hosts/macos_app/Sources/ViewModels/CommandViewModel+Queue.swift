@@ -12,8 +12,16 @@ final class JobQueueViewModel: ObservableObject {
         jobs.append(contentsOf: newJobs)
     }
 
+    func addPrecomputed(_ newJobs: [Job]) {
+        jobs.append(contentsOf: newJobs)
+    }
+
     func clear() {
         jobs.removeAll()
+    }
+
+    func clearPending() {
+        jobs.removeAll { $0.status == .pending }
     }
 
     func markRunning(jobID: UUID) {

@@ -11,8 +11,7 @@ struct PromptView: View {
                 .maText(.caption)
             HStack {
                 TextField("Type a message…", text: $text)
-                    .textFieldStyle(.roundedBorder)
-                    .foregroundColor(.primary)
+                    .maInput()
                     .onSubmit { onSend() }
                 Button("Send") {
                     onSend()
@@ -20,6 +19,6 @@ struct PromptView: View {
                 .maButton(.primary)
             }
         }
-        .maCard()
+        .maCardInteractive()
     }
 }

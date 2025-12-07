@@ -37,3 +37,28 @@ jobs:
         run: |
           chmod +x tests/helper/run_helper_tests.sh
           tests/helper/run_helper_tests.sh
+
+  swift-ui:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: SwiftUI design system tests
+        working-directory: shared/design_system
+        run: |
+          LOCAL=$PWD/.build/local
+          mkdir -p "$LOCAL/ModuleCache" "$LOCAL/home"
+          HOME="$LOCAL/home" \
+          SWIFT_MODULE_CACHE_PATH="$LOCAL/ModuleCache" \
+          LLVM_MODULE_CACHE_PATH="$LOCAL/ModuleCache" \
+          SWIFTPM_DISABLE_SANDBOX=1 \
+          swift test --disable-sandbox
+
+      - name: macOS app build (showcase tab)
+        working-directory: hosts/macos_app
+        run: |
+          mkdir -p build/home
+          HOME=$PWD/build/home \
+          SWIFTPM_DISABLE_SANDBOX=1 \
+          swift build --scratch-path $PWD/build/.swiftpm --disable-sandbox

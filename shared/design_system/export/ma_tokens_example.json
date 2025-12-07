@@ -1,0 +1,28 @@
+{
+  "colors": {
+    "background": "Color(...)",
+    "panel": "Color(...)",
+    "border": "Color(...)",
+    "primary": "Color(...)",
+    "success": "Color(...)",
+    "warning": "Color(...)",
+    "danger": "Color(...)",
+    "info": "Color(...)",
+    "muted": "Color(...)",
+    "metricBG": "Color(...)"
+  },
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 20,
+    "xxl": 28
+  },
+  "radius": {
+    "sm": 6,
+    "md": 10,
+    "lg": 14,
+    "pill": 999
+  }
+}

@@ -12,16 +12,16 @@ struct ConsoleView: View {
                 VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
                     ForEach(messages.indices, id: \.self) { idx in
                         Text(messages[idx])
-                            .font(.system(.body, design: .monospaced))
-                            .foregroundColor(.primary)
+                            .font(MAStyle.Typography.bodyMono)
+                            .foregroundColor(MAStyle.ColorToken.muted)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .frame(minHeight: 220)
-            .overlay(RoundedRectangle(cornerRadius: MAStyle.Radius.md).stroke(MAStyle.ColorToken.border))
+            .maCardInteractive()
         }
-        .maCard()
+        .maCardInteractive()
     }
 }

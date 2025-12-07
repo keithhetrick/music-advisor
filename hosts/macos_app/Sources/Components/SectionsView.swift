@@ -12,8 +12,9 @@ struct SectionsView: View {
                         .maText(.body)
                     Spacer()
                 }
-                .maCard(padding: MAStyle.Spacing.sm)
+                .maCardInteractive(padding: MAStyle.Spacing.sm)
             }
         }
+        .maCard()
     }
 }

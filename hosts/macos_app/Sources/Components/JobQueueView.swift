@@ -59,15 +59,27 @@ struct JobQueueView: View {
                                     .maButton(.ghost)
                                 }
                             }
+                            HStack(spacing: MAStyle.Spacing.sm) {
+                                if #available(macOS 13.0, *) {
+                                    ProgressView(value: job.progress)
+                                        .maProgressStyle()
+                                        .frame(maxWidth: 160)
+                                } else {
+                                    ProgressView()
+                                        .maProgressStyle()
+                                        .frame(maxWidth: 160)
+                                }
+                                Text(progressLabel(for: job))
+                                    .maText(.caption)
+                                    .foregroundStyle(MAStyle.ColorToken.muted)
+                            }
                         }
-                        .padding(MAStyle.Spacing.xs)
-                        .background(MAStyle.ColorToken.panel.opacity(0.4))
-                        .cornerRadius(MAStyle.Radius.sm)
+                        .maCardInteractive()
                     }
                 }
             }
         }
-        .maCard()
+        .maCardInteractive()
     }
 
     @ViewBuilder
@@ -81,6 +93,20 @@ struct JobQueueView: View {
             Text("Done").maBadge(.success)
         case .failed:
             Text("Failed").maBadge(.danger)
+        }
+    }
+
+    private func progressLabel(for job: Job) -> String {
+        let percent = Int(job.progress * 100)
+        switch job.status {
+        case .pending:
+            return "Pending"
+        case .running:
+            return "\(percent)%"
+        case .done:
+            return "100% (done)"
+        case .failed:
+            return "Failed"
         }
     }
 }

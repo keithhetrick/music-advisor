@@ -25,6 +25,7 @@ struct CommandInputsView: View {
                         }
                     }
                     .labelsHidden()
+                    .ifAvailable { $0.maPickerStyle() }
                     Button("Apply profile") {
                         onApplyProfile()
                     }
@@ -51,8 +52,7 @@ struct CommandInputsView: View {
                 Text("Command").maText(.headline)
                 HStack(spacing: MAStyle.Spacing.sm) {
                     TextField("/usr/bin/python3 tools/cli/ma_audio_features.py --audio /path/to/audio.wav --out /tmp/out.json", text: $commandText)
-                        .textFieldStyle(.roundedBorder)
-                        .foregroundColor(.primary)
+                        .maInput()
                     Button("Pick audio…") {
                         onPickAudio()
                     }
@@ -62,8 +62,7 @@ struct CommandInputsView: View {
                 Text("Working directory (optional)").maText(.headline)
                 HStack(spacing: MAStyle.Spacing.sm) {
                     TextField("e.g. /Users/you/music-advisor", text: $workingDirectory)
-                        .textFieldStyle(.roundedBorder)
-                        .foregroundColor(.primary)
+                        .maInput()
                     Button("Browse…") {
                         onBrowseDir()
                     }
@@ -72,10 +71,8 @@ struct CommandInputsView: View {
 
                 Text("Extra env (KEY=VALUE per line)").maText(.headline)
                 TextEditor(text: $envText)
-                    .font(.system(.body, design: .monospaced))
-                    .foregroundColor(.primary)
+                    .maTextArea()
                     .frame(minHeight: 80)
-                    .overlay(RoundedRectangle(cornerRadius: MAStyle.Radius.sm).stroke(MAStyle.ColorToken.border))
             }
         }
     }

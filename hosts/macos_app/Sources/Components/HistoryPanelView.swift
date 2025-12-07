@@ -1,12 +1,13 @@
 import SwiftUI
 import MAStyle
 
-struct HistoryView: View {
+struct HistoryPanelView: View {
     var items: [SidecarItem]
+    var previews: [String: HistoryPreview]
     var onRefresh: () -> Void
     var onReveal: (String) -> Void
     var onPreview: (String) -> Void
-    var previews: [String: HistoryPreview]
+    var onClear: () -> Void
     @State private var isExpanded: [String: Bool] = [:]
 
     var body: some View {
@@ -30,6 +31,8 @@ struct HistoryView: View {
             Text("History")
                 .maText(.headline)
             Spacer()
+            Button("Clear") { onClear() }
+                .maButton(.ghost)
             Button("Refresh") { onRefresh() }
                 .maButton(.ghost)
         }
@@ -85,9 +88,7 @@ struct HistoryView: View {
                 .padding(.top, MAStyle.Spacing.xs)
             }
         }
-        .padding(MAStyle.Spacing.xs)
-        .background(MAStyle.ColorToken.panel.opacity(0.4))
-        .cornerRadius(MAStyle.Radius.sm)
+        .maCardInteractive()
     }
 
     @ViewBuilder

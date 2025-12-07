@@ -24,6 +24,13 @@ cd hosts/macos_app
 # HOME=$PWD/build/home swift run   --scratch-path $PWD/build/.swiftpm
 ```
 
+Package (unsigned dev zip)
+```bash
+cd hosts/macos_app
+./scripts/package_release.sh
+# outputs dist/MusicAdvisorMacApp.app and dist/MusicAdvisorMacApp.zip
+```
+
 What it does today
 - Shows a SwiftUI window with a configurable CLI runner (defaults to echo a JSON string).
 - No external deps; good for proving the Swift toolchain is ready.

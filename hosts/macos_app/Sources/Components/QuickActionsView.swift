@@ -19,6 +19,6 @@ struct QuickActionsView: View {
                 Spacer()
             }
         }
-        .maCard()
+        .maCardInteractive()
     }
 }
