@@ -27,7 +27,10 @@ struct ContentView: View {
             )
                 .ignoresSafeArea()
             VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
-                HeaderView()
+                HeaderView(hostStatus: store.state.hostSnapshot.status,
+                           progress: store.state.hostSnapshot.processing.progress,
+                           showProgress: store.state.hostSnapshot.processing.status == "running",
+                           lastUpdated: store.state.hostSnapshot.lastUpdated)
                     .maSheen(isActive: store.commandVM.isRunning, duration: 4.5)
                 Divider()
                 SettingsView(useDarkTheme: Binding(get: { store.state.useDarkTheme },
@@ -79,6 +82,13 @@ struct ContentView: View {
         }
         .onReceive(store.commandVM.queueVM.objectWillChange) { _ in
             scheduleHistoryReload()
+        }
+        .onReceive(store.commandVM.$isRunning) { running in
+            let status = running ? "processing" : "idle"
+            var snap = store.state.hostSnapshot
+            snap.status = status
+            snap.lastUpdated = Date()
+            store.dispatch(.setHostSnapshot(snap))
         }
     }
 

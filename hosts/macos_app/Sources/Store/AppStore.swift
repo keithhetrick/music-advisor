@@ -19,6 +19,7 @@ enum AppAction {
     case setHistoryPreview(path: String, preview: HistoryPreview)
     case setPreviewCache(path: String, preview: HistoryPreview)
     case clearHistory
+    case setHostSnapshot(HostSnapshot)
 }
 
 struct AppState {
@@ -31,6 +32,7 @@ struct AppState {
     var historyItems: [SidecarItem] = []
     var historyPreviews: [String: HistoryPreview] = [:]
     var previewCache: [String: (HistoryPreview, Date?)] = [:]
+    var hostSnapshot: HostSnapshot = .idle
     // UI literals made dynamic for future tweaks.
     var mockTrackTitle: String = "Track Title — Artist"
     var quickActions: [(title: String, symbol: String)] = [
@@ -48,6 +50,8 @@ final class AppStore: ObservableObject {
     // Adapters to keep existing bindings working while we refactor views to scoped state later.
     let commandVM: CommandViewModel
     let trackVM: TrackListViewModel?
+    private let hostCoordinator: HostCoordinator
+    private var hostMonitorTask: Task<Void, Never>?
 
     func dispatch(_ action: AppAction) {
         switch action {
@@ -77,12 +81,25 @@ final class AppStore: ObservableObject {
             state.historyItems = []
             state.historyPreviews = [:]
             state.previewCache = [:]
+        case .setHostSnapshot(let snap):
+            state.hostSnapshot = snap
         }
     }
 
     init() {
+        self.hostCoordinator = HostCoordinator()
         self.commandVM = CommandViewModel()
         self.trackVM = AppStore.makeTrackViewModel()
+        self.commandVM.processingUpdater = { [weak self] status, progress, message in
+            Task {
+                await self?.hostCoordinator.updateProcessing(status: status, progress: progress, message: message)
+            }
+        }
+        startHostMonitor()
+    }
+
+    deinit {
+        hostMonitorTask?.cancel()
     }
 
     private static func trackStorePaths() -> (trackURL: URL, artistURL: URL) {
@@ -98,5 +115,18 @@ final class AppStore: ObservableObject {
         let trackStore = JsonTrackStore(url: paths.trackURL)
         let artistStore = JsonArtistStore(url: paths.artistURL)
         return TrackListViewModel(trackStore: trackStore, artistStore: artistStore)
+    }
+
+    private func startHostMonitor() {
+        hostMonitorTask?.cancel()
+        hostMonitorTask = Task.detached { [weak self] in
+            while let self = self {
+                let snap = await self.hostCoordinator.snapshot()
+                await MainActor.run {
+                    self.state.hostSnapshot = snap
+                }
+                try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5s to reduce UI churn
+            }
+        }
     }
 }

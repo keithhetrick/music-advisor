@@ -24,9 +24,12 @@ final class CommandViewModel: ObservableObject {
     @Published var queueVM = JobQueueViewModel()
     @Published var currentJobID: UUID?
     private var stopAfterCurrent: Bool = false
+    private var progressThrottle = Date.distantPast
 
     private let runnerService = RunnerService()
     private let initialConfig: AppConfig
+    // Optional updater for processing snapshots (actor in AppStore).
+    var processingUpdater: ((String?, Double?, String?) -> Void)?
 
     init(config: AppConfig = .fromEnv()) {
         self.initialConfig = config
@@ -118,6 +121,7 @@ final class CommandViewModel: ObservableObject {
         summaryMetrics = []
         lastDuration = nil
         sidecarPreview = ""
+        processingUpdater?("running", 0.0, "starting")
 
         Task.detached {
             let start = Date()
@@ -139,6 +143,7 @@ final class CommandViewModel: ObservableObject {
                 self.summaryMetrics = metrics
                 self.lastRunTime = Date()
                 self.isRunning = false
+                self.processingUpdater?(result.exitCode == 0 ? "done" : "failed", 1.0, self.status)
 
                 if let jobID = self.currentJobID {
                     if result.exitCode == 0 {
@@ -368,6 +373,7 @@ final class CommandViewModel: ObservableObject {
         stopAfterCurrent = true
         // Clear pending jobs but let the current one finish.
         queueVM.clearPending()
+        processingUpdater?("stopping", nil, "pending jobs cleared")
     }
 
     private func processNextJobIfNeeded() {
@@ -401,6 +407,11 @@ final class CommandViewModel: ObservableObject {
         queueVM.assignSidecar(jobID: next.id, sidecarPath: sidecarPathForJob)
 
         queueVM.markRunning(jobID: next.id)
+        let now = Date()
+        if now.timeIntervalSince(progressThrottle) > 0.2 {
+            processingUpdater?("running", 0.05, "processing \(next.displayName)")
+            progressThrottle = now
+        }
         run()
     }
 
