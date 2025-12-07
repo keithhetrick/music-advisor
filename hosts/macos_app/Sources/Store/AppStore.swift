@@ -8,9 +8,9 @@ enum AppTab: String, CaseIterable {
 }
 
 enum AppAction {
+    case setAlert(AlertState?)
+    case setRoute(AppRoute)
     case setTheme(Bool)
-    case setTab(AppTab)
-    case setPane(ResultPane)
     case setPrompt(String)
     case appendMessage(String)
     case setMessages([String])
@@ -23,9 +23,9 @@ enum AppAction {
 }
 
 struct AppState {
+    var alert: AlertState? = nil
+    var route: AppRoute = .run(.json)
     var useDarkTheme: Bool = true
-    var selectedTab: AppTab = .run
-    var selectedPane: ResultPane = .json
     var promptText: String = ""
     var messages: [String] = ["Welcome to Music Advisor!"]
     var showAdvanced: Bool = false
@@ -54,36 +54,7 @@ final class AppStore: ObservableObject {
     private var hostMonitorTask: Task<Void, Never>?
 
     func dispatch(_ action: AppAction) {
-        switch action {
-        case .setTheme(let value):
-            state.useDarkTheme = value
-        case .setTab(let tab):
-            state.selectedTab = tab
-        case .setPane(let pane):
-            state.selectedPane = pane
-        case .setPrompt(let text):
-            state.promptText = text
-        case .appendMessage(let msg):
-            state.messages.append(msg)
-        case .setMessages(let msgs):
-            state.messages = msgs
-        case .setShowAdvanced(let value):
-            state.showAdvanced = value
-        case .setHistoryItems(let items):
-            state.historyItems = items
-        case .setHistoryPreview(let path, let preview):
-            state.historyPreviews[path] = preview
-        case .setPreviewCache(let path, let preview):
-            // Keep old mtime if present (will be overridden by caller when needed).
-            let currentMtime = state.previewCache[path]?.1
-            state.previewCache[path] = (preview, currentMtime)
-        case .clearHistory:
-            state.historyItems = []
-            state.historyPreviews = [:]
-            state.previewCache = [:]
-        case .setHostSnapshot(let snap):
-            state.hostSnapshot = snap
-        }
+        reduce(&state, action: action)
     }
 
     init() {
@@ -128,5 +99,40 @@ final class AppStore: ObservableObject {
                 try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5s to reduce UI churn
             }
         }
+    }
+}
+
+// MARK: - Reducer
+
+private func reduce(_ state: inout AppState, action: AppAction) {
+    switch action {
+    case .setAlert(let alert):
+        state.alert = alert
+    case .setRoute(let route):
+        state.route = route
+    case .setTheme(let value):
+        state.useDarkTheme = value
+    case .setPrompt(let text):
+        state.promptText = text
+    case .appendMessage(let msg):
+        state.messages.append(msg)
+    case .setMessages(let msgs):
+        state.messages = msgs
+    case .setShowAdvanced(let value):
+        state.showAdvanced = value
+    case .setHistoryItems(let items):
+        state.historyItems = items
+    case .setHistoryPreview(let path, let preview):
+        state.historyPreviews[path] = preview
+    case .setPreviewCache(let path, let preview):
+        // Keep old mtime if present (will be overridden by caller when needed).
+        let currentMtime = state.previewCache[path]?.1
+        state.previewCache[path] = (preview, currentMtime)
+    case .clearHistory:
+        state.historyItems = []
+        state.historyPreviews = [:]
+        state.previewCache = [:]
+    case .setHostSnapshot(let snap):
+        state.hostSnapshot = snap
     }
 }

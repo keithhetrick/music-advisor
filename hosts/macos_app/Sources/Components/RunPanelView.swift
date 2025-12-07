@@ -146,16 +146,18 @@ struct RunPanelView: View {
     private var results: some View {
         VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
             Text("Result").maText(.headline)
-            Picker("", selection: Binding(get: { store.state.selectedPane },
-                                          set: { store.dispatch(.setPane($0)) })) {
+            Picker("", selection: Binding(get: { store.state.route.runPane },
+                                          set: { pane in
+                                              store.dispatch(.setRoute(store.state.route.updatingRunPane(pane)))
+                                          })) {
                 Text("JSON").tag(ResultPane.json)
                 Text("stdout").tag(ResultPane.stdout)
                 Text("stderr").tag(ResultPane.stderr)
             }
             .pickerStyle(.segmented)
             .onChange(of: viewModel.parsedJSON, perform: { _ in
-                if store.state.selectedPane == .json && viewModel.parsedJSON.isEmpty {
-                    store.dispatch(.setPane(.stdout))
+                if store.state.route.runPane == .json && viewModel.parsedJSON.isEmpty {
+                    store.dispatch(.setRoute(store.state.route.updatingRunPane(.stdout)))
                 }
             })
 
@@ -203,9 +205,9 @@ struct RunPanelView: View {
                 Spacer()
             }
 
-            resultBlock(title: store.state.selectedPane.title,
-                        text: paneText(store.state.selectedPane),
-                        color: store.state.selectedPane.color)
+            resultBlock(title: store.state.route.runPane.title,
+                        text: paneText(store.state.route.runPane),
+                        color: store.state.route.runPane.color)
 
             if !viewModel.sidecarPreview.isEmpty {
                 resultBlock(title: "sidecar preview",

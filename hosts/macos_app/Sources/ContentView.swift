@@ -25,7 +25,7 @@ struct ContentView: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
-                .ignoresSafeArea()
+            .ignoresSafeArea()
             VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
                 HeaderView(hostStatus: store.state.hostSnapshot.status,
                            progress: store.state.hostSnapshot.processing.progress,
@@ -37,15 +37,17 @@ struct ContentView: View {
                                                   set: { store.dispatch(.setTheme($0)) }),
                              statusText: store.commandVM.status)
                 Divider()
-                Picker("Tab", selection: Binding(get: { store.state.selectedTab },
-                                                 set: { store.dispatch(.setTab($0)) })) {
+                Picker("Tab", selection: Binding(get: { store.state.route.tab },
+                                                 set: { tab in
+                                                     store.dispatch(.setRoute(store.state.route.updatingTab(tab)))
+                                                 })) {
                     ForEach(AppTab.allCases, id: \.self) { tab in
                         Text(tab.rawValue).tag(tab)
                     }
                 }
                 .pickerStyle(.segmented)
                 ScrollView {
-                    if store.state.selectedTab == .run {
+                    if store.state.route.tab == .run {
                         RunPanelView(
                             store: store,
                             viewModel: viewModel,
@@ -60,7 +62,7 @@ struct ContentView: View {
                             onPreviewRich: { path in loadHistoryPreview(path: path) }
                         )
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    } else if store.state.selectedTab == .history {
+                    } else if store.state.route.tab == .history {
                         historyPane
                             .frame(maxWidth: .infinity, alignment: .leading)
                     } else {
@@ -211,8 +213,10 @@ struct ContentView: View {
                     }
                 )
                 ResultsView(
-                    selectedPane: Binding(get: { store.state.selectedPane },
-                                          set: { store.dispatch(.setPane($0)) }),
+                    selectedPane: Binding(get: { store.state.route.runPane },
+                                          set: { pane in
+                                              store.dispatch(.setRoute(store.state.route.updatingRunPane(pane)))
+                                          }),
                     parsedJSON: viewModel.parsedJSON,
                     stdout: viewModel.stdout,
                     stderr: viewModel.stderr,
@@ -419,16 +423,18 @@ struct ContentView: View {
     private var results: some View {
         VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
             Text("Result").maText(.headline)
-            Picker("", selection: Binding(get: { store.state.selectedPane },
-                                          set: { store.dispatch(.setPane($0)) })) {
+            Picker("", selection: Binding(get: { store.state.route.runPane },
+                                          set: { pane in
+                                              store.dispatch(.setRoute(store.state.route.updatingRunPane(pane)))
+                                          })) {
                 Text("JSON").tag(ResultPane.json)
                 Text("stdout").tag(ResultPane.stdout)
                 Text("stderr").tag(ResultPane.stderr)
             }
             .pickerStyle(.segmented)
             .onChange(of: viewModel.parsedJSON, perform: { _ in
-                if store.state.selectedPane == .json && viewModel.parsedJSON.isEmpty {
-                    store.dispatch(.setPane(.stdout))
+                if store.state.route.runPane == .json && viewModel.parsedJSON.isEmpty {
+                    store.dispatch(.setRoute(store.state.route.updatingRunPane(.stdout)))
                 }
             })
 
@@ -476,9 +482,9 @@ struct ContentView: View {
                 Spacer()
             }
 
-            resultBlock(title: store.state.selectedPane.title,
-                        text: paneText(store.state.selectedPane),
-                        color: store.state.selectedPane.color)
+            resultBlock(title: store.state.route.runPane.title,
+                        text: paneText(store.state.route.runPane),
+                        color: store.state.route.runPane.color)
 
             if !viewModel.sidecarPreview.isEmpty {
                 resultBlock(title: "sidecar preview",
