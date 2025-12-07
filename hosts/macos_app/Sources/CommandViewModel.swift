@@ -1,5 +1,7 @@
 import Foundation
 import SwiftUI
+import MAStyle
+import Combine
 
 @MainActor
 final class CommandViewModel: ObservableObject {
@@ -19,6 +21,8 @@ final class CommandViewModel: ObservableObject {
     @Published var sidecarPreview: String = ""
     @Published var profiles: [AppConfig.Profile] = []
     @Published var selectedProfile: String = ""
+    @Published var queueVM = JobQueueViewModel()
+    @Published var currentJobID: UUID?
 
     private let runner = CommandRunner()
     private let initialConfig: AppConfig
@@ -29,7 +33,22 @@ final class CommandViewModel: ObservableObject {
         self.workingDirectory = config.workingDirectory ?? ""
         self.envText = config.extraEnv.map { "\($0.key)=\($0.value)" }.sorted().joined(separator: "\n")
         self.profiles = config.profiles
-        self.selectedProfile = config.profiles.first?.name ?? ""
+        // Default to a sensible profile if present.
+        if let pipelineProfile = config.profiles.first(where: { $0.name.lowercased().contains("pipeline") }) {
+            self.selectedProfile = pipelineProfile.name
+            self.commandText = pipelineProfile.command.joined(separator: " ")
+            self.workingDirectory = pipelineProfile.workingDirectory ?? self.workingDirectory
+            let mergedEnv = pipelineProfile.extraEnv.map { "\($0.key)=\($0.value)" }.sorted().joined(separator: "\n")
+            self.envText = mergedEnv.isEmpty ? self.envText : mergedEnv
+            if let out = pipelineProfile.outputPath {
+                self.sidecarPath = out
+            }
+        } else {
+            self.selectedProfile = config.profiles.first?.name ?? ""
+            if let firstProfile = config.profiles.first, let out = firstProfile.outputPath {
+                self.sidecarPath = out
+            }
+        }
     }
 
     func loadDefaults() {
@@ -37,6 +56,11 @@ final class CommandViewModel: ObservableObject {
         commandText = defaults.command.joined(separator: " ")
         workingDirectory = defaults.workingDirectory ?? ""
         envText = defaults.extraEnv.map { "\($0.key)=\($0.value)" }.sorted().joined(separator: "\n")
+        profiles = defaults.profiles
+        selectedProfile = defaults.profiles.first?.name ?? ""
+        if let out = defaults.profiles.first?.outputPath {
+            sidecarPath = out
+        }
     }
 
     func setWorkingDirectory(_ path: String) {
@@ -59,6 +83,21 @@ final class CommandViewModel: ObservableObject {
         workingDirectory = profile.workingDirectory ?? ""
         let mergedEnv = profile.extraEnv.map { "\($0.key)=\($0.value)" }.sorted().joined(separator: "\n")
         envText = mergedEnv
+        if let out = profile.outputPath {
+            sidecarPath = out
+        }
+    }
+
+    func reloadConfig() {
+        let refreshed = AppConfig.fromEnv()
+        commandText = refreshed.command.joined(separator: " ")
+        workingDirectory = refreshed.workingDirectory ?? ""
+        envText = refreshed.extraEnv.map { "\($0.key)=\($0.value)" }.sorted().joined(separator: "\n")
+        profiles = refreshed.profiles
+        selectedProfile = refreshed.profiles.first?.name ?? ""
+        if let out = refreshed.profiles.first?.outputPath {
+            sidecarPath = out
+        }
     }
 
     func run() {
@@ -79,20 +118,38 @@ final class CommandViewModel: ObservableObject {
         lastDuration = nil
         sidecarPreview = ""
 
-        Task {
+        Task.detached {
             let start = Date()
-            let result = runner.run(command: parsedCommand,
-                                    workingDirectory: workingDirectory.isEmpty ? nil : workingDirectory,
-                                    extraEnv: env)
-            lastDuration = Date().timeIntervalSince(start)
-            stdout = result.stdout
-            stderr = result.stderr
-            exitCode = result.exitCode
-            status = "Done (exit \(result.exitCode))"
-            parsedJSON = parseJSON(result.stdout)
-            summaryMetrics = extractMetrics(from: parsedJSON)
-            lastRunTime = Date()
-            isRunning = false
+            let result = await self.runner.run(command: parsedCommand,
+                                               workingDirectory: self.workingDirectory.isEmpty ? nil : self.workingDirectory,
+                                               extraEnv: env)
+            let duration = Date().timeIntervalSince(start)
+            // Parse heavy-ish work off the main actor.
+            let parsed = await self.parseJSON(result.stdout)
+            let metrics = await self.extractMetrics(from: parsed)
+
+            await MainActor.run {
+                self.lastDuration = duration
+                self.stdout = result.stdout
+                self.stderr = result.stderr
+                self.exitCode = result.exitCode
+                self.status = "Done (exit \(result.exitCode))"
+                self.parsedJSON = parsed
+                self.summaryMetrics = metrics
+                self.lastRunTime = Date()
+                self.isRunning = false
+
+                if let jobID = self.currentJobID {
+                    if result.exitCode == 0 {
+                        self.queueVM.markDone(jobID: jobID, sidecarPath: self.sidecarPath)
+                    } else {
+                        let err = self.stderr.isEmpty ? self.status : self.stderr
+                        self.queueVM.markFailed(jobID: jobID, error: err)
+                    }
+                    self.currentJobID = nil
+                    self.processNextJobIfNeeded()
+                }
+            }
         }
     }
 
@@ -224,6 +281,16 @@ final class CommandViewModel: ObservableObject {
             sidecarPath = "/tmp/ma_features.json"
             lastRunTime = Date()
             isRunning = false
+            if let jobID = currentJobID {
+                if result.exitCode == 0 {
+                    queueVM.markDone(jobID: jobID, sidecarPath: sidecarPath)
+                } else {
+                    let err = stderr.isEmpty ? status : stderr
+                    queueVM.markFailed(jobID: jobID, error: err)
+                }
+                currentJobID = nil
+                processNextJobIfNeeded()
+            }
         }
     }
 
@@ -261,10 +328,58 @@ final class CommandViewModel: ObservableObject {
         }
         return result
     }
+
+    // MARK: - Queue
+    func enqueue(files: [URL]) {
+        queueVM.addJobs(urls: files)
+        processNextJobIfNeeded()
+    }
+
+    private func processNextJobIfNeeded() {
+        guard !isRunning else { return }
+        guard let next = queueVM.jobs.first(where: { $0.status == .pending }) else { return }
+        currentJobID = next.id
+
+        let sidecarPathForJob = makeSidecarPath(for: next.fileURL)
+
+        // Replace --audio with the next file
+        var parts = splitCommand(commandText)
+        if let idx = parts.firstIndex(of: "--audio"), parts.indices.contains(idx + 1) {
+            parts[idx + 1] = shellEscape(next.fileURL.path)
+        } else {
+            parts.append(contentsOf: ["--audio", shellEscape(next.fileURL.path)])
+        }
+        if let outIdx = parts.firstIndex(of: "--out"), parts.indices.contains(outIdx + 1) {
+            parts[outIdx + 1] = shellEscape(sidecarPathForJob)
+        } else {
+            parts.append(contentsOf: ["--out", shellEscape(sidecarPathForJob)])
+        }
+        commandText = parts.joined(separator: " ")
+        sidecarPath = sidecarPathForJob
+        queueVM.assignSidecar(jobID: next.id, sidecarPath: sidecarPathForJob)
+
+        queueVM.markRunning(jobID: next.id)
+        run()
+    }
+
+    private func makeSidecarPath(for audioURL: URL) -> String {
+        let supportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        let appDir = supportDir.appendingPathComponent("MusicAdvisorMacApp", isDirectory: true)
+        let sidecarDir = appDir.appendingPathComponent("sidecars", isDirectory: true)
+        try? FileManager.default.createDirectory(at: sidecarDir, withIntermediateDirectories: true)
+        let base = audioURL.deletingPathExtension().lastPathComponent
+        let timestamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
+        let filename = "\(base)_\(timestamp).json"
+        return sidecarDir.appendingPathComponent(filename).path
+    }
 }
 
-struct Metric: Identifiable, Hashable {
-    let id = UUID()
-    let label: String
-    let value: String
+public struct Metric: Identifiable, Hashable {
+    public let id = UUID()
+    public let label: String
+    public let value: String
+    public init(label: String, value: String) {
+        self.label = label
+        self.value = value
+    }
 }

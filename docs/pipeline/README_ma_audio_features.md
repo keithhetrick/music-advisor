@@ -348,6 +348,55 @@ Schemas are enforced via `tools/validate_io.py` and `schemas/`; see `docs/EXTRAC
 - Confidence: raw score retained; normalized 0–1 via `adapters/confidence_adapter.py`; labels derived from raw when available.
 - Safety: `tools/sidecar_adapter.py` enforces allowed binaries/placeholder checks, JSON size caps, timeouts; returns warnings instead of crashing pipelines.
 - Tempo norms: `tools/tempo_norms_sidecar.py` emits `<stem>.tempo_norms.json` (lane stats + advisory) and feeds `tools/ma_add_tempo_overlay_to_client_rich.py`, which injects the TEMPO LANE OVERLAY (BPM) block into `.client.rich.txt` without altering other sections. Schema: `tools/tempo_norms_schema.json`; helper logic: `tools/tempo_relationships.py`. Flags of note: `--adaptive-bin-width` (Freedman–Diaconis with min/max guards), `--smoothing/--smoothing-method gaussian`, `--smoothing-sigma`, `--trim-lower-pct/--trim-upper-pct`, `--fold-low/--fold-high` (halftime/doubletime folding), `--neighbor-steps/--neighbor-decay`, and `--bpm-precision`. Sidecar now also exposes `peak_clusters`, `hit_medium_percentile_band`, neighbor `weight/step`, and `shape` metrics (skew/kurtosis/entropy); the overlay can optionally surface these fields when present.
+- Tempo norms: `tools/tempo_norms_sidecar.py` emits `<stem>.tempo_norms.json` (lane stats + advisory) and feeds `tools/ma_add_tempo_overlay_to_client_rich.py`, which injects the TEMPO LANE OVERLAY (BPM) block into `.client.rich.txt` without altering other sections. Schema: `tools/tempo_norms_schema.json`; helper logic: `tools/tempo_relationships.py`. Flags of note: `--adaptive-bin-width` (Freedman–Diaconis with min/max guards), `--smoothing/--smoothing-method gaussian`, `--smoothing-sigma`, `--trim-lower-pct/--trim-upper-pct`, `--fold-low/--fold-high` (halftime/doubletime folding), `--neighbor-steps/--neighbor-decay`, and `--bpm-precision`. Sidecar now also exposes `peak_clusters`, `hit_medium_percentile_band`, neighbor `weight/step`, and `shape` metrics (skew/kurtosis/entropy); the overlay can optionally surface these fields when present.
+
+  **Rebuild a local tempo demo DB (for tempo_norms):** from repo root (`music-advisor`), run:
+
+  ```bash
+  python - <<'PY'
+  import sqlite3
+  from pathlib import Path
+  from ma_lyrics_engine.schema import ensure_schema
+  ```
+
+src = Path("data/private/lyric_intel/lyric_intel.db")
+dst = Path("data/private/local_assets/lyric_intel/tempo_demo.db")
+dst.parent.mkdir(parents=True, exist_ok=True)
+if dst.exists():
+dst.unlink()
+
+con_src = sqlite3.connect(src)
+con_dst = sqlite3.connect(dst)
+ensure_schema(con_dst)
+
+song_ids = [row[0] for row in con_src.execute(
+"SELECT song_id FROM songs WHERE tier=1 AND era_bucket='2015_2024'"
+)]
+if not song_ids:
+raise SystemExit("No songs matched filter; adjust WHERE clause.")
+
+def copy_rows(table):
+cols = [c[1] for c in con_src.execute(f"PRAGMA table_info({table})")]
+placeholders = ",".join("?" * len(cols))
+rows = con_src.execute(
+f"SELECT {','.join(cols)} FROM {table} WHERE song_id IN ({','.join('?'*len(song_ids))})",
+song_ids
+).fetchall()
+con_dst.executemany(
+f"INSERT INTO {table} ({','.join(cols)}) VALUES ({placeholders})", rows
+)
+
+copy_rows("songs")
+copy_rows("features_song")
+
+con_dst.commit()
+con_dst.close()
+con_src.close()
+print(f"Wrote tempo demo DB: {dst}")
+PY
+
+````
+Then point `--db` at `data/private/local_assets/lyric_intel/tempo_demo.db` when running `tools/tempo_norms_sidecar.py`. Adjust the `WHERE` clause if you want a different slice (other tiers/eras).
 - Key norms: `tools/key_norms_sidecar.py` emits `<stem>.key_norms.json` (lane key stats + advisory) and feeds `tools/ma_add_key_overlay_to_client_rich.py`, which injects the KEY LANE OVERLAY block into `.client.rich.txt` without altering other sections. Schema: `tools/key_norms_schema.json`; helper logic: `tools/key_relationships.py` (preferred enharmonic names, relative/parallel/fifths matrix, neighbor weights, chord-friendly key families). CLI flags include `--prefer-flat`, overlay display style, and schema validation; payload adds `lane_percent`, lane_shape (entropy/flatness/mode_split), per-mode top keys, fifths_chain ordering, and weighted target moves with rationale_tags/chord_fit_hint for historical-hit alignment. Overlay legend clarifies abbreviations: st=semitones delta; w=weight; c5=circle-of-fifths distance; tags=rationale tags.
 - Host/chat helpers: `tools/overlay_sidecar_loader.py` can be imported to load tempo/key sidecars into chat/recommendation-friendly dicts without recomputing stats.
 
@@ -382,12 +431,12 @@ You can feed an external tempo/key/beat sidecar (Essentia or Madmom) into the pi
 
 ```bash
 python tools/cli/ma_audio_features.py \
-  --audio song.wav \
-  --out song.features.json \
-  --tempo-backend sidecar \
-  --tempo-sidecar-json-out /tmp/tempo.json \
-  --tempo-sidecar-verbose
-```
+--audio song.wav \
+--out song.features.json \
+--tempo-backend sidecar \
+--tempo-sidecar-json-out /tmp/tempo.json \
+--tempo-sidecar-verbose
+````
 
 Defaults run `tools/cli/tempo_sidecar_runner.py` (prefers Essentia → Madmom → librosa; shim: `tools/tempo_sidecar_runner.py`). The extractor merges the payload and records:
 

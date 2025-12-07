@@ -371,6 +371,32 @@ def build_sidecar_payload(
 
 
 def load_lane_bpms(conn: sqlite3.Connection, lane_id: str) -> List[float]:
+    """
+    Fetch BPMs for a lane. Prefer a dedicated lane_bpms table if present; otherwise
+    fall back to features_song + songs filters (tier/era_bucket).
+    """
+    # Fallback: explicit lane_bpms table
+    try:
+        cur = conn.execute("SELECT bpm FROM lane_bpms WHERE lane_id = ? AND bpm IS NOT NULL AND bpm > 0", (lane_id,))
+        lane_rows = [float(row[0]) for row in cur.fetchall() if valid_bpm(row[0])]
+        if lane_rows:
+            return lane_rows
+        else:
+            # If lane_bpms exists but is empty for this lane, do not force a legacy fallback;
+            # returning [] will cause the caller to skip gracefully.
+            return []
+    except sqlite3.Error:
+        pass  # table may not exist; continue to legacy path
+
+    # Legacy path: only attempt if the needed columns exist
+    try:
+        cur = conn.execute("PRAGMA table_info(songs)")
+        song_cols = {row[1] for row in cur.fetchall()}
+        if not {"tier", "era_bucket"}.issubset(song_cols):
+            return []
+    except sqlite3.Error:
+        return []
+
     tier, era_bucket = _parse_lane_id(lane_id)
     query = """
         SELECT f.tempo_bpm
@@ -473,7 +499,9 @@ def main() -> int:
 
     db_path = Path(args.db).expanduser().resolve()
     if not db_path.exists():
-        raise SystemExit(f"DB not found: {db_path}")
+        log(f"[WARN] tempo_norms_sidecar skipping: DB not found ({db_path})")
+        log_stage_end(log, "tempo_norms_sidecar", status="skip_missing_db", out=str(out_path))
+        return 0
     if args.bin_width <= 0 and not args.adaptive_bin_width:
         raise SystemExit("--bin-width must be > 0")
     if args.smoothing < 0:
@@ -491,20 +519,28 @@ def main() -> int:
 
     log_stage_start(log, "tempo_norms_sidecar", song_id=args.song_id, lane_id=args.lane_id, db=str(db_path), out=str(out_path))
     conn = sqlite3.connect(str(db_path))
-    ensure_schema(conn)
+    try:
+        ensure_schema(conn)
 
-    song_bpm = args.song_bpm
-    if song_bpm is None:
-        song_bpm = load_song_bpm(conn, args.song_id)
-    if song_bpm is None:
-        raise SystemExit(f"Could not resolve song BPM for {args.song_id} (pass --song-bpm).")
-    if not valid_bpm(song_bpm):
-        raise SystemExit(f"Song BPM invalid/out of range: {song_bpm}")
+        song_bpm = args.song_bpm
+        if song_bpm is None:
+            song_bpm = load_song_bpm(conn, args.song_id)
+        if song_bpm is None:
+            log(f"[WARN] tempo_norms_sidecar skipping: no song BPM for {args.song_id}")
+            log_stage_end(log, "tempo_norms_sidecar", status="skip_missing_bpm", out=str(out_path))
+            return 0
+        if not valid_bpm(song_bpm):
+            raise SystemExit(f"Song BPM invalid/out of range: {song_bpm}")
 
-    lane_bpms = load_lane_bpms(conn, args.lane_id)
-    if not lane_bpms:
-        raise SystemExit(f"No lane BPM data found for lane_id={args.lane_id}")
-    lane_bpms, lane_weights, validation_warnings = validate_tempo_series(lane_bpms, min_count=1)
+        lane_bpms = load_lane_bpms(conn, args.lane_id)
+        if not lane_bpms:
+            log(f"[WARN] tempo_norms_sidecar skipping: no lane BPM data for lane_id={args.lane_id}")
+            log_stage_end(log, "tempo_norms_sidecar", status="skip_no_lane_data", out=str(out_path))
+            return 0
+        lane_bpms, lane_weights, validation_warnings = validate_tempo_series(lane_bpms, min_count=1)
+    finally:
+        conn.close()
+
     if validation_warnings:
         log(f"[WARN] tempo_norms validation warnings: {validation_warnings}")
     bin_width = args.bin_width
@@ -535,7 +571,6 @@ def main() -> int:
     log(f"[OK] Wrote tempo norms sidecar: {out_path}")
 
     log_stage_end(log, "tempo_norms_sidecar", status="ok", out=str(out_path))
-    conn.close()
     return 0
 
 

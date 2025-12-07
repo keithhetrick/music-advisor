@@ -404,9 +404,13 @@ def insert_rows_stream(
                     row[field] = None
                     continue
                 try:
-                    row[field] = int(val) if typ == "int" else float(val)
+                    if typ == "int":
+                        row[field] = int(float(val))
+                    else:
+                        row[field] = float(val)
                 except Exception:
                     errors.append(f"[build-spine-db] numeric parse failed ({table}.{field}): {val!r}")
+                    row[field] = None
         # Paranoid: duplicate key check (by spine_track_id where applicable)
         if seen_keys is not None and "spine_track_id" in row:
             key = row["spine_track_id"]
@@ -455,7 +459,8 @@ def main() -> int:
     out_db.parent.mkdir(parents=True, exist_ok=True)
 
     required_missing: List[str] = []
-    issues: List[str] = []
+    issues: List[str] = []  # hard failures
+    warnings: List[str] = []  # non-fatal notices
     table_counts: Dict[str, int] = {}
     csv_counts: Dict[str, int] = {}
 
@@ -488,7 +493,7 @@ def main() -> int:
                 rows_stream = load_csv_rows_stream(csv_path, expected)
                 inserted, errs = insert_rows_stream(conn, table, rows_stream, args.batch_size, args.paranoid)
                 table_counts[table] = inserted
-                issues.extend(errs)
+                warnings.extend(errs)
                 if args.verify_counts:
                     # count lines minus header
                     with csv_path.open() as fh:
@@ -508,6 +513,9 @@ def main() -> int:
             log(msg)
     if args.strict and (required_missing or issues):
         return 1
+    if warnings:
+        for msg in warnings:
+            log(msg)
     if args.verify_counts:
         mismatches = []
         for table, inserted in table_counts.items():

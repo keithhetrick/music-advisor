@@ -86,8 +86,8 @@ export LOG_SANDBOX="${LOG_SANDBOX:-0}"
 CONF_LOWER="${TEMPO_CONF_LOWER:-${MA_AUTOMATOR_CONF_LOWER:-0.9}}"
 CONF_UPPER="${TEMPO_CONF_UPPER:-${MA_AUTOMATOR_CONF_UPPER:-3.6}}"
 ANCHOR="${ANCHOR:-00_core_modern}"
-# Tempo lane defaults for tempo_norms sidecar
-export TEMPO_LANE_ID="${TEMPO_LANE_ID:-tier1__2015_2024}"
+# Tempo lane defaults for tempo_norms sidecar (align with curated lanes in lyric_intel.db)
+export TEMPO_LANE_ID="${TEMPO_LANE_ID:-tier1__1985_2025}"
 export TEMPO_BIN_WIDTH="${TEMPO_BIN_WIDTH:-2.0}"
 export TEMPO_DB="${TEMPO_DB:-}"
 # Ensure historical echo DB path is always correct, even if MA_DATA_ROOT points to repo root.

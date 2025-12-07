@@ -42,11 +42,13 @@ Smoke test the default CLI (headless)
 ```bash
 ./scripts/smoke_default.sh
 # or for CI hooks: ./scripts/run_smoke_ci.sh
+# install a git pre-push hook to run smoke: ./scripts/install_prepush_hook.sh
 ```
 
 Config overrides (no code edits)
 - Optional `.env.local` (copy from `.env.local.example`) and/or JSON config at `config/defaults.json` (override path via `MA_APP_CONFIG_FILE`).
 - Env has highest priority (`MA_APP_DEFAULT_*`, `MA_APP_ENV_*`, `MA_APP_CMD/ARGS/WORKDIR`), then JSON config, then code fallback.
+- Profiles: define named presets in JSON (cmd/args/workdir/env/out). UI has a profile picker + “Apply profile” + “Reload config”.
 
 Design/architecture notes
 - UI: SwiftUI for native macOS host.

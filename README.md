@@ -270,6 +270,7 @@ audio file
 - AWS S3 for public data bootstrap (see data/public/README.md, docs/ops/aws_sync.md)
 - SQLite (optional) built locally from public CSVs via infra/scripts/build_public_spine_db.py
 - macOS/Linux tooling for audio sidecars (ffmpeg/libsamplerate/fftw; see Health checks)
+- Tempo/lyric sidecars require a private lyric DB; set `MA_LYRIC_INTEL_DB` to your local `lyric_intel.db` (not shipped in public S3)
 
 ## What’s new (v0.3.0)
 

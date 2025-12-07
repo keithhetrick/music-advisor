@@ -61,7 +61,7 @@
       "name": "public_readme",
       "target_path": "data/public/README.md",
       "url": "https://music-advisor-data-external-database-resources.s3.amazonaws.com/v1/data/public/current/README.md",
-      "sha256": "a818a822d7e86398486c065cd023adcc345754bf4ed38bd9cc80ceb3e4066479",
+      "sha256": "6db08829abe0004bf8eac1e96ebebfc2c482d1b458cad8e34044d6030823909d",
       "optional": true
     }
   ]

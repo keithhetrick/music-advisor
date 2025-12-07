@@ -11,6 +11,7 @@ struct AppConfig {
         let command: [String]
         let workingDirectory: String?
         let extraEnv: [String: String]
+        let outputPath: String?
     }
 
     static func fromEnv() -> AppConfig {
@@ -114,7 +115,8 @@ struct AppConfig {
             let args = (dict["args"] as? [String]) ?? []
             let workdir = dict["workdir"] as? String
             let envDict = dict["env"] as? [String: String] ?? [:]
-            profiles.append(Profile(name: name, command: cmd + args, workingDirectory: workdir, extraEnv: envDict))
+            let output = dict["out"] as? String
+            profiles.append(Profile(name: name, command: cmd + args, workingDirectory: workdir, extraEnv: envDict, outputPath: output))
         }
         return profiles.sorted { $0.name < $1.name }
     }

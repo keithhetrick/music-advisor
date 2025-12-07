@@ -21,7 +21,8 @@
       "cmd": ["/bin/echo"],
       "args": ["{\"status\":\"ok\",\"message\":\"mock\"}"],
       "workdir": "/",
-      "env": {}
+      "env": {},
+      "out": "/tmp/mock.json"
     },
     "essentia": {
       "cmd": ["/usr/local/bin/python3"],
@@ -29,7 +30,8 @@
       "workdir": "/Users/keithhetrick/music-advisor",
       "env": {
         "PYTHONPATH": "/Users/keithhetrick/music-advisor"
-      }
+      },
+      "out": "/tmp/essentia_features.json"
     }
   }
 }

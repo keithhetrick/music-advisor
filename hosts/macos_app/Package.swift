@@ -7,9 +7,15 @@ let package = Package(
     products: [
         .executable(name: "MusicAdvisorMacApp", targets: ["MusicAdvisorMacApp"])
     ],
+    dependencies: [
+        .package(path: "../../shared/design_system")
+    ],
     targets: [
         .executableTarget(
             name: "MusicAdvisorMacApp",
+            dependencies: [
+                .product(name: "MAStyle", package: "design_system")
+            ],
             path: "Sources"
         )
     ]

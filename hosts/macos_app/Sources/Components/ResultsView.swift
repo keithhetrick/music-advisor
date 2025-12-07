@@ -1,0 +1,112 @@
+import SwiftUI
+import MAStyle
+
+struct ResultsView: View {
+    @Binding var selectedPane: ResultPane
+    var parsedJSON: [String: AnyHashable]
+    var stdout: String
+    var stderr: String
+    var exitCode: Int32
+    var summaryMetrics: [Metric]
+    var sidecarPath: String?
+    var sidecarPreview: String
+    var onRevealSidecar: () -> Void
+    var onCopySidecarPath: () -> Void
+    var onPreviewSidecar: () -> Void
+    var onCopyJSON: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
+            Text("Result").maText(.headline)
+            Picker("", selection: $selectedPane) {
+                Text("JSON").tag(ResultPane.json)
+                Text("stdout").tag(ResultPane.stdout)
+                Text("stderr").tag(ResultPane.stderr)
+            }
+            .pickerStyle(.segmented)
+            .onChange(of: parsedJSON, perform: { _ in
+                if selectedPane == .json && parsedJSON.isEmpty {
+                    selectedPane = .stdout
+                }
+            })
+
+            if !summaryMetrics.isEmpty || sidecarPath != nil {
+                HStack(spacing: MAStyle.Spacing.sm) {
+                    ForEach(summaryMetrics) { metric in
+                        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
+                            Text(metric.label).maText(.caption).foregroundStyle(MAStyle.ColorToken.muted)
+                            Text(metric.value).maText(.body)
+                        }
+                        .maMetric()
+                    }
+                    if sidecarPath != nil {
+                        Button("Reveal sidecar", action: onRevealSidecar).maButton(.ghost)
+                        Button("Copy path", action: onCopySidecarPath).maButton(.ghost)
+                        Button("Preview sidecar", action: onPreviewSidecar).maButton(.ghost)
+                    }
+                    Spacer()
+                }
+            }
+
+            HStack(spacing: MAStyle.Spacing.sm) {
+                Button("Copy JSON", action: onCopyJSON)
+                    .maButton(.ghost)
+                    .disabled(parsedJSON.isEmpty)
+                if sidecarPath != nil {
+                    Button("Copy sidecar path", action: onCopySidecarPath)
+                        .maButton(.ghost)
+                }
+                Spacer()
+            }
+
+            resultBlock(title: selectedPane.title,
+                        text: paneText(selectedPane),
+                        color: selectedPane.color)
+
+            if !sidecarPreview.isEmpty {
+                resultBlock(title: "sidecar preview",
+                            text: sidecarPreview,
+                            color: .purple)
+            }
+
+            Text("Exit code: \(exitCode)")
+                .maText(.caption)
+                .foregroundStyle(MAStyle.ColorToken.muted)
+        }
+        .maCard(padding: MAStyle.Spacing.md)
+    }
+
+    private func resultBlock(title: String, text: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
+            Text(title).maText(.headline)
+            ScrollView {
+                Text(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "(empty)" : text.trimmingCharacters(in: .whitespacesAndNewlines))
+                    .font(MAStyle.Typography.bodyMono)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(MAStyle.Spacing.sm)
+                    .background(color.opacity(0.05))
+                    .cornerRadius(MAStyle.Radius.sm)
+            }
+            .frame(minHeight: 80)
+        }
+    }
+
+    private func paneText(_ pane: ResultPane) -> String {
+        switch pane {
+        case .json:
+            return prettyJSON(parsedJSON)
+        case .stdout:
+            return stdout
+        case .stderr:
+            return stderr
+        }
+    }
+
+    private func prettyJSON(_ dict: [String: AnyHashable]) -> String {
+        guard let data = try? JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted]),
+              let str = String(data: data, encoding: .utf8) else {
+            return dict.isEmpty ? "(no JSON parsed)" : dict.description
+        }
+        return str
+    }
+}

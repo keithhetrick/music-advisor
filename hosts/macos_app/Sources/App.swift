@@ -1,4 +1,5 @@
 import SwiftUI
+import MAStyle
 
 @main
 struct MusicAdvisorMacApp: App {
