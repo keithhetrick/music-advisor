@@ -653,12 +653,17 @@ extension ContentView {
         let supportDir = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let sidecarDir = supportDir.appendingPathComponent("MusicAdvisorMacApp/sidecars", isDirectory: true)
         guard let urls = try? fm.contentsOfDirectory(at: sidecarDir, includingPropertiesForKeys: [.contentModificationDateKey], options: [.skipsHiddenFiles]) else {
-                let persisted = historyStore.load()
-                if persisted.isEmpty {
-                    store.dispatch(.setHistoryItems([]))
-                } else {
-                    store.dispatch(.setHistoryItems(persisted))
-                }
+            let persisted = historyStore.load()
+            if persisted.isEmpty {
+                store.dispatch(.setHistoryItems([]))
+            } else {
+                store.dispatch(.setHistoryItems(persisted))
+            }
+            // Warn on load failure only once.
+            store.dispatch(.setAlert(AlertState(title: "History load",
+                                                message: "Could not read sidecars directory; using cached history if available.",
+                                                level: .warning,
+                                                presentAsToast: true)))
             return
         }
         let items: [SidecarItem] = urls.compactMap { url in
