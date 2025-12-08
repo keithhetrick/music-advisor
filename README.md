@@ -193,6 +193,7 @@ ma affected --base origin/main
 # Start development dashboard
 ma chat-dev  # Opens tmux split with server and logs
 ```
+
 4. Explore: list projects/tests with `python3 tools/ma_orchestrator.py list-projects`; see docs links above for deeper dives.
 5. Next step: run `python -m ma_helper help` (or `ma help` if you set `alias ma="python -m ma_helper"`) to see the helper commands. For a 30-second orientation, try `ma quickstart`. The helper is your main entrypoint for tasks, tests, affected runs, git/CI checks, and dashboards.
 6. Optional UX dependencies: install `rich` for TUI/live dashboards and `prompt_toolkit` for fuzzy prompts. `tmux` is used by `ma chat-dev` if available (falls back to printed commands). Git helpers require running inside the repo with `.git` present.
@@ -497,6 +498,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ### Open Source Notices
 
 When redistributing or bundling this software, please include:
+
 - Root `LICENSE` and `NOTICE` files
 - Licenses from `src/ma_config/` and `shared/` directories
 - An "Open Source Notices" section in your documentation

@@ -31,6 +31,8 @@
 - macOS host (SwiftUI) QoL: segmented JSON/stdout/stderr viewer, “Run defaults” button, quote-aware command parsing, per-run log at `/tmp/macos_app_cmd.log`, and helper scripts for local build/run/log reset; README updated with dependency pin guidance.
 - Host/chat loaders and helpers: `overlay_sidecar_loader` for sidecars; chat summaries and dispatcher for app-tailored responses.
 - Chat routing supports “details” replay, context reporting, help/legend, and artifact/status checks.
+- JUCE UI demo: universal (arm64+x86_64) build, manufacturer set to Bellweather Studios (Bwsd), new CMake preset + `install_root.sh` for root AU/VST3 installs, and docs updated with targeted `pluginkit` refresh (no full cache wipe).
+- JUCE UI demo QoL: Ninja preset for fast Standalone-only dev, PCH removed (ObjC/PCH issues), warnings cleaned (shadowed member, deprecated Font ctor, float-to-int), and docs updated for Ninja/Xcode split and targeted refresh.
 - Monorepo cleanup: root shims removed; legacy packages archived under `archive/legacy_src/`; console scripts now point at `ma_audio_engine.*`.
 - Full-app smoke added (`make e2e-app-smoke`): tone → `python -m ma_audio_engine.pipe_cli` → host CLI; temp outputs only.
 - Synthetic reference fixtures added (`tests/fixtures/pipeline_sample/`) with validation test.
@@ -47,6 +49,7 @@
 - TTC corpus stats helper relocated to `infra/scripts/ttc_stats_report.py` to keep root clean.
 - Data bootstrap added: `infra/scripts/data_bootstrap.py` with manifest template to fetch assets into `data/`.
 - macOS app: route-driven reducer state, alert banners/toasts (info/warn/error), queue persistence to Application Support (best effort), preview cache and history persistence, bounded preview search, coalesced + capped stdout/stderr updates, trimmed console log buffer, host polling backoff, lazy stacks for log/history/queue, copy-pane action, and host-architecture docs; MAStyle remains the styling source of truth.
+- JUCE UI demo added under `plugins/juce_ui_demo`: custom vector controls (dials, envelope mini-view, meter), safe DSP shell, AU/VST3/Standalone via JUCE CMake; docs at `docs/juce_ui_demo.md`.
 
 ## v0.3.0 — 2025-11-07
 

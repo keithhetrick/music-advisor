@@ -38,6 +38,10 @@ __pycache__/
 *.pyd
 *.so
 *.dylib
+
+# JUCE build artifacts
+/plugins/juce_ui_demo/build/
+/plugins/juce_ui_demo/build-ninja/
 *.egg
 *.egg-info/
 .eggs/

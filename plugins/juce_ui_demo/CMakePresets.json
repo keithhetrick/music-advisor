@@ -1,0 +1,70 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "juce-universal",
+      "displayName": "JUCE Universal (arm64+x86_64, Makefiles)",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "12.0",
+        "CMAKE_OSX_SYSROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "JUCE_DIR": "/Users/keithhetrick/JUCE"
+      }
+    },
+    {
+      "name": "juce-ninja",
+      "displayName": "JUCE Ninja (arm64+x86_64)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-ninja",
+      "cacheVariables": {
+        "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "12.0",
+        "CMAKE_OSX_SYSROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "JUCE_DIR": "/Users/keithhetrick/JUCE",
+        "MASTYLE_DEV_STANDALONE": "ON"
+      }
+    },
+    {
+      "name": "juce-xcode",
+      "displayName": "JUCE Xcode (RelWithDebInfo)",
+      "generator": "Xcode",
+      "binaryDir": "${sourceDir}/build-xcode",
+      "cacheVariables": {
+        "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "12.0",
+        "CMAKE_OSX_SYSROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "JUCE_DIR": "/Users/keithhetrick/JUCE"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "juce-universal-build",
+      "configurePreset": "juce-universal",
+      "targets": [
+        "MAStyleJuceDemo",
+        "MAStyleJuceDemo_AU",
+        "MAStyleJuceDemo_VST3",
+        "MAStyleJuceDemo_Standalone"
+      ]
+    },
+    {
+      "name": "juce-ninja-build",
+      "configurePreset": "juce-ninja"
+    },
+    {
+      "name": "juce-xcode-build",
+      "configurePreset": "juce-xcode"
+    }
+  ]
+}
