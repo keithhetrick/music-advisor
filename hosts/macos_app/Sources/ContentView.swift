@@ -44,7 +44,9 @@ struct ContentView: View {
                                                      store.dispatch(.setRoute(store.state.route.updatingTab(tab)))
                                                  })) {
                     ForEach(AppTab.allCases, id: \.self) { tab in
-                        Text(tab.rawValue).tag(tab)
+                        if tab != .style {
+                            Text(tab.rawValue).tag(tab)
+                        }
                     }
                 }
                 .pickerStyle(.segmented)
@@ -68,8 +70,8 @@ struct ContentView: View {
                         historyPane
                             .frame(maxWidth: .infinity, alignment: .leading)
                     } else {
-                        MAStyleShowcase()
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        // Style tab temporarily hidden on macOS 12; keep Run/History only.
+                        EmptyView()
                     }
                 }
             }
