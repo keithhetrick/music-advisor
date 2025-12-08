@@ -283,16 +283,6 @@ Creative and A&R teams make high-stakes calls on unreleased music using gut, pla
 - Data/bootstrap docs: `docs/data_bootstrap.md` spells out the data layout, S3/HTTPS bootstrap, and env overrides.
 - One-line public bootstrap (fetch + build public spine DB): `infra/scripts/full_public_bootstrap.sh`
 
-## Quick start
-
-- **Audio pipeline**
-  - `./automator.sh /path/to/song.wav`
-  - Outputs: `features.json`, `sidecar.json`, `merged.json`, `.client.*`, `.hci.json`, `.neighbors.json`, `run_summary.json`
-- **Host/chat demo**
-  - Start stub: `make chat-stub` (file store; port 8090)
-  - POST a sample: `curl -X POST http://localhost:8090/chat -H "Content-Type: application/json" -d @docs/samples/chat_analyze_sample.json`
-  - See `reply` + `ui_hints`; resend `session` on follow-ups.
-
 ## Architecture at a glance (ASCII)
 
 ```ascii
