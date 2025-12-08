@@ -15,6 +15,22 @@ Music Advisor is a local, feature-only toolchain that turns that mess into a rep
 
 ---
 
+## 🌟 Key Features
+
+- **🔒 Privacy-First**: 100% local processing - your audio never leaves your machine
+- **📊 Feature Extraction**: Advanced audio analysis (tempo, key, loudness, spectral features)
+- **📈 Historical Comparison**: Compare tracks against decades of hit song data
+- **🎨 Multi-Platform Components**:
+  - **Python**: Core audio engine, CLI tools, and pipeline orchestration
+  - **Swift**: Native macOS desktop app with SwiftUI and custom design system (MAStyle)
+  - **C++**: JUCE audio plugins for DAW integration
+- **🔄 Reproducible**: Same audio + config = same results, every time
+- **📴 Offline-Ready**: Works completely offline after initial data bootstrap
+- **🛡️ Quality Guardrails**: Built-in QA gates, tempo confidence, and validation
+- **📦 Schema-Validated**: All outputs conform to documented JSON schemas
+
+---
+
 ## Network usage (local-first)
 
 - Internet is only needed for the initial data bootstrap (`infra/scripts/data_bootstrap.py --manifest ...`).
@@ -112,11 +128,71 @@ make -f docs/Makefile.sparse-smoke sparse-smoke-all
 After this one-time setup, you can operate fully offline; pipeline/host/sidecars keep all processing on your machine.
 If you previously installed from an older path (e.g., `MusicAdvisor_AudioTools`) and want to refresh the environment, `make rebuild-venv` will remove `.venv` (with a prompt) and recreate it via `bootstrap-all`.
 
-## Getting started in a few minutes
+## 🚀 Quick Start Examples
 
-1. Clone + bootstrap: `git clone … && cd music-advisor && make bootstrap-all`
-2. Run chat stub: `make chat-stub` (file store; port 8090).
-3. POST a sample: `curl -X POST http://localhost:8090/chat -H "Content-Type: application/json" -d @docs/samples/chat_analyze_sample.json`
+### Example 1: Analyze a Single Audio File
+
+```bash
+# Activate your environment
+source .venv/bin/activate
+
+# Run analysis on a WAV file
+./automator.sh /path/to/your/song.wav
+
+# Outputs generated:
+# - features.json      (extracted audio features)
+# - sidecar.json       (tempo/key from specialized backends)
+# - merged.json        (combined features)
+# - *.client.*         (client-ready summaries)
+# - *.hci.json         (human-computer interaction data)
+# - *.neighbors.json   (similar tracks)
+# - run_summary.json   (execution metadata)
+```
+
+### Example 2: Start the Chat/Analysis Server
+
+```bash
+# Start the local chat server (port 8090)
+make chat-stub
+
+# In another terminal, analyze a track via API:
+curl -X POST http://localhost:8090/chat \
+  -H "Content-Type: application/json" \
+  -d @docs/samples/chat_analyze_sample.json
+
+# Response includes:
+# - Analysis results
+# - UI hints for display
+# - Session ID for follow-up queries
+```
+
+### Example 3: Batch Processing
+
+```bash
+# Extract features from multiple files
+for file in /path/to/music/*.wav; do
+  python -m ma_audio_engine.pipe_cli "$file"
+done
+
+# Rank tracks in a folder
+python tools/cli/hci_rank_from_folder.py /path/to/output_root
+```
+
+### Example 4: Using the Helper CLI
+
+```bash
+# Set up helper alias (optional but recommended)
+alias ma="python -m ma_helper"
+
+# Get quick orientation
+ma quickstart
+
+# Run affected tests only
+ma affected --base origin/main
+
+# Start development dashboard
+ma chat-dev  # Opens tmux split with server and logs
+```
 4. Explore: list projects/tests with `python3 tools/ma_orchestrator.py list-projects`; see docs links above for deeper dives.
 5. Next step: run `python -m ma_helper help` (or `ma help` if you set `alias ma="python -m ma_helper"`) to see the helper commands. For a 30-second orientation, try `ma quickstart`. The helper is your main entrypoint for tasks, tests, affected runs, git/CI checks, and dashboards.
 6. Optional UX dependencies: install `rich` for TUI/live dashboards and `prompt_toolkit` for fuzzy prompts. `tmux` is used by `ma chat-dev` if available (falls back to printed commands). Git helpers require running inside the repo with `.git` present.
@@ -207,16 +283,6 @@ Creative and A&R teams make high-stakes calls on unreleased music using gut, pla
 - Data/bootstrap docs: `docs/data_bootstrap.md` spells out the data layout, S3/HTTPS bootstrap, and env overrides.
 - One-line public bootstrap (fetch + build public spine DB): `infra/scripts/full_public_bootstrap.sh`
 
-## Quick start
-
-- **Audio pipeline**
-  - `./automator.sh /path/to/song.wav`
-  - Outputs: `features.json`, `sidecar.json`, `merged.json`, `.client.*`, `.hci.json`, `.neighbors.json`, `run_summary.json`
-- **Host/chat demo**
-  - Start stub: `make chat-stub` (file store; port 8090)
-  - POST a sample: `curl -X POST http://localhost:8090/chat -H "Content-Type: application/json" -d @docs/samples/chat_analyze_sample.json`
-  - See `reply` + `ui_hints`; resend `session` on follow-ups.
-
 ## Architecture at a glance (ASCII)
 
 ```ascii
@@ -278,11 +344,64 @@ audio file
 - Extractor JSON always contains a `TTC` block: `{seconds, confidence, lift_db, dropped, source}` (values may be `null`).
 - New CLI: `ma-extract` to run your existing `analyze()` and write a normalized JSON payload.
 
-## Install (editable)
+## 📦 Installation
+
+### Prerequisites
+
+- **Python 3.11+** (3.9+ supported, 3.11+ recommended)
+- **~5–10 GB disk space** for data/bootstrap (more for batch outputs)
+- **macOS or Linux** (Windows via WSL2)
+- **Audio processing tools** (optional for sidecars):
+  - `ffmpeg`, `libsamplerate`, `fftw` (install via `brew` on macOS or `apt` on Linux)
+
+### Quick Install
 
 ```bash
+# Clone the repository (sparse checkout supported)
+git clone --filter=blob:none https://github.com/keithhetrick/music-advisor.git
+cd music-advisor
+
+# One-shot bootstrap (venv + deps + data + smoke tests)
+# Recommended (uses pinned versions):
+make bootstrap-locked
+
+# Alternative (unpinned versions):
+# make bootstrap-all
+
+# If downloads/build deps are blocked, use:
+# make bootstrap-all EXTRA_PIP_FLAGS="--no-build-isolation"
+```
+
+### Manual Install (editable)
+
+If you prefer manual control:
+
+```bash
+# Create and activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies
 python -m pip install -e .
-python -m pip install --no-build-isolation -r requirements.txt
+python -m pip install -r requirements.lock  # or requirements.txt for unpinned
+
+# Bootstrap data (requires network access)
+python infra/scripts/data_bootstrap.py --manifest infra/scripts/data_manifest.json
+
+# Verify installation
+make quick-check
+```
+
+### Optional: Sparse Checkout
+
+For working on specific components only:
+
+```bash
+git sparse-checkout init --cone
+git sparse-checkout set hosts/advisor_host tools shared engines/audio_engine docs
+
+# Install only sparse targets
+pip install -e shared -e hosts/advisor_host -e tools/chat
 ```
 
 ## Public data bootstrap (one-shot)
@@ -329,3 +448,70 @@ Actual stack:
 > 🛠️ Tools: Audio Features CLI · Tempo Sidecar Runner · Equilibrium Merge CLI · Pack Writer CLI · HCI Echo Injector · Client Echo Injector · Pipeline Driver
 > 📂 Infra: Data Bootstrap · Public Spine Builder · Quick Check Smoke · E2E App Smoke · CI Stub
 > 📄 Docs: Ops Commands · Pipeline Overview · Host/Chat Contracts · Calibration & Sidecars · Architecture Overview
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Music Advisor is built with collaboration in mind.
+
+### How to Contribute
+
+1. **Read the Guidelines**: Check out [CONTRIBUTING.md](CONTRIBUTING.md) for detailed instructions
+2. **Code of Conduct**: Follow our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) to ensure respectful collaboration
+3. **Report Issues**: Use our [issue templates](.github/ISSUE_TEMPLATE/) for bugs and feature requests
+4. **Submit PRs**: Follow our [pull request template](.github/pull_request_template.md)
+
+### What You Can Contribute
+
+- 🐛 **Bug Fixes**: Help us squash bugs and improve stability
+- ✨ **Features**: Add new capabilities or enhance existing ones
+- 📖 **Documentation**: Improve guides, add examples, fix typos
+- 🧪 **Tests**: Expand test coverage and add edge cases
+- 🎨 **UI/UX**: Enhance the macOS app or design system
+- 🔌 **Plugins**: Develop new audio plugins or integrations
+
+### Development Quick Start
+
+```bash
+# Clone and setup
+git clone https://github.com/keithhetrick/music-advisor.git
+cd music-advisor
+make bootstrap-locked
+
+# Run tests
+make quick-check
+
+# See helper commands
+python -m ma_helper help
+```
+
+For more details, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### Open Source Notices
+
+When redistributing or bundling this software, please include:
+- Root `LICENSE` and `NOTICE` files
+- Licenses from `src/ma_config/` and `shared/` directories
+- An "Open Source Notices" section in your documentation
+
+---
+
+## 🔒 Security
+
+Music Advisor takes security seriously. If you discover a security vulnerability, please see [SECURITY.md](SECURITY.md) for reporting instructions.
+
+---
+
+## 📞 Support
+
+- **Documentation**: Check the [docs/](docs/) directory for detailed guides
+- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/keithhetrick/music-advisor/issues)
+- **Support**: See [SUPPORT.md](SUPPORT.md) for additional help
+- **Troubleshooting**: Common issues are documented in [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
