@@ -8,6 +8,9 @@ MAStyleJuceDemoAudioProcessor::MAStyleJuceDemoAudioProcessor()
               .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
       state(*this, nullptr, "MASTYLE_DEMO", createLayout()) {
   rmsMeter.reset(48000.0, 0.05);
+  // Cache raw step params for quick access.
+  for (size_t i = 0; i < stepParams.size(); ++i)
+    stepParams[i] = state.getRawParameterValue("step" + juce::String((int)i + 1));
 }
 
 MAStyleJuceDemoAudioProcessor::~MAStyleJuceDemoAudioProcessor() {
@@ -16,22 +19,35 @@ MAStyleJuceDemoAudioProcessor::~MAStyleJuceDemoAudioProcessor() {
 
 juce::AudioProcessorValueTreeState::ParameterLayout
 MAStyleJuceDemoAudioProcessor::createLayout() {
+  using juce::ParameterID;
   std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
   params.push_back(std::make_unique<juce::AudioParameterFloat>(
-      "drive", "Drive", juce::NormalisableRange<float>(0.0f, 24.0f), 6.0f));
+      ParameterID{"drive", 1}, "Drive",
+      juce::NormalisableRange<float>(0.0f, 24.0f), 6.0f));
   params.push_back(std::make_unique<juce::AudioParameterFloat>(
-      "mix", "Mix", juce::NormalisableRange<float>(0.0f, 1.0f), 0.5f));
+      ParameterID{"mix", 1}, "Mix",
+      juce::NormalisableRange<float>(0.0f, 1.0f), 0.5f));
   params.push_back(std::make_unique<juce::AudioParameterFloat>(
-      "cutoff", "Cutoff",
+      ParameterID{"cutoff", 1}, "Cutoff",
       juce::NormalisableRange<float>(80.0f, 12000.0f, 0.5f, 0.25f), 8000.0f));
   params.push_back(std::make_unique<juce::AudioParameterFloat>(
-      "resonance", "Resonance", juce::NormalisableRange<float>(0.1f, 1.2f),
-      0.7f));
+      ParameterID{"resonance", 1}, "Resonance",
+      juce::NormalisableRange<float>(0.1f, 1.2f), 0.7f));
   params.push_back(std::make_unique<juce::AudioParameterFloat>(
-      "attack", "Attack", juce::NormalisableRange<float>(1.0f, 500.0f), 40.0f));
+      ParameterID{"tone", 1}, "Tone",
+      juce::NormalisableRange<float>(150.0f, 12000.0f, 0.6f), 4000.0f));
+  for (int i = 0; i < numSteps; ++i) {
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+        ParameterID{"step" + juce::String(i + 1), 1},
+        "Step " + juce::String(i + 1),
+        juce::NormalisableRange<float>(0.0f, 1.0f), 0.5f));
+  }
   params.push_back(std::make_unique<juce::AudioParameterFloat>(
-      "release", "Release", juce::NormalisableRange<float>(5.0f, 1000.0f),
-      200.0f));
+      ParameterID{"attack", 1}, "Attack",
+      juce::NormalisableRange<float>(1.0f, 500.0f), 40.0f));
+  params.push_back(std::make_unique<juce::AudioParameterFloat>(
+      ParameterID{"release", 1}, "Release",
+      juce::NormalisableRange<float>(5.0f, 1000.0f), 200.0f));
   return {params.begin(), params.end()};
 }
 
@@ -44,6 +60,9 @@ void MAStyleJuceDemoAudioProcessor::prepareToPlay(double sampleRate,
   dryWet.setMixingRule(juce::dsp::DryWetMixingRule::linear);
   dryWet.prepare(spec);
   rmsMeter.reset(sampleRate, 0.05);
+
+  stepDeltaPerSample = (2.0 /* steps per second */ * (double)numSteps) / sampleRate;
+  stepPhase = 0.0;
 }
 
 bool MAStyleJuceDemoAudioProcessor::isBusesLayoutSupported(
@@ -63,13 +82,38 @@ void MAStyleJuceDemoAudioProcessor::processBlock(
 
   auto *drive = state.getRawParameterValue("drive");
   auto *mix = state.getRawParameterValue("mix");
+  auto *tone = state.getRawParameterValue("tone");
 
   auto block = juce::dsp::AudioBlock<float>(buffer);
   dryWet.pushDrySamples(block);
 
   // Simple drive + dry/wet (placeholder DSP, kept lightweight).
   auto driveGain = juce::Decibels::decibelsToGain(drive->load());
+
+  // Step modulation: pick current step based on block time.
+  auto currentStepIndex = static_cast<size_t>(static_cast<int>(stepPhase) % numSteps);
+  stepPhase += stepDeltaPerSample * buffer.getNumSamples();
+  auto stepVal = stepParams[currentStepIndex] ? stepParams[currentStepIndex]->load() : 0.0f;
+  auto stepGain = 1.0f + (0.5f * stepVal); // up to +6 dB-ish
+
+  driveGain *= stepGain;
   buffer.applyGain(driveGain);
+
+  // Lightweight tone tilt: one-pole LP per channel.
+  auto toneHz = tone->load();
+  auto alpha = 1.0f - std::exp(-2.0 * juce::MathConstants<double>::pi * (double)toneHz / getSampleRate());
+  auto* left = buffer.getWritePointer(0);
+  auto* right = buffer.getNumChannels() > 1 ? buffer.getWritePointer(1) : nullptr;
+  for (int i = 0; i < buffer.getNumSamples(); ++i)
+  {
+      toneStateL += (float)alpha * (left[i] - toneStateL);
+      left[i] = toneStateL;
+      if (right)
+      {
+          toneStateR += (float)alpha * (right[i] - toneStateR);
+          right[i] = toneStateR;
+      }
+  }
 
   dryWet.setWetMixProportion(mix->load());
   dryWet.mixWetSamples(block);

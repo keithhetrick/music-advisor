@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(MAStyleJuceDemo VERSION 0.1.0)
+project(MAStyleJuceDemo VERSION 0.1.1)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -41,6 +41,21 @@ target_sources(MAStyleJuceDemo PRIVATE
     Source/PluginProcessor.h
     Source/PluginEditor.cpp
     Source/PluginEditor.h
+    Source/gui/controls/GuiStyle.h
+    Source/gui/controls/Dial.cpp
+    Source/gui/controls/Dial.h
+    Source/gui/controls/MiniEnvelope.cpp
+    Source/gui/controls/MiniEnvelope.h
+    Source/gui/controls/SimpleMeter.cpp
+    Source/gui/controls/SimpleMeter.h
+    Source/gui/controls/HaloKnob.cpp
+    Source/gui/controls/HaloKnob.h
+    Source/gui/controls/StepSequencerView.cpp
+    Source/gui/controls/StepSequencerView.h
+    Source/gui/controls/AnimatedSvgBadge.cpp
+    Source/gui/controls/AnimatedSvgBadge.h
+    Source/gui/controls/ArcSlider.cpp
+    Source/gui/controls/ArcSlider.h
 )
 
 target_compile_definitions(MAStyleJuceDemo

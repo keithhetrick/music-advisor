@@ -55,10 +55,13 @@ cd plugins/juce_ui_demo
 cmake --preset juce-ninja
 cmake --build --preset juce-ninja-build
 # Run Standalone:
-open build-ninja/MAStyleJuceDemo_artefacts/Standalone/MAStyle\ JUCE\ Demo.app
+open build-ninja/MAStyleJuceDemo_artefacts/Debug/Standalone/MAStyle\ JUCE\ Demo.app
 
 # Install AU/VST3 to user root plugin folders (no vendor subfolder):
 ./scripts/install_root.sh Debug   # or Release
+
+# One-liner to rebuild+install+register AU (Logic): 
+# ./scripts/refresh_au.sh Debug
 
 # If a host doesn’t see it and you don’t want to rescan everything:
 # Targeted refresh (avoids wiping full AU cache):
@@ -76,11 +79,13 @@ cmake --build --preset juce-xcode-build
 
 Notes:
 
-- If Ninja ever complains about headers, ensure `CMAKE_OSX_SYSROOT` in `CMakePresets.json` matches your Xcode SDK path.
+- If Ninja complains about missing system headers, ensure Xcode is installed/selected and `CMAKE_OSX_SYSROOT` in `CMakePresets.json` points to your current SDK (`/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk`).
 - PCH is disabled to avoid ObjC++ conflicts in JUCE modules; no action needed—just rebuild.
-
-If Ninja complains about missing system headers (e.g., `<algorithm>` in a PCH), ensure Xcode is installed/selected and the SDK path in `CMakePresets.json` (`CMAKE_OSX_SYSROOT`) points to your current Xcode:
-`/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk`.
+- VS Code: tasks and launch are wired for the Ninja standalone loop:
+  - Build: “CMake: Build (Ninja, Standalone)”
+  - Launch: “Run MAStyle Standalone (Ninja)” (pre-builds, then runs the app from `build-ninja/…/Debug/Standalone`).
+- Cross-host quick check (no Logic rescan): open the VST3 in JUCE AudioPluginHost/REAPER:
+  `~/Library/Audio/Plug-Ins/VST3/MAStyle JUCE Demo.vst3`
 
 ## Packaging (example)
 
@@ -88,4 +93,29 @@ If Ninja complains about missing system headers (e.g., `<algorithm>` in a PCH), 
 cmake --build build --config Release
 cmake --install build --config Release --prefix dist
 # Zip dist or copy the .vst3/.component to your user plugin folders for testing
+# Skeleton signed packaging (manual signing/notarization):
+./scripts/package_release_signed.sh
 ```
+
+### Signing / Notarization (manual steps)
+- Env vars (optional):
+  - `DEV_ID_APP="Developer ID Application: Your Name (TEAMID)"`
+  - `NOTARY_APPLE_ID`, `NOTARY_TEAM_ID`, `NOTARY_APP_SPECIFIC_PW`
+- Run after a Release build: `./scripts/package_release_signed.sh`
+  - Stages AU/VST3/app to `dist/`
+  - Codesigns if `DEV_ID_APP` is set
+  - Creates a zip
+  - Notarizes + staples if `NOTARY_*` vars are set
+- Distribute the stapled bundles/zip from `dist/`.
+
+## UI/DSP demo notes
+- Custom vector controls: halo knob, envelope mini-view, step sequencer, animated SVG badge.
+- DSP shell: drive + tone + step modulation, dry/wet, RMS meter feeding sidecar writer (background thread).
+
+## Portfolio alignment (JD highlights)
+- Translate mockups → live vector graphics: bespoke halo knob, mini-envelope, step sequencer, animated SVG badge.
+- Complex UI controls: multiple APVTS-bound custom controls with styling tokens (GuiStyle), modularized under `Source/gui/controls/`.
+- UX/UI R&D loop: fast Ninja + Standalone for immediate feedback; VST3 usable in lightweight hosts for quick reloads.
+- Packaging: CMake presets, install scripts, and signing/notarization checklist (`scripts/package_release_signed.sh`).
+- Architecture/modularity: processor/editor split, small focused control files, APVTS-based state, ParameterID version hints for safe AU evolution.
+- Cross-host readiness: AU/VST3/Standalone artifacts built; VST3 handy for non-Logic hosts when avoiding AU rescans.

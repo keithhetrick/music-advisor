@@ -53,8 +53,8 @@ cmake --install build --config Release --prefix dist
 ```bash
 cd plugins/juce_ui_demo
 # Configure & build universal (arm64+x86_64) using presets (adjust JUCE_DIR in CMakePresets.json if needed):
-cmake --preset juce-universal
-cmake --build --preset juce-universal-build
+cmake --preset juce-ninja
+cmake --build --preset juce-ninja-build
 
 # Install AU/VST3 to user root plugin folders (no vendor subfolder):
 ./scripts/install_root.sh Debug   # or Release

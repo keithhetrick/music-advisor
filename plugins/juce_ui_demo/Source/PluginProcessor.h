@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include "FeatureCollector.h"
 #include "SidecarWriter.h"
 #include <juce_audio_processors/juce_audio_processors.h>
@@ -40,6 +41,8 @@ public:
   void requestSidecar(const SidecarMeta &meta);
 
 private:
+  float onePoleToneSample(float x, float fc) noexcept;
+
   juce::AudioProcessorValueTreeState state;
   juce::dsp::DryWetMixer<float> dryWet;
   juce::LinearSmoothedValue<float> rmsMeter;
@@ -47,6 +50,11 @@ private:
   FeatureCollector collector;
   SidecarWriter writer;
   juce::ThreadPool pool{1};
+  float toneStateL{0.0f}, toneStateR{0.0f};
+  double stepPhase{0.0};
+  double stepDeltaPerSample{0.0};
+  static constexpr int numSteps = 8;
+  std::array<std::atomic<float> *, numSteps> stepParams{};
 
   juce::AudioProcessorValueTreeState::ParameterLayout createLayout();
 

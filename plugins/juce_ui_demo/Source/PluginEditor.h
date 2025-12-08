@@ -4,47 +4,13 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 
-class Dial : public juce::Component {
-public:
-  Dial(juce::AudioProcessorValueTreeState &vts,
-       juce::RangedAudioParameter &param, juce::UndoManager *um);
-  void paint(juce::Graphics &g) override;
-  void resized() override;
-
-private:
-  juce::Slider slider;
-  juce::Label label;
-  std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
-      attachment;
-};
-
-class MiniEnvelope : public juce::Component, private juce::Timer {
-public:
-  MiniEnvelope(juce::AudioProcessorValueTreeState &vts,
-               juce::RangedAudioParameter &attack,
-               juce::RangedAudioParameter &release, juce::UndoManager *um);
-  ~MiniEnvelope() override = default;
-  void paint(juce::Graphics &g) override;
-  void resized() override;
-
-private:
-  void timerCallback() override;
-  juce::AudioProcessorValueTreeState &processorState;
-  juce::Slider attackSlider, releaseSlider;
-  std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
-      attackAttach, releaseAttach;
-};
-
-class SimpleMeter : public juce::Component, private juce::Timer {
-public:
-  explicit SimpleMeter(std::function<float()> rmsProvider);
-  void paint(juce::Graphics &g) override;
-
-private:
-  void timerCallback() override;
-  std::function<float()> getRms;
-  float meterValue = 0.0f;
-};
+#include "gui/controls/Dial.h"
+#include "gui/controls/HaloKnob.h"
+#include "gui/controls/MiniEnvelope.h"
+#include "gui/controls/SimpleMeter.h"
+#include "gui/controls/StepSequencerView.h"
+#include "gui/controls/AnimatedSvgBadge.h"
+#include "gui/controls/ArcSlider.h"
 
 class MAStyleJuceDemoAudioProcessorEditor : public juce::AudioProcessorEditor {
 public:
@@ -60,12 +26,15 @@ private:
   juce::TextEditor trackId, sessionId, hostField;
   juce::TextButton snapshotButton{"Snapshot Sidecar"};
 
-  Dial driveDial;
+  HaloKnob driveDial;
   Dial mixDial;
   Dial cutoffDial;
   Dial resoDial;
+  ArcSlider toneDial;
   MiniEnvelope envView;
   SimpleMeter meter;
+  StepSequencerView seqView;
+  AnimatedSvgBadge badge;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(
       MAStyleJuceDemoAudioProcessorEditor)
