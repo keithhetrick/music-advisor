@@ -25,9 +25,14 @@ final class CommandViewModel: ObservableObject {
     @Published var currentJobID: UUID?
     private var stopAfterCurrent: Bool = false
     private var progressThrottle = Date.distantPast
+    private var cancellables = Set<AnyCancellable>()
 
     private let runnerService = RunnerService()
     private let initialConfig: AppConfig
+    private let queuePersistence = QueuePersistence()
+    private var logBuffer = PassthroughSubject<(String, Bool), Never>() // (line, isStdErr)
+    private var logCancellable: AnyCancellable?
+    private let logLimit = 10_000
     // Optional updater for processing snapshots (actor in AppStore).
     var processingUpdater: ((String?, Double?, String?) -> Void)?
 
@@ -53,6 +58,38 @@ final class CommandViewModel: ObservableObject {
                 self.sidecarPath = out
             }
         }
+
+        let persisted = queuePersistence.load()
+        if !persisted.isEmpty {
+            queueVM.replaceAll(persisted)
+        }
+
+        logCancellable = logBuffer
+            .collect(.byTime(DispatchQueue.main, .milliseconds(300)))
+            .sink { [weak self] batch in
+                guard let self else { return }
+                let stdoutLines = batch.filter { !$0.1 }.map { $0.0 }.joined(separator: "\n")
+                let stderrLines = batch.filter { $0.1 }.map { $0.0 }.joined(separator: "\n")
+                if !stdoutLines.isEmpty {
+                    self.stdout.append(stdoutLines + "\n")
+                    if self.stdout.count > self.logLimit {
+                        self.stdout = String(self.stdout.suffix(self.logLimit))
+                    }
+                }
+                if !stderrLines.isEmpty {
+                    self.stderr.append(stderrLines + "\n")
+                    if self.stderr.count > self.logLimit {
+                        self.stderr = String(self.stderr.suffix(self.logLimit))
+                    }
+                }
+            }
+
+        queueVM.jobsPublisher
+            .dropFirst()
+            .sink { [weak self] jobs in
+                self?.queuePersistence.save(jobs)
+            }
+            .store(in: &cancellables)
     }
 
     func loadDefaults() {
@@ -105,45 +142,60 @@ final class CommandViewModel: ObservableObject {
     }
 
     func run() {
-        let parsedCommand = splitCommand(commandText)
-        let env = parseEnv(envText)
+            let parsedCommand = splitCommand(commandText)
+            let env = parseEnv(envText)
 
-        guard !parsedCommand.isEmpty else {
-            status = "No command provided"
-            return
-        }
+            guard !parsedCommand.isEmpty else {
+                status = "No command provided"
+                // Surface to UI via optional processing updater.
+                processingUpdater?("failed", 1.0, status)
+                return
+            }
 
-        sidecarPath = extractOutPath(from: parsedCommand)
-        isRunning = true
-        status = "Running..."
-        stdout = ""
-        stderr = ""
-        summaryMetrics = []
-        lastDuration = nil
-        sidecarPreview = ""
-        processingUpdater?("running", 0.0, "starting")
+            sidecarPath = extractOutPath(from: parsedCommand)
+            isRunning = true
+            status = "Running..."
+            stdout = ""
+            stderr = ""
+            summaryMetrics = []
+            lastDuration = nil
+            sidecarPreview = ""
+            processingUpdater?("running", 0.0, "starting")
 
-        Task.detached {
-            let start = Date()
-            let result = await self.runnerService.run(command: parsedCommand,
-                                                      workingDirectory: self.workingDirectory.isEmpty ? nil : self.workingDirectory,
-                                                      extraEnv: env)
-            let duration = Date().timeIntervalSince(start)
-            // Parse heavy-ish work off the main actor.
-            let parsed = await self.parseJSON(result.stdout)
-            let metrics = await self.extractMetrics(from: parsed)
+            Task.detached {
+                let start = Date()
+                let result = await self.runnerService.run(command: parsedCommand,
+                                                          workingDirectory: self.workingDirectory.isEmpty ? nil : self.workingDirectory,
+                                                          extraEnv: env)
+                let duration = Date().timeIntervalSince(start)
+                // Parse heavy-ish work off the main actor.
+                let parsed = await self.parseJSON(result.stdout)
+                let metrics = await self.extractMetrics(from: parsed)
 
-            await MainActor.run {
-                self.lastDuration = duration
-                self.stdout = result.stdout
-                self.stderr = result.stderr
-                self.exitCode = result.exitCode
-                self.status = "Done (exit \(result.exitCode))"
+                await MainActor.run {
+                    if let spawnError = result.spawnError {
+                        self.stderr = spawnError
+                        self.status = "Failed to start: \(spawnError)"
+                        self.exitCode = result.exitCode
+                        self.isRunning = false
+                        self.processingUpdater?("failed", 1.0, self.status)
+                        return
+                    }
+
+                    self.lastDuration = duration
+                    self.stdout = result.stdout
+                    self.stderr = result.stderr
+                    self.exitCode = result.exitCode
+                    self.status = "Done (exit \(result.exitCode))"
                 self.parsedJSON = parsed
                 self.summaryMetrics = metrics
                 self.lastRunTime = Date()
                 self.isRunning = false
                 self.processingUpdater?(result.exitCode == 0 ? "done" : "failed", 1.0, self.status)
+                if let spawnError = result.spawnError {
+                    self.stderr = spawnError
+                    self.status = "Failed to start: \(spawnError)"
+                }
 
                 if let jobID = self.currentJobID {
                     if result.exitCode == 0 {
@@ -157,6 +209,24 @@ final class CommandViewModel: ObservableObject {
                 }
             }
         }
+    }
+
+    func appendStdout(_ line: String) {
+        logBuffer.send((line, false))
+        if stdout.count > logLimit {
+            stdout = String(stdout.suffix(logLimit))
+        }
+    }
+
+    func appendStderr(_ line: String) {
+        logBuffer.send((line, true))
+        if stderr.count > logLimit {
+            stderr = String(stderr.suffix(logLimit))
+        }
+    }
+
+    func flushLogs() {
+        // Combine pipeline is already time-based; hook left for explicit flush if needed later.
     }
 
     // Basic shell-style splitter that respects single/double quotes and backslash escapes.

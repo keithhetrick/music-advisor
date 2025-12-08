@@ -9,7 +9,7 @@ struct ConsoleView: View {
             Text("Console")
                 .maText(.headline)
             ScrollView {
-                VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
+                LazyVStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
                     ForEach(messages.indices, id: \.self) { idx in
                         Text(messages[idx])
                             .font(MAStyle.Typography.bodyMono)
@@ -23,5 +23,6 @@ struct ConsoleView: View {
             .maCardInteractive()
         }
         .maCardInteractive()
+        .textSelection(.enabled)
     }
 }

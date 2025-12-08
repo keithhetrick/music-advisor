@@ -7,4 +7,5 @@ struct AlertState: Equatable {
     var title: String
     var message: String
     var level: Level
+    var presentAsToast: Bool = false
 }

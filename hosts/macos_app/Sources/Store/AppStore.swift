@@ -96,7 +96,9 @@ final class AppStore: ObservableObject {
                 await MainActor.run {
                     self.state.hostSnapshot = snap
                 }
-                try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5s to reduce UI churn
+                // Back off polling when idle to reduce wakeups.
+                let interval: UInt64 = snap.processing.status == "running" ? 1_500_000_000 : 3_500_000_000
+                try? await Task.sleep(nanoseconds: interval)
             }
         }
     }
@@ -116,6 +118,9 @@ private func reduce(_ state: inout AppState, action: AppAction) {
         state.promptText = text
     case .appendMessage(let msg):
         state.messages.append(msg)
+        if state.messages.count > 200 {
+            state.messages.removeFirst(state.messages.count - 200)
+        }
     case .setMessages(let msgs):
         state.messages = msgs
     case .setShowAdvanced(let value):

@@ -17,18 +17,31 @@ struct ResultsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
-            Text("Result").maText(.headline)
-            Picker("", selection: $selectedPane) {
-                Text("JSON").tag(ResultPane.json)
-                Text("stdout").tag(ResultPane.stdout)
-                Text("stderr").tag(ResultPane.stderr)
-            }
-            .pickerStyle(.segmented)
-            .onChange(of: parsedJSON, perform: { _ in
-                if selectedPane == .json && parsedJSON.isEmpty {
-                    selectedPane = .stdout
+            HStack(spacing: MAStyle.Spacing.sm) {
+                Text("Result").maText(.headline)
+                Picker("", selection: $selectedPane) {
+                    Text("JSON").tag(ResultPane.json)
+                    Text("stdout").tag(ResultPane.stdout)
+                    Text("stderr").tag(ResultPane.stderr)
                 }
-            })
+                .pickerStyle(.segmented)
+                .onChange(of: parsedJSON, perform: { _ in
+                    if selectedPane == .json && parsedJSON.isEmpty {
+                        selectedPane = .stdout
+                    }
+                })
+                Spacer()
+                Button {
+                    let text = paneText(selectedPane)
+                    guard !text.isEmpty else { return }
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(text, forType: .string)
+                } label: {
+                    Label("Copy pane", systemImage: "doc.on.doc")
+                }
+                .maButton(.ghost)
+                .disabled(paneText(selectedPane).isEmpty)
+            }
 
             if !summaryMetrics.isEmpty || sidecarPath != nil {
                 HStack(spacing: MAStyle.Spacing.sm) {

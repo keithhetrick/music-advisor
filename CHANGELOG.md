@@ -46,7 +46,7 @@
 - CI workflow added: `.github/workflows/ci.yml` runs quick-check on push/PR.
 - TTC corpus stats helper relocated to `infra/scripts/ttc_stats_report.py` to keep root clean.
 - Data bootstrap added: `infra/scripts/data_bootstrap.py` with manifest template to fetch assets into `data/`.
-- macOS app: route-driven reducer state, alert banners/toasts (info/warn/error), queue persistence to Application Support (best effort), preview cache persistence, trimmed console log buffer, and host-architecture docs; MAStyle remains the styling source of truth.
+- macOS app: route-driven reducer state, alert banners/toasts (info/warn/error), queue persistence to Application Support (best effort), preview cache and history persistence, bounded preview search, coalesced + capped stdout/stderr updates, trimmed console log buffer, host polling backoff, lazy stacks for log/history/queue, copy-pane action, and host-architecture docs; MAStyle remains the styling source of truth.
 
 ## v0.3.0 — 2025-11-07
 

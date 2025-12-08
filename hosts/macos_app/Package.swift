@@ -17,6 +17,11 @@ let package = Package(
                 .product(name: "MAStyle", package: "design_system")
             ],
             path: "Sources"
+        ),
+        .testTarget(
+            name: "MusicAdvisorMacAppTests",
+            dependencies: ["MusicAdvisorMacApp"],
+            path: "Tests"
         )
     ]
 )

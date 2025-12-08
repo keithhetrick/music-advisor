@@ -5,7 +5,7 @@ struct Job: Identifiable, Hashable {
         case pending, running, done, failed
     }
 
-    let id = UUID()
+    let id: UUID
     let fileURL: URL
     let displayName: String
     var status: Status = .pending
@@ -21,5 +21,23 @@ struct Job: Identifiable, Hashable {
         case .running: return 0.5
         case .done, .failed: return 1.0
         }
+    }
+
+    init(id: UUID = UUID(),
+         fileURL: URL,
+         displayName: String,
+         status: Status = .pending,
+         sidecarPath: String? = nil,
+         errorMessage: String? = nil,
+         preparedCommand: [String]? = nil,
+         preparedOutPath: String? = nil) {
+        self.id = id
+        self.fileURL = fileURL
+        self.displayName = displayName
+        self.status = status
+        self.sidecarPath = sidecarPath
+        self.errorMessage = errorMessage
+        self.preparedCommand = preparedCommand
+        self.preparedOutPath = preparedOutPath
     }
 }

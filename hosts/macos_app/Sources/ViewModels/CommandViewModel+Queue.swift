@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 final class JobQueueViewModel: ObservableObject {
     @Published private(set) var jobs: [Job] = []
+    var jobsPublisher: Published<[Job]>.Publisher { $jobs }
 
     func addJobs(urls: [URL]) {
         let newJobs = urls.map { url in
@@ -14,6 +15,10 @@ final class JobQueueViewModel: ObservableObject {
 
     func addPrecomputed(_ newJobs: [Job]) {
         jobs.append(contentsOf: newJobs)
+    }
+
+    func replaceAll(_ newJobs: [Job]) {
+        jobs = newJobs
     }
 
     func clear() {

@@ -34,6 +34,8 @@ This app is a thin host UI that drives the Music Advisor pipeline. It keeps UX r
 - Queue lives in `CommandViewModel.queueVM` (add/remove/clear).
 - History/sidecar previews handled via store actions; previews cached in `AppState.previewCache`.
 - Jobs flow: queued → processing → done/failed; history tab consumes the emitted artifacts.
+- Queue snapshot is persisted to Application Support (`queue.json`) so pending jobs survive relaunch (best effort; errors are silent).
+- Sidecar preview cache persists to Application Support (`preview_cache.json`) to avoid re-reading large sidecars on relaunch (best effort; limited to recent entries).
 
 ## Configuration
 
@@ -56,4 +58,7 @@ This app is a thin host UI that drives the Music Advisor pipeline. It keeps UX r
 
 - Keep UI responsive: never block the main actor; throttle frequent updates.
 - Surface errors via a small `AlertState`/toast (use MAStyle banners).
+- Console messages are trimmed to the most recent 200 entries to reduce churn.
 - Keep MAStyle the only source of styling; swap `MAStyle.theme` to reskin globally.
+- Host polling backs off when idle to reduce wakeups (faster while processing).
+- Logs: stdout/stderr buffered and capped (~10k chars) to avoid UI churn; preview search bounded to avoid deep walks.

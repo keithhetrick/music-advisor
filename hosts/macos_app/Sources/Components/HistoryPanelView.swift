@@ -18,8 +18,12 @@ struct HistoryPanelView: View {
                     .maText(.caption)
                     .foregroundStyle(MAStyle.ColorToken.muted)
             } else {
-                ForEach(items) { item in
-                    historyRow(item: item)
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
+                        ForEach(items) { item in
+                            historyRow(item: item)
+                        }
+                    }
                 }
             }
         }

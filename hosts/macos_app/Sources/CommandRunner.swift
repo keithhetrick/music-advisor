@@ -5,6 +5,9 @@ struct CommandResult {
     let stdout: String
     let stderr: String
     let exitCode: Int32
+    let stdoutLines: [String]
+    let stderrLines: [String]
+    let spawnError: String?
 }
 
 struct CommandRunner {
@@ -12,7 +15,7 @@ struct CommandRunner {
 
     func run(command: [String], workingDirectory: String?, extraEnv: [String: String]) -> CommandResult {
         guard let executable = command.first else {
-            return CommandResult(commandLine: "", stdout: "", stderr: "No command provided", exitCode: -1)
+            return CommandResult(commandLine: "", stdout: "", stderr: "No command provided", exitCode: -1, stdoutLines: [], stderrLines: [], spawnError: "No command provided")
         }
 
         let args = Array(command.dropFirst())
@@ -38,7 +41,10 @@ struct CommandRunner {
             return CommandResult(commandLine: command.joined(separator: " "),
                                  stdout: "",
                                  stderr: "Failed to start: \(error)",
-                                 exitCode: -1)
+                                 exitCode: -1,
+                                 stdoutLines: [],
+                                 stderrLines: [],
+                                 spawnError: "\(error)")
         }
 
         process.waitUntilExit()
@@ -49,7 +55,10 @@ struct CommandRunner {
             commandLine: ([executable] + args).joined(separator: " "),
             stdout: String(data: stdoutData, encoding: .utf8) ?? "",
             stderr: String(data: stderrData, encoding: .utf8) ?? "",
-            exitCode: process.terminationStatus
+            exitCode: process.terminationStatus,
+            stdoutLines: (String(data: stdoutData, encoding: .utf8) ?? "").components(separatedBy: .newlines),
+            stderrLines: (String(data: stderrData, encoding: .utf8) ?? "").components(separatedBy: .newlines),
+            spawnError: nil
         )
 
         // Write a simple log for debugging runs.

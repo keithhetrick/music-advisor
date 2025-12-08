@@ -37,44 +37,49 @@ struct JobQueueView: View {
                         .maText(.caption)
                         .foregroundStyle(MAStyle.ColorToken.muted)
                 } else {
-                    ForEach(jobs) { job in
-                        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
-                            HStack {
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
+                            ForEach(jobs) { job in
                                 VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
-                                    Text(job.displayName).maText(.body)
-                                    Text(job.fileURL.path)
-                                        .maText(.caption)
-                                        .foregroundStyle(MAStyle.ColorToken.muted)
-                                        .lineLimit(1)
-                                }
-                                Spacer()
-                                statusChip(job.status)
-                                if let sidecar = job.sidecarPath {
-                                    Button("Reveal") { onReveal(sidecar) }
-                                        .maButton(.ghost)
-                                    Button("Preview Rich") {
-                                        let richPath = sidecar.replacingOccurrences(of: ".json", with: ".client.rich.txt")
-                                        onPreviewRich(richPath)
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
+                                            Text(job.displayName).maText(.body)
+                                            Text(job.fileURL.path)
+                                                .maText(.caption)
+                                                .foregroundStyle(MAStyle.ColorToken.muted)
+                                                .lineLimit(1)
+                                        }
+                                        Spacer()
+                                        statusChip(job.status)
+                                        if let sidecar = job.sidecarPath {
+                                            Button("Reveal") { onReveal(sidecar) }
+                                                .maButton(.ghost)
+                                            Button("Preview Rich") {
+                                                let richPath = sidecar.replacingOccurrences(of: ".json", with: ".client.rich.txt")
+                                                onPreviewRich(richPath)
+                                            }
+                                            .maButton(.ghost)
+                                        }
                                     }
-                                    .maButton(.ghost)
+                                    HStack(spacing: MAStyle.Spacing.sm) {
+                                        if #available(macOS 13.0, *) {
+                                            ProgressView(value: job.progress)
+                                                .maProgressStyle()
+                                                .frame(maxWidth: 160)
+                                        } else {
+                                            ProgressView()
+                                                .maProgressStyle()
+                                                .frame(maxWidth: 160)
+                                        }
+                                        Text(progressLabel(for: job))
+                                            .maText(.caption)
+                                            .foregroundStyle(MAStyle.ColorToken.muted)
+                                    }
                                 }
-                            }
-                            HStack(spacing: MAStyle.Spacing.sm) {
-                                if #available(macOS 13.0, *) {
-                                    ProgressView(value: job.progress)
-                                        .maProgressStyle()
-                                        .frame(maxWidth: 160)
-                                } else {
-                                    ProgressView()
-                                        .maProgressStyle()
-                                        .frame(maxWidth: 160)
-                                }
-                                Text(progressLabel(for: job))
-                                    .maText(.caption)
-                                    .foregroundStyle(MAStyle.ColorToken.muted)
+                                .maCardInteractive()
+                                .maSheen(isActive: job.status == .running, duration: 3.0, highlight: Color.white.opacity(0.08))
                             }
                         }
-                        .maCardInteractive()
                     }
                 }
             }

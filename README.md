@@ -74,6 +74,7 @@ music-advisor/
 - 🧭 Codex review entrypoint: `make review` or `scripts/review.sh` (runs helper github-check/preflight/verify/ci-plan vs origin/main).
 - 🚀 Codex optimize (report-only): `make optimize` for lint (ruff, no fix), mypy, and CI plan.
 - 🛠️ Codex optimize-fix (auto-fix lint): `make optimize-fix` (ruff --fix, mypy, CI plan).
+- 🎨 macOS custom toolkit: SwiftUI app + MAStyle (our Tailwind-like design system) lives under `hosts/macos_app` and `shared/design_system`. Build/run headless via `hosts/macos_app/scripts/swift_run_local.sh` and package via `hosts/macos_app/scripts/package_release.sh`. Style guide: `docs/MAStyle_styleguide.md`.
 
 ## Root essentials (what to look at first)
 
