@@ -30,6 +30,7 @@ struct ResultsView: View {
                         selectedPane = .stdout
                     }
                 })
+                .accessibilityLabel("Result pane")
                 Spacer()
                 Button {
                     let text = paneText(selectedPane)
@@ -41,6 +42,7 @@ struct ResultsView: View {
                 }
                 .maButton(.ghost)
                 .disabled(paneText(selectedPane).isEmpty)
+                .accessibilityLabel("Copy current result pane")
             }
 
             if !summaryMetrics.isEmpty || sidecarPath != nil {
@@ -53,9 +55,9 @@ struct ResultsView: View {
                         .maMetric()
                     }
                     if sidecarPath != nil {
-                        Button("Reveal sidecar", action: onRevealSidecar).maButton(.ghost)
-                        Button("Copy path", action: onCopySidecarPath).maButton(.ghost)
-                        Button("Preview sidecar", action: onPreviewSidecar).maButton(.ghost)
+                        Button("Reveal sidecar", action: onRevealSidecar).maButton(.ghost).accessibilityLabel("Reveal sidecar")
+                        Button("Copy path", action: onCopySidecarPath).maButton(.ghost).accessibilityLabel("Copy sidecar path")
+                        Button("Preview sidecar", action: onPreviewSidecar).maButton(.ghost).accessibilityLabel("Preview sidecar")
                     }
                     Spacer()
                 }
@@ -65,9 +67,11 @@ struct ResultsView: View {
                 Button("Copy JSON", action: onCopyJSON)
                     .maButton(.ghost)
                     .disabled(parsedJSON.isEmpty)
+                    .accessibilityLabel("Copy JSON result")
                 if sidecarPath != nil {
                     Button("Copy sidecar path", action: onCopySidecarPath)
                         .maButton(.ghost)
+                        .accessibilityLabel("Copy sidecar path")
                 }
                 Spacer()
             }

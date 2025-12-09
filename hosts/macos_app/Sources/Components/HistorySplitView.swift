@@ -68,8 +68,10 @@ struct HistorySplitView: View {
             TextField("Search history…", text: $searchText)
                 .maInput()
                 .focused(historySearchFocus)
+                .accessibilityLabel("Search history")
             Toggle("Rich only", isOn: $filterRichOnly)
                 .toggleStyle(.switch)
+                .accessibilityLabel("Filter rich previews")
             Spacer()
         }
         .padding(.horizontal, MAStyle.Spacing.sm)

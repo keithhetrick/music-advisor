@@ -1,52 +1,57 @@
-# macOS host scaffold (Swift/SwiftUI, no JUCE)
+# macOS host (Swift/SwiftUI, no JUCE required)
 
 Why this exists
-- A lightweight native shell to host Music Advisor UI and call the Python engines via IPC/CLI later.
-- Keeps JUCE optional: plug-ins/DSP can arrive later without entangling the host UI.
+
+- A lightweight native shell for Music Advisor that calls the Python engines via CLI/IPC (future).
+- JUCE remains optional for DAW probes/DSP; the host UI is pure SwiftUI.
 
 Location
+
 - `hosts/macos_app/` (SwiftPM package, macOS 12+, Swift 5.7+).
 
-How to run
-```bash
-cd hosts/macos_app
-swift build
-swift run
-# or open Package.swift in Xcode
-```
+How to run (fast local loop)
 
-Local helper (uses local HOME + scratch path)
 ```bash
 cd hosts/macos_app
 ./scripts/swift_run_local.sh
 # or manually:
-# HOME=$PWD/build/home swift build --scratch-path $PWD/build/.swiftpm
-# HOME=$PWD/build/home swift run   --scratch-path $PWD/build/.swiftpm
+# HOME=$PWD/build/home SWIFTPM_DISABLE_SANDBOX=1 swift build --scratch-path $PWD/build/.swiftpm --disable-sandbox
+# HOME=$PWD/build/home SWIFTPM_DISABLE_SANDBOX=1 swift run   --scratch-path $PWD/build/.swiftpm --disable-sandbox
 ```
 
 Package (unsigned dev zip)
+
 ```bash
 cd hosts/macos_app
 ./scripts/package_release.sh
 # outputs dist/MusicAdvisorMacApp.app and dist/MusicAdvisorMacApp.zip
 ```
 
-What it does today
-- Shows a SwiftUI window with a configurable CLI runner (defaults to echo a JSON string).
-- No external deps; good for proving the Swift toolchain is ready.
+What the UI is now
+
+- Nav rail + adaptive split panes:
+  - Run: drop zone + batch queue left; command/profile/run + results right.
+  - History: filter/search left; preview card (reveal/preview/re-run) right.
+  - Console: log + prompt, snippets that prefill/focus the prompt.
+- Getting Started overlay, glassy MAStyle depth, non-blocking toasts, throttled alerts.
+- Shortcuts: ⌘⏎ run, ⇧⌘⏎ defaults, ⌥⌘⏎ smoke, ⌘R reveal last sidecar, ⌘T theme, ⌘F history search, ⌘L console prompt.
+- Accessibility labels on key controls; missing-file guards for reveal/re-run; stronger glass depth on core panels and cards.
 
 Intended architecture
+
 - UI: SwiftUI.
-- Engines: Python remains the brain (Historical Echo, HCI, TTC, Lyric). Add IPC/CLI when needed.
-- Audio: AVAudioEngine or future JUCE plug-in for DAW probes; keep real-time DSP off the UI thread.
+- Engines: Python remains the brain (Historical Echo, HCI, TTC, Lyric). Add IPC/CLI when ready.
+- Audio: AVAudioEngine or future JUCE plug-in for DAW probes; keep real-time work off the UI thread.
 
 Next integration steps
-- Add IPC/CLI hooks to the Python pipeline (local-only).
-- Render real feature outputs/sidecars in the UI.
-- Add local logging/telemetry if needed (no network).
+
+- Wire CLI/IPC to Python engines for real runs.
+- Stream live logs into Console, true “re-run” using history metadata.
+- Add signed/notarized packaging when needed.
 
 CLI runner env overrides
+
 - `MA_APP_CMD="/usr/bin/python3"` (default cmd)
 - `MA_APP_ARGS="tools/cli/ma_audio_features.py --audio tone.wav --out /tmp/out.json"` (default args)
 - `MA_APP_WORKDIR="/Users/you/music-advisor"`
-- `MA_APP_ENV_FOO=bar` (extra env; prefix keys with `MA_APP_ENV_`)***
+- `MA_APP_ENV_FOO=bar` (extra env; prefix keys with `MA_APP_ENV_`)
