@@ -16,11 +16,14 @@ struct ConsoleTabView: View {
     var onSnippet: (String) -> Void = { _ in }
     var onStop: () -> Void = {}
     var onPickContext: () -> Void = {}
+    var onDevSmoke: () -> Void = {}
     var promptFocus: FocusState<Bool>.Binding?
     var isThinking: Bool = false
     var contextOptions: [ChatContextOption] = []
     var selectedContext: Binding<String?> = .constant(nil)
     var contextLabel: String = "No context"
+    var contextBadgeTitle: String = "No context"
+    var contextBadgeSubtitle: String = ""
     @State private var showSnippetsPopover: Bool = false
     @State private var snippetSearch: String = ""
 
@@ -85,6 +88,16 @@ struct ConsoleTabView: View {
                         onSnippet(item.value)
                     }
                 }
+                HStack(spacing: MAStyle.Spacing.sm) {
+                    Text(contextBadgeTitle)
+                        .maBadge(.info)
+                    if !contextBadgeSubtitle.isEmpty {
+                        Text(contextBadgeSubtitle)
+                            .maText(.caption)
+                            .foregroundStyle(MAStyle.ColorToken.muted)
+                    }
+                    Spacer()
+                }
                 PromptBar(
                     text: $prompt,
                     placeholder: "Type a message…",
@@ -107,6 +120,8 @@ struct ConsoleTabView: View {
                     .keyboardShortcut("k", modifiers: [.command])
                 Button(action: { withAnimation { showSnippetsPopover.toggle() } }) { EmptyView() }
                     .keyboardShortcut("s", modifiers: [.command, .option]) // Cmd+Opt+S toggles snippets drawer
+                Button(action: onDevSmoke) { EmptyView() }
+                    .keyboardShortcut("e", modifiers: [.command, .option]) // Cmd+Opt+E runs chat engine smoke (dev)
             }
             .opacity(0)
         )

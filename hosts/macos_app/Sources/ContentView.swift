@@ -23,9 +23,6 @@ struct ContentView: View {
     private let services = AppServices()
     @State private var chatIsThinking: Bool = false
     @State private var chatTask: Task<Void, Never>?
-    @State private var selectedChatContext: String? = "none"
-    @State private var chatContextPathOverride: String? = nil
-    @State private var chatContextLabel: String = "No context"
     init() {
         let s = AppStore()
         _store = StateObject(wrappedValue: s)
@@ -100,10 +97,9 @@ struct ContentView: View {
                                                                                     level: .warning)))
                                     }
                                 },
-                                onSelectContext: { path in
-                                    chatContextPathOverride = path
-                                    selectedChatContext = "history"
-                                },
+                onSelectContext: { path in
+                    setChatContext(selection: "history", overridePath: path)
+                },
                                 historySearchFocus: $historySearchFocused,
                                 confirmClearHistory: $confirmClearHistory
                             )
@@ -118,17 +114,18 @@ struct ContentView: View {
                                     store.dispatch(.setPrompt(snippet))
                                     promptFocused = true
                                     if let last = viewModel.sidecarPath {
-                                        selectedChatContext = "last-run"
-                                        chatContextLabel = "Last run"
-                                        chatContextPathOverride = last
+                                        setChatContext(selection: "last-run", overridePath: last)
                                     }
                                 },
                                 onStop: stopChat,
+                                onDevSmoke: runChatEngineSmoke,
                                 promptFocus: $promptFocused,
                                 isThinking: chatIsThinking,
                                 contextOptions: chatContextOptions(),
-                                selectedContext: $selectedChatContext,
-                                contextLabel: chatContextLabel
+                                selectedContext: chatSelectionBinding(),
+                                contextLabel: store.state.chatContextLabel,
+                                contextBadgeTitle: store.state.chatBadgeTitle,
+                                contextBadgeSubtitle: store.state.chatBadgeSubtitle
                                 )
                         }
                     }
@@ -218,9 +215,17 @@ struct ContentView: View {
         .onChange(of: viewModel.sidecarPath) { _ in
             // Default to the latest run sidecar when available.
             if viewModel.sidecarPath != nil {
-                selectedChatContext = "last-run"
-                chatContextPathOverride = viewModel.sidecarPath
+                setChatContext(selection: "last-run", overridePath: viewModel.sidecarPath)
             }
+        }
+        .onChange(of: store.state.chatSelection) { newSel in
+            renderChatContext(selection: newSel, overridePath: store.state.chatOverridePath)
+        }
+        .onChange(of: store.state.chatOverridePath) { newOverride in
+            renderChatContext(selection: store.state.chatSelection, overridePath: newOverride)
+        }
+        .onAppear {
+            renderChatContext(selection: store.state.chatSelection, overridePath: store.state.chatOverridePath)
         }
     }
 
@@ -657,9 +662,9 @@ private var historyPane: some View {
         store.dispatch(.setPrompt(""))
         chatTask?.cancel()
         chatIsThinking = true
-        let selection = selectedChatContext
+        let selection = store.state.chatSelection
         let sidecarPath = viewModel.sidecarPath
-        let overridePath = chatContextPathOverride
+        let overridePath = store.state.chatOverridePath
         let historyItems = store.state.historyItems
         let previewCache = store.state.previewCache
 
@@ -672,6 +677,8 @@ private var historyPane: some View {
                                                       overridePath: effectiveOverride,
                                                       historyItems: historyItems,
                                                       previewCache: previewCache)
+        setChatBadge(from: preResolved)
+        store.dispatch(.setChatContextLabel(preResolved.label))
 
         // Fallback: if prompt itself is an absolute .client.rich.txt path and no context was found, use it.
         if preResolved.path == nil, let pathFromPrompt = absoluteRichPath(from: prompt) {
@@ -682,17 +689,25 @@ private var historyPane: some View {
                                                       overridePath: effectiveOverride,
                                                       historyItems: historyItems,
                                                       previewCache: previewCache)
+            setChatContext(selection: effectiveSelection, overridePath: effectiveOverride)
             showAlertThrottled(key: "chat_manual_ctx", alert: AlertHelper.toast("Context from prompt",
                                                                                 message: "Using \(URL(fileURLWithPath: pathFromPrompt).lastPathComponent)",
                                                                                 level: .info))
         }
 
+        if preResolved.path == nil {
+            showAlertThrottled(key: "chat_context_missing", alert: AlertHelper.toast("No context",
+                                                                                    message: "Select History/Last run or include a .client.rich.txt path.",
+                                                                                    level: .warning))
+        }
         if let warn = preResolved.warning {
             showAlertThrottled(key: "chat_context_warn_pre", alert: AlertHelper.toast("Context", message: warn, level: .warning))
         }
         if let usedPath = preResolved.path {
             showAlertThrottled(key: "chat_context_info", alert: AlertHelper.toast("Context", message: "Using \(URL(fileURLWithPath: usedPath).lastPathComponent)", level: .info))
         }
+        // Persist the resolved label so the picker reflects it.
+        store.dispatch(.setChatContextLabel(preResolved.label))
 
         let selSnapshot = effectiveSelection
         let overrideSnapshot = effectiveOverride
@@ -734,9 +749,16 @@ private var historyPane: some View {
                         store.dispatch(.setAlert(AlertHelper.toast("Chat issue", message: reply, level: .warning)))
                     }
                 }
-                chatContextLabel = outgoingContext
+                store.dispatch(.setChatContextLabel(outgoingContext))
             }
         }
+    }
+
+    private func chatSelectionBinding() -> Binding<String?> {
+        Binding(get: { store.state.chatSelection },
+                set: { newValue in
+                    setChatContext(selection: newValue, overridePath: store.state.chatOverridePath)
+                })
     }
 
     private func chatContextOptions() -> [ChatContextOption] {
@@ -746,7 +768,7 @@ private var historyPane: some View {
         if let path = viewModel.sidecarPath {
             opts.append(ChatContextOption(id: "last-run", label: "Last run", path: path))
         }
-        if let path = chatContextPathOverride {
+        if let path = store.state.chatOverridePath {
             opts.append(ChatContextOption(id: "history", label: "History preview", path: path))
         }
         if !store.state.historyItems.isEmpty {
@@ -760,26 +782,29 @@ private var historyPane: some View {
         return opts
     }
 
-    private func contextLabelForSelection(_ sel: String?) -> String {
-        let opts = chatContextOptions()
-        guard let sel,
-              let match = opts.first(where: { $0.id == sel }) else {
-            return "No context"
-        }
-        return match.label
+    private func setChatContext(selection: String?, overridePath: String?) {
+        store.dispatch(.setChatSelection(selection))
+        store.dispatch(.setChatOverride(overridePath))
+        renderChatContext(selection: selection, overridePath: overridePath)
     }
 
-
-    private func resolveContext() -> (String?, String) {
-        let resolution = ChatContextResolver.resolve(selection: selectedChatContext,
+    private func renderChatContext(selection: String?, overridePath: String?) {
+        let resolution = ChatContextResolver.resolve(selection: selection,
                                                      sidecarPath: viewModel.sidecarPath,
-                                                     overridePath: chatContextPathOverride,
+                                                     overridePath: overridePath,
                                                      historyItems: store.state.historyItems,
                                                      previewCache: store.state.previewCache)
-        if let warn = resolution.warning {
-            showAlertThrottled(key: "context_missing", alert: AlertHelper.toast("Context missing", message: warn, level: .warning))
+        store.dispatch(.setChatContextLabel(resolution.label))
+        setChatBadge(from: resolution)
+    }
+
+    private func setChatBadge(from resolution: ChatContextResolver.Resolution) {
+        if let p = resolution.path {
+            store.dispatch(.setChatBadge(title: resolution.label,
+                                         subtitle: URL(fileURLWithPath: p).lastPathComponent))
+        } else {
+            store.dispatch(.setChatBadge(title: "No context", subtitle: "No file"))
         }
-        return (resolution.path, resolution.label)
     }
 
     private func stopChat() {
@@ -795,6 +820,18 @@ private var historyPane: some View {
             return trimmed
         }
         return nil
+    }
+
+    private func runChatEngineSmoke() {
+        Task {
+            let path = store.state.chatOverridePath ?? viewModel.sidecarPath
+            let res = await ChatEngineSmoke.run(prompt: store.state.promptText.isEmpty ? "Hello" : store.state.promptText,
+                                                contextPath: path)
+            let msg = res.reply ?? "(no reply)"
+            let title = res.exit == 0 ? "Chat engine smoke" : "Chat engine smoke (error)"
+            let level: AlertState.Level = res.exit == 0 ? .info : .error
+            store.dispatch(.setAlert(AlertHelper.toast(title, message: msg, level: level)))
+        }
     }
 
     private var shortcutButtons: some View {
@@ -956,8 +993,7 @@ extension ContentView {
         if let cached = store.state.previewCache[path] {
             store.dispatch(.setHistoryPreview(path: path, preview: cached.0))
             // Set chat context to this history item when previewed.
-            chatContextPathOverride = cached.0.richPath ?? path
-            selectedChatContext = "history"
+            setChatContext(selection: "history", overridePath: cached.0.richPath ?? path)
             return
         }
         Task {
@@ -970,8 +1006,7 @@ extension ContentView {
                 cache[path] = (preview, mtime)
                 store.state.previewCache = cache
                 previewCacheStore.save(cache)
-                chatContextPathOverride = preview.richPath ?? path
-                selectedChatContext = "history"
+                setChatContext(selection: "history", overridePath: preview.richPath ?? path)
 
                 if unreadable {
                     showAlertThrottled(key: "preview_unreadable",

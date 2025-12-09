@@ -20,6 +20,12 @@ enum AppAction {
     case setPreviewCache(path: String, preview: HistoryPreview)
     case clearHistory
     case setHostSnapshot(HostSnapshot)
+    // Chat UI state
+    case setChatBadge(title: String, subtitle: String)
+    case setChatContextLabel(String)
+    // Chat context
+    case setChatSelection(String?)
+    case setChatOverride(String?)
 }
 
 struct AppState {
@@ -41,6 +47,12 @@ struct AppState {
         ("Norms", "chart.bar.doc.horizontal.fill")
     ]
     var sections: [String] = ["HCI", "Axes", "Historical Echo", "Optimization / Plan"]
+    // Chat context selection
+    var chatSelection: String? = "none"
+    var chatOverridePath: String? = nil
+    var chatContextLabel: String = "No context"
+    var chatBadgeTitle: String = "No context"
+    var chatBadgeSubtitle: String = "No file"
 }
 
 @MainActor
@@ -139,5 +151,14 @@ private func reduce(_ state: inout AppState, action: AppAction) {
         state.previewCache = [:]
     case .setHostSnapshot(let snap):
         state.hostSnapshot = snap
+    case .setChatBadge(let title, let subtitle):
+        state.chatBadgeTitle = title
+        state.chatBadgeSubtitle = subtitle
+    case .setChatContextLabel(let label):
+        state.chatContextLabel = label
+    case .setChatSelection(let sel):
+        state.chatSelection = sel
+    case .setChatOverride(let path):
+        state.chatOverridePath = path
     }
 }

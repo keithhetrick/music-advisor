@@ -20,6 +20,17 @@ cd hosts/macos_app
 # HOME=$PWD/build/home SWIFTPM_DISABLE_SANDBOX=1 swift run   --scratch-path $PWD/build/.swiftpm --disable-sandbox
 ```
 
+Chat smoke (quick verification)
+
+```bash
+cd hosts/macos_app
+./scripts/chat_smoke.sh             # builds mac app + runs chat_engine/cli_smoke.py
+# optional prompt override:
+./scripts/chat_smoke.sh --prompt "Hello"
+# optional context override:
+./scripts/chat_smoke.sh --prompt "Hello" --context "/path/to/your.client.rich.txt"
+```
+
 Package (unsigned dev zip)
 
 ```bash
@@ -37,13 +48,14 @@ What the UI is now
 - Getting Started overlay, glassy MAStyle depth, non-blocking toasts, throttled alerts.
 - Shortcuts: ⌘⏎ run, ⇧⌘⏎ defaults, ⌥⌘⏎ smoke, ⌘R reveal last sidecar, ⌘T theme, ⌘F history search, ⌘L console prompt.
 - Accessibility labels on key controls; missing-file guards for reveal/re-run; stronger glass depth on core panels and cards.
-- MAStyle-backed components everywhere: `AlertBanner`, `PromptBar`, `HeaderBar`/`CardHeader`, `ChipRow` + `FABPopover` (snippets palette), `RailToggleOverlay`. Rail width tuned (≈72.6) so “History/Chat” fit without clipping; rail toggle hugs the border and stays subtle.
+- MAStyle-backed components everywhere: `AlertBanner`, `PromptBar`, `HeaderBar`/`CardHeader`, `ChipRow` + `FABPopover` (snippets palette), `RailToggleOverlay`. Rail width tuned (≈72.6) so “History/Chat” fit without clipping; rail toggle hugs the border and stays subtle. Toasts auto-dismiss (default from `MAStyle.ToastDefaults.autoDismissSeconds`) with a left-slide/accordion fade and progress bar; close button uses the same exit.
 
 Intended architecture
 
 - UI: SwiftUI.
 - Engines: Python remains the brain (Historical Echo, HCI, TTC, Lyric). Add IPC/CLI when ready.
 - Audio: AVAudioEngine or future JUCE plug-in for DAW probes; keep real-time work off the UI thread.
+- Chat: a new `engines/chat_engine/` scaffold wraps the existing `tools/chat` backend; future work moves chat logic/context/rate handling into that engine for all hosts.
 
 Next integration steps
 

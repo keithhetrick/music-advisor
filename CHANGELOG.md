@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+- Chat UI/state: chat context labels and badges now live in `AppStore`; chat sends carry the resolved `.client.rich.txt` path end-to-end to `ChatService`; smoke script added at `hosts/macos_app/scripts/chat_smoke.sh` (supports `--prompt` and `--context`) to build and run the chat engine smoke.
+- MAStyle toasts: centralized default duration (`MAStyle.ToastDefaults.autoDismissSeconds`), left-slide/accordion fade on dismiss, reusable `ToastProgressBar`, and a single knob for toast timing.
 - macOS app UI now fully backed by MAStyle components: alerts (`AlertBanner`), prompts (`PromptBar`), headers (`HeaderBar`/`CardHeader`), chips + palettes (`ChipRow` + `FABPopover`), and rail toggle overlay. Rail width tuned (~72.6) so “History/Chat” fit without clipping; snippets use a modern FAB+popover anchored in the chips row; prompts consolidated; legacy AlertBannerView/PromptView removed. Docs updated (docs/hosts/macos_app.md) to reflect the MAStyle-backed UI.
+- Added chat engine scaffold under `engines/chat_engine/` with a thin wrapper to the existing `tools/chat` backend, plus a CLI smoke (`engines/chat_engine/cli_smoke.py`). Future work will move chat context/rate/error handling into this engine for all hosts.
 
 - Helper CLI is now safety-first and feature-complete: project-aware tasks, affected logic, caching + artifact metadata, dashboards/TUI/palette/quickstart, watch hotkeys, chat-dev layout, git helpers (branch/status/upstream/rebase/pull-check), hooks (pre-push/pre-commit), guardrails, preflight/clean-tree/safe-run enforcement, state relocation (`MA_HELPER_HOME`), artifact metadata cache, and chat-dev fallback when tmux is unavailable.
 - Helper self-checks added (`tests/helper/self_check.py` + CI step) covering palette/list/preflight/ci-plan/github-check/dashboard-json/chat-dev/git-sim/state-relocation/quickstart.

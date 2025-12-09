@@ -136,6 +136,12 @@ public enum MAStyle {
         borders: BorderTokens(thin: 1.2, regular: 1.6)
     )
 
+    // MARK: - Global Defaults
+    /// Toast defaults live here so changing once updates app-wide behavior.
+    public enum ToastDefaults {
+        public static var autoDismissSeconds: Double = 8.0
+    }
+
     // MARK: - Token Accessors
     // These pull directly from the active `MAStyle.theme`; swap the theme to change all values globally.
     public enum ColorToken {

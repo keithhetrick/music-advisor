@@ -35,14 +35,13 @@ actor ChatService: ChatProvider {
         let script = """
 import sys
 from pathlib import Path
-from tools.chat.chat_router import route_message
-from tools.chat.chat_context import ChatSession
+from engines.chat_engine.chat_engine import ChatRequest, run
 
 prompt = sys.argv[1]
 client = Path(sys.argv[2]) if len(sys.argv) > 2 and sys.argv[2] else None
-sess = ChatSession(session_id="macos-app")
-reply = route_message(sess, prompt, client_path=client)
-print(reply)
+req = ChatRequest(prompt=prompt, context_path=str(client) if client else None, label="macos-app")
+res = run(req)
+print(res.reply)
 """
         let clientArg = resolution.path ?? ""
         let result = await runner.run(
