@@ -48,11 +48,7 @@ struct ResultsView: View {
             if !summaryMetrics.isEmpty || sidecarPath != nil {
                 HStack(spacing: MAStyle.Spacing.sm) {
                     ForEach(summaryMetrics) { metric in
-                        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
-                            Text(metric.label).maText(.caption).foregroundStyle(MAStyle.ColorToken.muted)
-                            Text(metric.value).maText(.body)
-                        }
-                        .maMetric()
+                        MetricTile(label: metric.label, value: metric.value)
                     }
                     if sidecarPath != nil {
                         Button("Reveal sidecar", action: onRevealSidecar).maButton(.ghost).accessibilityLabel("Reveal sidecar")

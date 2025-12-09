@@ -33,21 +33,16 @@ struct HistoryPanelView: View {
     }
 
     private var header: some View {
-        HStack(alignment: .center, spacing: MAStyle.Spacing.xs) {
+        HStack {
             CardHeader(title: "History",
-                       subtitle: "Saved sidecars",
-                       badge: nil,
-                       actionTitle: nil,
-                       action: {})
+                       subtitle: "Saved sidecars")
             Spacer()
-            HStack(spacing: MAStyle.Spacing.xs) {
-                Button("Refresh") { onRefresh() }
-                    .maButton(.ghost)
-                    .accessibilityLabel("Refresh history")
-                Button("Clear") { onClear() }
-                    .maButton(.ghost)
-                    .accessibilityLabel("Clear history")
-            }
+            Button("Refresh") { onRefresh() }
+                .maButton(.ghost)
+                .accessibilityLabel("Refresh history")
+            Button("Clear") { onClear() }
+                .maButton(.ghost)
+                .accessibilityLabel("Clear history")
         }
     }
 

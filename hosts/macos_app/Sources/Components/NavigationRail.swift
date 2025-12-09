@@ -14,10 +14,14 @@ struct NavigationRail: View {
                         Image(systemName: icon(for: tab))
                             .font(.system(size: 18, weight: .semibold))
                         Text(label(for: tab))
-                            .font(MAStyle.Typography.caption)
+                            .font(MAStyle.Typography.body)
+                            .minimumScaleFactor(0.85)
+                            .lineLimit(1)
+                            .frame(maxWidth: .infinity)
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(MAStyle.Spacing.sm)
+                    .padding(.horizontal, MAStyle.Spacing.sm)
+                    .padding(.vertical, MAStyle.Spacing.xs)
                     .background(selection == tab ? MAStyle.ColorToken.panel.opacity(0.6) : Color.clear)
                     .cornerRadius(MAStyle.Radius.md)
                 }
@@ -26,7 +30,8 @@ struct NavigationRail: View {
             }
             Spacer()
         }
-        .padding(MAStyle.Spacing.sm)
+        .padding(.horizontal, MAStyle.Spacing.sm)
+        .padding(.vertical, MAStyle.Spacing.md)
         .background(
             LinearGradient(
                 colors: [
@@ -53,7 +58,7 @@ struct NavigationRail: View {
         switch tab {
         case .run: return "Run"
         case .history: return "History"
-        case .style: return "Console"
+        case .style: return "Chat"
         }
     }
 }

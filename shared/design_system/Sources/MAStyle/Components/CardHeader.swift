@@ -1,6 +1,7 @@
 import SwiftUI
 
-// MARK: - Card Header with optional badge / action
+// MARK: - CardHeader
+/// Reusable card header with optional subtitle, badge, and trailing action.
 public struct CardHeader: View {
     let title: String
     let subtitle: String?
@@ -21,26 +22,23 @@ public struct CardHeader: View {
     }
 
     public var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: MAStyle.Spacing.xs) {
+        HStack(alignment: .center, spacing: MAStyle.Spacing.sm) {
             VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
-                Text(title).maText(.headline)
-                if let subtitle {
+                Text(title)
+                    .maText(.headline)
+                if let subtitle, !subtitle.isEmpty {
                     Text(subtitle)
                         .maText(.caption)
                         .foregroundStyle(MAStyle.ColorToken.muted)
                 }
             }
-            Spacer()
-            if let badge {
+            if let badge, !badge.isEmpty {
                 Text(badge)
-                    .padding(.horizontal, MAStyle.Spacing.sm)
-                    .padding(.vertical, MAStyle.Spacing.xs / 2)
-                    .background(MAStyle.ColorToken.primary.opacity(0.1))
-                    .foregroundColor(MAStyle.ColorToken.primary)
-                    .cornerRadius(MAStyle.Radius.pill)
+                    .maChip(style: .solid, color: MAStyle.ColorToken.info)
             }
+            Spacer()
             if let actionTitle, let action {
-                Button(actionTitle, action: action)
+                Button(actionTitle) { action() }
                     .maButton(.ghost)
             }
         }

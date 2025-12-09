@@ -41,45 +41,28 @@ struct JobQueueView: View {
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
                             ForEach(jobs) { job in
-                                VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
-                                    HStack {
-                                        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
-                                            Text(job.displayName).maText(.body)
-                                            Text(job.fileURL.path)
-                                                .maText(.caption)
-                                                .foregroundStyle(MAStyle.ColorToken.muted)
-                                                .lineLimit(1)
-                                        }
-                                        Spacer()
-                                        statusChip(job.status)
-                                        if let sidecar = job.sidecarPath {
-                                            Button("Reveal") { onReveal(sidecar) }
+                                StatusRow<AnyView>(
+                                    title: job.displayName,
+                                    subtitle: job.fileURL.path,
+                                    status: statusStyle(job.status),
+                                    progress: job.status == .running ? job.progress : nil
+                                ) {
+                                    AnyView(
+                                        HStack(spacing: MAStyle.Spacing.xs) {
+                                            if let sidecar = job.sidecarPath {
+                                                Button("Reveal") { onReveal(sidecar) }
+                                                    .maButton(.ghost)
+                                                    .accessibilityLabel("Reveal sidecar")
+                                                Button("Preview Rich") {
+                                                    let richPath = sidecar.replacingOccurrences(of: ".json", with: ".client.rich.txt")
+                                                    onPreviewRich(richPath)
+                                                }
                                                 .maButton(.ghost)
-                                                .accessibilityLabel("Reveal sidecar")
-                                            Button("Preview Rich") {
-                                                let richPath = sidecar.replacingOccurrences(of: ".json", with: ".client.rich.txt")
-                                                onPreviewRich(richPath)
+                                                .accessibilityLabel("Preview rich text")
                                             }
-                                            .maButton(.ghost)
-                                            .accessibilityLabel("Preview rich text")
                                         }
-                                    }
-                                    HStack(spacing: MAStyle.Spacing.sm) {
-                                        if #available(macOS 13.0, *) {
-                                            ProgressView(value: job.progress)
-                                                .maProgressStyle()
-                                                .frame(maxWidth: 160)
-                                        } else {
-                                            ProgressView()
-                                                .maProgressStyle()
-                                                .frame(maxWidth: 160)
-                                        }
-                                        Text(progressLabel(for: job))
-                                            .maText(.caption)
-                                            .foregroundStyle(MAStyle.ColorToken.muted)
-                                    }
+                                    )
                                 }
-                                .maCardInteractive()
                                 .maSheen(isActive: job.status == .running, duration: 3.0, highlight: Color.white.opacity(0.08))
                             }
                         }
@@ -90,17 +73,12 @@ struct JobQueueView: View {
         .maCardInteractive()
     }
 
-    @ViewBuilder
-    private func statusChip(_ status: Job.Status) -> some View {
+    private func statusStyle(_ status: Job.Status) -> StatusRow<AnyView>.StatusStyle {
         switch status {
-        case .pending:
-            Text("Pending").maBadge(.neutral)
-        case .running:
-            Text("Running").maBadge(.info)
-        case .done:
-            Text("Done").maBadge(.success)
-        case .failed:
-            Text("Failed").maBadge(.danger)
+        case .pending: return .neutral
+        case .running: return .info
+        case .done: return .success
+        case .failed: return .danger
         }
     }
 

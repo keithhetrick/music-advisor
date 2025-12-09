@@ -7,20 +7,8 @@ struct HeaderView: View {
     var showProgress: Bool = false
     var lastUpdated: Date? = nil
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
-                Text("Music Advisor")
-                    .maText(.headline)
-                Text("SwiftUI shell; configure any local CLI and pipeline.")
-                    .maText(.caption)
-                    .foregroundStyle(MAStyle.ColorToken.muted)
-                if let lastUpdated {
-                    Text("Updated: \(lastUpdated.formatted(date: .omitted, time: .standard))")
-                        .maText(.caption)
-                        .foregroundStyle(MAStyle.ColorToken.muted)
-                }
-            }
-            Spacer()
+        HeaderBar(title: "Music Advisor",
+                  subtitle: "SwiftUI shell; configure any local CLI and pipeline.") {
             HStack(spacing: MAStyle.Spacing.xs) {
                 Text(hostStatus)
                     .maBadge(.success)

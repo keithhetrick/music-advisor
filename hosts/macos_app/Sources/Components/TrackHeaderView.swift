@@ -6,13 +6,7 @@ struct TrackHeaderView: View {
     var badgeText: String
 
     var body: some View {
-        HStack {
-            Text(title)
-                .maText(.headline)
-            Spacer()
-            Text(badgeText)
-                .maChip(style: .solid, color: MAStyle.ColorToken.info)
-        }
-        .maCard()
+        CardHeader(title: title, badge: badgeText)
+            .maCard()
     }
 }

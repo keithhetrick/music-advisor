@@ -19,6 +19,7 @@ struct ContentView: View {
     @FocusState private var promptFocused: Bool
     @State private var showGettingStarted: Bool = false
     @State private var confirmClearHistory: Bool = false
+    @State private var showRail: Bool = true
     private let services = AppServices()
     @State private var chatIsThinking: Bool = false
     @State private var chatTask: Task<Void, Never>?
@@ -45,13 +46,19 @@ struct ContentView: View {
             .ignoresSafeArea()
 
             HStack(spacing: MAStyle.Spacing.md) {
-                NavigationRail(
-                    selection: Binding(get: { store.state.route.tab },
-                                       set: { tab in store.dispatch(.setRoute(store.state.route.updatingTab(tab))) })
-                )
-                .frame(width: 72)
+                if showRail {
+                    NavigationRail(
+                        selection: Binding(get: { store.state.route.tab },
+                                           set: { tab in store.dispatch(.setRoute(store.state.route.updatingTab(tab))) })
+                    )
+                    .frame(width: 72.6)
+                    .transition(.move(edge: .leading).combined(with: .opacity))
+                }
 
-                Divider()
+                if showRail {
+                    Divider()
+                        .transition(.opacity)
+                }
 
                 VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
                     HeaderView(hostStatus: store.state.hostSnapshot.status,
@@ -126,18 +133,23 @@ struct ContentView: View {
                         }
                     }
                 }
-                .padding(MAStyle.Spacing.lg)
+                .padding(MAStyle.Spacing.md)
                 .frame(minWidth: 720, minHeight: 480)
+                .animation(.easeOut(duration: 0.2), value: showRail)
             }
+            .padding(.horizontal, MAStyle.Spacing.md)
+            .padding(.vertical, MAStyle.Spacing.md)
 
             if let alert = store.state.alert {
                 VStack {
-                    if alert.presentAsToast {
-                        Spacer()
-                    }
-                    AlertBannerView(alert: alert) {
-                        store.dispatch(.setAlert(nil))
-                    }
+                    if alert.presentAsToast { Spacer() }
+                    AlertBanner(
+                        title: alert.title,
+                        message: alert.message,
+                        tone: mapTone(alert.level),
+                        presentAsToast: alert.presentAsToast,
+                        onClose: { store.dispatch(.setAlert(nil)) }
+                    )
                     .padding(MAStyle.Spacing.md)
                     .transition(.move(edge: alert.presentAsToast ? .bottom : .top).combined(with: .opacity))
                     .zIndex(1)
@@ -157,6 +169,18 @@ struct ContentView: View {
             }
         }
         .preferredColorScheme(store.state.useDarkTheme ? .dark : .light)
+        .overlay(alignment: .topLeading) {
+            RailToggleOverlay(
+                isShown: showRail,
+                railWidth: 72,
+                topPadding: MAStyle.Spacing.md,
+                hiddenEdgePadding: railHiddenPadding
+            ) {
+                withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+                    showRail.toggle()
+                }
+            }
+        }
         .overlay(shortcutButtons.opacity(0))
         .onAppear {
             // Ensure the app becomes frontmost so text input goes to the window, not the launching terminal.
@@ -370,9 +394,15 @@ private var historyPane: some View {
     private var leftColumn: some View {
         VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
             ConsoleView(messages: store.state.messages)
-            PromptView(text: Binding(get: { store.state.promptText },
-                                     set: { store.dispatch(.setPrompt($0)) }),
-                       onSend: sendMessage)
+            PromptBar(
+                text: Binding(get: { store.state.promptText },
+                              set: { store.dispatch(.setPrompt($0)) }),
+                placeholder: "Type a message…",
+                isThinking: chatIsThinking,
+                focus: $promptFocused,
+                onSend: sendMessage,
+                onClear: { store.dispatch(.setPrompt("")) }
+            )
         }
     }
 
@@ -807,11 +837,24 @@ private var historyPane: some View {
         let tail = text.suffix(limit)
         return "[\(label) truncated to last \(limit) chars]\n\(tail)"
     }
+
+    private var railHiddenPadding: CGFloat { MAStyle.Spacing.md }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+    }
+}
+
+// MARK: - Helpers
+extension ContentView {
+    fileprivate func mapTone(_ level: AlertState.Level) -> AlertBanner.Tone {
+        switch level {
+        case .info: return .info
+        case .warning: return .warning
+        case .error: return .error
+        }
     }
 }
 

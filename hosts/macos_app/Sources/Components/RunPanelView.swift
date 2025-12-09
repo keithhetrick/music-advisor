@@ -28,7 +28,23 @@ struct RunPanelView: View {
                     trackVM?.ingestDropped(urls: urls)
                 }
                 .maCardInteractive()
+
                 HStack(spacing: MAStyle.Spacing.sm) {
+                    Button("Add file to queue") {
+                        if let url = pickFile() {
+                            viewModel.enqueue(files: [url])
+                            trackVM?.ingestDropped(urls: [url])
+                        }
+                    }
+                    .maButton(.ghost)
+                    Button("Add folder…") {
+                        if let dir = pickDirectory() {
+                            let urls = (try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)) ?? []
+                            viewModel.enqueue(files: urls)
+                            trackVM?.ingestDropped(urls: urls)
+                        }
+                    }
+                    .maButton(.ghost)
                     Button("Start batch") {
                         viewModel.startQueue()
                     }
@@ -39,7 +55,8 @@ struct RunPanelView: View {
                     }
                     .maButton(.ghost)
                 }
-                CollapsibleSection {
+
+                CollapsibleCard {
                     CardHeader(title: "Batch Queue")
                 } content: {
                     JobQueueView(
@@ -56,18 +73,29 @@ struct RunPanelView: View {
                     )
                 }
                 .maCardInteractive()
-                QuickActionsView(actions: quickActions)
-                    .maCard()
-                SectionsView(sections: sections)
-                    .maCard()
-                if let trackVM {
-                    CollapsibleSection {
-                        CardHeader(title: "Tracks")
-                    } content: {
-                        TrackListView(viewModel: trackVM)
-                    }
-                    .maCardInteractive()
+
+                CollapsibleCard {
+                    CardHeader(title: "Quick Actions")
+                } content: {
+                    QuickActionsView(actions: quickActions)
                 }
+                .maCardInteractive()
+                CollapsibleCard {
+                    CardHeader(title: "Sections")
+                } content: {
+                    SectionsView(sections: sections)
+                }
+                .maCardInteractive()
+
+                if let trackVM {
+                CollapsibleCard {
+                    CardHeader(title: "Tracks")
+                } content: {
+                    TrackListView(viewModel: trackVM)
+                }
+                .maCardInteractive()
+                }
+
                 CommandInputsView(
                     profiles: viewModel.profiles,
                     selectedProfile: Binding(get: { viewModel.selectedProfile },
@@ -102,27 +130,53 @@ struct RunPanelView: View {
                     }
                 )
                 .maCardInteractive()
-                RunControlsView(
-                    isRunning: viewModel.isRunning,
-                    status: viewModel.status,
-                    lastRunTime: viewModel.lastRunTime,
-                    lastDuration: viewModel.lastDuration,
-                    onRun: {
-                        Task { @MainActor in viewModel.run() }
-                    },
-                    onRunDefaults: {
-                        Task { @MainActor in
-                            viewModel.loadDefaults()
-                            viewModel.run()
+
+                VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
+                    RunControlsView(
+                        isRunning: viewModel.isRunning,
+                        status: viewModel.status,
+                        lastRunTime: viewModel.lastRunTime,
+                        lastDuration: viewModel.lastDuration,
+                        onRun: {
+                            Task { @MainActor in viewModel.run() }
+                        },
+                        onRunDefaults: {
+                            Task { @MainActor in
+                                viewModel.loadDefaults()
+                                viewModel.run()
+                            }
+                        },
+                        onRunSmoke: {
+                            Task { @MainActor in viewModel.runSmoke() }
                         }
-                    },
-                    onRunSmoke: {
-                        Task { @MainActor in viewModel.runSmoke() }
+                    )
+                    .maCard()
+
+                    HStack(spacing: MAStyle.Spacing.sm) {
+                        Button("Run picked file…") {
+                            if let url = pickFile() {
+                                viewModel.insertAudioPath(url.path)
+                                Task { @MainActor in viewModel.run() }
+                            }
+                        }
+                        .maButton(.primary)
+                        .disabled(viewModel.isRunning)
+                        Text("Runs immediately with selected profile and last settings.")
+                            .maText(.caption)
+                            .foregroundStyle(MAStyle.ColorToken.muted)
+                        Button("Run pipeline") {
+                            Task { @MainActor in
+                                viewModel.run()
+                            }
+                        }
+                        .maButton(.secondary)
+                        .disabled(viewModel.isRunning)
                     }
-                )
-                .maCard()
-                results
                     .maCardInteractive()
+
+                    resultsSectionView
+                        .maCardInteractive()
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -131,13 +185,30 @@ struct RunPanelView: View {
     private var leftColumn: some View {
         VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
             ConsoleView(messages: store.state.messages)
-            PromptView(text: Binding(get: { store.state.promptText },
-                                     set: { store.dispatch(.setPrompt($0)) }),
-                       onSend: sendMessage)
+            PromptBar(
+                text: Binding(get: { store.state.promptText },
+                              set: { store.dispatch(.setPrompt($0)) }),
+                placeholder: "Type a command or note…",
+                isThinking: viewModel.isRunning,
+                focus: nil,
+                onSend: sendMessage,
+                onClear: { store.dispatch(.setPrompt("")) }
+            )
         }
     }
 
-    private var results: some View {
+    private func sendMessage() {
+        let trimmed = store.state.promptText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        store.dispatch(.appendMessage(trimmed))
+        store.dispatch(.setPrompt(""))
+    }
+
+    private func loadHistoryPreview(path: String) {
+        onPreviewRich(path)
+    }
+
+    private var resultsSectionView: some View {
         VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
             Text("Result").maText(.headline)
             Picker("", selection: Binding(get: { store.state.route.runPane },
@@ -149,11 +220,6 @@ struct RunPanelView: View {
                 Text("stderr").tag(ResultPane.stderr)
             }
             .pickerStyle(.segmented)
-            .onChange(of: viewModel.parsedJSON, perform: { _ in
-                if store.state.route.runPane == .json && viewModel.parsedJSON.isEmpty {
-                    store.dispatch(.setRoute(store.state.route.updatingRunPane(.stdout)))
-                }
-            })
 
             if !viewModel.summaryMetrics.isEmpty || viewModel.sidecarPath != nil {
                 HStack(spacing: MAStyle.Spacing.sm) {
@@ -165,17 +231,14 @@ struct RunPanelView: View {
                         .maMetric()
                     }
                     if let path = viewModel.sidecarPath {
-                        Button("Reveal sidecar") {
-                            revealSidecar(path)
-                        }
-                        .maButton(.ghost)
+                        Button("Reveal sidecar") { revealSidecar(path) }.maButton(.ghost)
                         Button("Copy path") {
                             NSPasteboard.general.clearContents()
                             NSPasteboard.general.setString(path, forType: .string)
                         }
                         .maButton(.ghost)
                         Button("Preview sidecar") {
-                            viewModel.loadSidecarPreview()
+                            _ = Task { @MainActor in viewModel.loadSidecarPreview() }
                         }
                         .maButton(.ghost)
                     }
@@ -184,11 +247,9 @@ struct RunPanelView: View {
             }
 
             HStack(spacing: MAStyle.Spacing.sm) {
-                Button("Copy JSON") {
-                    copyJSON()
-                }
-                .maButton(.ghost)
-                .disabled(viewModel.parsedJSON.isEmpty)
+                Button("Copy JSON") { copyJSON() }
+                    .maButton(.ghost)
+                    .disabled(viewModel.parsedJSON.isEmpty)
                 if let path = viewModel.sidecarPath {
                     Button("Copy sidecar path") {
                         NSPasteboard.general.clearContents()
@@ -223,8 +284,7 @@ struct RunPanelView: View {
                     .font(MAStyle.Typography.bodyMono)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(MAStyle.Spacing.sm)
-                    .background(color.opacity(0.05))
-                    .cornerRadius(MAStyle.Radius.sm)
+                    .maCardInteractive()
             }
             .frame(minHeight: 80)
         }
@@ -247,16 +307,5 @@ struct RunPanelView: View {
             return dict.isEmpty ? "(no JSON parsed)" : dict.description
         }
         return str
-    }
-
-    private func sendMessage() {
-        let trimmed = store.state.promptText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-        store.dispatch(.appendMessage(trimmed))
-        store.dispatch(.setPrompt(""))
-    }
-
-    private func loadHistoryPreview(path: String) {
-        onPreviewRich(path)
     }
 }

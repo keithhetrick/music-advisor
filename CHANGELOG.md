@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- macOS app UI now fully backed by MAStyle components: alerts (`AlertBanner`), prompts (`PromptBar`), headers (`HeaderBar`/`CardHeader`), chips + palettes (`ChipRow` + `FABPopover`), and rail toggle overlay. Rail width tuned (~72.6) so “History/Chat” fit without clipping; snippets use a modern FAB+popover anchored in the chips row; prompts consolidated; legacy AlertBannerView/PromptView removed. Docs updated (docs/hosts/macos_app.md) to reflect the MAStyle-backed UI.
+
 - Helper CLI is now safety-first and feature-complete: project-aware tasks, affected logic, caching + artifact metadata, dashboards/TUI/palette/quickstart, watch hotkeys, chat-dev layout, git helpers (branch/status/upstream/rebase/pull-check), hooks (pre-push/pre-commit), guardrails, preflight/clean-tree/safe-run enforcement, state relocation (`MA_HELPER_HOME`), artifact metadata cache, and chat-dev fallback when tmux is unavailable.
 - Helper self-checks added (`tests/helper/self_check.py` + CI step) covering palette/list/preflight/ci-plan/github-check/dashboard-json/chat-dev/git-sim/state-relocation/quickstart.
 - Docs updated (README + docs/tools/helper_cli.md) to spotlight the helper, optional deps (rich/prompt_toolkit/tmux), git requirements, state location, artifact metadata, and new git commands. Bootstrap echoes next steps to run `ma help`/`ma quickstart`.

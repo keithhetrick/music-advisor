@@ -37,6 +37,7 @@ What the UI is now
 - Getting Started overlay, glassy MAStyle depth, non-blocking toasts, throttled alerts.
 - Shortcuts: ⌘⏎ run, ⇧⌘⏎ defaults, ⌥⌘⏎ smoke, ⌘R reveal last sidecar, ⌘T theme, ⌘F history search, ⌘L console prompt.
 - Accessibility labels on key controls; missing-file guards for reveal/re-run; stronger glass depth on core panels and cards.
+- MAStyle-backed components everywhere: `AlertBanner`, `PromptBar`, `HeaderBar`/`CardHeader`, `ChipRow` + `FABPopover` (snippets palette), `RailToggleOverlay`. Rail width tuned (≈72.6) so “History/Chat” fit without clipping; rail toggle hugs the border and stays subtle.
 
 Intended architecture
 

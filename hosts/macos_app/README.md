@@ -1,9 +1,9 @@
-# Music Advisor macOS host (Swift/SwiftUI, no JUCE)
+# Music Advisor macOS host (Swift/SwiftUI)
 
 Purpose
 
 - Provide a minimal macOS shell you can grow into the production host.
-- Keep concerns separated: SwiftUI UI + IPC/CLI to Python engines; JUCE optional later (for audio UI or shared DSP).
+- Keep concerns separated: SwiftUI UI + IPC/CLI to Python engines.
 
 What’s included
 

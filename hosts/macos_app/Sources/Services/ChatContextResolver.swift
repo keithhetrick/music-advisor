@@ -62,7 +62,7 @@ struct ChatContextResolver {
         if let p = path, !FileManager.default.fileExists(atPath: p) {
             warning = "Context missing: \(URL(fileURLWithPath: p).lastPathComponent)"
             path = nil
-            label = "No context"
+            label = "No context (missing file)"
         }
 
         return Resolution(path: path, label: label, warning: warning)

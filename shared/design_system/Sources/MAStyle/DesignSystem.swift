@@ -1,7 +1,10 @@
 import SwiftUI
 
 public enum MAStyle {
-    // Theme is fully tokenized; swap MAStyle.theme to reskin or to a darkTheme.
+    // MARK: - Theme Backbone
+    // All style values originate from MAStyle.theme. Swap this at runtime (useDarkTheme / useHighContrastTheme / useLightTheme)
+    // or assign a custom Theme to reskin everything. The initial palette seeds live in `defaultDark.colors`.
+    // Primary token container (colors/spacing/radius/typography/shadows/borders).
     public struct Theme {
         public let colors: ColorTokens
         public let spacing: SpacingTokens
@@ -11,6 +14,7 @@ public enum MAStyle {
         public let borders: BorderTokens
     }
 
+    // MARK: Theme Token Definitions
     public struct ColorTokens {
         public let background: Color
         public let panel: Color
@@ -65,7 +69,8 @@ public enum MAStyle {
         public let regular: CGFloat
     }
 
-    // Default theme (dark-forward, neon-accented)
+    // MARK: - Default Palette
+    // This is the single source of truth for initial colors/spacing/radius/etc.
     private static let defaultDark = Theme(
         colors: ColorTokens(
             background: Color(red: 0.04, green: 0.05, blue: 0.08),     // deeper midnight
@@ -95,6 +100,8 @@ public enum MAStyle {
         borders: BorderTokens(thin: 1, regular: 1.5)
     )
 
+    /// Global theme state. Swap to a different Theme to reskin; defaults to `defaultDark`.
+    /// All ColorToken/Spacing/etc. values read from this.
     public static var theme = defaultDark
     public static var reduceMotionEnabled: Bool = false
 
@@ -129,6 +136,8 @@ public enum MAStyle {
         borders: BorderTokens(thin: 1.2, regular: 1.6)
     )
 
+    // MARK: - Token Accessors
+    // These pull directly from the active `MAStyle.theme`; swap the theme to change all values globally.
     public enum ColorToken {
         public static var background: Color { MAStyle.theme.colors.background }
         public static var panel: Color { MAStyle.theme.colors.panel }
@@ -176,6 +185,7 @@ public enum MAStyle {
         public static var regular: CGFloat { MAStyle.theme.borders.regular }
     }
 
+    // MARK: - Core Modifiers / Components
     public struct Card: ViewModifier {
         var padding: CGFloat = Spacing.sm
         var isDisabled: Bool = false
@@ -625,6 +635,7 @@ public enum MAStyle {
         }
     }
 
+    // MARK: - Theme Helpers
     public static func useDarkTheme() { theme = darkTheme }
     public static func useLightTheme(_ light: Theme? = nil) {
         if let light { theme = light } else {
@@ -684,6 +695,7 @@ public enum MAStyle {
     }
 }
 
+// MARK: - View Extensions (syntactic sugar)
 extension View {
     public func maCard(padding: CGFloat = MAStyle.Spacing.sm) -> some View {
         modifier(MAStyle.Card(padding: padding))
