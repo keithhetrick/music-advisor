@@ -32,6 +32,9 @@ struct DropZoneView: View {
         }
         .padding(MAStyle.Spacing.sm)
         .maCard()
+        .maGlass()
+        .accessibilityLabel("Drop zone")
+        .accessibilityHint("Drop audio files to enqueue them for processing")
         .onDrop(of: [.fileURL], isTargeted: $isHovering) { providers in
             var urls: [URL] = []
             let group = DispatchGroup()

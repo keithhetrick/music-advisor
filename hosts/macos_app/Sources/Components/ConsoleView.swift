@@ -24,5 +24,6 @@ struct ConsoleView: View {
         }
         .maCardInteractive()
         .textSelection(.enabled)
+        .accessibilityLabel("Console output")
     }
 }

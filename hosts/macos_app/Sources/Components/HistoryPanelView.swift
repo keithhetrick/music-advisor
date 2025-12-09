@@ -19,7 +19,7 @@ struct HistoryPanelView: View {
                     .foregroundStyle(MAStyle.ColorToken.muted)
             } else {
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
+                    LazyVStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
                         ForEach(items) { item in
                             historyRow(item: item)
                         }
@@ -28,6 +28,7 @@ struct HistoryPanelView: View {
             }
         }
         .maCard()
+        .maGlass()
     }
 
     private var header: some View {
@@ -37,8 +38,10 @@ struct HistoryPanelView: View {
             Spacer()
             Button("Clear") { onClear() }
                 .maButton(.ghost)
+                .accessibilityLabel("Clear history")
             Button("Refresh") { onRefresh() }
                 .maButton(.ghost)
+                .accessibilityLabel("Refresh history")
         }
     }
 

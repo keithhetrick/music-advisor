@@ -14,6 +14,9 @@ struct ContentView: View {
     @State private var previewHydrateTask: Task<Void, Never>?
     private let previewLoader = HistoryPreviewLoader()
     @State private var alertTimestamps: [String: Date] = [:]
+    @FocusState private var historySearchFocused: Bool
+    @FocusState private var promptFocused: Bool
+    @State private var showGettingStarted: Bool = true
     @State private var confirmClearHistory: Bool = false
     private let services = AppServices()
     init() {
@@ -33,53 +36,80 @@ struct ContentView: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
-                .ignoresSafeArea()
-            VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
-                HeaderView(hostStatus: store.state.hostSnapshot.status,
-                           progress: store.state.hostSnapshot.processing.progress,
-                           showProgress: store.state.hostSnapshot.processing.status == "running",
-                           lastUpdated: store.state.hostSnapshot.lastUpdated)
-                    .maSheen(isActive: store.commandVM.isRunning, duration: 4.5)
+            .ignoresSafeArea()
+
+            HStack(spacing: MAStyle.Spacing.md) {
+                NavigationRail(
+                    selection: Binding(get: { store.state.route.tab },
+                                       set: { tab in store.dispatch(.setRoute(store.state.route.updatingTab(tab))) })
+                )
+                .frame(width: 72)
+
                 Divider()
-                SettingsView(useDarkTheme: Binding(get: { store.state.useDarkTheme },
-                                                  set: { store.dispatch(.setTheme($0)) }),
-                             statusText: store.commandVM.status)
-                Divider()
-                Picker("Tab", selection: Binding(get: { store.state.route.tab },
-                                                 set: { tab in
-                                                     store.dispatch(.setRoute(store.state.route.updatingTab(tab)))
-                                                 })) {
-                    ForEach(AppTab.allCases, id: \.self) { tab in
-                        if tab != .style {
-                            Text(tab.rawValue).tag(tab)
+
+                VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
+                    HeaderView(hostStatus: store.state.hostSnapshot.status,
+                               progress: store.state.hostSnapshot.processing.progress,
+                               showProgress: store.state.hostSnapshot.processing.status == "running",
+                               lastUpdated: store.state.hostSnapshot.lastUpdated)
+                        .maSheen(isActive: store.commandVM.isRunning, duration: 4.5)
+                    SettingsView(useDarkTheme: Binding(get: { store.state.useDarkTheme },
+                                                      set: { store.dispatch(.setTheme($0)) }),
+                                 statusText: store.commandVM.status)
+                    Divider()
+                    ScrollView {
+                        switch store.state.route.tab {
+                        case .run:
+                            RunSplitView(
+                                store: store,
+                                viewModel: viewModel,
+                                trackVM: trackVM,
+                                pickFile: { services.filePicker.pickFile() },
+                                pickDirectory: { services.filePicker.pickDirectory() },
+                                revealSidecar: revealSidecar(path:),
+                                copyJSON: copyJSON,
+                                onPreviewRich: { path in loadHistoryPreview(path: path) }
+                            )
+                        case .history:
+                            HistorySplitView(
+                                store: store,
+                                reloadHistory: reloadHistory,
+                                revealSidecar: revealSidecar(path:),
+                                loadPreview: { path in loadHistoryPreview(path: path) },
+                                reRun: { item in
+                                    guard let path = item?.path else { return }
+                                    let fm = FileManager.default
+                                    if fm.fileExists(atPath: path) {
+                                        viewModel.insertAudioPath(path)
+                                    } else {
+                                        store.dispatch(.setAlert(AlertHelper.toast("File missing",
+                                                                                    message: "Cannot re-run; file not found at \(URL(fileURLWithPath: path).lastPathComponent)",
+                                                                                    level: .warning)))
+                                    }
+                                },
+                                historySearchFocus: $historySearchFocused,
+                                confirmClearHistory: $confirmClearHistory
+                            )
+                        case .style:
+                            ConsoleTabView(
+                                prompt: Binding(get: { store.state.promptText },
+                                                set: { store.dispatch(.setPrompt($0)) }),
+                                messages: store.state.messages,
+                                onSend: sendMessage,
+                                onClear: { store.dispatch(.setMessages([])) },
+                                onSnippet: { snippet in
+                                    store.dispatch(.setPrompt(snippet))
+                                    promptFocused = true
+                                },
+                                promptFocus: $promptFocused
+                            )
                         }
                     }
                 }
-                .pickerStyle(.segmented)
-                ScrollView {
-                    switch store.state.route.tab {
-                    case .run:
-                        RunTabView(
-                            store: store,
-                            viewModel: viewModel,
-                            trackVM: trackVM,
-                            pickFile: { services.filePicker.pickFile() },
-                            pickDirectory: { services.filePicker.pickDirectory() },
-                            revealSidecar: revealSidecar(path:),
-                            copyJSON: copyJSON,
-                            onPreviewRich: { path in loadHistoryPreview(path: path) }
-                        )
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    case .history:
-                        historyPane
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    case .style:
-                        EmptyView()
-                    }
-                }
+                .padding(MAStyle.Spacing.lg)
+                .frame(minWidth: 720, minHeight: 480)
             }
-            .padding(MAStyle.Spacing.lg)
-            .frame(minWidth: 640, minHeight: 420)
+
             if let alert = store.state.alert {
                 VStack {
                     if alert.presentAsToast {
@@ -93,8 +123,21 @@ struct ContentView: View {
                     .zIndex(1)
                 }
             }
+            if showGettingStarted {
+                VStack {
+                    GettingStartedOverlay {
+                        showGettingStarted = false
+                    }
+                    .frame(maxWidth: 520)
+                    Spacer()
+                }
+                .padding(MAStyle.Spacing.lg)
+                .transition(.opacity)
+                .zIndex(2)
+            }
         }
         .preferredColorScheme(store.state.useDarkTheme ? .dark : .light)
+        .overlay(shortcutButtons.opacity(0))
         .onAppear {
             if store.state.useDarkTheme { MAStyle.useDarkTheme() } else { MAStyle.useLightTheme() }
             reloadHistory()
@@ -268,30 +311,30 @@ struct ContentView: View {
         }
     }
 
-    private var historyPane: some View {
-        HistoryPanelView(
-            items: store.state.historyItems,
-            previews: store.state.historyPreviews,
-            onRefresh: reloadHistory,
-            onReveal: revealSidecar(path:),
-            onPreview: { path in
-                loadHistoryPreview(path: path)
-            },
-            onClear: {
-                confirmClearHistory = true
-            }
-        )
-        .alert("Clear history?", isPresented: $confirmClearHistory) {
-            Button("Cancel", role: .cancel) {}
-            Button("Clear", role: .destructive) {
-                store.dispatch(.clearHistory)
-                try? SpecialActions.clearSidecarsOnDisk()
-                reloadHistory()
-            }
-        } message: {
-            Text("This will remove saved sidecars from disk and clear in-memory history.")
+private var historyPane: some View {
+    HistoryPanelView(
+        items: store.state.historyItems,
+        previews: store.state.historyPreviews,
+        onRefresh: reloadHistory,
+        onReveal: revealSidecar(path:),
+        onPreview: { path in
+            loadHistoryPreview(path: path)
+        },
+        onClear: {
+            confirmClearHistory = true
         }
+    )
+    .alert("Clear history?", isPresented: $confirmClearHistory) {
+        Button("Cancel", role: .cancel) {}
+        Button("Clear", role: .destructive) {
+            store.dispatch(.clearHistory)
+            try? SpecialActions.clearSidecarsOnDisk()
+            reloadHistory()
+        }
+    } message: {
+        Text("This will remove saved sidecars from disk and clear in-memory history.")
     }
+}
 
     private var leftColumn: some View {
         VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
@@ -552,6 +595,16 @@ struct ContentView: View {
         guard !trimmed.isEmpty else { return }
         store.dispatch(.appendMessage(trimmed))
         store.dispatch(.setPrompt(""))
+        store.dispatch(.appendMessage("[ack] \(trimmed)"))
+    }
+
+    private var shortcutButtons: some View {
+        Group {
+            Button(action: { historySearchFocused = true }) { EmptyView() }
+                .keyboardShortcut("f", modifiers: [.command])
+            Button(action: { promptFocused = true }) { EmptyView() }
+                .keyboardShortcut("l", modifiers: [.command])
+        }
     }
 
     private func trackStorePaths() -> (trackURL: URL, artistURL: URL) {
@@ -605,6 +658,10 @@ extension ContentView {
 
     private func revealSidecar(path: String) {
         let url = URL(fileURLWithPath: path)
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            store.dispatch(.setAlert(AlertHelper.toast("File missing", message: "Sidecar not found at \(url.lastPathComponent)", level: .warning)))
+            return
+        }
         NSWorkspace.shared.activateFileViewerSelecting([url])
     }
 
@@ -725,6 +782,7 @@ extension ContentView {
                     store.dispatch(.setHistoryItems(existingHistory))
                     historyStore.save(existingHistory)
                 }
+                showAlertThrottled(key: "preview_done", alert: AlertHelper.toast("Preview updated", message: selectedPreviewName(path), level: .info))
             }
             Perf.end(Perf.previewLog, "preview.load", signpostID)
         }
@@ -738,5 +796,9 @@ extension ContentView {
         }
         alertTimestamps[key] = now
         store.dispatch(.setAlert(alert))
+    }
+
+    private func selectedPreviewName(_ path: String) -> String {
+        URL(fileURLWithPath: path).lastPathComponent
     }
 }

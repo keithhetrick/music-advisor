@@ -36,6 +36,7 @@ struct JobQueueView: View {
                     Text("Drop audio files to start a batch.")
                         .maText(.caption)
                         .foregroundStyle(MAStyle.ColorToken.muted)
+                        .accessibilityLabel("Queue empty")
                 } else {
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
@@ -54,11 +55,13 @@ struct JobQueueView: View {
                                         if let sidecar = job.sidecarPath {
                                             Button("Reveal") { onReveal(sidecar) }
                                                 .maButton(.ghost)
+                                                .accessibilityLabel("Reveal sidecar")
                                             Button("Preview Rich") {
                                                 let richPath = sidecar.replacingOccurrences(of: ".json", with: ".client.rich.txt")
                                                 onPreviewRich(richPath)
                                             }
                                             .maButton(.ghost)
+                                            .accessibilityLabel("Preview rich text")
                                         }
                                     }
                                     HStack(spacing: MAStyle.Spacing.sm) {

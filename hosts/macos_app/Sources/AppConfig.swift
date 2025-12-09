@@ -61,7 +61,9 @@ struct AppConfig {
             ?? "/tmp/ma_features.json"
 
         let argsFromConfig = config["default_args"] as? [String]
-        let args = env["MA_APP_DEFAULT_ARGS"]?.split(separator: " ").map(String.init)
+        let args = env["MA_APP_DEFAULT_ARGS"]?
+            .split(separator: " ")
+            .map(String.init)
             ?? argsFromConfig
             ?? [script, "--audio", audioPlaceholder, "--out", outPlaceholder]
 
@@ -86,9 +88,10 @@ struct AppConfig {
         for line in content.split(separator: "\n") {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
             if trimmed.isEmpty || trimmed.hasPrefix("#") { continue }
-            if let eq = trimmed.firstIndex(of: "=") {
-                let key = String(trimmed[..<eq])
-                let value = String(trimmed[trimmed.index(after: eq)...])
+            guard let eq = trimmed.firstIndex(of: "=") else { continue }
+            let key = String(trimmed[..<eq]).trimmingCharacters(in: .whitespaces)
+            let value = String(trimmed[trimmed.index(after: eq)...]).trimmingCharacters(in: .whitespaces)
+            if !key.isEmpty {
                 result[key] = value
             }
         }
