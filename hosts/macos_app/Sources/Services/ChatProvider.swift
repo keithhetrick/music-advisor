@@ -11,7 +11,7 @@ struct ChatContext {
 struct ChatProviderConfig {
     let pythonPath: String
     let repoRoot: String
-    let timeoutNanos: UInt64
+    let timeoutSeconds: TimeInterval
     let rateLimitSeconds: TimeInterval
 
     static func defaultConfig() -> ChatProviderConfig {
@@ -20,12 +20,12 @@ struct ChatProviderConfig {
         return ChatProviderConfig(
             pythonPath: "/usr/bin/python3",
             repoRoot: repo,
-            timeoutNanos: 5_000_000_000,
+            timeoutSeconds: 5.0,
             rateLimitSeconds: 0.3
         )
     }
 }
 
 protocol ChatProvider {
-    func send(prompt: String, context: ChatContext, lastSent: Date?) async -> (reply: String?, rateLimited: Bool, timedOut: Bool, warning: String?, label: String, nextSentAt: Date?)
+    func send(prompt: String, context: ChatContext, lastSent: Date?) async -> (reply: String?, rateLimited: Bool, timedOut: Bool, warning: String?, label: String, contextPath: String?, nextSentAt: Date?)
 }

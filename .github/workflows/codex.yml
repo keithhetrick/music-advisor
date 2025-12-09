@@ -30,6 +30,11 @@ jobs:
       - name: Codex review gate
         run: make review
 
+      - name: Chat engine contract
+        run: |
+          cd engines/chat_engine
+          ./run_contract.sh
+
   optimize:
     runs-on: ubuntu-latest
     steps:

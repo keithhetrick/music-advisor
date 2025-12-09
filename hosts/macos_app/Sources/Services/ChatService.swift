@@ -15,47 +15,38 @@ actor ChatService: ChatProvider {
 
     func send(prompt: String,
               context: ChatContext,
-              lastSent: Date?) async -> (reply: String?, rateLimited: Bool, timedOut: Bool, warning: String?, label: String, nextSentAt: Date?) {
+              lastSent: Date?) async -> (reply: String?, rateLimited: Bool, timedOut: Bool, warning: String?, label: String, contextPath: String?, nextSentAt: Date?) {
 
         let trimmed = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
-            return (nil, false, false, nil, "No context", lastSent)
+            return (nil, false, false, nil, "No context", nil, lastSent)
         }
 
         if let last = lastSent, Date().timeIntervalSince(last) < config.rateLimitSeconds {
-            return (nil, true, false, nil, "No context", lastSent)
+            return (nil, true, false, nil, "No context", nil, lastSent)
         }
 
-        let resolution = ChatContextResolver.resolve(selection: context.selection,
-                                                     sidecarPath: context.sidecarPath,
-                                                     overridePath: context.overridePath,
-                                                     historyItems: context.historyItems,
-                                                     previewCache: context.previewCache)
-
-        let script = """
-import sys
-from pathlib import Path
-from engines.chat_engine.chat_engine import ChatRequest, run
-
-prompt = sys.argv[1]
-client = Path(sys.argv[2]) if len(sys.argv) > 2 and sys.argv[2] else None
-req = ChatRequest(prompt=prompt, context_path=str(client) if client else None, label="macos-app")
-res = run(req)
-print(res.reply)
-"""
-        let clientArg = resolution.path ?? ""
+        let script = "\(config.repoRoot)/engines/chat_engine/chat_cli.py"
+        let clientArg = context.overridePath ?? context.sidecarPath ?? ""
         let result = await runner.run(
-            command: [config.pythonPath, "-c", script, trimmed, clientArg],
+            command: [
+                config.pythonPath,
+                script,
+                "--prompt", trimmed,
+                "--label", "macos-app",
+                "--rate-limit", "\(config.rateLimitSeconds)",
+                "--timeout", "\(config.timeoutSeconds)",
+                "--context", clientArg
+            ],
             workingDirectory: config.repoRoot,
             extraEnv: ["PYTHONPATH": config.repoRoot]
         )
 
         let nextSent = Date()
-
         let logLine = """
         chat run:
           prompt: \(trimmed.prefix(120))
-          context: \(resolution.path ?? "(none)") [label=\(resolution.label)]
+          context: \(clientArg.isEmpty ? "(none)" : clientArg)
           exit: \(result.exitCode)
           stdout: \(result.stdout.prefix(400))
           stderr: \(result.stderr.prefix(400))
@@ -76,10 +67,20 @@ print(res.reply)
 
         if result.exitCode != 0 {
             os_log("chat error %{public}@", log: log, type: .error, result.stderr)
-            return ("[chat error] \(result.stderr.trimmingCharacters(in: .whitespacesAndNewlines))", false, false, resolution.warning, resolution.label, nextSent)
+            return ("[chat error] \(result.stderr.trimmingCharacters(in: .whitespacesAndNewlines))", false, false, nil, "No context", nil, nextSent)
         }
 
-        let reply = result.stdout.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        return (reply, false, false, resolution.warning, resolution.label, nextSent)
+        guard let data = result.stdout.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return ("[chat error] malformed response", false, false, nil, "No context", nil, nextSent)
+        }
+
+        let reply = (json["reply"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let label = json["label"] as? String ?? "No context"
+        let warning = json["warning"] as? String
+        let rateLimited = json["rate_limited"] as? Bool ?? false
+        let timedOut = json["timed_out"] as? Bool ?? false
+        let ctxPath = json["context_path"] as? String
+        return (reply, rateLimited, timedOut, warning, label, ctxPath, nextSent)
     }
 }

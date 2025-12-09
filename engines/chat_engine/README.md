@@ -31,10 +31,22 @@ struct ChatResponse {
 
 ## Current state
 
-- Uses existing `tools/chat/chat_router.py` via `ChatService` in the macOS app. This folder is a placeholder to centralize future logic/tests.
+- Uses existing `tools/chat/chat_router.py` via this engine.
+- Provides JSON output via `chat_cli.py` for hosts to consume.
+
+### Smokes
+
+```bash
+cd engines/chat_engine
+python cli_smoke.py
+# JSON-emitting CLI:
+python chat_cli.py --prompt "Hello" --context /path/to/file.client.rich.txt
+# Contract smoke (checks output keys):
+python contract_smoke.py
+# Contract test:
+PYTHONPATH=.. python test_contract.py
+```
 
 ### Next steps
 
-- Add a small CLI smoke here that calls the router with a sample `.client.rich.txt`.
-- Move context resolution and rate/error handling into this engine.
 - Add tests/fixtures to keep the interface stable for all hosts.

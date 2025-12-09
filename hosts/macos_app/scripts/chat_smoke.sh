@@ -12,7 +12,14 @@ HOME="$APP_DIR/build/home" SWIFTPM_DISABLE_SANDBOX=1 swift build \
   --disable-sandbox
 
 echo "== Chat engine smoke =="
-PYTHONPATH="$ROOT" "$ROOT/engines/chat_engine/chat_engine.py" --help >/dev/null 2>&1 || true
-PYTHONPATH="$ROOT" python "$ROOT/engines/chat_engine/cli_smoke.py" "$@"
+PYTHON_BIN="${PYTHON_BIN:-$(command -v python3 || true)}"
+if [ -z "$PYTHON_BIN" ]; then
+  echo "python3 not found on PATH" >&2
+  exit 1
+fi
+PYTHONPATH="$ROOT" "$PYTHON_BIN" "$ROOT/engines/chat_engine/chat_cli.py" "$@"
+# Contract checks (fail if contract breaks)
+PYTHONPATH="$ROOT" "$PYTHON_BIN" "$ROOT/engines/chat_engine/contract_smoke.py"
+PYTHONPATH="$ROOT" "$PYTHON_BIN" "$ROOT/engines/chat_engine/test_contract.py"
 
 echo "Done."

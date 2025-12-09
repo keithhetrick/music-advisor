@@ -671,86 +671,27 @@ private var historyPane: some View {
         var effectiveSelection = selection
         var effectiveOverride = overridePath
 
-        // Try to resolve normally.
-        var preResolved = ChatContextResolver.resolve(selection: effectiveSelection,
-                                                      sidecarPath: sidecarPath,
-                                                      overridePath: effectiveOverride,
-                                                      historyItems: historyItems,
-                                                      previewCache: previewCache)
-        setChatBadge(from: preResolved)
-        store.dispatch(.setChatContextLabel(preResolved.label))
+        // Best effort badge before send.
+        updateBadge(label: contextLabelForSelection(effectiveSelection),
+                    path: effectiveOverride ?? sidecarPath)
 
-        // Fallback: if prompt itself is an absolute .client.rich.txt path and no context was found, use it.
-        if preResolved.path == nil, let pathFromPrompt = absoluteRichPath(from: prompt) {
+        // Fallback: if prompt itself is an absolute .client.rich.txt path, use it.
+        if let pathFromPrompt = absoluteRichPath(from: prompt) {
             effectiveOverride = pathFromPrompt
             effectiveSelection = "manual-path"
-            preResolved = ChatContextResolver.resolve(selection: effectiveSelection,
-                                                      sidecarPath: sidecarPath,
-                                                      overridePath: effectiveOverride,
-                                                      historyItems: historyItems,
-                                                      previewCache: previewCache)
             setChatContext(selection: effectiveSelection, overridePath: effectiveOverride)
             showAlertThrottled(key: "chat_manual_ctx", alert: AlertHelper.toast("Context from prompt",
                                                                                 message: "Using \(URL(fileURLWithPath: pathFromPrompt).lastPathComponent)",
                                                                                 level: .info))
         }
 
-        if preResolved.path == nil {
-            showAlertThrottled(key: "chat_context_missing", alert: AlertHelper.toast("No context",
-                                                                                    message: "Select History/Last run or include a .client.rich.txt path.",
-                                                                                    level: .warning))
-        }
-        if let warn = preResolved.warning {
-            showAlertThrottled(key: "chat_context_warn_pre", alert: AlertHelper.toast("Context", message: warn, level: .warning))
-        }
-        if let usedPath = preResolved.path {
-            showAlertThrottled(key: "chat_context_info", alert: AlertHelper.toast("Context", message: "Using \(URL(fileURLWithPath: usedPath).lastPathComponent)", level: .info))
-        }
-        // Persist the resolved label so the picker reflects it.
-        store.dispatch(.setChatContextLabel(preResolved.label))
-
-        let selSnapshot = effectiveSelection
-        let overrideSnapshot = effectiveOverride
-        chatTask = Task.detached {
-            let ctx = ChatContext(selection: selSnapshot,
-                                  sidecarPath: sidecarPath,
-                                  overridePath: overrideSnapshot,
-                                  historyItems: historyItems,
-                                  previewCache: previewCache)
-            let result = await chatProvider.send(prompt: prompt,
-                                                 context: ctx,
-                                                 lastSent: nil)
-            guard !Task.isCancelled else { return }
-            await MainActor.run {
-                chatIsThinking = false
-                if result.rateLimited {
-                    showAlertThrottled(key: "chat_rate", alert: AlertHelper.toast("Slow down", message: "Please wait a moment between sends.", level: .info))
-                    return
-                }
-                if let warn = result.warning {
-                    showAlertThrottled(key: "chat_context_warn", alert: AlertHelper.toast("Context", message: warn, level: .warning))
-                }
-                let outgoingContext = result.label
-                let contextDetail: String = {
-                    if let path = preResolved.path {
-                        return "\(outgoingContext) (\(URL(fileURLWithPath: path).lastPathComponent))"
-                    } else {
-                        return outgoingContext
-                    }
-                }()
-                var outgoing = prompt
-                if outgoingContext != "No context" {
-                    outgoing += "\n[context: \(contextDetail)]"
-                }
-                store.dispatch(.appendMessage(outgoing))
-                if let reply = result.reply, !reply.isEmpty {
-                    store.dispatch(.appendMessage(reply))
-                    if result.timedOut || reply.contains("chat error") {
-                        store.dispatch(.setAlert(AlertHelper.toast("Chat issue", message: reply, level: .warning)))
-                    }
-                }
-                store.dispatch(.setChatContextLabel(outgoingContext))
-            }
+        chatTask = Task {
+            await performChat(prompt: prompt,
+                              selection: effectiveSelection,
+                              overridePath: effectiveOverride,
+                              sidecarPath: sidecarPath,
+                              historyItems: historyItems,
+                              previewCache: previewCache)
         }
     }
 
@@ -789,21 +730,21 @@ private var historyPane: some View {
     }
 
     private func renderChatContext(selection: String?, overridePath: String?) {
-        let resolution = ChatContextResolver.resolve(selection: selection,
-                                                     sidecarPath: viewModel.sidecarPath,
-                                                     overridePath: overridePath,
-                                                     historyItems: store.state.historyItems,
-                                                     previewCache: store.state.previewCache)
-        store.dispatch(.setChatContextLabel(resolution.label))
-        setChatBadge(from: resolution)
+        updateBadge(label: contextLabelForSelection(selection),
+                    path: overridePath ?? viewModel.sidecarPath)
     }
 
-    private func setChatBadge(from resolution: ChatContextResolver.Resolution) {
-        if let p = resolution.path {
-            store.dispatch(.setChatBadge(title: resolution.label,
-                                         subtitle: URL(fileURLWithPath: p).lastPathComponent))
-        } else {
-            store.dispatch(.setChatBadge(title: "No context", subtitle: "No file"))
+    private func contextLabelForSelection(_ sel: String?) -> String {
+        guard let sel else { return "No context" }
+        let opts = chatContextOptions()
+        if let match = opts.first(where: { $0.id == sel }) {
+            return match.label
+        }
+        switch sel {
+        case "last-run": return "Last run"
+        case "history": return "History preview"
+        case "manual-path": return "Manual path"
+        default: return "No context"
         }
     }
 
@@ -820,6 +761,66 @@ private var historyPane: some View {
             return trimmed
         }
         return nil
+    }
+
+    private func updateBadge(label: String?, path: String?) {
+        let title = label ?? "No context"
+        var subtitle = "No file"
+        if let path, FileManager.default.fileExists(atPath: path) {
+            subtitle = URL(fileURLWithPath: path).lastPathComponent
+        }
+        store.dispatch(.setChatContextLabel(title))
+        store.dispatch(.setChatBadge(title: title, subtitle: subtitle))
+    }
+
+    private func performChat(prompt: String,
+                             selection: String?,
+                             overridePath: String?,
+                             sidecarPath: String?,
+                             historyItems: [SidecarItem],
+                             previewCache: [String: (HistoryPreview, Date?)]) async {
+        let ctx = ChatContext(selection: selection,
+                              sidecarPath: sidecarPath,
+                              overridePath: overridePath,
+                              historyItems: historyItems,
+                              previewCache: previewCache)
+        let result = await chatProvider.send(prompt: prompt,
+                                             context: ctx,
+                                             lastSent: nil)
+        guard !Task.isCancelled else { return }
+        handleChatResult(result: result, prompt: prompt)
+    }
+
+    @MainActor
+    private func handleChatResult(result: (reply: String?, rateLimited: Bool, timedOut: Bool, warning: String?, label: String, contextPath: String?, nextSentAt: Date?), prompt: String) {
+        chatIsThinking = false
+        if result.rateLimited {
+            showAlertThrottled(key: "chat_rate", alert: AlertHelper.toast("Slow down", message: "Please wait a moment between sends.", level: .info))
+            return
+        }
+        if let warn = result.warning {
+            showAlertThrottled(key: "chat_context_warn", alert: AlertHelper.toast("Context", message: warn, level: .warning))
+        }
+        let outgoingContext = result.label
+        let contextDetail: String = {
+            if let path = result.contextPath {
+                return "\(outgoingContext) (\(URL(fileURLWithPath: path).lastPathComponent))"
+            } else {
+                return outgoingContext
+            }
+        }()
+        var outgoing = prompt
+        if outgoingContext != "No context" {
+            outgoing += "\n[context: \(contextDetail)]"
+        }
+        store.dispatch(.appendMessage(outgoing))
+        if let reply = result.reply, !reply.isEmpty {
+            store.dispatch(.appendMessage(reply))
+            if result.timedOut || reply.contains("chat error") {
+                store.dispatch(.setAlert(AlertHelper.toast("Chat issue", message: reply, level: .warning)))
+            }
+        }
+        updateBadge(label: outgoingContext, path: result.contextPath)
     }
 
     private func runChatEngineSmoke() {
