@@ -31,6 +31,13 @@ cd hosts/macos_app
 ./scripts/chat_smoke.sh --prompt "Hello" --context "/path/to/your.client.rich.txt"
 ```
 
+Pipeline smoke (Python CLI)
+
+```bash
+cd hosts/macos_app
+./scripts/pipeline_smoke.sh /path/to/audio.wav /tmp/ma_features_smoke.json
+```
+
 Package (unsigned dev zip)
 
 ```bash

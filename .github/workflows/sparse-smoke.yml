@@ -23,8 +23,28 @@ jobs:
             engines/**/pyproject.toml
             src/ma_config/pyproject.toml
             shared/pyproject.toml
+      - name: Pipeline fixture (tone)
+        run: |
+          mkdir -p tests/fixtures/audio
+          python - <<'PY'
+import wave, math
+path = 'tests/fixtures/audio/tone_440.wav'
+freq = 440.0; sr = 44100; dur = 0.5
+n = int(sr*dur)
+data = bytearray()
+for i in range(n):
+    s = int(32767*math.sin(2*math.pi*freq*i/sr))
+    data += int.to_bytes(s, 2, 'little', signed=True)
+with wave.open(path, 'w') as f:
+    f.setnchannels(1); f.setsampwidth(2); f.setframerate(sr); f.writeframes(bytes(data))
+print('wrote', path)
+PY
       - name: Install shared
         run: pip install -e src/ma_config -e shared
       - name: Run sparse smokes
         run: |
           PYTHONPATH=. make -f docs/Makefile.sparse-smoke sparse-smoke-all
+      - name: Chat engine contract
+        run: |
+          cd engines/chat_engine
+          ./run_contract.sh

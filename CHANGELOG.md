@@ -8,6 +8,8 @@
 - Added chat engine scaffold under `engines/chat_engine/` with a thin wrapper to the existing `tools/chat` backend, plus a CLI smoke (`engines/chat_engine/cli_smoke.py`). Future work will move chat context/rate/error handling into this engine for all hosts.
 - Chat engine contract tests added (`contract_smoke.py`, `test_contract.py`); chat smoke script now runs contract checks with `python3`.
 - CI: codex review job now runs `engines/chat_engine/run_contract.sh` to ensure the chat JSON contract stays intact on PRs.
+- Pipeline smoke helper added: `hosts/macos_app/scripts/pipeline_smoke.sh` to run `ma_audio_features.py` against a supplied audio file.
+- Removed unused `PythonChatProvider`/`ChatContextResolver` after engine migration; macOS app now solely uses the engine JSON path.
 
 - Helper CLI is now safety-first and feature-complete: project-aware tasks, affected logic, caching + artifact metadata, dashboards/TUI/palette/quickstart, watch hotkeys, chat-dev layout, git helpers (branch/status/upstream/rebase/pull-check), hooks (pre-push/pre-commit), guardrails, preflight/clean-tree/safe-run enforcement, state relocation (`MA_HELPER_HOME`), artifact metadata cache, and chat-dev fallback when tmux is unavailable.
 - Helper self-checks added (`tests/helper/self_check.py` + CI step) covering palette/list/preflight/ci-plan/github-check/dashboard-json/chat-dev/git-sim/state-relocation/quickstart.

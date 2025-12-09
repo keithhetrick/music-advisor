@@ -15,6 +15,9 @@ sparse-smoke-ttc:
 sparse-smoke-reco:
 	@PYTHONPATH=$(PYTHONPATH) python - <<'PY'\nfrom recommendation_engine.engine.recommendation import compute_recommendation\nfrom recommendation_engine.tests.fixtures import sample_payload, sample_market_norms\nrec = compute_recommendation(sample_payload, sample_market_norms)\nprint('ok', bool(rec))\nPY
 
-sparse-smoke-all: sparse-smoke-chat sparse-smoke-tempo sparse-smoke-key sparse-smoke-ttc sparse-smoke-reco
+sparse-smoke-pipeline:
+	@PYTHONPATH=$(PYTHONPATH) python tools/cli/ma_audio_features.py --audio tests/fixtures/audio/tone_440.wav --out /tmp/demo.audio_features.json >/dev/null 2>&1 && echo "pipeline-smoke: ok"
 
-.PHONY: sparse-smoke-chat sparse-smoke-tempo sparse-smoke-key sparse-smoke-ttc sparse-smoke-reco
+sparse-smoke-all: sparse-smoke-chat sparse-smoke-tempo sparse-smoke-key sparse-smoke-ttc sparse-smoke-reco sparse-smoke-pipeline
+
+.PHONY: sparse-smoke-chat sparse-smoke-tempo sparse-smoke-key sparse-smoke-ttc sparse-smoke-reco sparse-smoke-pipeline
