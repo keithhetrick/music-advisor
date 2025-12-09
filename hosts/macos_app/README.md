@@ -1,14 +1,17 @@
 # Music Advisor macOS host (Swift/SwiftUI, no JUCE)
 
 Purpose
+
 - Provide a minimal macOS shell you can grow into the production host.
 - Keep concerns separated: SwiftUI UI + IPC/CLI to Python engines; JUCE optional later (for audio UI or shared DSP).
 
 What’s included
+
 - SwiftPM app at `hosts/macos_app/` targeting macOS 12+, Swift 5.7+.
 - SwiftUI shell with a configurable CLI runner (call your Python pipeline or a mock). No external deps.
 
 Build/run (CLI)
+
 ```bash
 cd hosts/macos_app
 swift build
@@ -16,18 +19,21 @@ swift run
 ```
 
 Open in Xcode
+
 ```bash
 cd hosts/macos_app
 open Package.swift
 ```
 
 Local build/run helper (uses local HOME + scratch path; tolerates locked global SwiftPM caches)
+
 ```bash
 cd hosts/macos_app
 ./scripts/swift_run_local.sh
 ```
 
 Package a release .app (unsigned zip for sharing)
+
 ```bash
 cd hosts/macos_app
 ./scripts/package_release.sh
@@ -35,17 +41,20 @@ cd hosts/macos_app
 ```
 
 Reset logs / clean builds
+
 ```bash
 ./scripts/clean_builds.sh       # wipe app build artifacts
 ./scripts/reset_run_log.sh      # remove last command log
 ```
 
 Pin Python deps to expected ranges
+
 ```bash
 ./scripts/pin_python_deps.sh
 ```
 
 Smoke test the default CLI (headless)
+
 ```bash
 ./scripts/smoke_default.sh
 # or for CI hooks: ./scripts/run_smoke_ci.sh
@@ -53,11 +62,13 @@ Smoke test the default CLI (headless)
 ```
 
 Config overrides (no code edits)
+
 - Optional `.env.local` (copy from `.env.local.example`) and/or JSON config at `config/defaults.json` (override path via `MA_APP_CONFIG_FILE`).
 - Env has highest priority (`MA_APP_DEFAULT_*`, `MA_APP_ENV_*`, `MA_APP_CMD/ARGS/WORKDIR`), then JSON config, then code fallback.
 - Profiles: define named presets in JSON (cmd/args/workdir/env/out). UI has a profile picker + “Apply profile” + “Reload config”.
 
 Design/architecture notes
+
 - UI: SwiftUI for native macOS host.
 - Engines: Python remains the brain (Historical Echo, HCI, TTC, Lyric). Add IPC/CLI bindings later.
 - Audio: Use AVAudioEngine or the future JUCE plug-in for in-DAW probes; keep real-time DSP out of the UI thread.
@@ -73,6 +84,7 @@ Design/architecture notes
     - Other env: `MA_APP_ENV_FOO=bar` (prefix with `MA_APP_ENV_`)
 
 Default overrides for other machines (env)
+
 - `MA_APP_DEFAULT_CMD` (e.g., `/usr/bin/python3`)
 - `MA_APP_DEFAULT_SCRIPT` (e.g., `/path/to/cli.py`)
 - `MA_APP_DEFAULT_AUDIO` (e.g., `/path/to/audio.wav`)
@@ -82,6 +94,7 @@ Default overrides for other machines (env)
 - Optional `.env.local` (copied from `.env.local.example`) can set these without shell exports. Override file path with `MA_APP_ENV_FILE`.
 
 UI behavior
+
 - “Run defaults” refills fields from env/defaults and executes.
 - “Run smoke” calls `scripts/smoke_default.sh` headless to verify the default CLI and sidecar.
 - Results use a segmented view (JSON/stdout/stderr) with parsed JSON prettified when possible.
@@ -89,13 +102,16 @@ UI behavior
 - Inline helpers: copy JSON to clipboard; reveal sidecar in Finder; summary metrics (tempo/key/duration/LUFS/peak/crest); last run time + duration shown in the header.
 
 Dependency note (Python CLI)
+
 - If you see warnings about numpy/scipy/librosa versions, you can pin to the expected ranges in the same Python you run from the app:
+
   ```bash
   cd /Users/keithhetrick/music-advisor
   PYTHONPATH=$PWD /usr/local/bin/python3 -m pip install "numpy<2" "scipy<1.12" "librosa>=0.10,<0.11"
   ```
 
 Next steps (when ready)
+
 - Add IPC/CLI bridge to the Python pipeline (local calls; no network).
 - Wire real feature outputs into the UI.
 - Add minimal logging/telemetry (local-only).

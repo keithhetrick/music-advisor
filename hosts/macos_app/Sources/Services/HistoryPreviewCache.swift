@@ -31,30 +31,45 @@ struct HistoryPreviewCache {
         return result
     }
 
+    func loadAsync(filterExisting: Bool = true) async -> [String: (HistoryPreview, Date?)] {
+        await withCheckedContinuation { cont in
+            DispatchQueue.global(qos: .utility).async {
+                var loaded = load()
+                if filterExisting {
+                    let fm = FileManager.default
+                    loaded = loaded.filter { fm.fileExists(atPath: $0.key) }
+                }
+                cont.resume(returning: loaded)
+            }
+        }
+    }
+
     func save(_ cache: [String: (HistoryPreview, Date?)]) {
-        // Keep only most recent entries by modification date if available, else by name.
-        let sorted = cache.sorted { lhs, rhs in
-            let ldate = lhs.value.1 ?? Date.distantPast
-            let rdate = rhs.value.1 ?? Date.distantPast
-            return ldate > rdate
-        }
-        let trimmed = sorted.prefix(maxEntries)
-        let payload: [PersistedPreview] = trimmed.map { key, value in
-            PersistedPreview(path: key,
-                             sidecar: value.0.sidecar,
-                             rich: value.0.rich,
-                             richFound: value.0.richFound,
-                             richPath: value.0.richPath,
-                             modified: value.1)
-        }
-        do {
-            let data = try JSONEncoder().encode(payload)
-            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(),
-                                                    withIntermediateDirectories: true,
-                                                    attributes: nil)
-            try data.write(to: url, options: .atomic)
-        } catch {
-            // Best-effort cache; ignore failures.
+        Task.detached(priority: .utility) {
+            // Keep only most recent entries by modification date if available, else by name.
+            let sorted = cache.sorted { lhs, rhs in
+                let ldate = lhs.value.1 ?? Date.distantPast
+                let rdate = rhs.value.1 ?? Date.distantPast
+                return ldate > rdate
+            }
+            let trimmed = sorted.prefix(maxEntries)
+            let payload: [PersistedPreview] = trimmed.map { key, value in
+                PersistedPreview(path: key,
+                                 sidecar: value.0.sidecar,
+                                 rich: value.0.rich,
+                                 richFound: value.0.richFound,
+                                 richPath: value.0.richPath,
+                                 modified: value.1)
+            }
+            do {
+                let data = try JSONEncoder().encode(payload)
+                try FileManager.default.createDirectory(at: url.deletingLastPathComponent(),
+                                                        withIntermediateDirectories: true,
+                                                        attributes: nil)
+                try data.write(to: url, options: .atomic)
+            } catch {
+                // Best-effort cache; ignore failures.
+            }
         }
     }
 

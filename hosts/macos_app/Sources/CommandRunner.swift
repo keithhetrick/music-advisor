@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 struct CommandResult {
     let commandLine: String
@@ -18,6 +19,7 @@ struct CommandRunner {
             return CommandResult(commandLine: "", stdout: "", stderr: "No command provided", exitCode: -1, stdoutLines: [], stderrLines: [], spawnError: "No command provided")
         }
 
+        let signpost = Perf.begin(Perf.runnerLog, "runner.exec")
         let args = Array(command.dropFirst())
         let process = Process()
         process.executableURL = URL(fileURLWithPath: executable)
@@ -38,13 +40,15 @@ struct CommandRunner {
         do {
             try process.run()
         } catch {
-            return CommandResult(commandLine: command.joined(separator: " "),
-                                 stdout: "",
-                                 stderr: "Failed to start: \(error)",
-                                 exitCode: -1,
-                                 stdoutLines: [],
-                                 stderrLines: [],
-                                 spawnError: "\(error)")
+            let result = CommandResult(commandLine: command.joined(separator: " "),
+                                       stdout: "",
+                                       stderr: "Failed to start: \(error)",
+                                       exitCode: -1,
+                                       stdoutLines: [],
+                                       stderrLines: [],
+                                       spawnError: "\(error)")
+            Perf.end(Perf.runnerLog, "runner.exec", signpost)
+            return result
         }
 
         process.waitUntilExit()
@@ -76,6 +80,7 @@ struct CommandRunner {
 
         """
         try? log.write(to: logPath, atomically: false, encoding: .utf8)
+        Perf.end(Perf.runnerLog, "runner.exec", signpost)
 
         return result
     }

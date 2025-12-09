@@ -1,6 +1,8 @@
 import SwiftUI
 import AppKit
 import MAStyle
+import UniformTypeIdentifiers
+import os
 
 struct ContentView: View {
     @StateObject private var store: AppStore
@@ -8,8 +10,12 @@ struct ContentView: View {
     private let trackVM: TrackListViewModel?
     private let previewCacheStore = HistoryPreviewCache()
     private let historyStore = HistoryStore()
-    @State private var historyReloadWork: DispatchWorkItem?
+    @State private var historyReloadTask: Task<Void, Never>?
+    @State private var previewHydrateTask: Task<Void, Never>?
+    private let previewLoader = HistoryPreviewLoader()
+    @State private var alertTimestamps: [String: Date] = [:]
     @State private var confirmClearHistory: Bool = false
+    private let services = AppServices()
     init() {
         let s = AppStore()
         _store = StateObject(wrappedValue: s)
@@ -51,26 +57,23 @@ struct ContentView: View {
                 }
                 .pickerStyle(.segmented)
                 ScrollView {
-                    if store.state.route.tab == .run {
-                        RunPanelView(
+                    switch store.state.route.tab {
+                    case .run:
+                        RunTabView(
                             store: store,
                             viewModel: viewModel,
                             trackVM: trackVM,
-                            mockTrackTitle: store.state.mockTrackTitle,
-                            quickActions: store.state.quickActions,
-                            sections: store.state.sections,
-                            pickFile: { pickFile() },
-                            pickDirectory: { pickDirectory() },
+                            pickFile: { services.filePicker.pickFile() },
+                            pickDirectory: { services.filePicker.pickDirectory() },
                             revealSidecar: revealSidecar(path:),
                             copyJSON: copyJSON,
                             onPreviewRich: { path in loadHistoryPreview(path: path) }
                         )
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    } else if store.state.route.tab == .history {
+                    case .history:
                         historyPane
                             .frame(maxWidth: .infinity, alignment: .leading)
-                    } else {
-                        // Style tab temporarily hidden on macOS 12; keep Run/History only.
+                    case .style:
                         EmptyView()
                     }
                 }
@@ -93,12 +96,12 @@ struct ContentView: View {
         }
         .preferredColorScheme(store.state.useDarkTheme ? .dark : .light)
         .onAppear {
-            applyTheme(store.state.useDarkTheme)
+            if store.state.useDarkTheme { MAStyle.useDarkTheme() } else { MAStyle.useLightTheme() }
             reloadHistory()
             hydratePreviewCache()
         }
         .onChange(of: store.state.useDarkTheme) { isDark in
-            applyTheme(isDark)
+            if isDark { MAStyle.useDarkTheme() } else { MAStyle.useLightTheme() }
         }
         .onReceive(store.commandVM.queueVM.objectWillChange) { _ in
             scheduleHistoryReload()
@@ -590,44 +593,14 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
-enum ResultPane: Hashable {
-    case json, stdout, stderr
-
-    var title: String {
-        switch self {
-        case .json: return "parsed JSON"
-        case .stdout: return "stdout"
-        case .stderr: return "stderr"
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .json: return .blue
-        case .stdout: return .green
-        case .stderr: return .red
-        }
-    }
-}
-
 // MARK: - Pickers
 extension ContentView {
     private func pickFile() -> URL? {
-        let panel = NSOpenPanel()
-        panel.allowsMultipleSelection = false
-        panel.canChooseDirectories = false
-        panel.canChooseFiles = true
-        let response = panel.runModal()
-        return response == .OK ? panel.urls.first : nil
+        services.filePicker.pickFile()
     }
 
     private func pickDirectory() -> URL? {
-        let panel = NSOpenPanel()
-        panel.allowsMultipleSelection = false
-        panel.canChooseDirectories = true
-        panel.canChooseFiles = false
-        let response = panel.runModal()
-        return response == .OK ? panel.urls.first : nil
+        services.filePicker.pickDirectory()
     }
 
     private func revealSidecar(path: String) {
@@ -651,56 +624,61 @@ extension ContentView {
     }
 
     private func reloadHistory() {
+        historyReloadTask?.cancel()
+        historyReloadTask = Task(priority: .utility) { await reloadHistoryAsync() }
+    }
+
+    private func reloadHistoryAsync() async {
+        let signpostID = Perf.begin(Perf.historyLog, "history.reload")
         let fm = FileManager.default
         let supportDir = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let sidecarDir = supportDir.appendingPathComponent("MusicAdvisorMacApp/sidecars", isDirectory: true)
-        guard let urls = try? fm.contentsOfDirectory(at: sidecarDir, includingPropertiesForKeys: [.contentModificationDateKey], options: [.skipsHiddenFiles]) else {
-            let persisted = historyStore.load()
-            if persisted.isEmpty {
-                store.dispatch(.setHistoryItems([]))
-            } else {
-                store.dispatch(.setHistoryItems(persisted))
+        if let urls = try? fm.contentsOfDirectory(at: sidecarDir,
+                                                  includingPropertiesForKeys: [.contentModificationDateKey],
+                                                  options: [.skipsHiddenFiles]) {
+            let items: [SidecarItem] = urls.compactMap { url in
+                let attrs = try? url.resourceValues(forKeys: [.contentModificationDateKey])
+                let mod = attrs?.contentModificationDate ?? Date.distantPast
+                return SidecarItem(path: url.path, name: url.lastPathComponent, modified: mod)
             }
-            // Warn on load failure only once.
-            store.dispatch(.setAlert(AlertState(title: "History load",
-                                                message: "Could not read sidecars directory; using cached history if available.",
-                                                level: .warning,
-                                                presentAsToast: true)))
+            let sorted = items.sorted { $0.modified > $1.modified }
+            await MainActor.run {
+                store.dispatch(.setHistoryItems(sorted))
+                historyStore.save(sorted)
+            }
+            Perf.end(Perf.historyLog, "history.reload", signpostID)
             return
         }
-        let items: [SidecarItem] = urls.compactMap { url in
-            let attrs = try? url.resourceValues(forKeys: [.contentModificationDateKey])
-            let mod = attrs?.contentModificationDate ?? Date.distantPast
-            return SidecarItem(path: url.path, name: url.lastPathComponent, modified: mod)
+
+        // Fallback to cached history if sidecar directory is missing.
+        let (persisted, _) = await historyStore.loadAsync(filterExisting: true)
+        await MainActor.run {
+            store.dispatch(.setHistoryItems(persisted))
+            store.dispatch(.setAlert(AlertHelper.toast("History load",
+                                                       message: "Could not read sidecars directory; using cached history if available.",
+                                                       level: .warning)))
         }
-        let sorted = items.sorted { $0.modified > $1.modified }
-        store.dispatch(.setHistoryItems(sorted))
-        historyStore.save(sorted)
+        Perf.end(Perf.historyLog, "history.reload", signpostID)
     }
 
     private func scheduleHistoryReload() {
-        historyReloadWork?.cancel()
-        let work = DispatchWorkItem { reloadHistory() }
-        historyReloadWork = work
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: work)
+        historyReloadTask?.cancel()
+        historyReloadTask = Task(priority: .utility) {
+            try? await Task.sleep(nanoseconds: 350_000_000)
+            await reloadHistoryAsync()
+        }
     }
 
     private func hydratePreviewCache() {
-        let fm = FileManager.default
-        let cached = previewCacheStore.load()
-        guard !cached.isEmpty else { return }
-        var liveCache: [String: (HistoryPreview, Date?)] = [:]
-        var livePreviews: [String: HistoryPreview] = [:]
-        for (path, value) in cached {
-            if fm.fileExists(atPath: path) {
-                liveCache[path] = value
-                livePreviews[path] = value.0
-            }
-        }
-        if !liveCache.isEmpty {
-            store.state.previewCache = liveCache
-            for (path, preview) in livePreviews {
-                store.dispatch(.setHistoryPreview(path: path, preview: preview))
+        previewHydrateTask?.cancel()
+        previewHydrateTask = Task.detached(priority: .utility) {
+            let cached = await previewCacheStore.loadAsync(filterExisting: true)
+            guard !cached.isEmpty else { return }
+            await MainActor.run {
+                store.state.previewCache = cached
+                for (path, preview) in cached {
+                    store.dispatch(.setHistoryPreview(path: path, preview: preview.0))
+                }
             }
         }
     }
@@ -710,83 +688,29 @@ extension ContentView {
             store.dispatch(.setHistoryPreview(path: path, preview: cached.0))
             return
         }
-        Task.detached {
-            let sidecarText: String
-            if let data = FileManager.default.contents(atPath: path),
-               let txt = String(data: data, encoding: .utf8) {
-                sidecarText = txt
-            } else {
-                sidecarText = "(unreadable)"
-            }
-            var richText: String?
-            var richFound = false
-            var richPathUsed: String?
-            // Try sibling rich file first.
-            let richPath = path.replacingOccurrences(of: ".json", with: ".client.rich.txt")
-            if FileManager.default.fileExists(atPath: richPath),
-               let data = FileManager.default.contents(atPath: richPath),
-               let txt = String(data: data, encoding: .utf8) {
-                richText = txt
-                richFound = true
-                richPathUsed = richPath
-            } else {
-                // Fallback: search the repo features_output tree for a matching rich file by basename.
-                let baseName = URL(fileURLWithPath: path).deletingPathExtension().lastPathComponent
-                var candidates: [String] = [baseName]
-                if let lastUnderscore = baseName.lastIndex(of: "_") {
-                    let truncated = String(baseName[..<lastUnderscore])
-                    candidates.append(truncated)
-                }
-                let repoRoot = URL(fileURLWithPath: "/Users/keithhetrick/music-advisor")
-                let featuresRoot = repoRoot.appendingPathComponent("data/features_output")
-                if let enumerator = FileManager.default.enumerator(at: featuresRoot, includingPropertiesForKeys: nil) {
-                    var steps = 0
-                    let maxSteps = 5000
-                    for case let url as URL in enumerator {
-                        steps += 1
-                        if steps > maxSteps { break }
-                        for candidate in candidates {
-                            if url.lastPathComponent == "\(candidate).client.rich.txt",
-                               let data = try? Data(contentsOf: url),
-                               let txt = String(data: data, encoding: .utf8) {
-                                richText = txt
-                                richFound = true
-                                richPathUsed = url.path
-                                break
-                            }
-                        }
-                        if richFound { break }
-                    }
-                }
-            }
-            let preview = HistoryPreview(sidecar: sidecarText, rich: richText, richFound: richFound, richPath: richPathUsed)
-            let mtime = (try? FileManager.default.attributesOfItem(atPath: path)[.modificationDate] as? Date) ?? nil
-            let unreadable = sidecarText == "(unreadable)"
-            let missingRich = !richFound
+        Task {
+            let signpostID = Perf.begin(Perf.previewLog, "preview.load")
+            let (preview, mtime, unreadable, missingRich) = await previewLoader.load(path: path)
             await MainActor.run {
-                // Cache with mtime so we can reuse until file changes.
                 store.dispatch(.setPreviewCache(path: path, preview: preview))
                 store.dispatch(.setHistoryPreview(path: path, preview: preview))
-                // Store cache with mtime directly on state to avoid extra dispatch plumbing.
                 var cache = store.state.previewCache
                 cache[path] = (preview, mtime)
                 store.state.previewCache = cache
-
                 previewCacheStore.save(cache)
 
                 if unreadable {
-                    store.dispatch(.setAlert(AlertState(title: "Preview unreadable",
-                                                        message: "Could not read sidecar at \(path)",
-                                                        level: .warning,
-                                                        presentAsToast: true)))
+                    showAlertThrottled(key: "preview_unreadable",
+                                       alert: AlertHelper.toast("Preview unreadable",
+                                                                message: "Could not read sidecar at \(path)",
+                                                                level: .warning))
                 } else if missingRich {
-                    store.dispatch(.setAlert(AlertState(title: "Rich preview missing",
-                                                        message: "No .client.rich.txt found for \(URL(fileURLWithPath: path).lastPathComponent)",
-                                                        level: .info,
-                                                        presentAsToast: true)))
+                    showAlertThrottled(key: "preview_missing_rich",
+                                       alert: AlertHelper.toast("Rich preview missing",
+                                                                message: "No .client.rich.txt found for \(URL(fileURLWithPath: path).lastPathComponent)",
+                                                                level: .info))
                 }
 
-                // Prune cache if file disappeared
                 var prunedCache = store.state.previewCache
                 for key in prunedCache.keys {
                     if !FileManager.default.fileExists(atPath: key) {
@@ -796,20 +720,23 @@ extension ContentView {
                 store.state.previewCache = prunedCache
                 previewCacheStore.save(prunedCache)
 
-                // Prune history items that vanished
                 let existingHistory = store.state.historyItems.filter { FileManager.default.fileExists(atPath: $0.path) }
                 if existingHistory.count != store.state.historyItems.count {
                     store.dispatch(.setHistoryItems(existingHistory))
                     historyStore.save(existingHistory)
                 }
             }
+            Perf.end(Perf.previewLog, "preview.load", signpostID)
         }
     }
-}
 
-struct HistoryPreview: Hashable {
-    let sidecar: String
-    let rich: String?
-    let richFound: Bool
-    let richPath: String?
+    @MainActor
+    private func showAlertThrottled(key: String, alert: AlertState, minInterval: TimeInterval = 1.2) {
+        let now = Date()
+        if let last = alertTimestamps[key], now.timeIntervalSince(last) < minInterval {
+            return
+        }
+        alertTimestamps[key] = now
+        store.dispatch(.setAlert(alert))
+    }
 }
