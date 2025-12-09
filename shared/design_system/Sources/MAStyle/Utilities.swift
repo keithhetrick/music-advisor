@@ -1,5 +1,7 @@
 import SwiftUI
 
+// MARK: - Icons
+
 public struct MAIcon: View {
     let systemName: String
     let size: CGFloat
@@ -57,6 +59,7 @@ public struct MATag: View {
     }
 }
 
+// MARK: - Layout / Background
 public struct MAStackSpacing: ViewModifier {
     let spacing: CGFloat
     public func body(content: Content) -> some View {
@@ -114,6 +117,7 @@ public struct GradientStroke: ViewModifier {
     }
 }
 
+// MARK: - Text / Section Styling
 public struct SectionTitle: ViewModifier {
     public func body(content: Content) -> some View {
         if #available(macOS 13.0, *) {
@@ -131,6 +135,7 @@ public struct SectionTitle: ViewModifier {
     }
 }
 
+// MARK: - Focus / Skeleton / Effects
 public struct FocusRing: ViewModifier {
     let isFocused: Bool
     public func body(content: Content) -> some View {
@@ -214,6 +219,37 @@ public struct SlideIn: ViewModifier {
     }
 }
 
+// MARK: - Hover Icon Button
+public struct HoverIconButton: View {
+    let systemName: String
+    let action: () -> Void
+    let size: CGFloat
+    let weight: Font.Weight
+    @State private var hovering = false
+
+    public init(_ systemName: String,
+                size: CGFloat = 12,
+                weight: Font.Weight = .medium,
+                action: @escaping () -> Void) {
+        self.systemName = systemName
+        self.action = action
+        self.size = size
+        self.weight = weight
+    }
+
+    public var body: some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: size, weight: weight))
+                .foregroundColor(MAStyle.ColorToken.muted)
+                .opacity(hovering ? 1.0 : 0.0)
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering = $0 }
+    }
+}
+
+// MARK: - Motion Effects
 public struct FloatEffect: ViewModifier {
     let amplitude: CGFloat
     let duration: Double
@@ -256,6 +292,7 @@ public struct ShakeEffect: GeometryEffect {
 }
 
 extension View {
+    // MARK: - Icons / Tags
     public func maIcon(_ systemName: String, size: CGFloat = 14, weight: Font.Weight = .regular, color: Color? = nil) -> some View {
         MAIcon(systemName, size: size, weight: weight, color: color)
     }
@@ -264,6 +301,7 @@ extension View {
         MATag(text, icon: icon, tone: tone)
     }
 
+    // MARK: - Layout / Background
     public func maStackSpacing(_ spacing: CGFloat = MAStyle.Spacing.sm) -> some View {
         modifier(MAStackSpacing(spacing: spacing))
     }
@@ -280,6 +318,7 @@ extension View {
         modifier(GradientStroke(colors: colors, lineWidth: lineWidth))
     }
 
+    // MARK: - Text / Focus
     public func maSectionTitle() -> some View {
         modifier(SectionTitle())
     }
@@ -292,6 +331,7 @@ extension View {
         self.animation(MAStyle.reduceMotionEnabled ? nil : animation, value: value)
     }
 
+    // MARK: - Controls / Pickers
     public func maSegmentedStyle() -> some View {
         self
             .padding(.vertical, MAStyle.Spacing.xs)

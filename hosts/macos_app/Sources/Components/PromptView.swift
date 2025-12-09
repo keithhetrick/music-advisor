@@ -27,10 +27,14 @@ struct PromptView: View {
             TextField("Type a message…", text: $text)
                 .maInput()
                 .focused(focus)
+                .disabled(false)
+                .focusable(true)
                 .onSubmit { onSend() }
         } else {
             TextField("Type a message…", text: $text)
                 .maInput()
+                .disabled(false)
+                .focusable(true)
                 .onSubmit { onSend() }
         }
     }

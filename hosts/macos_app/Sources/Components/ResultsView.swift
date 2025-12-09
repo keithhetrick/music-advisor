@@ -98,6 +98,7 @@ struct ResultsView: View {
             Text(title).maText(.headline)
             ScrollView {
                 Text(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "(empty)" : text.trimmingCharacters(in: .whitespacesAndNewlines))
+                    .maCardInteractive()
                     .font(MAStyle.Typography.bodyMono)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(MAStyle.Spacing.sm)

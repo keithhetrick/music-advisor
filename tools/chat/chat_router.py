@@ -329,6 +329,37 @@ def _compare_summary(client_path: Path) -> str:
     return " ".join(parts) if parts else "Compare not available."
 
 
+def _fallback_summary(session: ChatSession) -> str:
+    """
+    Generic summary fallback when intent is unknown.
+    Attempts to read the .client.rich.txt and return a trimmed excerpt with basic artifact hints.
+    """
+    path = session.client_path
+    if not path or not path.exists():
+        return "Context missing or unreadable; please provide a .client.rich.txt path."
+    try:
+        text = path.read_text()
+        excerpt = text.strip().replace("\r", " ").replace("\n\n", "\n")
+        if len(excerpt) > 1200:
+            excerpt = excerpt[:1200] + "... [truncated]"
+    except Exception:
+        excerpt = "Could not read .client.rich.txt content."
+
+    base = path.parent
+    stem = path.name.replace(".client.rich.txt", "")
+    flags = []
+    if (base / f"{stem}.tempo_norms.json").exists():
+        flags.append("tempo")
+    if (base / f"{stem}.key_norms.json").exists():
+        flags.append("key")
+    if (base / f"{stem}.neighbors.json").exists():
+        flags.append("neighbors")
+    if any(base.glob(f"{stem}*.hci.json")):
+        flags.append("hci")
+    flag_str = f"Artifacts present: {', '.join(flags)}" if flags else "No tempo/key/neighbor/HCI artifacts found."
+    return f"{flag_str}\n\nExcerpt:\n{excerpt}"
+
+
 def route_message(session: ChatSession, message: str, client_path: Optional[Path] = None) -> str:
     """
     Route a chat message. If client_path is provided, set it on the session.
@@ -446,7 +477,8 @@ def route_message(session: ChatSession, message: str, client_path: Optional[Path
         session.last_reply = reply
         session.history.append(reply)
         return _clamp_length(session, _maybe_paraphrase(session, reply))
-    reply = "Unknown intent. Ask about tempo or key overlays."
+    # Fallback generic summary from the .client.rich.txt so users are not stuck.
+    reply = _fallback_summary(session)
     session.last_reply = reply
     session.history.append(reply)
     return _clamp_length(session, _maybe_paraphrase(session, reply))

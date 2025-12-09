@@ -7,6 +7,7 @@ struct HistorySplitView: View {
     let revealSidecar: (String) -> Void
     let loadPreview: (String) -> Void
     let reRun: (SidecarItem?) -> Void
+    let onSelectContext: (String) -> Void
     let historySearchFocus: FocusState<Bool>.Binding
     @Binding var confirmClearHistory: Bool
     @State private var searchText: String = ""
@@ -28,7 +29,11 @@ struct HistorySplitView: View {
                     loadPreview(path)
                     selected = store.state.historyItems.first(where: { $0.path == path })
                 },
-                onClear: { confirmClearHistory = true }
+                onClear: { confirmClearHistory = true },
+                onSelectContext: { path in
+                    selected = store.state.historyItems.first(where: { $0.path == path })
+                    onSelectContext(path)
+                }
             )
             .alert("Clear history?", isPresented: $confirmClearHistory) {
                 Button("Cancel", role: .cancel) {}
@@ -70,10 +75,11 @@ struct HistorySplitView: View {
                 .focused(historySearchFocus)
                 .accessibilityLabel("Search history")
             Toggle("Rich only", isOn: $filterRichOnly)
-                .toggleStyle(.switch)
+                .maToggleStyle()
                 .accessibilityLabel("Filter rich previews")
             Spacer()
         }
+        .maStackSpacing(MAStyle.Spacing.xs)
         .padding(.horizontal, MAStyle.Spacing.sm)
     }
 }

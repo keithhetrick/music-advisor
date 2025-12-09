@@ -43,7 +43,7 @@ cat > "$BUNDLE_ROOT/Contents/Info.plist" <<'EOF'
 <dict>
     <key>CFBundleName</key> <string>MusicAdvisorMacApp</string>
     <key>CFBundleDisplayName</key> <string>Music Advisor</string>
-    <key>CFBundleIdentifier</key> <string>com.withrowstreet.musicadvisor.host</string>
+  <key>CFBundleIdentifier</key> <string>com.bellweatherstudios.musicadvisor.host</string>
     <key>CFBundleExecutable</key> <string>MusicAdvisorMacApp</string>
     <key>CFBundlePackageType</key> <string>APPL</string>
     <key>CFBundleShortVersionString</key> <string>0.1.0</string>

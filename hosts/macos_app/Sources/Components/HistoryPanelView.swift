@@ -8,6 +8,7 @@ struct HistoryPanelView: View {
     var onReveal: (String) -> Void
     var onPreview: (String) -> Void
     var onClear: () -> Void
+    var onSelectContext: (String) -> Void = { _ in }
     @State private var isExpanded: [String: Bool] = [:]
 
     var body: some View {
@@ -32,16 +33,21 @@ struct HistoryPanelView: View {
     }
 
     private var header: some View {
-        HStack {
-            Text("History")
-                .maText(.headline)
+        HStack(alignment: .center, spacing: MAStyle.Spacing.xs) {
+            CardHeader(title: "History",
+                       subtitle: "Saved sidecars",
+                       badge: nil,
+                       actionTitle: nil,
+                       action: {})
             Spacer()
-            Button("Clear") { onClear() }
-                .maButton(.ghost)
-                .accessibilityLabel("Clear history")
-            Button("Refresh") { onRefresh() }
-                .maButton(.ghost)
-                .accessibilityLabel("Refresh history")
+            HStack(spacing: MAStyle.Spacing.xs) {
+                Button("Refresh") { onRefresh() }
+                    .maButton(.ghost)
+                    .accessibilityLabel("Refresh history")
+                Button("Clear") { onClear() }
+                    .maButton(.ghost)
+                    .accessibilityLabel("Clear history")
+            }
         }
     }
 
@@ -68,6 +74,10 @@ struct HistoryPanelView: View {
                     .maButton(.ghost)
                 Button(previews[item.path] == nil ? "Preview" : "Reload") { onPreview(item.path) }
                     .maButton(.ghost)
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                onSelectContext(item.path)
             }
             if let preview = previews[item.path] {
                 DisclosureGroup(isExpanded: Binding(
@@ -107,8 +117,7 @@ struct HistoryPanelView: View {
                     .font(MAStyle.Typography.bodyMono)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(MAStyle.Spacing.sm)
-                    .background(MAStyle.ColorToken.panel.opacity(0.5))
-                    .cornerRadius(MAStyle.Radius.sm)
+                    .maCardInteractive()
             }
             .frame(minHeight: 80)
         }

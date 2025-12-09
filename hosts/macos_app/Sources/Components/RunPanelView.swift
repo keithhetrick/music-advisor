@@ -21,7 +21,7 @@ struct RunPanelView: View {
                 .frame(maxWidth: 260)
                 .maCardInteractive()
             VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
-                TrackHeaderView(title: mockTrackTitle, badgeText: "Norms Badge")
+                CardHeader(title: mockTrackTitle, badge: "Norms")
                     .maSheen(isActive: viewModel.isRunning, duration: 5.5, highlight: Color.white.opacity(0.12))
                 DropZoneView { urls in
                     viewModel.enqueue(files: urls)
@@ -40,10 +40,7 @@ struct RunPanelView: View {
                     .maButton(.ghost)
                 }
                 CollapsibleSection {
-                    HStack {
-                        Text("Batch Queue").maText(.headline)
-                        Spacer()
-                    }
+                    CardHeader(title: "Batch Queue")
                 } content: {
                     JobQueueView(
                         jobs: viewModel.queueVM.jobs,
@@ -65,10 +62,7 @@ struct RunPanelView: View {
                     .maCard()
                 if let trackVM {
                     CollapsibleSection {
-                        HStack {
-                            Text("Tracks").maText(.headline)
-                            Spacer()
-                        }
+                        CardHeader(title: "Tracks")
                     } content: {
                         TrackListView(viewModel: trackVM)
                     }

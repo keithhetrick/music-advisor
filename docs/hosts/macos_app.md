@@ -14,6 +14,7 @@ How to run (fast local loop)
 ```bash
 cd hosts/macos_app
 ./scripts/swift_run_local.sh
+# builds and opens the .app (focus stays in the window)
 # or manually:
 # HOME=$PWD/build/home SWIFTPM_DISABLE_SANDBOX=1 swift build --scratch-path $PWD/build/.swiftpm --disable-sandbox
 # HOME=$PWD/build/home SWIFTPM_DISABLE_SANDBOX=1 swift run   --scratch-path $PWD/build/.swiftpm --disable-sandbox

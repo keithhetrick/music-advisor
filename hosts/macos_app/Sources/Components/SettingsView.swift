@@ -11,7 +11,7 @@ struct SettingsView: View {
                 Text("Theme")
                     .maText(.caption)
                 Toggle("", isOn: $useDarkTheme)
-                    .toggleStyle(.switch)
+                    .maToggleStyle()
                     .labelsHidden()
             }
             Spacer()

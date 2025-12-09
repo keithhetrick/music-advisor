@@ -13,12 +13,18 @@ struct ContentView: View {
     @State private var historyReloadTask: Task<Void, Never>?
     @State private var previewHydrateTask: Task<Void, Never>?
     private let previewLoader = HistoryPreviewLoader()
+    private let chatProvider: ChatProvider = ChatService()
     @State private var alertTimestamps: [String: Date] = [:]
     @FocusState private var historySearchFocused: Bool
     @FocusState private var promptFocused: Bool
-    @State private var showGettingStarted: Bool = true
+    @State private var showGettingStarted: Bool = false
     @State private var confirmClearHistory: Bool = false
     private let services = AppServices()
+    @State private var chatIsThinking: Bool = false
+    @State private var chatTask: Task<Void, Never>?
+    @State private var selectedChatContext: String? = "none"
+    @State private var chatContextPathOverride: String? = nil
+    @State private var chatContextLabel: String = "No context"
     init() {
         let s = AppStore()
         _store = StateObject(wrappedValue: s)
@@ -87,6 +93,10 @@ struct ContentView: View {
                                                                                     level: .warning)))
                                     }
                                 },
+                                onSelectContext: { path in
+                                    chatContextPathOverride = path
+                                    selectedChatContext = "history"
+                                },
                                 historySearchFocus: $historySearchFocused,
                                 confirmClearHistory: $confirmClearHistory
                             )
@@ -100,9 +110,19 @@ struct ContentView: View {
                                 onSnippet: { snippet in
                                     store.dispatch(.setPrompt(snippet))
                                     promptFocused = true
+                                    if let last = viewModel.sidecarPath {
+                                        selectedChatContext = "last-run"
+                                        chatContextLabel = "Last run"
+                                        chatContextPathOverride = last
+                                    }
                                 },
-                                promptFocus: $promptFocused
-                            )
+                                onStop: stopChat,
+                                promptFocus: $promptFocused,
+                                isThinking: chatIsThinking,
+                                contextOptions: chatContextOptions(),
+                                selectedContext: $selectedChatContext,
+                                contextLabel: chatContextLabel
+                                )
                         }
                     }
                 }
@@ -139,6 +159,10 @@ struct ContentView: View {
         .preferredColorScheme(store.state.useDarkTheme ? .dark : .light)
         .overlay(shortcutButtons.opacity(0))
         .onAppear {
+            // Ensure the app becomes frontmost so text input goes to the window, not the launching terminal.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                NSApplication.shared.activate(ignoringOtherApps: true)
+            }
             if store.state.useDarkTheme { MAStyle.useDarkTheme() } else { MAStyle.useLightTheme() }
             reloadHistory()
             hydratePreviewCache()
@@ -165,6 +189,13 @@ struct ContentView: View {
                                                     level: .error)))
             } else if store.state.alert?.level == .error {
                 store.dispatch(.setAlert(nil))
+            }
+        }
+        .onChange(of: viewModel.sidecarPath) { _ in
+            // Default to the latest run sidecar when available.
+            if viewModel.sidecarPath != nil {
+                selectedChatContext = "last-run"
+                chatContextPathOverride = viewModel.sidecarPath
             }
         }
     }
@@ -591,11 +622,149 @@ private var historyPane: some View {
     }
 
     private func sendMessage() {
-        let trimmed = store.state.promptText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-        store.dispatch(.appendMessage(trimmed))
+        let prompt = store.state.promptText
+        guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         store.dispatch(.setPrompt(""))
-        store.dispatch(.appendMessage("[ack] \(trimmed)"))
+        chatTask?.cancel()
+        chatIsThinking = true
+        let selection = selectedChatContext
+        let sidecarPath = viewModel.sidecarPath
+        let overridePath = chatContextPathOverride
+        let historyItems = store.state.historyItems
+        let previewCache = store.state.previewCache
+
+        var effectiveSelection = selection
+        var effectiveOverride = overridePath
+
+        // Try to resolve normally.
+        var preResolved = ChatContextResolver.resolve(selection: effectiveSelection,
+                                                      sidecarPath: sidecarPath,
+                                                      overridePath: effectiveOverride,
+                                                      historyItems: historyItems,
+                                                      previewCache: previewCache)
+
+        // Fallback: if prompt itself is an absolute .client.rich.txt path and no context was found, use it.
+        if preResolved.path == nil, let pathFromPrompt = absoluteRichPath(from: prompt) {
+            effectiveOverride = pathFromPrompt
+            effectiveSelection = "manual-path"
+            preResolved = ChatContextResolver.resolve(selection: effectiveSelection,
+                                                      sidecarPath: sidecarPath,
+                                                      overridePath: effectiveOverride,
+                                                      historyItems: historyItems,
+                                                      previewCache: previewCache)
+            showAlertThrottled(key: "chat_manual_ctx", alert: AlertHelper.toast("Context from prompt",
+                                                                                message: "Using \(URL(fileURLWithPath: pathFromPrompt).lastPathComponent)",
+                                                                                level: .info))
+        }
+
+        if let warn = preResolved.warning {
+            showAlertThrottled(key: "chat_context_warn_pre", alert: AlertHelper.toast("Context", message: warn, level: .warning))
+        }
+        if let usedPath = preResolved.path {
+            showAlertThrottled(key: "chat_context_info", alert: AlertHelper.toast("Context", message: "Using \(URL(fileURLWithPath: usedPath).lastPathComponent)", level: .info))
+        }
+
+        let selSnapshot = effectiveSelection
+        let overrideSnapshot = effectiveOverride
+        chatTask = Task.detached {
+            let ctx = ChatContext(selection: selSnapshot,
+                                  sidecarPath: sidecarPath,
+                                  overridePath: overrideSnapshot,
+                                  historyItems: historyItems,
+                                  previewCache: previewCache)
+            let result = await chatProvider.send(prompt: prompt,
+                                                 context: ctx,
+                                                 lastSent: nil)
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                chatIsThinking = false
+                if result.rateLimited {
+                    showAlertThrottled(key: "chat_rate", alert: AlertHelper.toast("Slow down", message: "Please wait a moment between sends.", level: .info))
+                    return
+                }
+                if let warn = result.warning {
+                    showAlertThrottled(key: "chat_context_warn", alert: AlertHelper.toast("Context", message: warn, level: .warning))
+                }
+                let outgoingContext = result.label
+                let contextDetail: String = {
+                    if let path = preResolved.path {
+                        return "\(outgoingContext) (\(URL(fileURLWithPath: path).lastPathComponent))"
+                    } else {
+                        return outgoingContext
+                    }
+                }()
+                var outgoing = prompt
+                if outgoingContext != "No context" {
+                    outgoing += "\n[context: \(contextDetail)]"
+                }
+                store.dispatch(.appendMessage(outgoing))
+                if let reply = result.reply, !reply.isEmpty {
+                    store.dispatch(.appendMessage(reply))
+                    if result.timedOut || reply.contains("chat error") {
+                        store.dispatch(.setAlert(AlertHelper.toast("Chat issue", message: reply, level: .warning)))
+                    }
+                }
+                chatContextLabel = outgoingContext
+            }
+        }
+    }
+
+    private func chatContextOptions() -> [ChatContextOption] {
+        var opts: [ChatContextOption] = [
+            ChatContextOption(id: "none", label: "No context", path: nil)
+        ]
+        if let path = viewModel.sidecarPath {
+            opts.append(ChatContextOption(id: "last-run", label: "Last run", path: path))
+        }
+        if let path = chatContextPathOverride {
+            opts.append(ChatContextOption(id: "history", label: "History preview", path: path))
+        }
+        if !store.state.historyItems.isEmpty {
+            let historyOpts = store.state.historyItems.prefix(10).map {
+                ChatContextOption(id: "hist-\($0.id.uuidString)",
+                                  label: "History: \($0.name)",
+                                  path: $0.path)
+            }
+            opts.append(contentsOf: historyOpts)
+        }
+        return opts
+    }
+
+    private func contextLabelForSelection(_ sel: String?) -> String {
+        let opts = chatContextOptions()
+        guard let sel,
+              let match = opts.first(where: { $0.id == sel }) else {
+            return "No context"
+        }
+        return match.label
+    }
+
+
+    private func resolveContext() -> (String?, String) {
+        let resolution = ChatContextResolver.resolve(selection: selectedChatContext,
+                                                     sidecarPath: viewModel.sidecarPath,
+                                                     overridePath: chatContextPathOverride,
+                                                     historyItems: store.state.historyItems,
+                                                     previewCache: store.state.previewCache)
+        if let warn = resolution.warning {
+            showAlertThrottled(key: "context_missing", alert: AlertHelper.toast("Context missing", message: warn, level: .warning))
+        }
+        return (resolution.path, resolution.label)
+    }
+
+    private func stopChat() {
+        chatTask?.cancel()
+        chatIsThinking = false
+    }
+
+    private func absoluteRichPath(from prompt: String) -> String? {
+        let trimmed = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.hasPrefix("/") else { return nil }
+        guard trimmed.hasSuffix(".client.rich.txt") else { return nil }
+        if FileManager.default.fileExists(atPath: trimmed) {
+            return trimmed
+        }
+        return nil
     }
 
     private var shortcutButtons: some View {
@@ -743,6 +912,9 @@ extension ContentView {
     private func loadHistoryPreview(path: String) {
         if let cached = store.state.previewCache[path] {
             store.dispatch(.setHistoryPreview(path: path, preview: cached.0))
+            // Set chat context to this history item when previewed.
+            chatContextPathOverride = cached.0.richPath ?? path
+            selectedChatContext = "history"
             return
         }
         Task {
@@ -755,6 +927,8 @@ extension ContentView {
                 cache[path] = (preview, mtime)
                 store.state.previewCache = cache
                 previewCacheStore.save(cache)
+                chatContextPathOverride = preview.richPath ?? path
+                selectedChatContext = "history"
 
                 if unreadable {
                     showAlertThrottled(key: "preview_unreadable",

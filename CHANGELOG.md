@@ -50,7 +50,7 @@
 - Data bootstrap added: `infra/scripts/data_bootstrap.py` with manifest template to fetch assets into `data/`.
 - macOS app: route-driven reducer state, alert banners/toasts (info/warn/error), queue persistence to Application Support (best effort), preview cache and history persistence, bounded preview search, coalesced + capped stdout/stderr updates, trimmed console log buffer, host polling backoff, lazy stacks for log/history/queue, copy-pane action, and host-architecture docs; MAStyle remains the styling source of truth.
 - JUCE UI demo added under `plugins/juce_ui_demo`: custom vector controls (dials, envelope mini-view, meter), safe DSP shell, AU/VST3/Standalone via JUCE CMake; docs at `docs/juce_ui_demo.md`.
-- macOS app shell overhaul: nav rail + adaptive split panes (Run/History/Console), glassy depth via MAStyle, keyboard shortcuts (run/reveal/theme, history search, console prompt), accessibility labels on key controls, missing-file guards for reveal/rerun, snippets that prefill/focus prompt, history filters with preview card (reveal/preview/rerun), onboarding overlay, and non-blocking toasts with throttling.
+- macOS app shell overhaul: nav rail + adaptive split panes (Run/History/Console), glassy depth via MAStyle, keyboard shortcuts (run/reveal/theme, history search, console prompt), accessibility labels on key controls, missing-file guards for reveal/rerun, snippets that prefill/focus prompt, history filters with preview card (reveal/preview/rerun), onboarding overlay, non-blocking toasts with throttling, local chat stubbed reply, and `scripts/swift_run_local.sh` now opens the built .app (keyboard focus stays in window).
 
 ## v0.3.0 — 2025-11-07
 
