@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- macOS host persistence and UX: added SQLite-backed Track/Artist store with one-time migration from legacy JSON; App Support path surfaced in Settings (reveal/copy), and a default run script (`scripts/swift_run_default.sh`) to build/run without HOME overrides. Run/queue flow refined with queue-aware runs, delayed track ingestion until successful job completion, and compacted Settings data-path UI.
 - Chat UI/state: chat context labels and badges now live in `AppStore`; chat sends carry the resolved `.client.rich.txt` path end-to-end to `ChatService`; smoke script added at `hosts/macos_app/scripts/chat_smoke.sh` (supports `--prompt` and `--context`) to build and run the chat engine smoke.
 - MAStyle toasts: centralized default duration (`MAStyle.ToastDefaults.autoDismissSeconds`), left-slide/accordion fade on dismiss, reusable `ToastProgressBar`, and a single knob for toast timing.
 - macOS app UI now fully backed by MAStyle components: alerts (`AlertBanner`), prompts (`PromptBar`), headers (`HeaderBar`/`CardHeader`), chips + palettes (`ChipRow` + `FABPopover`), and rail toggle overlay. Rail width tuned (~72.6) so “History/Chat” fit without clipping; snippets use a modern FAB+popover anchored in the chips row; prompts consolidated; legacy AlertBannerView/PromptView removed. Docs updated (docs/hosts/macos_app.md) to reflect the MAStyle-backed UI.
