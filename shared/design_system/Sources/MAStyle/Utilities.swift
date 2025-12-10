@@ -142,8 +142,37 @@ public struct FocusRing: ViewModifier {
         content
             .overlay(
                 RoundedRectangle(cornerRadius: MAStyle.Radius.md)
-                    .stroke(isFocused ? MAStyle.ColorToken.primary.opacity(0.7) : Color.clear, lineWidth: 2)
+                    .stroke(
+                        isFocused ? MAStyle.ColorToken.primary.opacity(0.5) : Color.clear,
+                        lineWidth: 1.2
+                    )
             )
+    }
+}
+
+// macOS blur material wrapper (macOS 12+ safe).
+public struct VisualEffectBlur: NSViewRepresentable {
+    public let material: NSVisualEffectView.Material
+    public let blendingMode: NSVisualEffectView.BlendingMode
+
+    public init(material: NSVisualEffectView.Material = .hudWindow,
+                blendingMode: NSVisualEffectView.BlendingMode = .withinWindow) {
+        self.material = material
+        self.blendingMode = blendingMode
+    }
+
+    public func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = NSVisualEffectView()
+        view.state = .active
+        view.material = material
+        view.blendingMode = blendingMode
+        view.isEmphasized = false
+        return view
+    }
+
+    public func updateNSView(_ nsView: NSVisualEffectView, context: Context) {
+        nsView.material = material
+        nsView.blendingMode = blendingMode
     }
 }
 

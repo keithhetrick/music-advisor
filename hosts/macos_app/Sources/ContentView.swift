@@ -59,15 +59,8 @@ struct ContentView: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            LinearGradient(
-                colors: [
-                    MAStyle.ColorToken.background,
-                    MAStyle.ColorToken.panel.opacity(0.85)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+            MAStyle.Backdrop(intensity: 1.0, accent: MAStyle.ColorToken.primary)
+                .ignoresSafeArea()
 
             HStack(spacing: MAStyle.Spacing.md) {
                 NavigationRail(

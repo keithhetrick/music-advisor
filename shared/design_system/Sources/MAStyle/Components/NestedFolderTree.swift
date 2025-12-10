@@ -1,5 +1,4 @@
 import SwiftUI
-import MAStyle
 
 /// Item model for nested folder trees.
 public struct FolderTreeItem<Item>: Identifiable {

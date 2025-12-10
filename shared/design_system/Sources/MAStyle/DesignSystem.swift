@@ -90,10 +90,10 @@ public enum MAStyle {
         radius: RadiusTokens(sm: 6, md: 10, lg: 14, pill: 999),
         typography: TypographyTokens(
             bodyMono: Font.system(size: 13, weight: .regular, design: .monospaced),
-            body: Font.system(size: 14.2, weight: .regular).leading(.tight),
-            caption: Font.system(size: 12.5, weight: .regular).leading(.tight),
-            headline: Font.system(size: 17.5, weight: .semibold).leading(.tight),
-            title: Font.system(size: 22.5, weight: .semibold).leading(.tight)
+            body: Font.system(size: 15, weight: .regular),
+            caption: Font.system(size: 12, weight: .regular),
+            headline: Font.system(size: 17, weight: .semibold),
+            title: Font.system(size: 22, weight: .semibold)
         ),
         shadows: ShadowTokens(
             sm: Shadow(color: Color.black.opacity(0.28), radius: 10, x: 0, y: 6),
@@ -204,20 +204,58 @@ public enum MAStyle {
         @State private var hovering = false
 
         public func body(content: Content) -> some View {
+            let corner: CGFloat = Radius.lg * 1.4
             let base = content
                 .padding(padding)
                 .background(
                     ZStack {
-                        ColorToken.panel.opacity(0.92)
+                        // Frosted material with a soft tint.
+                        VisualEffectBlur(material: .menu, blendingMode: .withinWindow)
+                            .clipShape(RoundedRectangle(cornerRadius: corner))
+                            .blur(radius: 14)
+                        Color.white.opacity(0.05)
+                            .clipShape(RoundedRectangle(cornerRadius: corner))
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.04),
+                                ColorToken.panel.opacity(0.10),
+                                ColorToken.primary.opacity(0.03)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: corner))
                     }
+                    .opacity(0.58)
                 )
-                .cornerRadius(Radius.md)
+                .cornerRadius(corner)
                 .overlay(
-                    RoundedRectangle(cornerRadius: Radius.md)
+                    RoundedRectangle(cornerRadius: corner)
                         .stroke(ColorToken.border, lineWidth: Borders.thin)
                 )
-                .shadow(color: Color.black.opacity(0.24), radius: 12, x: 0, y: 6)
-                .shadow(color: ColorToken.primary.opacity(0.10), radius: 14, x: 0, y: 8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: corner)
+                        .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                        .blendMode(.screen)
+                )
+                // Inset feel: light inner highlight bottom/right, soft inner shadow top/left.
+                .overlay(
+                    RoundedRectangle(cornerRadius: corner)
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    Color.black.opacity(0.08),
+                                    Color.clear,
+                                    Color.white.opacity(0.08)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1.5
+                        )
+                )
+                // Softer outer shadow so the glass sits over the darker backdrop.
+                .shadow(color: Color.black.opacity(0.12), radius: 10, x: 0, y: 8)
                 .opacity(isDisabled ? 0.6 : 1.0)
 
             return base
@@ -624,6 +662,67 @@ public enum MAStyle {
         }
     }
 
+    // MARK: - Backdrop
+    /// Lightweight, vector-only backdrop with soft gradients for depth.
+    public struct Backdrop: View {
+        public var intensity: Double
+        public var accent: Color
+
+        public init(intensity: Double = 1.0, accent: Color = MAStyle.ColorToken.primary) {
+            self.intensity = intensity
+            self.accent = accent
+        }
+
+        public var body: some View {
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        MAStyle.ColorToken.panel.opacity(0.78),
+                        MAStyle.ColorToken.background.opacity(0.82)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .opacity(1.0)
+
+                RadialGradient(
+                    colors: [
+                        accent.opacity(0.12 * intensity),
+                        accent.opacity(0.04 * intensity),
+                        .clear
+                    ],
+                    center: .topLeading,
+                    startRadius: 40,
+                    endRadius: 520
+                )
+                .blur(radius: 60)
+
+                RadialGradient(
+                    colors: [
+                        MAStyle.ColorToken.background.opacity(0.06 * intensity),
+                        MAStyle.ColorToken.panel.opacity(0.04 * intensity),
+                        .clear
+                    ],
+                    center: .bottomTrailing,
+                    startRadius: 60,
+                    endRadius: 640
+                )
+                .blur(radius: 50)
+
+                LinearGradient(
+                    colors: [
+                        Color.black.opacity(0.06 * intensity),
+                        Color.clear,
+                        Color.black.opacity(0.06 * intensity)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .blendMode(.multiply)
+            }
+        }
+    }
+
     // MARK: - Theme Helpers
     public static func useDarkTheme() { theme = darkTheme }
     public static func useLightTheme(_ light: Theme? = nil) {
@@ -708,7 +807,7 @@ public enum MAStyle {
             typography: theme.typography,
             shadows: theme.shadows,
             borders: theme.borders
-        )
+                )
     }
 }
 
