@@ -93,17 +93,8 @@ def run(request: ChatRequest) -> ChatResponse:
             context_path=request.context_path,
         )
 
-    try:
-        reply = route_message(sess, request.prompt, client_path=client_path)
-    except Exception as exc:  # pragma: no cover - passthrough to caller
-        return ChatResponse(
-            reply=f"[chat error] {exc}",
-            label=request.label,
-            warning=None,
-            rate_limited=False,
-            timed_out=False,
-            context_path=request.context_path,
-        )
+    # Temporary offline placeholder: acknowledge prompt/context without dumping context or overlays.
+    reply = _format_stub(prompt=request.prompt, client_path=client_path)
 
     elapsed = time.time() - start
     timed_out = request.timeout_seconds > 0 and elapsed > request.timeout_seconds
@@ -115,4 +106,12 @@ def run(request: ChatRequest) -> ChatResponse:
         rate_limited=False,
         timed_out=timed_out,
         context_path=str(client_path) if client_path else None,
+    )
+
+
+def _format_stub(prompt: str, client_path: Optional[Path]) -> str:
+    context_label = client_path.name if client_path else "none"
+    return (
+        f"Context: {context_label}\n"
+        f"Prompt received. LLM not wired yet; no analysis performed."
     )

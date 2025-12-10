@@ -23,11 +23,32 @@ struct ContentView: View {
     private let services = AppServices()
     @State private var chatIsThinking: Bool = false
     @State private var chatTask: Task<Void, Never>?
+    @State private var contextLastUpdated: Date? = nil
     init() {
         let s = AppStore()
         _store = StateObject(wrappedValue: s)
         _viewModel = ObservedObject(wrappedValue: s.commandVM)
         self.trackVM = s.trackVM
+    }
+
+    private func handleRunDrop(providers: [NSItemProvider]) -> Bool {
+        var handled = false
+        for provider in providers {
+            if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) ||
+                provider.hasItemConformingToTypeIdentifier(UTType.audio.identifier) {
+                handled = true
+                provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
+                    if let data = item as? Data,
+                       let url = URL(dataRepresentation: data, relativeTo: nil) {
+                        Task { @MainActor in
+                            viewModel.enqueue(files: [url])
+                            trackVM?.ingestDropped(urls: [url])
+                        }
+                    }
+                }
+            }
+        }
+        return handled
     }
 
     var body: some View {
@@ -65,9 +86,10 @@ struct ContentView: View {
                         .maSheen(isActive: store.commandVM.isRunning, duration: 4.5)
                     SettingsView(useDarkTheme: Binding(get: { store.state.useDarkTheme },
                                                       set: { store.dispatch(.setTheme($0)) }),
-                                 statusText: store.commandVM.status)
+                                 statusText: store.commandVM.status,
+                                 dataPath: applicationSupportPath())
                     Divider()
-                    ScrollView {
+                    ScrollView(.vertical) {
                         switch store.state.route.tab {
                         case .run:
                             RunSplitView(
@@ -125,13 +147,14 @@ struct ContentView: View {
                                 selectedContext: chatSelectionBinding(),
                                 contextLabel: store.state.chatContextLabel,
                                 contextBadgeTitle: store.state.chatBadgeTitle,
-                                contextBadgeSubtitle: store.state.chatBadgeSubtitle
+                                contextBadgeSubtitle: store.state.chatBadgeSubtitle,
+                                contextLastUpdated: store.state.chatContextLastUpdated
                                 )
                         }
                     }
                 }
                 .padding(MAStyle.Spacing.md)
-                .frame(minWidth: 720, minHeight: 480)
+                .frame(minWidth: 720, minHeight: 480, alignment: .top)
                 .animation(.easeOut(duration: 0.2), value: showRail)
             }
             .padding(.horizontal, MAStyle.Spacing.md)
@@ -216,18 +239,24 @@ struct ContentView: View {
             // Default to the latest run sidecar when available.
             if viewModel.sidecarPath != nil {
                 setChatContext(selection: "last-run", overridePath: viewModel.sidecarPath)
+                contextLastUpdated = Date()
             }
         }
         .onChange(of: store.state.chatSelection) { newSel in
             renderChatContext(selection: newSel, overridePath: store.state.chatOverridePath)
+            contextLastUpdated = Date()
         }
         .onChange(of: store.state.chatOverridePath) { newOverride in
             renderChatContext(selection: store.state.chatSelection, overridePath: newOverride)
+            contextLastUpdated = Date()
         }
         .onAppear {
             renderChatContext(selection: store.state.chatSelection, overridePath: store.state.chatOverridePath)
         }
     }
+
+    // MARK: - Drop handling
+    // Drop handling is scoped to DropZoneView to avoid blocking scroll/gestures.
 
     private var header: some View {
         HStack {
@@ -768,9 +797,13 @@ private var historyPane: some View {
         var subtitle = "No file"
         if let path, FileManager.default.fileExists(atPath: path) {
             subtitle = URL(fileURLWithPath: path).lastPathComponent
+            store.dispatch(.setChatContextPath(path))
+        } else {
+            store.dispatch(.setChatContextPath(nil))
         }
         store.dispatch(.setChatContextLabel(title))
         store.dispatch(.setChatBadge(title: title, subtitle: subtitle))
+        store.dispatch(.setChatContextTimestamp(Date()))
     }
 
     private func performChat(prompt: String,
@@ -802,18 +835,7 @@ private var historyPane: some View {
             showAlertThrottled(key: "chat_context_warn", alert: AlertHelper.toast("Context", message: warn, level: .warning))
         }
         let outgoingContext = result.label
-        let contextDetail: String = {
-            if let path = result.contextPath {
-                return "\(outgoingContext) (\(URL(fileURLWithPath: path).lastPathComponent))"
-            } else {
-                return outgoingContext
-            }
-        }()
-        var outgoing = prompt
-        if outgoingContext != "No context" {
-            outgoing += "\n[context: \(contextDetail)]"
-        }
-        store.dispatch(.appendMessage(outgoing))
+        store.dispatch(.appendMessage(prompt))
         if let reply = result.reply, !reply.isEmpty {
             store.dispatch(.appendMessage(reply))
             if result.timedOut || reply.contains("chat error") {
@@ -1053,5 +1075,10 @@ extension ContentView {
 
     private func selectedPreviewName(_ path: String) -> String {
         URL(fileURLWithPath: path).lastPathComponent
+    }
+
+    private func applicationSupportPath() -> String? {
+        let supportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+        return supportDir?.appendingPathComponent("MusicAdvisorMacApp", isDirectory: true).path
     }
 }

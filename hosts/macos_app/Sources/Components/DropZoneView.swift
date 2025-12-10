@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 import MAStyle
 
 struct DropZoneView: View {
@@ -35,22 +36,56 @@ struct DropZoneView: View {
         .maGlass()
         .accessibilityLabel("Drop zone")
         .accessibilityHint("Drop audio files to enqueue them for processing")
-        .onDrop(of: [.fileURL], isTargeted: $isHovering) { providers in
+        .contentShape(Rectangle())
+        // Legacy-compatible drop handler (macOS 12-friendly)
+        .onDrop(of: [UTType.fileURL, UTType.audio, UTType.movie],
+                isTargeted: $isHovering) { providers in
             var urls: [URL] = []
             let group = DispatchGroup()
+
             for provider in providers {
-                group.enter()
-                _ = provider.loadObject(ofClass: URL.self) { url, _ in
-                    if let url { urls.append(url) }
-                    group.leave()
+                if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) ||
+                    provider.hasItemConformingToTypeIdentifier(UTType.audio.identifier) ||
+                    provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
+                    group.enter()
+                    loadURL(from: provider) { url in
+                        if let url {
+                            urls.append(url)
+                        }
+                        group.leave()
+                    }
                 }
             }
+
             group.notify(queue: .main) {
-                if !urls.isEmpty {
-                    onFilesDropped(urls)
+                guard !urls.isEmpty else { return }
+                onFilesDropped(urls)
+            }
+
+            return true
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func loadURL(from provider: NSItemProvider, completion: @escaping (URL?) -> Void) {
+        if provider.canLoadObject(ofClass: URL.self) {
+            _ = provider.loadObject(ofClass: URL.self) { url, _ in
+                DispatchQueue.main.async {
+                    completion(url)
                 }
             }
-            return true
+        } else {
+            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
+                DispatchQueue.main.async {
+                    if let data = item as? Data {
+                        completion(URL(dataRepresentation: data, relativeTo: nil))
+                    } else if let url = item as? URL {
+                        completion(url)
+                    } else {
+                        completion(nil)
+                    }
+                }
+            }
         }
     }
 }

@@ -38,6 +38,17 @@ cd hosts/macos_app
 ./scripts/pipeline_smoke.sh /path/to/audio.wav /tmp/ma_features_smoke.json
 ```
 
+Manual quick checks (UI)
+
+- Run the app: `./scripts/swift_run_local.sh`
+- In Console tab: pick a context (history or last-run), send a prompt, confirm badges update and toast slide/fade.
+- Run tab: drop an audio file, run, and reveal/preview sidecar; chat context should use the last run when present.
+- Full checklist: see `docs/ui_smoke.md` for a step-by-step smoke.
+
+CI notes
+
+- Sparse smokes synthesize a 0.5s 440 Hz tone (tests/fixtures/audio/tone_440.wav) and run `ma_audio_features.py` against it.
+
 Package (unsigned dev zip)
 
 ```bash

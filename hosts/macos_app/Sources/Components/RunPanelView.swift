@@ -1,6 +1,6 @@
 import SwiftUI
-import AppKit
 import MAStyle
+import AppKit
 
 struct RunPanelView: View {
     @ObservedObject var store: AppStore
@@ -14,7 +14,6 @@ struct RunPanelView: View {
     var revealSidecar: (String) -> Void
     var copyJSON: () -> Void
     var onPreviewRich: (String) -> Void
-
     var body: some View {
         HStack(alignment: .top, spacing: MAStyle.Spacing.md) {
             leftColumn

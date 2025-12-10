@@ -121,9 +121,10 @@ public struct AlertBanner: View {
     }
 
     private func dismiss() {
-        withAnimation(.spring(response: 0.5, dampingFraction: 0.85)) {
-            scaleX = 0.82
-            slideOffset = -32
+        withAnimation(.spring(response: MAStyle.ToastDefaults.dismissSpring.response,
+                              dampingFraction: MAStyle.ToastDefaults.dismissSpring.damping)) {
+            scaleX = MAStyle.ToastDefaults.collapseScaleX
+            slideOffset = -MAStyle.ToastDefaults.slideOffset
             isVisible = false
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.32) {

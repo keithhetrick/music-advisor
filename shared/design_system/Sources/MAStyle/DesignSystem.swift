@@ -140,6 +140,9 @@ public enum MAStyle {
     /// Toast defaults live here so changing once updates app-wide behavior.
     public enum ToastDefaults {
         public static var autoDismissSeconds: Double = 8.0
+        public static var slideOffset: CGFloat = 24.0
+        public static var collapseScaleX: CGFloat = 0.88
+        public static var dismissSpring: (response: Double, damping: Double) = (0.6, 0.88)
     }
 
     // MARK: - Token Accessors

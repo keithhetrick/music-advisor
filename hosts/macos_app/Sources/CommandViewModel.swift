@@ -35,6 +35,8 @@ final class CommandViewModel: ObservableObject {
     private let logLimit = 10_000
     // Optional updater for processing snapshots (actor in AppStore).
     var processingUpdater: ((String?, Double?, String?) -> Void)?
+    // Optional hook for when a job finishes; used to ingest into Tracks after success.
+    var jobCompletionHandler: ((Job, Bool) -> Void)?
 
     init(config: AppConfig = .fromEnv()) {
         self.initialConfig = config
@@ -198,16 +200,35 @@ final class CommandViewModel: ObservableObject {
                 }
 
                 if let jobID = self.currentJobID {
+                    let job = self.queueVM.jobs.first(where: { $0.id == jobID })
                     if result.exitCode == 0 {
                         self.queueVM.markDone(jobID: jobID, sidecarPath: self.sidecarPath)
+                        if let job { self.jobCompletionHandler?(job, true) }
                     } else {
                         let err = self.stderr.isEmpty ? self.status : self.stderr
                         self.queueVM.markFailed(jobID: jobID, error: err)
+                        if let job { self.jobCompletionHandler?(job, false) }
                     }
                     self.currentJobID = nil
+                    self.updateProcessingProgress(message: "finished \(job?.displayName ?? "")")
                     self.processNextJobIfNeeded()
+                } else {
+                    // Standalone run; clear processing state.
+                    self.processingUpdater?("done", 1.0, self.status)
                 }
             }
+        }
+    }
+
+    func runQueueOrSingle() {
+        // If there are pending queue jobs, process them; otherwise run the current command once.
+        if queueVM.jobs.contains(where: { $0.status == .pending }) || currentJobID != nil {
+            stopAfterCurrent = false
+            updateProcessingProgress(message: "starting queue")
+            processNextJobIfNeeded()
+        } else {
+            currentJobID = nil
+            run()
         }
     }
 
@@ -432,11 +453,13 @@ final class CommandViewModel: ObservableObject {
                        preparedOutPath: outPath)
         }
         queueVM.addPrecomputed(newJobs)
+        updateProcessingProgress(message: "queued \(newJobs.count) file(s)")
     }
 
     func startQueue() {
         stopAfterCurrent = false
         processNextJobIfNeeded()
+        updateProcessingProgress(message: "starting queue")
     }
 
     func stopQueue() {
@@ -444,12 +467,16 @@ final class CommandViewModel: ObservableObject {
         // Clear pending jobs but let the current one finish.
         queueVM.clearPending()
         processingUpdater?("stopping", nil, "pending jobs cleared")
+        updateProcessingProgress(message: "pending jobs cleared")
     }
 
     private func processNextJobIfNeeded() {
         guard !stopAfterCurrent else { return }
         guard !isRunning else { return }
-        guard let next = queueVM.jobs.first(where: { $0.status == .pending }) else { return }
+        guard let next = queueVM.jobs.first(where: { $0.status == .pending }) else {
+            updateProcessingProgress(message: "queue complete")
+            return
+        }
         currentJobID = next.id
 
         let sidecarPathForJob = next.preparedOutPath ?? makeSidecarPath(for: next.fileURL)
@@ -482,6 +509,7 @@ final class CommandViewModel: ObservableObject {
             processingUpdater?("running", 0.05, "processing \(next.displayName)")
             progressThrottle = now
         }
+        updateProcessingProgress(message: "processing \(next.displayName)")
         run()
     }
 
@@ -494,6 +522,24 @@ final class CommandViewModel: ObservableObject {
         let timestamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
         let filename = "\(base)_\(timestamp).json"
         return sidecarDir.appendingPathComponent(filename).path
+    }
+
+    private func updateProcessingProgress(message: String? = nil) {
+        let total = queueVM.jobs.count
+        guard total > 0 else {
+            processingUpdater?("idle", 0.0, message)
+            return
+        }
+        let completed = queueVM.jobs.filter { $0.status == .done }.count
+        let failed = queueVM.jobs.filter { $0.status == .failed }.count
+        let running = queueVM.jobs.contains { $0.status == .running }
+        let baseProgress = Double(completed + failed) / Double(total)
+        let progress = running ? min(0.99, baseProgress + 0.05) : baseProgress
+        let status: String
+        if running { status = "running" }
+        else if completed + failed == total { status = "done" }
+        else { status = "pending" }
+        processingUpdater?(status, progress, message)
     }
 }
 

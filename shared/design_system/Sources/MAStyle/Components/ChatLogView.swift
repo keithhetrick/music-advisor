@@ -6,12 +6,19 @@ public struct ChatLogView: View {
     @ObservedObject var scrollController: ScrollToBottomController
     let onCopy: (String) -> Void
 
+    private let minHeight: CGFloat
+    private let maxHeight: CGFloat
+
     public init(messages: [String],
                 scrollController: ScrollToBottomController,
+                minHeight: CGFloat = 180,
+                maxHeight: CGFloat = 240,
                 onCopy: @escaping (String) -> Void) {
         self.messages = messages
         self._scrollController = ObservedObject(initialValue: scrollController)
         self.onCopy = onCopy
+        self.minHeight = minHeight
+        self.maxHeight = maxHeight
     }
 
     public var body: some View {
@@ -31,6 +38,8 @@ public struct ChatLogView: View {
                     scrollController.didScrollAway()
                 })
             }
+            .accessibilityLabel("Chat messages")
+            .accessibilityElement(children: .contain)
             .onAppear {
                 proxy.scrollTo("chat-bottom", anchor: .bottom)
                 scrollController.didScrollToBottom()
@@ -48,6 +57,7 @@ public struct ChatLogView: View {
                     }
                 }
             }
+            .frame(minHeight: minHeight, maxHeight: maxHeight)
             .overlay(alignment: .bottomTrailing) {
                 if scrollController.showJump && !messages.isEmpty {
                     JumpToBottomButton {

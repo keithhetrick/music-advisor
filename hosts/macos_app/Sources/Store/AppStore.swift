@@ -23,6 +23,8 @@ enum AppAction {
     // Chat UI state
     case setChatBadge(title: String, subtitle: String)
     case setChatContextLabel(String)
+    case setChatContextTimestamp(Date?)
+    case setChatContextPath(String?)
     // Chat context
     case setChatSelection(String?)
     case setChatOverride(String?)
@@ -53,6 +55,8 @@ struct AppState {
     var chatContextLabel: String = "No context"
     var chatBadgeTitle: String = "No context"
     var chatBadgeSubtitle: String = "No file"
+    var chatContextLastUpdated: Date? = nil
+    var chatContextPath: String? = nil
 }
 
 @MainActor
@@ -78,6 +82,16 @@ final class AppStore: ObservableObject {
                 await self?.hostCoordinator.updateProcessing(status: status, progress: progress, message: message)
             }
         }
+        if let trackVM {
+            self.commandVM.jobCompletionHandler = { job, success in
+                guard success else { return }
+                Task { @MainActor in
+                    trackVM.ingestDropped(urls: [job.fileURL])
+                }
+            }
+            // Ensure track data is loaded even before the view appears (e.g., before scrolling).
+            trackVM.load()
+        }
         startHostMonitor()
     }
 
@@ -85,19 +99,50 @@ final class AppStore: ObservableObject {
         hostMonitorTask?.cancel()
     }
 
-    private static func trackStorePaths() -> (trackURL: URL, artistURL: URL) {
+    private static func trackStorePaths() -> (dbURL: URL, legacyTrackURL: URL, legacyArtistURL: URL) {
         let supportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let appDir = supportDir.appendingPathComponent("MusicAdvisorMacApp", isDirectory: true)
+        let dbURL = appDir.appendingPathComponent("MusicAdvisor.sqlite")
         let trackURL = appDir.appendingPathComponent("tracks.json")
         let artistURL = appDir.appendingPathComponent("artists.json")
-        return (trackURL, artistURL)
+        return (dbURL, trackURL, artistURL)
     }
 
     private static func makeTrackViewModel() -> TrackListViewModel {
         let paths = trackStorePaths()
-        let trackStore = JsonTrackStore(url: paths.trackURL)
-        let artistStore = JsonArtistStore(url: paths.artistURL)
-        return TrackListViewModel(trackStore: trackStore, artistStore: artistStore)
+        let sqliteStore = try? SQLiteTrackStore(url: paths.dbURL)
+
+        if let sqliteStore {
+            migrateLegacyJSONIfNeeded(into: sqliteStore,
+                                      trackURL: paths.legacyTrackURL,
+                                      artistURL: paths.legacyArtistURL)
+            return TrackListViewModel(trackStore: sqliteStore, artistStore: sqliteStore)
+        } else {
+            // Fall back to legacy JSON stores if SQLite init fails.
+            let trackStore = JsonTrackStore(url: paths.legacyTrackURL)
+            let artistStore = JsonArtistStore(url: paths.legacyArtistURL)
+            return TrackListViewModel(trackStore: trackStore, artistStore: artistStore)
+        }
+    }
+
+    private static func migrateLegacyJSONIfNeeded(into store: SQLiteTrackStore,
+                                                  trackURL: URL,
+                                                  artistURL: URL) {
+        let jsonTrackStore = JsonTrackStore(url: trackURL)
+        let jsonArtistStore = JsonArtistStore(url: artistURL)
+        let hasExistingData = (try? store.listTracks().isEmpty == false) ?? false
+        guard !hasExistingData else { return }
+        guard FileManager.default.fileExists(atPath: trackURL.path) || FileManager.default.fileExists(atPath: artistURL.path) else {
+            return
+        }
+        let artists = (try? jsonArtistStore.listArtists()) ?? []
+        let tracks = (try? jsonTrackStore.listTracks()) ?? []
+        for artist in artists {
+            try? store.upsert(artist)
+        }
+        for track in tracks {
+            try? store.upsert(track)
+        }
     }
 
     private func startHostMonitor() {
@@ -156,6 +201,10 @@ private func reduce(_ state: inout AppState, action: AppAction) {
         state.chatBadgeSubtitle = subtitle
     case .setChatContextLabel(let label):
         state.chatContextLabel = label
+    case .setChatContextTimestamp(let ts):
+        state.chatContextLastUpdated = ts
+    case .setChatContextPath(let path):
+        state.chatContextPath = path
     case .setChatSelection(let sel):
         state.chatSelection = sel
     case .setChatOverride(let path):

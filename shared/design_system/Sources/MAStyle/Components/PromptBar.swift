@@ -12,6 +12,27 @@ public struct PromptBar: View {
     let focus: FocusState<Bool>.Binding?
     @FocusState private var internalFocus: Bool
 
+    private var canSend: Bool {
+        !isThinking && !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private func sendIfPossible() {
+        guard canSend else { return }
+        onSend()
+        refocus()
+    }
+
+    private func refocus() {
+        // Keep focus for fast consecutive sends.
+        DispatchQueue.main.async {
+            if let focus = focus {
+                focus.wrappedValue = true
+            } else {
+                internalFocus = true
+            }
+        }
+    }
+
     public init(text: Binding<String>,
                 placeholder: String = "Type a message…",
                 isThinking: Bool = false,
@@ -33,11 +54,23 @@ public struct PromptBar: View {
             TextField(placeholder, text: $text)
                 .textFieldStyle(.roundedBorder)
                 .focused(focus ?? $internalFocus)
+                .submitLabel(.send)
                 .disabled(isThinking)
+                .onSubmit {
+                    sendIfPossible()
+                }
+                .onAppear {
+                    refocus()
+                }
+                .onChange(of: isThinking) { thinking in
+                    if !thinking {
+                        refocus()
+                    }
+                }
             if let trailing { trailing }
-            Button("Send") { onSend() }
+            Button("Send") { sendIfPossible() }
                 .maButton(.primary)
-                .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isThinking)
+                .disabled(!canSend)
             Button("Clear") { onClear() }
                 .maButton(.ghost)
                 .disabled(text.isEmpty)

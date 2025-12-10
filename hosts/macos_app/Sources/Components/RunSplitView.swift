@@ -1,5 +1,6 @@
 import SwiftUI
 import MAStyle
+import UniformTypeIdentifiers
 
 struct RunSplitView: View {
     @ObservedObject var store: AppStore
@@ -25,7 +26,6 @@ struct RunSplitView: View {
                 .maSheen(isActive: viewModel.isRunning, duration: 5.5, highlight: Color.white.opacity(0.12))
             DropZoneView { urls in
                 viewModel.enqueue(files: urls)
-                trackVM?.ingestDropped(urls: urls)
             }
             JobQueueView(
                 jobs: viewModel.queueVM.jobs,
@@ -42,7 +42,6 @@ struct RunSplitView: View {
                 TrackListView(viewModel: trackVM)
             }
         }
-        .maGlass()
     }
 
     private var rightPane: some View {
@@ -82,12 +81,12 @@ struct RunSplitView: View {
                 lastRunTime: viewModel.lastRunTime,
                 lastDuration: viewModel.lastDuration,
                 onRun: {
-                    Task { @MainActor in viewModel.run() }
+                    Task { @MainActor in viewModel.runQueueOrSingle() }
                 },
                 onRunDefaults: {
                     Task { @MainActor in
                         viewModel.loadDefaults()
-                        viewModel.run()
+                        viewModel.runQueueOrSingle()
                     }
                 },
                 onRunSmoke: {
@@ -127,6 +126,5 @@ struct RunSplitView: View {
                 onCopyJSON: copyJSON
             )
         }
-        .maGlass()
     }
 }

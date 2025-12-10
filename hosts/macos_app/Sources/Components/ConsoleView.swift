@@ -12,8 +12,9 @@ struct ConsoleView: View {
                 .maText(.headline)
             ChatLogView(messages: messages,
                         scrollController: scrollController,
+                        minHeight: 240,
+                        maxHeight: 240,
                         onCopy: copy)
-                .frame(minHeight: 220, maxHeight: 220)
                 .maCardInteractive()
         }
         .maCardInteractive()

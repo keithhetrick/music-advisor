@@ -18,6 +18,13 @@ swift build
 swift run
 ```
 
+Build/run with default HOME (no overrides)
+
+```bash
+cd hosts/macos_app
+./scripts/swift_run_default.sh
+```
+
 Open in Xcode
 
 ```bash
@@ -66,6 +73,12 @@ Config overrides (no code edits)
 - Optional `.env.local` (copy from `.env.local.example`) and/or JSON config at `config/defaults.json` (override path via `MA_APP_CONFIG_FILE`).
 - Env has highest priority (`MA_APP_DEFAULT_*`, `MA_APP_ENV_*`, `MA_APP_CMD/ARGS/WORKDIR`), then JSON config, then code fallback.
 - Profiles: define named presets in JSON (cmd/args/workdir/env/out). UI has a profile picker + “Apply profile” + “Reload config”.
+
+Data storage (App Support, no hard-coded paths)
+
+- All persisted app data (tracks/artists/queue/history/sidecars) lives under `~/Library/Application Support/MusicAdvisorMacApp` for the current user, following macOS conventions via `FileManager.default.urls(.applicationSupportDirectory, ...)`.
+- Running with an overridden `HOME` (e.g., `HOME=$PWD/build/home … swift run`) will redirect to `"$HOME/Library/Application Support/MusicAdvisorMacApp"`. Ensure that directory exists or copy your DB there if you want to reuse data in a sandboxed run.
+- No absolute paths are hard-coded; the active App Support path is entirely determined by the environment’s `HOME`.
 
 Design/architecture notes
 

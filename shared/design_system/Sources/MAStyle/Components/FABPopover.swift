@@ -47,6 +47,7 @@ public struct FABPopover<Item: Identifiable & Hashable>: View where Item: Custom
                 .shadow(color: .black.opacity(0.18), radius: 8, x: 0, y: 4)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("Open snippets")
         .popover(isPresented: $isPresented, attachmentAnchor: .rect(.bounds), arrowEdge: .top) {
             VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
                 HStack {
