@@ -64,6 +64,30 @@ struct DropZoneView: View {
 
             return true
         }
+        .overlay {
+            if isHovering {
+                ZStack {
+                    RoundedRectangle(cornerRadius: MAStyle.Radius.lg)
+                        .fill(.ultraThinMaterial)
+                        .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                    RoundedRectangle(cornerRadius: MAStyle.Radius.lg)
+                        .strokeBorder(MAStyle.ColorToken.primary, style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
+                    VStack(spacing: MAStyle.Spacing.sm) {
+                        Image(systemName: "tray.and.arrow.down.fill")
+                            .font(.system(size: 28, weight: .semibold))
+                            .foregroundStyle(MAStyle.ColorToken.primary)
+                        Text("Drop files here")
+                            .maText(.headline)
+                            .foregroundStyle(MAStyle.ColorToken.primary)
+                        Text("We’ll enqueue them in the batch queue.")
+                            .maText(.caption)
+                            .foregroundStyle(MAStyle.ColorToken.muted)
+                    }
+                    .padding()
+                }
+                .transition(.opacity)
+            }
+        }
         .frame(maxWidth: .infinity)
     }
 

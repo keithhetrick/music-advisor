@@ -1,10 +1,65 @@
 name: CI
 
+permissions:
+  contents: read
+
 on:
   push:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  lint-typecheck:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+          cache-dependency-path: |
+            requirements.txt
+            requirements.lock
+            engines/**/requirements*.txt
+
+      - name: Build requirements for CI
+        run: |
+          python - <<'PY'
+from pathlib import Path
+src = Path("requirements.lock")
+if not src.exists():
+    src = Path("requirements.txt")
+if not src.exists():
+    raise SystemExit("requirements file not found")
+lines = src.read_text().splitlines()
+filtered = [line for line in lines if "MusicAdvisor_BuilderPack" not in line]
+Path("/tmp/requirements.ci.txt").write_text("\n".join(filtered) + "\n")
+print(f"Wrote /tmp/requirements.ci.txt from {src}")
+PY
+
+      - name: Install dependencies (lint/typecheck)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --no-build-isolation -r /tmp/requirements.ci.txt
+          python -m pip install --no-build-isolation ruff mypy
+          python -m pip install --no-build-isolation -e engines/audio_engine -e engines/lyrics_engine -e engines/ttc_engine -e engines/recommendation_engine -e hosts/advisor_host_core -e hosts/advisor_host
+
+      - name: Ruff lint
+        run: python -m ruff check hosts/advisor_host engines/recommendation_engine/recommendation_engine tools ma_helper
+
+      - name: Mypy typecheck
+        run: python -m mypy --config-file hosts/advisor_host/pyproject.toml hosts/advisor_host
+
   quick-check:
     runs-on: ubuntu-latest
     steps:
@@ -21,10 +76,25 @@ jobs:
             requirements.lock
             engines/audio_engine/requirements.txt
 
+      - name: Build requirements for CI
+        run: |
+          python - <<'PY'
+from pathlib import Path
+src = Path("requirements.lock")
+if not src.exists():
+    src = Path("requirements.txt")
+if not src.exists():
+    raise SystemExit("requirements file not found")
+lines = src.read_text().splitlines()
+filtered = [line for line in lines if "MusicAdvisor_BuilderPack" not in line]
+Path("/tmp/requirements.ci.txt").write_text("\n".join(filtered) + "\n")
+print(f"Wrote /tmp/requirements.ci.txt from {src}")
+PY
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --no-build-isolation -r requirements.lock || python -m pip install --no-build-isolation -r requirements.txt
+          python -m pip install --no-build-isolation -r /tmp/requirements.ci.txt
           python -m pip install --no-build-isolation -r engines/audio_engine/requirements.txt || true
           python -m pip install --no-build-isolation -e engines/audio_engine -e engines/lyrics_engine -e engines/ttc_engine -e engines/recommendation_engine -e hosts/advisor_host_core -e hosts/advisor_host
 
@@ -39,6 +109,7 @@ jobs:
           tests/helper/run_helper_tests.sh
 
   swift-ui:
+    if: ${{ false }} # disabled to avoid macOS runner cost; flip to true to re-enable
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -62,3 +133,13 @@ jobs:
           HOME=$PWD/build/home \
           SWIFTPM_DISABLE_SANDBOX=1 \
           swift build --scratch-path $PWD/build/.swiftpm --disable-sandbox
+
+      - name: Upload derived data on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: swift-derived-data
+          path: |
+            shared/design_system/.build
+            hosts/macos_app/build
+          if-no-files-found: ignore

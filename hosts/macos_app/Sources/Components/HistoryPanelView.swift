@@ -29,7 +29,6 @@ struct HistoryPanelView: View {
             }
         }
         .maCard()
-        .maGlass()
     }
 
     private var header: some View {
@@ -48,10 +47,11 @@ struct HistoryPanelView: View {
 
     @ViewBuilder
     private func historyRow(item: SidecarItem) -> some View {
-        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
+        VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
             HStack(alignment: .center, spacing: MAStyle.Spacing.sm) {
                 VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
-                    Text(item.name).maText(.body)
+                    Text(item.name)
+                        .maText(.body)
                     Text(item.modified.formatted(date: .abbreviated, time: .shortened))
                         .maText(.caption)
                         .foregroundStyle(MAStyle.ColorToken.muted)
@@ -74,6 +74,7 @@ struct HistoryPanelView: View {
             .onTapGesture {
                 onSelectContext(item.path)
             }
+            Divider()
             if let preview = previews[item.path] {
                 DisclosureGroup(isExpanded: Binding(
                     get: { isExpanded[item.path] ?? false },
@@ -100,7 +101,7 @@ struct HistoryPanelView: View {
                 .padding(.top, MAStyle.Spacing.xs)
             }
         }
-        .maCardInteractive()
+        .maCard()
     }
 
     @ViewBuilder

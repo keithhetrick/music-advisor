@@ -13,10 +13,14 @@ struct HistorySplitView: View {
     @State private var searchText: String = ""
     @State private var filterRichOnly: Bool = false
     @State private var selected: SidecarItem? = nil
+    @State private var debouncedSearch: String = ""
+    private let debounceInterval: Double = 0.25
+    @State private var debounceTask: DispatchWorkItem?
 
     var body: some View {
         AdaptiveSplitView {
             filterBar
+                .maCard()
             HistoryPanelView(
                 items: filteredItems,
                 previews: store.state.historyPreviews,
@@ -35,6 +39,7 @@ struct HistorySplitView: View {
                     onSelectContext(path)
                 }
             )
+            .maCard()
             .alert("Clear history?", isPresented: $confirmClearHistory) {
                 Button("Cancel", role: .cancel) {}
                 Button("Clear", role: .destructive) {
@@ -57,12 +62,14 @@ struct HistorySplitView: View {
                 },
                 onRerun: { reRun(selected) }
             )
+            .maCard()
         }
     }
 
     private var filteredItems: [SidecarItem] {
         store.state.historyItems.filter { item in
-            let matchesSearch = searchText.isEmpty || item.name.localizedCaseInsensitiveContains(searchText) || item.path.localizedCaseInsensitiveContains(searchText)
+            let term = debouncedSearch.trimmingCharacters(in: .whitespacesAndNewlines)
+            let matchesSearch = term.isEmpty || item.name.localizedCaseInsensitiveContains(term) || item.path.localizedCaseInsensitiveContains(term)
             let matchesRich = !filterRichOnly || store.state.historyPreviews[item.path]?.richFound == true
             return matchesSearch && matchesRich
         }
@@ -81,5 +88,11 @@ struct HistorySplitView: View {
         }
         .maStackSpacing(MAStyle.Spacing.xs)
         .padding(.horizontal, MAStyle.Spacing.sm)
+        .onChange(of: searchText) { newValue in
+            debounceTask?.cancel()
+            let task = DispatchWorkItem { debouncedSearch = newValue }
+            debounceTask = task
+            DispatchQueue.main.asyncAfter(deadline: .now() + debounceInterval, execute: task)
+        }
     }
 }

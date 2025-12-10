@@ -184,6 +184,33 @@ public struct SkeletonView: View {
     }
 }
 
+// MARK: - Transitions / Motion
+public extension View {
+    /// Applies a subtle fade/slide when appearing.
+    func maModalTransition() -> some View {
+        transition(.move(edge: .top).combined(with: .opacity))
+    }
+
+    /// Hover lift for cards or buttons.
+    func maHoverLift(enabled: Bool = true) -> some View {
+        modifier(MAHoverLift(enabled: enabled))
+    }
+}
+
+private struct MAHoverLift: ViewModifier {
+    @State private var hovering = false
+    var enabled: Bool = true
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(hovering && enabled ? 1.01 : 1.0)
+            .shadow(color: hovering && enabled ? Color.black.opacity(0.25) : Color.clear,
+                    radius: hovering && enabled ? 12 : 0,
+                    x: 0, y: hovering && enabled ? 6 : 0)
+            .animation(.easeInOut(duration: 0.15), value: hovering)
+            .onHover { hovering = enabled && $0 }
+    }
+}
+
 public struct PulseEffect: ViewModifier {
     let isActive: Bool
     @State private var animate = false
@@ -216,6 +243,26 @@ public struct SlideIn: ViewModifier {
                     offset = 0
                 }
             }
+    }
+}
+
+// MARK: - Active Outline / State Helpers
+public extension View {
+    /// Applies a subtle active outline and fill for selected/processing states.
+    func maActiveOutline(isActive: Bool,
+                         cornerRadius: CGFloat = MAStyle.Radius.md,
+                         fillOpacity: Double = 0.08,
+                         strokeOpacity: Double = 0.35,
+                         lineWidth: CGFloat = 1.2) -> some View {
+        overlay(
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(isActive ? MAStyle.ColorToken.primary.opacity(strokeOpacity) : Color.clear,
+                        lineWidth: isActive ? lineWidth : 0)
+        )
+        .background(
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(isActive ? MAStyle.ColorToken.primary.opacity(fillOpacity) : Color.clear)
+        )
     }
 }
 

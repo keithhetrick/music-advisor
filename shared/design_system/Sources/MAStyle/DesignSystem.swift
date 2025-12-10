@@ -1,4 +1,6 @@
 import SwiftUI
+import Combine
+import AppKit
 
 public enum MAStyle {
     // MARK: - Theme Backbone
@@ -73,31 +75,31 @@ public enum MAStyle {
     // This is the single source of truth for initial colors/spacing/radius/etc.
     private static let defaultDark = Theme(
         colors: ColorTokens(
-            background: Color(red: 0.04, green: 0.05, blue: 0.08),     // deeper midnight
-            panel: Color(red: 0.08, green: 0.09, blue: 0.14),          // luxury charcoal
+            background: Color(red: 0.05, green: 0.06, blue: 0.08),     // charcoal base
+            panel: Color(red: 0.10, green: 0.11, blue: 0.15),          // deep panel
             border: Color.white.opacity(0.12),
-            primary: Color(red: 0.16, green: 0.78, blue: 0.72),        // elegant teal
-            success: Color(red: 0.38, green: 0.90, blue: 0.60),
-            warning: Color(red: 0.96, green: 0.70, blue: 0.36),
-            danger: Color(red: 0.90, green: 0.32, blue: 0.46),
+            primary: Color(red: 0.42, green: 0.64, blue: 0.82),        // crisp neutral steel
+            success: Color(red: 0.42, green: 0.82, blue: 0.56),
+            warning: Color(red: 0.95, green: 0.72, blue: 0.38),
+            danger: Color(red: 0.88, green: 0.30, blue: 0.44),
             info: Color(red: 0.48, green: 0.68, blue: 0.96),
-            muted: Color.white.opacity(0.82),
+            muted: Color.white.opacity(0.84),
             metricBG: Color.white.opacity(0.08)
         ),
         spacing: SpacingTokens(xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 28),
         radius: RadiusTokens(sm: 6, md: 10, lg: 14, pill: 999),
         typography: TypographyTokens(
             bodyMono: Font.system(size: 13, weight: .regular, design: .monospaced),
-            body: Font.system(size: 14, weight: .regular),
-            caption: Font.system(size: 12, weight: .regular),
-            headline: Font.system(size: 16, weight: .semibold),
-            title: Font.system(size: 20, weight: .semibold)
+            body: Font.system(size: 14.2, weight: .regular).leading(.tight),
+            caption: Font.system(size: 12.5, weight: .regular).leading(.tight),
+            headline: Font.system(size: 17.5, weight: .semibold).leading(.tight),
+            title: Font.system(size: 22.5, weight: .semibold).leading(.tight)
         ),
         shadows: ShadowTokens(
-            sm: Shadow(color: Color.black.opacity(0.30), radius: 10, x: 0, y: 6),
-            md: Shadow(color: Color.black.opacity(0.42), radius: 18, x: 0, y: 10)
+            sm: Shadow(color: Color.black.opacity(0.28), radius: 10, x: 0, y: 6),
+            md: Shadow(color: Color.black.opacity(0.36), radius: 16, x: 0, y: 10)
         ),
-        borders: BorderTokens(thin: 1, regular: 1.5)
+        borders: BorderTokens(thin: 1, regular: 1.4)
     )
 
     /// Global theme state. Swap to a different Theme to reskin; defaults to `defaultDark`.
@@ -206,63 +208,21 @@ public enum MAStyle {
                 .padding(padding)
                 .background(
                     ZStack {
-                        LinearGradient(
-                            colors: [
-                                ColorToken.panel.opacity(0.98),
-                                ColorToken.panel.opacity(0.72)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                        RoundedRectangle(cornerRadius: Radius.md)
-                            .stroke(Color.white.opacity(0.06), lineWidth: 1)
-                            .blur(radius: 1.2)
-                            .blendMode(.screen)
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.10),
-                                Color.white.opacity(0.02)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                        .mask(
-                            RoundedRectangle(cornerRadius: Radius.md)
-                                .padding(.top, 2)
-                        )
+                        ColorToken.panel.opacity(0.92)
                     }
                 )
                 .cornerRadius(Radius.md)
                 .overlay(
                     RoundedRectangle(cornerRadius: Radius.md)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.10),
-                                    ColorToken.border
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: Borders.thin
-                        )
+                        .stroke(ColorToken.border, lineWidth: Borders.thin)
                 )
-                .overlay(
-                    RoundedRectangle(cornerRadius: Radius.md)
-                        .stroke(Color.black.opacity(0.25), lineWidth: 1)
-                        .blur(radius: 4)
-                        .offset(y: 2)
-                        .mask(
-                            RoundedRectangle(cornerRadius: Radius.md)
-                        )
-                )
-                .shadow(color: Color.black.opacity(0.42), radius: 18, x: 0, y: 12)
-                .shadow(color: ColorToken.primary.opacity(0.12), radius: 26, x: 0, y: 18)
+                .shadow(color: Color.black.opacity(0.24), radius: 12, x: 0, y: 6)
+                .shadow(color: ColorToken.primary.opacity(0.10), radius: 14, x: 0, y: 8)
                 .opacity(isDisabled ? 0.6 : 1.0)
 
             return base
-                .scaleEffect(isInteractive && hovering ? 1.01 : 1.0)
-                .animation(.easeOut(duration: 0.12), value: hovering)
+                .scaleEffect(isInteractive && hovering ? 1.005 : 1.0)
+                .animation(.easeOut(duration: 0.10), value: hovering)
                 .onHover { hovering = $0 && isInteractive && !isDisabled }
         }
     }
@@ -393,8 +353,8 @@ public enum MAStyle {
                                     )
                                 )
                                 .foregroundColor(.white)
-                                .shadow(color: Color.black.opacity(0.35), radius: 12, x: 0, y: 6)
-                                .shadow(color: MAStyle.ColorToken.primary.opacity(0.20), radius: 16, x: 0, y: 10)
+                                .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: 5)
+                                .shadow(color: MAStyle.ColorToken.primary.opacity(0.16), radius: 12, x: 0, y: 8)
                         )
                     case .secondary:
                         return AnyView(
@@ -420,12 +380,32 @@ public enum MAStyle {
                                 .padding(.leading, MAStyle.Spacing.xs)
                         }
                     }
+                    .overlay(
+                        RoundedRectangle(cornerRadius: MAStyle.Radius.md)
+                            .stroke(focusGlow(configuration), lineWidth: focusGlowWidth(configuration))
+                            .opacity(configuration.isPressed ? 0.7 : (hovering ? 0.5 : 0.35))
+                    )
                     .opacity(configuration.isPressed ? 0.88 : (isBusy ? 0.85 : 1.0))
                     .scaleEffect(configuration.isPressed ? 0.98 : (hovering ? hoverScale : 1.0))
                     .animation(.spring(response: 0.18, dampingFraction: 0.8), value: configuration.isPressed)
                     .animation(.easeOut(duration: 0.12), value: hovering)
                     .onHover { hovering = $0 }
                     .disabled(isBusy)
+            }
+
+            private func focusGlow(_ configuration: Configuration) -> Color {
+                switch variant {
+                case .primary, .busy:
+                    return MAStyle.ColorToken.primary.opacity(0.45)
+                case .secondary:
+                    return MAStyle.ColorToken.primary.opacity(0.35)
+                case .ghost:
+                    return MAStyle.ColorToken.border.opacity(0.25)
+                }
+            }
+
+            private func focusGlowWidth(_ configuration: Configuration) -> CGFloat {
+                configuration.isPressed ? 2.2 : 1.6
             }
         }
     }
@@ -680,6 +660,34 @@ public enum MAStyle {
         }
     }
 
+    // MARK: - Appearance helpers
+    /// Returns true when the current system appearance is dark.
+    public static func systemPrefersDark() -> Bool {
+        let best = NSApplication.shared.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua])
+        return best == .darkAqua
+    }
+
+    /// Publisher that emits when the system appearance changes, with the current dark/light boolean.
+    public static func appearanceChangePublisher() -> AnyPublisher<Bool, Never> {
+        DistributedNotificationCenter.default()
+            .publisher(for: Notification.Name("AppleInterfaceThemeChangedNotification"))
+            .map { _ in systemPrefersDark() }
+            .eraseToAnyPublisher()
+    }
+
+    /// Apply theme based on follow-system vs manual flags. Returns the effective dark/light value applied.
+    @discardableResult
+    public static func applyTheme(followSystem: Bool, manualDark: Bool) -> Bool {
+        let systemDark = systemPrefersDark()
+        let effectiveDark = followSystem ? systemDark : manualDark
+        if effectiveDark {
+            MAStyle.useDarkTheme()
+        } else {
+            MAStyle.useLightTheme()
+        }
+        return effectiveDark
+    }
+
     public static func useHighContrastTheme() {
         theme = highContrastTheme
     }
@@ -707,7 +715,7 @@ public enum MAStyle {
 // MARK: - View Extensions (syntactic sugar)
 extension View {
     public func maCard(padding: CGFloat = MAStyle.Spacing.sm) -> some View {
-        modifier(MAStyle.Card(padding: padding))
+        modifier(MAStyle.Card(padding: padding, isInteractive: false))
     }
 
     public func maCardInteractive(padding: CGFloat = MAStyle.Spacing.sm, isDisabled: Bool = false) -> some View {
@@ -772,5 +780,35 @@ extension View {
 
     public func maStripedRowStyle(index: Int, isSelected: Bool = false, isDisabled: Bool = false, isFocused: Bool = false) -> some View {
         modifier(MAStyle.StripedRowStyleModifier(index: index, isSelected: isSelected, isDisabled: isDisabled, isFocused: isFocused))
+    }
+}
+
+// MARK: - Grouped Row Helper
+public struct GroupedRow<Label: View>: View {
+    let isActive: Bool
+    let fillOpacity: Double
+    let strokeOpacity: Double
+    let lineWidth: CGFloat
+    let content: Label
+    public init(isActive: Bool,
+                fillOpacity: Double = 0.08,
+                strokeOpacity: Double = 0.35,
+                lineWidth: CGFloat = 1.2,
+                @ViewBuilder content: () -> Label) {
+        self.isActive = isActive
+        self.fillOpacity = fillOpacity
+        self.strokeOpacity = strokeOpacity
+        self.lineWidth = lineWidth
+        self.content = content()
+    }
+    public var body: some View {
+        content
+            .padding(.vertical, MAStyle.Spacing.xs)
+            .padding(.horizontal, MAStyle.Spacing.sm)
+            .maActiveOutline(isActive: isActive,
+                             cornerRadius: MAStyle.Radius.md,
+                             fillOpacity: fillOpacity,
+                             strokeOpacity: strokeOpacity,
+                             lineWidth: lineWidth)
     }
 }

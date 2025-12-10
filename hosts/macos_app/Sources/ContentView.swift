@@ -19,11 +19,17 @@ struct ContentView: View {
     @FocusState private var promptFocused: Bool
     @State private var showGettingStarted: Bool = false
     @State private var confirmClearHistory: Bool = false
-    @State private var showRail: Bool = true
     private let services = AppServices()
     @State private var chatIsThinking: Bool = false
     @State private var chatTask: Task<Void, Never>?
     @State private var contextLastUpdated: Date? = nil
+    @State private var showChatOverlay: Bool = false
+    @State private var pendingChatCard: PlaybookCard? = nil
+    @State private var canRun: Bool = true
+    @State private var disabledReason: String? = nil
+    @State private var runWarnings: [String] = []
+    @State private var missingAudioWarning: String? = nil
+    @State private var showSettingsSheet: Bool = false
     init() {
         let s = AppStore()
         _store = StateObject(wrappedValue: s)
@@ -64,19 +70,29 @@ struct ContentView: View {
             .ignoresSafeArea()
 
             HStack(spacing: MAStyle.Spacing.md) {
-                if showRail {
-                    NavigationRail(
-                        selection: Binding(get: { store.state.route.tab },
-                                           set: { tab in store.dispatch(.setRoute(store.state.route.updatingTab(tab))) })
-                    )
-                    .frame(width: 72.6)
-                    .transition(.move(edge: .leading).combined(with: .opacity))
-                }
-
-                if showRail {
-                    Divider()
-                        .transition(.opacity)
-                }
+                NavigationRail(
+                    selection: Binding(get: { store.state.route.tab },
+                                       set: { tab in
+                                           showSettingsSheet = false
+                                           store.dispatch(.setRoute(store.state.route.updatingTab(tab)))
+                                       }),
+                    isDarkTheme: store.state.useDarkTheme,
+                    followSystemTheme: store.state.followSystemTheme,
+                    onToggleTheme: {
+                        let systemDark = MAStyle.systemPrefersDark()
+                        if store.state.followSystemTheme {
+                            // Switch to manual using current system appearance.
+                            store.dispatch(.setFollowSystemTheme(false))
+                            let applied = MAStyle.applyTheme(followSystem: false, manualDark: systemDark)
+                            store.dispatch(.setTheme(applied))
+                        } else {
+                            let newValue = !store.state.useDarkTheme
+                            let applied = MAStyle.applyTheme(followSystem: false, manualDark: newValue)
+                            store.dispatch(.setTheme(applied))
+                        }
+                    },
+                    onSettings: { showSettingsSheet = true }
+                )
 
                 VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
                     HeaderView(hostStatus: store.state.hostSnapshot.status,
@@ -84,28 +100,42 @@ struct ContentView: View {
                                showProgress: store.state.hostSnapshot.processing.status == "running",
                                lastUpdated: store.state.hostSnapshot.lastUpdated)
                         .maSheen(isActive: store.commandVM.isRunning, duration: 4.5)
-                    SettingsView(useDarkTheme: Binding(get: { store.state.useDarkTheme },
-                                                      set: { store.dispatch(.setTheme($0)) }),
-                                 statusText: store.commandVM.status,
-                                 dataPath: applicationSupportPath())
+                    HStack {
+                        Text(tabTitle(for: store.state.route.tab))
+                            .maText(.headline)
+                        Spacer()
+                    }
                     Divider()
                     ScrollView(.vertical) {
                         switch store.state.route.tab {
                         case .run:
-                            RunSplitView(
-                                store: store,
-                                viewModel: viewModel,
-                                trackVM: trackVM,
-                                pickFile: { services.filePicker.pickFile() },
-                                pickDirectory: { services.filePicker.pickDirectory() },
-                                revealSidecar: revealSidecar(path:),
-                                copyJSON: copyJSON,
-                                onPreviewRich: { path in loadHistoryPreview(path: path) }
-                            )
-                        case .history:
-                            HistorySplitView(
-                                store: store,
-                                reloadHistory: reloadHistory,
+                    RunSplitView(
+                        store: store,
+                        viewModel: viewModel,
+                        trackVM: trackVM,
+                        pickFile: { services.filePicker.pickFile() },
+                        pickDirectory: { services.filePicker.pickDirectory() },
+                        revealSidecar: revealSidecar(path:),
+                        copyJSON: copyJSON,
+                        onPreviewRich: { path in loadHistoryPreview(path: path) },
+                        canRun: canRun,
+                        disabledReason: disabledReason,
+                        runWarnings: runWarnings,
+                        missingAudioWarning: missingAudioWarning,
+                        onPickAudio: {
+                            services.filePicker.pickFile().map { url in
+                                viewModel.insertAudioPath(url.path)
+                                return url
+                            }
+                        },
+                        onShowHistory: {
+                            store.dispatch(.setRoute(store.state.route.updatingTab(.history)))
+                        }
+                    )
+                case .history:
+                    HistorySplitView(
+                        store: store,
+                        reloadHistory: reloadHistory,
                                 revealSidecar: revealSidecar(path:),
                                 loadPreview: { path in loadHistoryPreview(path: path) },
                                 reRun: { item in
@@ -126,36 +156,22 @@ struct ContentView: View {
                                 confirmClearHistory: $confirmClearHistory
                             )
                         case .style:
-                            ConsoleTabView(
-                                prompt: Binding(get: { store.state.promptText },
-                                                set: { store.dispatch(.setPrompt($0)) }),
-                                messages: store.state.messages,
-                                onSend: sendMessage,
-                                onClear: { store.dispatch(.setMessages([])) },
-                                onSnippet: { snippet in
-                                    store.dispatch(.setPrompt(snippet))
-                                    promptFocused = true
-                                    if let last = viewModel.sidecarPath {
-                                        setChatContext(selection: "last-run", overridePath: last)
-                                    }
+                            PlaybookView(
+                                references: referenceOptions(),
+                                onAnalyze: { card, ref in
+                                    let result = analyzePlaybook(card: card, reference: ref)
+                                    return result
                                 },
-                                onStop: stopChat,
-                                onDevSmoke: runChatEngineSmoke,
-                                promptFocus: $promptFocused,
-                                isThinking: chatIsThinking,
-                                contextOptions: chatContextOptions(),
-                                selectedContext: chatSelectionBinding(),
-                                contextLabel: store.state.chatContextLabel,
-                                contextBadgeTitle: store.state.chatBadgeTitle,
-                                contextBadgeSubtitle: store.state.chatBadgeSubtitle,
-                                contextLastUpdated: store.state.chatContextLastUpdated
-                                )
+                                onAskChat: { card, ref, context in
+                                    openChat(for: card, mode: .ask, reference: ref, context: context)
+                                }
+                            )
                         }
                     }
+                    .padding(.horizontal, MAStyle.Spacing.md)
                 }
                 .padding(MAStyle.Spacing.md)
                 .frame(minWidth: 720, minHeight: 480, alignment: .top)
-                .animation(.easeOut(duration: 0.2), value: showRail)
             }
             .padding(.horizontal, MAStyle.Spacing.md)
             .padding(.vertical, MAStyle.Spacing.md)
@@ -188,34 +204,126 @@ struct ContentView: View {
                 .zIndex(2)
             }
         }
-        .preferredColorScheme(store.state.useDarkTheme ? .dark : .light)
-        .overlay(alignment: .topLeading) {
-            RailToggleOverlay(
-                isShown: showRail,
-                railWidth: 72,
-                topPadding: MAStyle.Spacing.md,
-                hiddenEdgePadding: railHiddenPadding
-            ) {
-                withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
-                    showRail.toggle()
+        .preferredColorScheme(store.state.followSystemTheme ? nil : (store.state.useDarkTheme ? .dark : .light))
+        .overlay(shortcutButtons.opacity(0))
+        .overlay {
+            if showSettingsSheet {
+                ZStack {
+                    Color.black.opacity(0.35)
+                        .ignoresSafeArea()
+                        .onTapGesture { showSettingsSheet = false }
+                    SettingsSheet(
+                        useDarkTheme: Binding(get: { store.state.useDarkTheme },
+                                              set: { value in
+                                                  store.dispatch(.setFollowSystemTheme(false))
+                                                  store.dispatch(.setTheme(value))
+                                                  if value { MAStyle.useDarkTheme() } else { MAStyle.useLightTheme() }
+                                              }),
+                        statusText: store.commandVM.status,
+                        dataPath: applicationSupportPath(),
+                        onClose: { showSettingsSheet = false }
+                    )
+                    .frame(width: 320)
+                    .padding(MAStyle.Spacing.sm)
+                    .maHoverLift(enabled: false)
                 }
+                .maModalTransition()
+                .zIndex(3)
             }
         }
-        .overlay(shortcutButtons.opacity(0))
+        .overlay {
+            if showChatOverlay {
+                ZStack {
+                    Color.black.opacity(0.35)
+                        .ignoresSafeArea()
+                        .onTapGesture { showChatOverlay = false }
+                    VStack(spacing: 0) {
+                        HStack(spacing: MAStyle.Spacing.sm) {
+                            Text("Chat")
+                                .maText(.headline)
+                                .foregroundStyle(MAStyle.ColorToken.muted)
+                            Spacer()
+                            Button {
+                                showChatOverlay = false
+                            } label: {
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 12, weight: .bold))
+                                    .padding(6)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Close chat")
+                        }
+                        .padding(.horizontal, MAStyle.Spacing.md)
+                        .padding(.vertical, MAStyle.Spacing.sm)
+                        .background(MAStyle.ColorToken.panel.opacity(0.9))
+                        .overlay(alignment: .bottom) {
+                            Divider()
+                                .foregroundStyle(MAStyle.ColorToken.border)
+                        }
+                        ConsoleTabView(
+                            prompt: Binding(get: { store.state.promptText },
+                                            set: { store.dispatch(.setPrompt($0)) }),
+                            messages: store.state.messages,
+                            onSend: sendMessage,
+                            onClear: { store.dispatch(.setMessages([])) },
+                            onSnippet: { snippet in
+                                store.dispatch(.setPrompt(snippet))
+                                promptFocused = true
+                                if let last = viewModel.sidecarPath {
+                                    setChatContext(selection: "last-run", overridePath: last)
+                                }
+                            },
+                            onStop: stopChat,
+                            onDevSmoke: runChatEngineSmoke,
+                            promptFocus: $promptFocused,
+                            isThinking: chatIsThinking,
+                            contextOptions: chatContextOptions(),
+                            selectedContext: chatSelectionBinding(),
+                            contextLabel: store.state.chatContextLabel,
+                            contextBadgeTitle: store.state.chatBadgeTitle,
+                            contextBadgeSubtitle: store.state.chatBadgeSubtitle,
+                            contextLastUpdated: store.state.chatContextLastUpdated
+                        )
+                        .frame(minWidth: 480, maxWidth: 720, minHeight: 360, maxHeight: 600)
+                        .padding(.horizontal)
+                        .padding(.bottom)
+                        .maHoverLift(enabled: false)
+                    }
+                    .background(MAStyle.ColorToken.panel)
+                    .cornerRadius(MAStyle.Radius.lg)
+                    .shadow(color: .black.opacity(0.3), radius: 14, x: 0, y: 8)
+                }
+                .maModalTransition()
+                .zIndex(3)
+            }
+        }
         .onAppear {
             // Ensure the app becomes frontmost so text input goes to the window, not the launching terminal.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 NSApplication.shared.activate(ignoringOtherApps: true)
             }
-            if store.state.useDarkTheme { MAStyle.useDarkTheme() } else { MAStyle.useLightTheme() }
+            let effectiveDark = MAStyle.applyTheme(followSystem: store.state.followSystemTheme,
+                                                   manualDark: store.state.useDarkTheme)
+            store.dispatch(.setTheme(effectiveDark))
             reloadHistory()
             hydratePreviewCache()
         }
         .onChange(of: store.state.useDarkTheme) { isDark in
-            if isDark { MAStyle.useDarkTheme() } else { MAStyle.useLightTheme() }
+            guard !store.state.followSystemTheme else { return }
+            MAStyle.applyTheme(followSystem: false, manualDark: isDark)
+        }
+        .onChange(of: store.state.followSystemTheme) { follow in
+            let effectiveDark = MAStyle.applyTheme(followSystem: follow,
+                                                   manualDark: store.state.useDarkTheme)
+            store.dispatch(.setTheme(effectiveDark))
         }
         .onReceive(store.commandVM.queueVM.objectWillChange) { _ in
             scheduleHistoryReload()
+        }
+        .onReceive(MAStyle.appearanceChangePublisher()) { systemDark in
+            guard store.state.followSystemTheme else { return }
+            store.dispatch(.setTheme(systemDark))
+            MAStyle.applyTheme(followSystem: true, manualDark: store.state.useDarkTheme)
         }
         .onReceive(store.commandVM.$isRunning) { running in
             let status = running ? "processing" : "idle"
@@ -245,14 +353,21 @@ struct ContentView: View {
         .onChange(of: store.state.chatSelection) { newSel in
             renderChatContext(selection: newSel, overridePath: store.state.chatOverridePath)
             contextLastUpdated = Date()
+            showSettingsSheet = false
         }
         .onChange(of: store.state.chatOverridePath) { newOverride in
             renderChatContext(selection: store.state.chatSelection, overridePath: newOverride)
             contextLastUpdated = Date()
         }
+        .onChange(of: store.state.route.tab) { _ in
+            showSettingsSheet = false
+        }
         .onAppear {
             renderChatContext(selection: store.state.chatSelection, overridePath: store.state.chatOverridePath)
+            refreshRunReadiness()
         }
+        .onChange(of: viewModel.commandText) { _ in refreshRunReadiness() }
+        .onChange(of: viewModel.queueVM.jobs) { _ in refreshRunReadiness() }
     }
 
     // MARK: - Drop handling
@@ -1080,5 +1195,93 @@ extension ContentView {
     private func applicationSupportPath() -> String? {
         let supportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
         return supportDir?.appendingPathComponent("MusicAdvisorMacApp", isDirectory: true).path
+    }
+
+    private func refreshRunReadiness() {
+        let hasCommand = !viewModel.commandText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let hasPending = viewModel.queueVM.jobs.contains { $0.status == .pending || $0.status == .running }
+        canRun = hasCommand || hasPending
+        var warnings: [String] = []
+        if viewModel.workingDirectory.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            warnings.append("Working directory not set.")
+        } else if !FileManager.default.fileExists(atPath: viewModel.workingDirectory) {
+            warnings.append("Working directory is missing.")
+        }
+        if !viewModel.commandText.contains("--audio") && !hasPending {
+            missingAudioWarning = "Audio argument not set; enqueue files or add --audio."
+        } else {
+            missingAudioWarning = nil
+        }
+        if !hasCommand && !hasPending {
+            disabledReason = "Provide a command or enqueue files first."
+        } else {
+            disabledReason = nil
+        }
+        runWarnings = warnings
+    }
+
+    private enum ChatMode {
+        case analyze
+        case ask
+    }
+
+    private func openChat(for card: PlaybookCard, mode: ChatMode, reference: String? = nil, context: String? = nil) {
+        let baseContext = context ?? playbookContextSummary(reference: reference)
+        let prompt: String
+        switch mode {
+        case .analyze:
+            prompt = "Analyze goal: \(card.title). Context: \(baseContext)"
+        case .ask:
+            prompt = "Question about \(card.title). Context: \(baseContext)"
+        }
+        store.dispatch(.setPrompt(prompt))
+        pendingChatCard = card
+        showChatOverlay = true
+    }
+
+    private func analyzePlaybook(card: PlaybookCard, reference: String?) -> PlaybookResult {
+        let metricsSummary = viewModel.summaryMetrics.map { "\($0.label): \($0.value)" }.joined(separator: ", ")
+        let exit = viewModel.exitCode
+        var issues: [String] = []
+        var fixes: [String] = []
+        var impact: [String] = []
+        if exit != 0 {
+            issues.append("Last run failed (exit \(exit)).")
+            fixes.append("Inspect stderr and rerun after resolving errors.")
+        }
+        if metricsSummary.isEmpty {
+            issues.append("No metrics parsed from last run.")
+            fixes.append("Ensure JSON output contains summary metrics.")
+        } else {
+            impact.append("Current metrics: \(metricsSummary)")
+        }
+        if let reference {
+            impact.append("Reference: \(reference)")
+            fixes.append("Compare current metrics against reference and align LUFS/tempo/key.")
+        }
+        let context = playbookContextSummary(reference: reference)
+        return PlaybookResult(issues: issues, fixes: fixes, impact: impact, contextSummary: context)
+    }
+
+    private func playbookContextSummary(reference: String?) -> String {
+        let metricsSummary = viewModel.summaryMetrics.map { "\($0.label): \($0.value)" }.joined(separator: ", ")
+        let sidecar = viewModel.sidecarPath ?? "n/a"
+        var parts: [String] = []
+        if !metricsSummary.isEmpty { parts.append("Metrics: \(metricsSummary)") }
+        parts.append("Sidecar: \(sidecar)")
+        if let reference { parts.append("Reference: \(reference)") }
+        return parts.joined(separator: " | ")
+    }
+
+    private func referenceOptions() -> [String] {
+        store.state.historyItems.prefix(8).map { $0.name }
+    }
+
+    private func tabTitle(for tab: AppTab) -> String {
+        switch tab {
+        case .run: return "Run"
+        case .history: return "History"
+        case .style: return "Playbook"
+        }
     }
 }

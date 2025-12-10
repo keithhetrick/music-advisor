@@ -321,6 +321,30 @@ final class CommandViewModel: ObservableObject {
         return nil
     }
 
+    private func expandSources(urls: [URL]) -> [(url: URL, groupName: String?, groupID: UUID?, groupRootPath: String?)] {
+        var results: [(URL, String?, UUID?, String?)] = []
+        let fm = FileManager.default
+        for url in urls {
+            var isDir: ObjCBool = false
+            if fm.fileExists(atPath: url.path, isDirectory: &isDir), isDir.boolValue {
+                let groupID = UUID()
+                let rootName = url.lastPathComponent
+                let rootPath = url.path
+                if let enumerator = fm.enumerator(at: url, includingPropertiesForKeys: [.isRegularFileKey], options: [.skipsHiddenFiles]) {
+                    for case let fileURL as URL in enumerator {
+                        if let vals = try? fileURL.resourceValues(forKeys: [.isRegularFileKey]),
+                           vals.isRegularFile == true {
+                            results.append((fileURL, rootName, groupID, rootPath))
+                        }
+                    }
+                }
+            } else {
+                results.append((url, nil, nil, nil))
+            }
+        }
+        return results
+    }
+
     private func extractMetrics(from dict: [String: AnyHashable]) -> [Metric] {
         func getDouble(_ key: String) -> Double? {
             dict[key] as? Double
@@ -431,7 +455,9 @@ final class CommandViewModel: ObservableObject {
         // Precompute per-job command/out to avoid per-run string editing.
         let baseParts = splitCommand(commandText)
         let baseOut = extractOutPath(from: baseParts)
-        let newJobs: [Job] = files.map { url in
+        let expanded = expandSources(urls: files)
+        let newJobs: [Job] = expanded.map { entry in
+            let url = entry.url
             let outPath = baseOut ?? makeSidecarPath(for: url)
             var parts = baseParts
             if let idx = parts.firstIndex(of: "--audio"), parts.indices.contains(idx + 1) {
@@ -446,6 +472,9 @@ final class CommandViewModel: ObservableObject {
             }
             return Job(fileURL: url,
                        displayName: url.lastPathComponent,
+                       groupID: entry.groupID,
+                       groupName: entry.groupName,
+                       groupRootPath: entry.groupRootPath,
                        status: .pending,
                        sidecarPath: outPath,
                        errorMessage: nil,
@@ -464,10 +493,11 @@ final class CommandViewModel: ObservableObject {
 
     func stopQueue() {
         stopAfterCurrent = true
-        // Clear pending jobs but let the current one finish.
-        queueVM.clearPending()
-        processingUpdater?("stopping", nil, "pending jobs cleared")
-        updateProcessingProgress(message: "pending jobs cleared")
+        if let currentID = currentJobID {
+            queueVM.cancelJob(jobID: currentID)
+        }
+        processingUpdater?("stopping", nil, "queue will pause after current job")
+        updateProcessingProgress(message: "queue stopping after current")
     }
 
     private func processNextJobIfNeeded() {

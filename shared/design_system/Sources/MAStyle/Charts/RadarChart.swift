@@ -41,19 +41,23 @@ public struct MARadarChart: View {
     }
 
     private func shape(in size: CGSize) -> Path {
+        guard !axes.isEmpty else { return Path() }
+
         let r = min(size.width, size.height) / 2 * 0.8
         let center = CGPoint(x: size.width / 2, y: size.height / 2)
+        let points: [CGPoint] = axes.enumerated().map { idx, axis in
+            let angle = (Double(idx) / Double(axes.count)) * 2 * Double.pi - Double.pi/2
+            let radius = r * axis.value.clamped(to: 0...1)
+            let x = center.x + CGFloat(cos(angle)) * radius
+            let y = center.y + CGFloat(sin(angle)) * radius
+            return CGPoint(x: x, y: y)
+        }
+
         return Path { path in
-            for (idx, axis) in axes.enumerated() {
-                let angle = (Double(idx) / Double(axes.count)) * 2 * Double.pi - Double.pi/2
-                let radius = r * axis.value.clamped(to: 0...1)
-                let point = CGPoint(x: center.x + CGFloat(cos(angle)) * radius,
-                                    y: center.y + CGFloat(sin(angle)) * radius)
-                if idx == 0 {
-                    path.move(to: point)
-                } else {
-                    path.addLine(to: point)
-                }
+            guard let first = points.first else { return }
+            path.move(to: first)
+            for point in points.dropFirst() {
+                path.addLine(to: point)
             }
             path.closeSubpath()
         }

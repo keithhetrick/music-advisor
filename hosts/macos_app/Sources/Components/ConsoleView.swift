@@ -15,9 +15,9 @@ struct ConsoleView: View {
                         minHeight: 240,
                         maxHeight: 240,
                         onCopy: copy)
-                .maCardInteractive()
+                .maCard()
         }
-        .maCardInteractive()
+        .maCard()
         .textSelection(.enabled)
         .accessibilityLabel("Console output")
     }

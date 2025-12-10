@@ -8,15 +8,18 @@ struct SettingsView: View {
     var dataPath: String?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
+        VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
             HStack {
-                HStack(spacing: MAStyle.Spacing.sm) {
-                    Text("Theme")
-                        .maText(.caption)
-                    Toggle("", isOn: $useDarkTheme)
-                        .maToggleStyle()
-                        .labelsHidden()
-                }
+                Text("Settings")
+                    .maText(.headline)
+                Spacer()
+            }
+            HStack {
+                Text("Theme")
+                    .maText(.caption)
+                Toggle("", isOn: $useDarkTheme)
+                    .maToggleStyle()
+                    .labelsHidden()
                 Spacer()
                 if !statusText.isEmpty {
                     Text(statusText)
@@ -33,22 +36,20 @@ struct SettingsView: View {
                         .foregroundStyle(MAStyle.ColorToken.muted)
                         .lineLimit(1)
                         .truncationMode(.middle)
-                        .frame(maxWidth: 260, alignment: .leading)
+                        .frame(maxWidth: 300, alignment: .leading)
                     Spacer()
                     Button("Reveal") {
                         NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: dataPath)])
                     }
                     .maButton(.ghost)
-                    .accessibilityLabel("Reveal data folder in Finder")
                     Button("Copy") {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(dataPath, forType: .string)
                     }
                     .maButton(.ghost)
-                    .accessibilityLabel("Copy data path")
                 }
             }
         }
-        .maCard(padding: MAStyle.Spacing.sm)
+        .padding(MAStyle.Spacing.md)
     }
 }

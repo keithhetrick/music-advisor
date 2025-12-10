@@ -6,11 +6,13 @@ struct RunControlsView: View {
     var status: String
     var lastRunTime: Date?
     var lastDuration: TimeInterval?
+    var canRun: Bool = true
+    var disabledReason: String? = nil
+    var warnings: [String] = []
     var onRun: () -> Void
     var onRunDefaults: () -> Void
     var onRunSmoke: () -> Void
     var onRevealLastSidecar: (() -> Void)? = nil
-    var onToggleTheme: (() -> Void)? = nil
 
     var body: some View {
         HStack(spacing: MAStyle.Spacing.sm) {
@@ -22,37 +24,27 @@ struct RunControlsView: View {
                 }
             }
             .maButton(.primary)
-            .disabled(isRunning)
+            .disabled(isRunning || !canRun)
             .keyboardShortcut(.return, modifiers: [.command])
             .accessibilityLabel("Run")
 
-            Button("Run defaults") {
-                onRunDefaults()
-            }
-            .maButton(.secondary)
-            .disabled(isRunning)
+            Button("Run defaults", action: onRunDefaults)
+                .maButton(.secondary)
+            .disabled(isRunning || !canRun)
             .keyboardShortcut(.return, modifiers: [.command, .shift])
             .accessibilityLabel("Run defaults")
 
-            Button("Run smoke") {
-                onRunSmoke()
-            }
-            .maButton(.ghost)
+            Button("Run smoke", action: onRunSmoke)
+                .maButton(.ghost)
             .disabled(isRunning)
             .keyboardShortcut(.return, modifiers: [.command, .option])
             .accessibilityLabel("Run smoke test")
 
             if let onRevealLastSidecar {
-                Button("Reveal last") { onRevealLastSidecar() }
+                Button("Reveal last", action: onRevealLastSidecar)
                     .maButton(.ghost)
                     .keyboardShortcut("r", modifiers: [.command])
                     .accessibilityLabel("Reveal last sidecar")
-            }
-            if let onToggleTheme {
-                Button("Theme") { onToggleTheme() }
-                    .maButton(.ghost)
-                    .keyboardShortcut("t", modifiers: [.command])
-                    .accessibilityLabel("Toggle theme")
             }
 
             if !status.isEmpty {
@@ -65,6 +57,16 @@ struct RunControlsView: View {
                 Text("Last run: \(last.formatted(date: .omitted, time: .standard))\(durationText)")
                     .maText(.caption)
                     .foregroundStyle(MAStyle.ColorToken.muted)
+            }
+            if let disabledReason, !disabledReason.isEmpty, !canRun {
+                Text(disabledReason)
+                    .maText(.caption)
+                    .foregroundStyle(MAStyle.ColorToken.danger)
+            }
+            ForEach(warnings, id: \.self) { warning in
+                Text(warning)
+                    .maText(.caption)
+                    .foregroundStyle(MAStyle.ColorToken.warning)
             }
             Spacer()
         }

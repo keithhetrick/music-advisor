@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import AppKit
 
 enum AppTab: String, CaseIterable {
     case run = "Pipeline"
@@ -11,6 +12,7 @@ enum AppAction {
     case setAlert(AlertState?)
     case setRoute(AppRoute)
     case setTheme(Bool)
+    case setFollowSystemTheme(Bool)
     case setPrompt(String)
     case appendMessage(String)
     case setMessages([String])
@@ -34,6 +36,7 @@ struct AppState {
     var alert: AlertState? = nil
     var route: AppRoute = .run(.json)
     var useDarkTheme: Bool = true
+    var followSystemTheme: Bool = true
     var promptText: String = ""
     var messages: [String] = ["Welcome to Music Advisor!"]
     var showAdvanced: Bool = false
@@ -77,6 +80,10 @@ final class AppStore: ObservableObject {
         self.hostCoordinator = HostCoordinator()
         self.commandVM = CommandViewModel()
         self.trackVM = AppStore.makeTrackViewModel()
+        // Seed theme from system appearance if following system.
+        let systemDark = AppStore.systemPrefersDark()
+        state.useDarkTheme = systemDark
+        state.followSystemTheme = true
         self.commandVM.processingUpdater = { [weak self] status, progress, message in
             Task {
                 await self?.hostCoordinator.updateProcessing(status: status, progress: progress, message: message)
@@ -84,7 +91,7 @@ final class AppStore: ObservableObject {
         }
         if let trackVM {
             self.commandVM.jobCompletionHandler = { job, success in
-                guard success else { return }
+                guard success, job.status == .done else { return }
                 Task { @MainActor in
                     trackVM.ingestDropped(urls: [job.fileURL])
                 }
@@ -171,6 +178,8 @@ private func reduce(_ state: inout AppState, action: AppAction) {
         state.route = route
     case .setTheme(let value):
         state.useDarkTheme = value
+    case .setFollowSystemTheme(let value):
+        state.followSystemTheme = value
     case .setPrompt(let text):
         state.promptText = text
     case .appendMessage(let msg):
@@ -209,5 +218,12 @@ private func reduce(_ state: inout AppState, action: AppAction) {
         state.chatSelection = sel
     case .setChatOverride(let path):
         state.chatOverridePath = path
+    }
+}
+
+extension AppStore {
+    static func systemPrefersDark() -> Bool {
+        let best = NSApplication.shared.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua])
+        return best == .darkAqua
     }
 }

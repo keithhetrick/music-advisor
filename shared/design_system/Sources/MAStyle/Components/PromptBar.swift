@@ -75,5 +75,6 @@ public struct PromptBar: View {
                 .maButton(.ghost)
                 .disabled(text.isEmpty)
         }
+        .padding(.vertical, MAStyle.Spacing.xs)
     }
 }
