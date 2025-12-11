@@ -116,6 +116,10 @@ struct JobQueueView: View {
                         }
                         .maButton(.ghost)
                         .accessibilityLabel("Preview rich text")
+                    } else {
+                        Text("No sidecar yet")
+                            .maText(.caption)
+                            .foregroundStyle(MAStyle.ColorToken.muted)
                     }
                     if let error = job.errorMessage, job.status == .failed {
                         Text(error)

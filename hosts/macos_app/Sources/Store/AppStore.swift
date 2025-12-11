@@ -117,6 +117,8 @@ final class AppStore: ObservableObject {
 
     private static func makeTrackViewModel() -> TrackListViewModel {
         let paths = trackStorePaths()
+        try? FileManager.default.createDirectory(at: paths.dbURL.deletingLastPathComponent(),
+                                                 withIntermediateDirectories: true)
         let sqliteStore = try? SQLiteTrackStore(url: paths.dbURL)
 
         if let sqliteStore {

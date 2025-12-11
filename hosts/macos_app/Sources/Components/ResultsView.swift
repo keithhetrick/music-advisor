@@ -54,6 +54,10 @@ struct ResultsView: View {
                         Button("Reveal sidecar", action: onRevealSidecar).maButton(.ghost).accessibilityLabel("Reveal sidecar")
                         Button("Copy path", action: onCopySidecarPath).maButton(.ghost).accessibilityLabel("Copy sidecar path")
                         Button("Preview sidecar", action: onPreviewSidecar).maButton(.ghost).accessibilityLabel("Preview sidecar")
+                    } else {
+                        Text("No sidecar yet")
+                            .maText(.caption)
+                            .foregroundStyle(MAStyle.ColorToken.muted)
                     }
                     Spacer()
                 }

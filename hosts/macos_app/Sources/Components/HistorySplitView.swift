@@ -82,6 +82,20 @@ struct HistorySplitView: View {
                 .focused(historySearchFocus)
                 .maFocusRing(historySearchFocus.wrappedValue)
                 .accessibilityLabel("Search history")
+                .overlay(alignment: .trailing) {
+                    if !searchText.isEmpty {
+                        Button {
+                            searchText = ""
+                            debouncedSearch = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(MAStyle.ColorToken.muted)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.trailing, MAStyle.Spacing.xs)
+                        .accessibilityLabel("Clear search")
+                    }
+                }
             Toggle("Rich only", isOn: $filterRichOnly)
                 .maToggleStyle()
                 .accessibilityLabel("Filter rich previews")

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- macOS host polish: Application Support path created before SQLite init (first-launch persistence), queue stop now cancels pending jobs, sidecar actions are gated with “No sidecar yet” messaging, History search gets a clear affordance and focus ring, Run buttons/search fields have clearer focus rings, and lens/glass effects are opt-in per card for calmer busy views (Run/History). Backdrop noise/lens tuned cooler/subtle; button hover sheen softened.
 - macOS host persistence and UX: added SQLite-backed Track/Artist store with one-time migration from legacy JSON; App Support path surfaced in Settings (reveal/copy), and a default run script (`scripts/swift_run_default.sh`) to build/run without HOME overrides. Run/queue flow refined with queue-aware runs, delayed track ingestion until successful job completion, and compacted Settings data-path UI.
 - Chat UI/state: chat context labels and badges now live in `AppStore`; chat sends carry the resolved `.client.rich.txt` path end-to-end to `ChatService`; smoke script added at `hosts/macos_app/scripts/chat_smoke.sh` (supports `--prompt` and `--context`) to build and run the chat engine smoke.
 - MAStyle toasts: centralized default duration (`MAStyle.ToastDefaults.autoDismissSeconds`), left-slide/accordion fade on dismiss, reusable `ToastProgressBar`, and a single knob for toast timing.

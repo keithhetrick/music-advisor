@@ -493,6 +493,8 @@ final class CommandViewModel: ObservableObject {
 
     func stopQueue() {
         stopAfterCurrent = true
+        // Cancel pending jobs so they surface as stopped/canceled instead of running later.
+        queueVM.cancelPending()
         if let currentID = currentJobID {
             queueVM.cancelJob(jobID: currentID)
         }

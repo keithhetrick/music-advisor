@@ -64,6 +64,9 @@ What the UI is now
   - History: filter/search left; preview card (reveal/preview/re-run) right.
   - Console: log + prompt, snippets that prefill/focus the prompt.
 - Getting Started overlay, glassy MAStyle depth, non-blocking toasts, throttled alerts.
+- Busy views (Run/History) default to calmer cards (lens/glass opt-in per card), backdrop uses a cool subtle gradient + light noise; buttons have softened hover/focus sheen.
+- Focus/keyboard: softened focus rings on primary Run controls and History search; History search has a clear “x”; Run shortcuts stay as before (⌘⏎, ⇧⌘⏎, ⌥⌘⏎, ⌘R, ⌘T, ⌘F, ⌘L).
+- Persistence: Application Support is created before SQLite init so saved tracks load on first launch without tab toggles; sidecar actions are gated (friendly “No sidecar yet” until present).
 - Shortcuts: ⌘⏎ run, ⇧⌘⏎ defaults, ⌥⌘⏎ smoke, ⌘R reveal last sidecar, ⌘T theme, ⌘F history search, ⌘L console prompt.
 - Accessibility labels on key controls; missing-file guards for reveal/re-run; stronger glass depth on core panels and cards.
 - MAStyle-backed components everywhere: `AlertBanner`, `PromptBar`, `HeaderBar`/`CardHeader`, `ChipRow` + `FABPopover` (snippets palette), `RailToggleOverlay`. Rail width tuned (≈72.6) so “History/Chat” fit without clipping; rail toggle hugs the border and stays subtle. Toasts auto-dismiss (default from `MAStyle.ToastDefaults.autoDismissSeconds`) with a left-slide/accordion fade and progress bar; close button uses the same exit.
