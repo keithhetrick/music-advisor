@@ -45,6 +45,17 @@ Manual quick checks (UI)
 - Run tab: drop an audio file, run, and reveal/preview sidecar; chat context should use the last run when present.
 - Full checklist: see `docs/ui_smoke.md` for a step-by-step smoke.
 
+Testing & coverage (macOS host)
+
+- Full tests: `cd hosts/macos_app && swift test` (includes slow stop/restart queue cases).
+- Optional stress/soak: `RUN_LARGE_QUEUE_STRESS=1 swift test --filter LargeQueueRobustnessTests` (add `RUN_SOAK=1` for longer budgets).
+- Optional micro-benchmark: `RUN_QUEUE_BENCH=1 swift test --filter QueueEngineBenchmarks`.
+- UI tests with coverage: `cd hosts/macos_app && scripts/ui_tests_with_coverage.sh` (or `task test-macos-ui`); outputs `build/ui-test-coverage.txt/.json`.
+- Coverage bundle: `cd hosts/macos_app && scripts/publish_coverage_artifacts.sh` (or `task publish-macos-coverage`) copies unit/UI coverage and, if present, zips the latest `.xcresult` into `build/coverage-latest/`. Run UI tests first if you need an xcresult.
+- Temp-path lint (prod sources): `cd hosts/macos_app && scripts/lint_tmp_paths.sh` (or `task lint-macos-tmp`).
+- Taskfile targets require go-task (`brew install go-task`), but all commands above can be run directly.
+- CI guidance: per-PR run swift tests + UI tests + publish coverage; nightly run `task ci-macos-queue-all` (lint + fast + slow + stress + bench; add `RUN_SOAK=1` for longer stress) and archive `build/coverage-latest/`.
+
 CI notes
 
 - Sparse smokes synthesize a 0.5s 440 Hz tone (tests/fixtures/audio/tone_440.wav) and run `ma_audio_features.py` against it.

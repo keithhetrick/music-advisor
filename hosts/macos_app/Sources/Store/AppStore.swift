@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import AppKit
+import MAQueue
 
 enum AppTab: String, CaseIterable {
     case run = "Pipeline"
@@ -60,6 +61,11 @@ struct AppState {
     var chatBadgeSubtitle: String = "No file"
     var chatContextLastUpdated: Date? = nil
     var chatContextPath: String? = nil
+    // Ingest/outbox status
+    var ingestPendingCount: Int = 0
+    var ingestErrorCount: Int = 0
+    // Queue jobs (engine-driven)
+    var queueJobs: [Job] = []
 }
 
 @MainActor
@@ -71,15 +77,68 @@ final class AppStore: ObservableObject {
     let trackVM: TrackListViewModel?
     private let hostCoordinator: HostCoordinator
     private var hostMonitorTask: Task<Void, Never>?
+    private let ingestOutbox = IngestOutbox()
+    private var ingestProcessor: IngestProcessor?
+    var queueEngine: QueueEngine?
+    private let uiTestQueueController: UITestQueueController?
+    private static let isUITestMode = UITestSupport.isEnabled
 
     func dispatch(_ action: AppAction) {
         reduce(&state, action: action)
     }
 
-    init() {
+    init(uiTestMode: Bool = AppStore.isUITestMode) {
         self.hostCoordinator = HostCoordinator()
         self.commandVM = CommandViewModel()
-        self.trackVM = AppStore.makeTrackViewModel()
+        if uiTestMode {
+            self.trackVM = nil
+            let controller = UITestSupport.makeQueueController()
+            self.uiTestQueueController = controller
+            self.queueEngine = nil
+            controller.$jobs
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] jobs in
+                    self?.state.queueJobs = jobs
+                }
+                .store(in: &commandVM.cancellables)
+            state.queueJobs = controller.jobs
+            state.alert = AlertHelper.toast("UI test toast", message: "Injected from UITest mode", level: .info)
+            state.messages = ["UI Test Harness Loaded"]
+            state.hostSnapshot = .idle
+        } else {
+            self.uiTestQueueController = nil
+            self.trackVM = AppStore.makeTrackViewModel()
+            if let trackVM {
+                let sink = TrackVMIngestSink(trackVM: trackVM)
+                let resolver = SidecarResolverAdapter()
+                let runner = CommandRunnerAdapter(runner: self.commandVM.runnerService)
+                self.queueEngine = QueueEngine(runner: runner,
+                                               ingestor: sink,
+                                               resolver: resolver,
+                                               persistence: QueuePersistence(),
+                                               outbox: ingestOutbox,
+                                               metricsHook: nil)
+                // Bind engine jobs/metrics to state for UI.
+                self.queueEngine?.$jobs
+                    .receive(on: DispatchQueue.main)
+                    .sink { [weak self] jobs in
+                        self?.state.queueJobs = jobs
+                    }
+                    .store(in: &commandVM.cancellables)
+                self.queueEngine?.$ingestPendingCount
+                    .receive(on: DispatchQueue.main)
+                    .sink { [weak self] count in
+                        self?.state.ingestPendingCount = count
+                    }
+                    .store(in: &commandVM.cancellables)
+                self.queueEngine?.$ingestErrorCount
+                    .receive(on: DispatchQueue.main)
+                    .sink { [weak self] count in
+                        self?.state.ingestErrorCount = count
+                    }
+                    .store(in: &commandVM.cancellables)
+            }
+        }
         // Seed theme from system appearance if following system.
         let systemDark = AppStore.systemPrefersDark()
         state.useDarkTheme = systemDark
@@ -89,21 +148,125 @@ final class AppStore: ObservableObject {
                 await self?.hostCoordinator.updateProcessing(status: status, progress: progress, message: message)
             }
         }
-        if let trackVM {
+        if !uiTestMode, let trackVM {
             self.commandVM.jobCompletionHandler = { job, success in
                 guard success, job.status == .done else { return }
-                Task { @MainActor in
-                    trackVM.ingestDropped(urls: [job.fileURL])
+                Task {
+                    await self.ingestOutbox.enqueue(fileURL: job.fileURL, jobID: job.id)
+                    await self.refreshOutboxCounts()
+                    self.ingestProcessor?.kick()
                 }
             }
             // Ensure track data is loaded even before the view appears (e.g., before scrolling).
             trackVM.load()
         }
-        startHostMonitor()
+        if !uiTestMode {
+            startHostMonitor()
+        }
     }
 
     deinit {
         hostMonitorTask?.cancel()
+    }
+
+    // MARK: - Queue helpers (shared by production + UI tests)
+
+    func enqueueJobs(_ jobs: [Job]) {
+        queueEngine?.enqueue(jobs)
+        uiTestQueueController?.enqueue(jobs)
+        if let queueEngine {
+            state.queueJobs = queueEngine.jobs
+        }
+    }
+
+    func enqueueFromDrop(_ urls: [URL], baseCommand: String) {
+        let jobs = JobsBuilder.makeJobs(from: urls, baseCommand: baseCommand)
+        guard !jobs.isEmpty else { return }
+        enqueueJobs(jobs)
+        startQueue()
+    }
+
+    func startQueue() {
+        queueEngine?.start()
+        uiTestQueueController?.start()
+    }
+
+    func stopQueue() {
+        queueEngine?.stop()
+        uiTestQueueController?.stop()
+    }
+
+    func cancelPendingQueue() {
+        queueEngine?.stop()
+        uiTestQueueController?.cancelPending()
+    }
+
+    func resumeCanceledQueue() {
+        queueEngine?.resumeCanceled()
+        uiTestQueueController?.resumeCanceled()
+    }
+
+    func clearQueueAll() {
+        queueEngine?.clearAll()
+        uiTestQueueController?.clearAll()
+    }
+
+    func clearQueueCompleted() {
+        queueEngine?.clearCompleted()
+        uiTestQueueController?.clearCompleted()
+    }
+
+    func clearQueueCanceledFailed() {
+        queueEngine?.clearCanceledFailed()
+        uiTestQueueController?.clearCanceledFailed()
+    }
+
+    func removeJob(_ id: UUID) {
+        uiTestQueueController?.remove(id)
+        if let controller = uiTestQueueController {
+            state.queueJobs = controller.jobs
+        }
+    }
+
+    func forceCanceledForUITests() {
+        uiTestQueueController?.markPendingAsCanceled()
+        if let controller = uiTestQueueController {
+            state.queueJobs = controller.jobs
+        }
+    }
+
+    func ensureResumeAvailableForUITests() {
+        uiTestQueueController?.ensureResumeAvailable()
+        if let controller = uiTestQueueController {
+            state.queueJobs = controller.jobs
+        }
+    }
+
+    func forceResumeCanceledForUITests() {
+        uiTestQueueController?.forceResumeAndStart()
+        if let controller = uiTestQueueController {
+            state.queueJobs = controller.jobs
+        }
+    }
+
+    func seedQueueForUITests() {
+        uiTestQueueController?.seed()
+        if let controller = uiTestQueueController {
+            state.queueJobs = controller.jobs
+        }
+    }
+
+    func enqueueSampleJobForUITests() {
+        guard let controller = uiTestQueueController else { return }
+        let job = UITestSupport.sampleJob(name: "ui-test.wav")
+        try? FileManager.default.createDirectory(at: job.fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        FileManager.default.createFile(atPath: job.fileURL.path, contents: Data())
+        controller.enqueue([job])
+        state.queueJobs = controller.jobs
+    }
+
+    var isUITestHarnessActive: Bool {
+        uiTestQueueController != nil
     }
 
     private static func trackStorePaths() -> (dbURL: URL, legacyTrackURL: URL, legacyArtistURL: URL) {
@@ -166,6 +329,14 @@ final class AppStore: ObservableObject {
                 let interval: UInt64 = snap.processing.status == "running" ? 1_500_000_000 : 3_500_000_000
                 try? await Task.sleep(nanoseconds: interval)
             }
+        }
+    }
+
+    func refreshOutboxCounts() async {
+        let snapshot = await ingestOutbox.snapshot()
+        await MainActor.run {
+            state.ingestPendingCount = snapshot.pending
+            state.ingestErrorCount = snapshot.errors
         }
     }
 }

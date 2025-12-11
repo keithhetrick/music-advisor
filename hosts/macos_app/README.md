@@ -68,6 +68,25 @@ Smoke test the default CLI (headless)
 # install a git pre-push hook to run smoke: ./scripts/install_prepush_hook.sh
 ```
 
+UI tests (XCUI)
+
+- Run `./scripts/ui_tests_with_coverage.sh` (or `task test-macos-ui`) to execute the `MusicAdvisorMacAppUITests` bundle with coverage enabled via the `MusicAdvisorMacApp-UI` scheme. Reports land in `build/ui-test-coverage.txt` and `build/ui-test-coverage.json`.
+- Debug-only UI controls appear when `MA_UI_TEST_MODE=1` (set by the UI test target) so automation can seed the queue, enqueue a sample job, start the harness, and trigger a toast reliably.
+
+Testing & coverage (macOS host)
+
+- Full tests: `cd hosts/macos_app && swift test` (slow stop/restart queue cases now run by default).
+- Optional stress/soak: `RUN_LARGE_QUEUE_STRESS=1 swift test --filter LargeQueueRobustnessTests` (add `RUN_SOAK=1` for longer budgets).
+- Optional micro-benchmark: `RUN_QUEUE_BENCH=1 swift test --filter QueueEngineBenchmarks`.
+- Temp-path lint (prod sources): `scripts/lint_tmp_paths.sh` (or `task lint-macos-tmp`).
+- Coverage bundle: `./scripts/publish_coverage_artifacts.sh` (or `task publish-macos-coverage`) collects `coverage.txt`, UI coverage, and, if present, zips the latest `.xcresult` into `build/coverage-latest/`. If you need the xcresult, run UI tests first (`scripts/ui_tests_with_coverage.sh`).
+- Taskfile convenience commands require go-task (`brew install go-task`), or run the scripts directly as shown.
+- CI/local validation recommendations:
+  - Per-PR: `swift test`, `scripts/ui_tests_with_coverage.sh` (or `task test-macos-ui`), `scripts/publish_coverage_artifacts.sh` to surface coverage.
+  - Nightly/periodic: `task ci-macos-queue-all` (runs lint + fast + slow + stress + bench; add `RUN_SOAK=1` if desired), then `task publish-macos-coverage` to archive coverage/xcresult.
+  - Enable a soft coverage threshold in CI using the generated `build/coverage-latest/` artifacts.
+  - Hardened runtime / code signing: for release builds, turn on Hardened Runtime under Signing & Capabilities and use your team signing identity. (UI tests can remain with ad-hoc signing.)
+
 Config overrides (no code edits)
 
 - Optional `.env.local` (copy from `.env.local.example`) and/or JSON config at `config/defaults.json` (override path via `MA_APP_CONFIG_FILE`).

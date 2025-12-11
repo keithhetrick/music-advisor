@@ -59,15 +59,19 @@ struct RunPanelView: View {
                     CardHeader(title: "Batch Queue")
                 } content: {
                     JobQueueView(
-                        jobs: viewModel.queueVM.jobs,
+                        jobs: store.state.queueJobs,
+                        ingestPendingCount: store.state.ingestPendingCount,
+                        ingestErrorCount: store.state.ingestErrorCount,
                         onReveal: revealSidecar,
                         onPreviewRich: { richPath in
                             let sidecar = richPath.replacingOccurrences(of: ".client.rich.txt", with: ".json")
                             onPreviewRich(sidecar)
                         },
                         onClear: {
-                            viewModel.queueVM.clear()
-                            viewModel.currentJobID = nil
+                            store.clearQueueAll()
+                        },
+                        onResumeCanceled: {
+                            store.resumeCanceledQueue()
                         }
                     )
                 }

@@ -7,6 +7,7 @@ struct SettingsSheet: View {
     var statusText: String
     var dataPath: String?
     var onClose: (() -> Void)? = nil
+    var uiTestMode: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: MAStyle.Spacing.md) {
@@ -21,6 +22,7 @@ struct SettingsSheet: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Close settings")
+                .accessibilityIdentifier("close-settings")
             }
             VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
                 HStack {
@@ -58,6 +60,13 @@ struct SettingsSheet: View {
                             .maButton(.ghost)
                         }
                     }
+                }
+                if uiTestMode {
+                    Button("Close settings (UITest)") {
+                        onClose?()
+                    }
+                    .maButton(.ghost)
+                    .accessibilityIdentifier("ui-test-close-settings")
                 }
             }
         }

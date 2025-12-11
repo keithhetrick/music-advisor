@@ -17,16 +17,35 @@ struct RunTabView: View {
             TrackHeaderView(title: store.state.mockTrackTitle, badgeText: "Norms Badge")
                 .maSheen(isActive: viewModel.isRunning, duration: 5.5, highlight: Color.white.opacity(0.12))
             DropZoneView { urls in
-                viewModel.enqueue(files: urls)
-                trackVM?.ingestDropped(urls: urls)
+                store.enqueueFromDrop(urls, baseCommand: viewModel.commandText)
             }
             JobQueueView(
-                jobs: viewModel.queueVM.jobs,
+                jobs: store.state.queueJobs,
+                expandFoldersSignal: NotificationCenter.default.publisher(for: .uiTestExpandFolders),
+                ingestPendingCount: store.state.ingestPendingCount,
+                ingestErrorCount: store.state.ingestErrorCount,
                 onReveal: revealSidecar,
                 onPreviewRich: { richPath in onPreviewRich(richPath.replacingOccurrences(of: ".client.rich.txt", with: ".json")) },
                 onClear: {
-                    viewModel.queueVM.clear()
-                    viewModel.currentJobID = nil
+                    store.clearQueueAll()
+                },
+                onStop: {
+                    store.stopQueue()
+                },
+                onRemove: { jobID in
+                    store.removeJob(jobID)
+                },
+                onCancelPending: {
+                    store.cancelPendingQueue()
+                },
+                onClearCompleted: {
+                    store.clearQueueCompleted()
+                },
+                onClearCanceledFailed: {
+                    store.clearQueueCanceledFailed()
+                },
+                onResumeCanceled: {
+                    store.resumeCanceledQueue()
                 }
             )
             QuickActionsView(actions: store.state.quickActions)

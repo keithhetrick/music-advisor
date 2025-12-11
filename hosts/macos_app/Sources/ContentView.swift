@@ -47,7 +47,7 @@ struct ContentView: View {
                     if let data = item as? Data,
                        let url = URL(dataRepresentation: data, relativeTo: nil) {
                         Task { @MainActor in
-                            viewModel.enqueue(files: [url])
+                            store.enqueueFromDrop([url], baseCommand: viewModel.commandText)
                             trackVM?.ingestDropped(urls: [url])
                         }
                     }
@@ -214,11 +214,13 @@ struct ContentView: View {
                                               }),
                         statusText: store.commandVM.status,
                         dataPath: applicationSupportPath(),
-                        onClose: { showSettingsSheet = false }
+                        onClose: { showSettingsSheet = false },
+                        uiTestMode: store.isUITestHarnessActive
                     )
                     .frame(width: 320)
                     .padding(MAStyle.Spacing.sm)
                     .maHoverLift(enabled: false)
+                    .accessibilityIdentifier("settings-overlay")
                 }
                 .maModalTransition()
                 .zIndex(3)
@@ -288,6 +290,72 @@ struct ContentView: View {
                 }
                 .maModalTransition()
                 .zIndex(3)
+            }
+        }
+        .overlay(alignment: .topTrailing) {
+            if store.isUITestHarnessActive {
+                VStack(alignment: .trailing, spacing: MAStyle.Spacing.xs) {
+                    Button("Start UI test queue") {
+                        store.startQueue()
+                    }
+                    .maButton(.secondary)
+                    .accessibilityIdentifier("ui-test-start-queue")
+
+                    Button("Reset UI test queue") {
+                        store.seedQueueForUITests()
+                    }
+                    .maButton(.ghost)
+                    .accessibilityIdentifier("ui-test-reset-queue")
+
+                    Button("Show test toast") {
+                        store.dispatch(.setAlert(AlertHelper.toast("UI Test Toast", message: "Debug toast for UI automation", level: .info)))
+                    }
+                    .maButton(.ghost)
+                    .accessibilityIdentifier("ui-test-show-toast")
+
+                    Button("Stop UI test queue") {
+                        store.stopQueue()
+                    }
+                    .maButton(.ghost)
+                    .accessibilityIdentifier("ui-test-stop-queue")
+
+                    Button("Open settings") {
+                        showSettingsSheet = true
+                    }
+                    .maButton(.ghost)
+                    .accessibilityIdentifier("ui-test-open-settings")
+
+                    Button("Enqueue sample job") {
+                        store.enqueueSampleJobForUITests()
+                    }
+                    .maButton(.ghost)
+                    .accessibilityIdentifier("ui-test-enqueue-sample")
+
+                    Button("Make pending jobs canceled") {
+                        store.forceCanceledForUITests()
+                    }
+                    .maButton(.ghost)
+                    .accessibilityIdentifier("ui-test-make-canceled")
+
+                    Button("Show resume control") {
+                        store.ensureResumeAvailableForUITests()
+                    }
+                    .maButton(.ghost)
+                    .accessibilityIdentifier("ui-test-show-resume")
+
+                    Button("Expand folders") {
+                        NotificationCenter.default.post(name: .uiTestExpandFolders, object: nil)
+                    }
+                    .maButton(.ghost)
+                    .accessibilityIdentifier("ui-test-expand-folders")
+
+                    Button("Force resume canceled") {
+                        store.forceResumeCanceledForUITests()
+                    }
+                    .maButton(.ghost)
+                    .accessibilityIdentifier("ui-test-force-resume")
+                }
+                .padding(MAStyle.Spacing.md)
             }
         }
         .onAppear {
@@ -409,16 +477,19 @@ struct ContentView: View {
                 TrackHeaderView(title: store.state.mockTrackTitle, badgeText: "Norms Badge")
                     .maSheen(isActive: viewModel.isRunning, duration: 5.5, highlight: Color.white.opacity(0.12))
                 DropZoneView { urls in
-                    viewModel.enqueue(files: urls)
-                    trackVM?.ingestDropped(urls: urls)
+                    store.enqueueFromDrop(urls, baseCommand: viewModel.commandText)
                 }
                 JobQueueView(
-                    jobs: viewModel.queueVM.jobs,
+                    jobs: store.state.queueJobs,
+                    ingestPendingCount: store.state.ingestPendingCount,
+                    ingestErrorCount: store.state.ingestErrorCount,
                     onReveal: revealSidecar(path:),
                     onPreviewRich: { richPath in loadHistoryPreview(path: richPath.replacingOccurrences(of: ".client.rich.txt", with: ".json")) },
                     onClear: {
-                        viewModel.queueVM.clear()
-                        viewModel.currentJobID = nil
+                        store.clearQueueAll()
+                    },
+                    onResumeCanceled: {
+                        store.resumeCanceledQueue()
                     }
                 )
                 QuickActionsView(actions: store.state.quickActions)

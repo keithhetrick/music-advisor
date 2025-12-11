@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 import MAStyle
 import Combine
+import MAQueue
 
 @MainActor
 final class CommandViewModel: ObservableObject {
@@ -25,9 +26,10 @@ final class CommandViewModel: ObservableObject {
     @Published var currentJobID: UUID?
     private var stopAfterCurrent: Bool = false
     private var progressThrottle = Date.distantPast
-    private var cancellables = Set<AnyCancellable>()
+    var cancellables = Set<AnyCancellable>()
+    private var currentTempSidecarPath: String?
 
-    private let runnerService = RunnerService()
+    let runnerService = RunnerService()
     private let initialConfig: AppConfig
     private let queuePersistence = QueuePersistence()
     private var logBuffer = PassthroughSubject<(String, Bool), Never>() // (line, isStdErr)
@@ -181,14 +183,13 @@ final class CommandViewModel: ObservableObject {
                         self.exitCode = result.exitCode
                         self.isRunning = false
                         self.processingUpdater?("failed", 1.0, self.status)
-                        return
+                    } else {
+                        self.lastDuration = duration
+                        self.stdout = result.stdout
+                        self.stderr = result.stderr
+                        self.exitCode = result.exitCode
+                        self.status = "Done (exit \(result.exitCode))"
                     }
-
-                    self.lastDuration = duration
-                    self.stdout = result.stdout
-                    self.stderr = result.stderr
-                    self.exitCode = result.exitCode
-                    self.status = "Done (exit \(result.exitCode))"
                 self.parsedJSON = parsed
                 self.summaryMetrics = metrics
                 self.lastRunTime = Date()
@@ -201,17 +202,28 @@ final class CommandViewModel: ObservableObject {
 
                 if let jobID = self.currentJobID {
                     let job = self.queueVM.jobs.first(where: { $0.id == jobID })
-                    if result.exitCode == 0 {
+                    let wasCanceled = job?.status == .canceled
+                    let tempSidecarPath = self.currentTempSidecarPath
+                    if result.exitCode == 0 && !wasCanceled {
+                        self.finishSidecar(tempPath: tempSidecarPath, finalPath: self.sidecarPath)
                         self.queueVM.markDone(jobID: jobID, sidecarPath: self.sidecarPath)
-                        if let job { self.jobCompletionHandler?(job, true) }
-                    } else {
+                        let updatedJob = self.queueVM.jobs.first(where: { $0.id == jobID })
+                        if let jobToReport = updatedJob ?? job { self.jobCompletionHandler?(jobToReport, true) }
+                        QueueLogger.shared.log(.debug, "job done \(job?.displayName ?? "") exit=\(result.exitCode)")
+                    } else if !wasCanceled {
+                        self.cleanupTempSidecar()
                         let err = self.stderr.isEmpty ? self.status : self.stderr
                         self.queueVM.markFailed(jobID: jobID, error: err)
-                        if let job { self.jobCompletionHandler?(job, false) }
+                        let updatedJob = self.queueVM.jobs.first(where: { $0.id == jobID })
+                        if let jobToReport = updatedJob ?? job { self.jobCompletionHandler?(jobToReport, false) }
+                        QueueLogger.shared.log(.error, "job failed \(job?.displayName ?? "") exit=\(result.exitCode) err=\(err)")
+                    } else {
+                        self.cleanupTempSidecar()
+                        QueueLogger.shared.log(.debug, "job canceled \(job?.displayName ?? "")")
                     }
+                    self.currentTempSidecarPath = nil
                     self.currentJobID = nil
-                    self.updateProcessingProgress(message: "finished \(job?.displayName ?? "")")
-                    self.processNextJobIfNeeded()
+                    self.updateProcessingProgress(message: wasCanceled ? "canceled \(job?.displayName ?? "")" : "finished \(job?.displayName ?? "")")
                 } else {
                     // Standalone run; clear processing state.
                     self.processingUpdater?("done", 1.0, self.status)
@@ -221,11 +233,9 @@ final class CommandViewModel: ObservableObject {
     }
 
     func runQueueOrSingle() {
-        // If there are pending queue jobs, process them; otherwise run the current command once.
+        // If the engine is wired, the UI should call into the engine directly. Keep standalone run.
         if queueVM.jobs.contains(where: { $0.status == .pending }) || currentJobID != nil {
-            stopAfterCurrent = false
-            updateProcessingProgress(message: "starting queue")
-            processNextJobIfNeeded()
+            updateProcessingProgress(message: "starting queue (engine handles)")
         } else {
             currentJobID = nil
             run()
@@ -410,7 +420,6 @@ final class CommandViewModel: ObservableObject {
                     queueVM.markFailed(jobID: jobID, error: err)
                 }
                 currentJobID = nil
-                processNextJobIfNeeded()
             }
         }
     }
@@ -452,97 +461,16 @@ final class CommandViewModel: ObservableObject {
 
     // MARK: - Queue
     func enqueue(files: [URL]) {
-        // Precompute per-job command/out to avoid per-run string editing.
-        let baseParts = splitCommand(commandText)
-        let baseOut = extractOutPath(from: baseParts)
-        let expanded = expandSources(urls: files)
-        let newJobs: [Job] = expanded.map { entry in
-            let url = entry.url
-            let outPath = baseOut ?? makeSidecarPath(for: url)
-            var parts = baseParts
-            if let idx = parts.firstIndex(of: "--audio"), parts.indices.contains(idx + 1) {
-                parts[idx + 1] = shellEscape(url.path)
-            } else {
-                parts.append(contentsOf: ["--audio", shellEscape(url.path)])
-            }
-            if let outIdx = parts.firstIndex(of: "--out"), parts.indices.contains(outIdx + 1) {
-                parts[outIdx + 1] = shellEscape(outPath)
-            } else {
-                parts.append(contentsOf: ["--out", shellEscape(outPath)])
-            }
-            return Job(fileURL: url,
-                       displayName: url.lastPathComponent,
-                       groupID: entry.groupID,
-                       groupName: entry.groupName,
-                       groupRootPath: entry.groupRootPath,
-                       status: .pending,
-                       sidecarPath: outPath,
-                       errorMessage: nil,
-                       preparedCommand: parts,
-                       preparedOutPath: outPath)
-        }
-        queueVM.addPrecomputed(newJobs)
-        updateProcessingProgress(message: "queued \(newJobs.count) file(s)")
+        // Delegated to QueueEngine (AppStore wires it); keep stub for compatibility.
+        QueueLogger.shared.log(.debug, "enqueue called (stub; engine should handle)")
     }
 
     func startQueue() {
-        stopAfterCurrent = false
-        processNextJobIfNeeded()
-        updateProcessingProgress(message: "starting queue")
+        // Delegated to QueueEngine
     }
 
     func stopQueue() {
-        stopAfterCurrent = true
-        // Cancel pending jobs so they surface as stopped/canceled instead of running later.
-        queueVM.cancelPending()
-        if let currentID = currentJobID {
-            queueVM.cancelJob(jobID: currentID)
-        }
-        processingUpdater?("stopping", nil, "queue will pause after current job")
-        updateProcessingProgress(message: "queue stopping after current")
-    }
-
-    private func processNextJobIfNeeded() {
-        guard !stopAfterCurrent else { return }
-        guard !isRunning else { return }
-        guard let next = queueVM.jobs.first(where: { $0.status == .pending }) else {
-            updateProcessingProgress(message: "queue complete")
-            return
-        }
-        currentJobID = next.id
-
-        let sidecarPathForJob = next.preparedOutPath ?? makeSidecarPath(for: next.fileURL)
-
-        // Replace --audio with the next file
-        let parts: [String]
-        if let prepared = next.preparedCommand {
-            parts = prepared
-        } else {
-            var tmp = splitCommand(commandText)
-            if let idx = tmp.firstIndex(of: "--audio"), tmp.indices.contains(idx + 1) {
-                tmp[idx + 1] = shellEscape(next.fileURL.path)
-            } else {
-                tmp.append(contentsOf: ["--audio", shellEscape(next.fileURL.path)])
-            }
-            if let outIdx = tmp.firstIndex(of: "--out"), tmp.indices.contains(outIdx + 1) {
-                tmp[outIdx + 1] = shellEscape(sidecarPathForJob)
-            } else {
-                tmp.append(contentsOf: ["--out", shellEscape(sidecarPathForJob)])
-            }
-            parts = tmp
-        }
-        commandText = parts.joined(separator: " ")
-        sidecarPath = sidecarPathForJob
-        queueVM.assignSidecar(jobID: next.id, sidecarPath: sidecarPathForJob)
-
-        queueVM.markRunning(jobID: next.id)
-        let now = Date()
-        if now.timeIntervalSince(progressThrottle) > 0.2 {
-            processingUpdater?("running", 0.05, "processing \(next.displayName)")
-            progressThrottle = now
-        }
-        updateProcessingProgress(message: "processing \(next.displayName)")
-        run()
+        // Delegated to QueueEngine
     }
 
     private func makeSidecarPath(for audioURL: URL) -> String {
@@ -554,6 +482,47 @@ final class CommandViewModel: ObservableObject {
         let timestamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
         let filename = "\(base)_\(timestamp).json"
         return sidecarDir.appendingPathComponent(filename).path
+    }
+
+    private func ensureSidecarDirectoryExists(path: String) {
+        let dir = URL(fileURLWithPath: path).deletingLastPathComponent()
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    }
+
+    private func makeTempSidecarPath(for finalPath: String) -> String {
+        let suffix = ".tmp-\(UUID().uuidString)"
+        return finalPath + suffix
+    }
+
+    private func finishSidecar(tempPath: String?, finalPath: String?) {
+        let fm = FileManager.default
+        guard let finalPath else { return }
+        ensureSidecarDirectoryExists(path: finalPath)
+        // If the tool already wrote to finalPath, accept and clean temp if present.
+        if fm.fileExists(atPath: finalPath) {
+            if let tempPath, fm.fileExists(atPath: tempPath) {
+                try? fm.removeItem(atPath: tempPath)
+            }
+            return
+        }
+        guard let tempPath else { return }
+        guard fm.fileExists(atPath: tempPath) else { return }
+        // Move atomically; if final exists now, prefer existing.
+        if fm.fileExists(atPath: finalPath) {
+            try? fm.removeItem(atPath: tempPath)
+            return
+        }
+        do {
+            try fm.moveItem(atPath: tempPath, toPath: finalPath)
+        } catch {
+            // Swallow; absence or contention shouldn’t fail the job.
+        }
+    }
+
+    private func cleanupTempSidecar() {
+        if let temp = currentTempSidecarPath {
+            try? FileManager.default.removeItem(atPath: temp)
+        }
     }
 
     private func updateProcessingProgress(message: String? = nil) {

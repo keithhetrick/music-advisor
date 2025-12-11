@@ -38,6 +38,64 @@ tasks:
     cmds:
       - python3 tools/ma_orchestrator.py test ttc_engine
 
+  test-macos-coverage:
+    desc: Run macOS app tests with coverage (hosts/macos_app/.build/coverage.txt)
+    cmds:
+      - cd hosts/macos_app && scripts/test_with_coverage.sh
+
+  test-macos-ui:
+    desc: Run macOS app UI tests with coverage (hosts/macos_app/build/ui-test-coverage.txt)
+    cmds:
+      - cd hosts/macos_app && scripts/ui_tests_with_coverage.sh
+    status:
+      - ls hosts/macos_app/build/ui-tests-latest.xcresult.zip >/dev/null 2>&1
+      - ls hosts/macos_app/build/ui-test-coverage.txt >/dev/null 2>&1
+      - ls hosts/macos_app/build/ui-test-coverage.json >/dev/null 2>&1
+
+  test-macos-queue-fast:
+    desc: Fast macOS queue determinism sweep (LargeQueueRobustnessTests quick path)
+    cmds:
+      - cd hosts/macos_app && swift test --filter LargeQueueRobustnessTests
+
+  test-macos-queue-stress:
+    desc: Full macOS queue stress (500/1000 jobs, enable optional soak with RUN_SOAK=1)
+    cmds:
+      - cd hosts/macos_app && RUN_LARGE_QUEUE_STRESS=1 swift test --filter LargeQueueRobustnessTests
+
+  test-macos-queue-slow:
+    desc: Run slow/optional queue stop/restart scenarios (RUN_SLOW_QUEUE=1)
+    cmds:
+      - cd hosts/macos_app && RUN_SLOW_QUEUE=1 swift test --filter QueueEngineTests
+
+  bench-macos-queue:
+    desc: Optional queue micro-benchmark (RUN_QUEUE_BENCH=1)
+    cmds:
+      - cd hosts/macos_app && RUN_QUEUE_BENCH=1 swift test --filter QueueEngineBenchmarks
+
+  lint-macos-tmp:
+    desc: Lint for hard-coded /tmp usage in macOS production sources
+    cmds:
+      - cd hosts/macos_app && scripts/lint_tmp_paths.sh
+
+  publish-macos-coverage:
+    desc: Collect coverage artifacts (unit + UI) into build/coverage-latest
+    cmds:
+      - cd hosts/macos_app && scripts/publish_coverage_artifacts.sh
+
+  ci-macos-queue-all:
+    desc: Full macOS queue validation (lint, fast, slow, stress, bench; optional soak if RUN_SOAK=1)
+    cmds:
+      - task: lint-macos-tmp
+      - cd hosts/macos_app && swift test --filter LargeQueueRobustnessTests
+      - cd hosts/macos_app && RUN_SLOW_QUEUE=1 swift test --filter QueueEngineTests
+      - cd hosts/macos_app && RUN_LARGE_QUEUE_STRESS=1 swift test --filter LargeQueueRobustnessTests
+      - cd hosts/macos_app && RUN_QUEUE_BENCH=1 swift test --filter QueueEngineBenchmarks
+
+  test-style-coverage:
+    desc: Run MAStyle design system tests with coverage (shared/design_system/.build/coverage.txt)
+    cmds:
+      - cd shared/design_system && scripts/test_with_coverage.sh
+
   test-reco:
     desc: Test recommendation engine
     cmds:
@@ -122,7 +180,8 @@ tasks:
       - . .venv/bin/activate && pip install --no-build-isolation -e engines/audio_engine -e engines/lyrics_engine -e engines/ttc_engine -e engines/recommendation_engine -e hosts/advisor_host_core -e hosts/advisor_host
       - . .venv/bin/activate && python infra/scripts/data_bootstrap.py --manifest infra/scripts/data_manifest.json
       - . .venv/bin/activate && ./infra/scripts/quick_check.sh
-      - echo "[ma] bootstrap complete. Next: run 'python -m ma_helper help' (or alias ma=\"python -m ma_helper\") for helper commands."
+      - cmd: >
+          echo "[ma] bootstrap complete. Next: run 'python -m ma_helper help' (or alias ma=\"python -m ma_helper\") for helper commands."
 
   bootstrap-locked:
     desc: Bootstrap using requirements.lock (pinned deps)
@@ -133,7 +192,8 @@ tasks:
       - . .venv/bin/activate && pip install --no-build-isolation -e engines/audio_engine -e engines/lyrics_engine -e engines/ttc_engine -e engines/recommendation_engine -e hosts/advisor_host_core -e hosts/advisor_host
       - . .venv/bin/activate && python infra/scripts/data_bootstrap.py --manifest infra/scripts/data_manifest.json
       - . .venv/bin/activate && ./infra/scripts/quick_check.sh
-      - echo "[ma] bootstrap complete. Next: run 'python -m ma_helper help' (or alias ma=\"python -m ma_helper\") for helper commands."
+      - cmd: >
+          echo "[ma] bootstrap complete. Next: run 'python -m ma_helper help' (or alias ma=\"python -m ma_helper\") for helper commands."
 
   rebuild-venv:
     desc: Remove and recreate .venv, then bootstrap-all

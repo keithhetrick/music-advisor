@@ -26,6 +26,7 @@ struct NavigationRail: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(label(for: tab))
+                .accessibilityIdentifier("tab-\(label(for: tab))")
                 .help(label(for: tab))
                 .contentShape(Rectangle())
                 .onHover { hover in
@@ -47,6 +48,7 @@ struct NavigationRail: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(followSystemTheme ? "Follow system theme" : "Toggle theme")
+                .accessibilityIdentifier("nav-theme-toggle")
                 .help(followSystemTheme ? "Following system appearance" : "Toggle theme")
             }
             if let onSettings {
@@ -59,6 +61,7 @@ struct NavigationRail: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Settings")
+                .accessibilityIdentifier("nav-settings")
                 .help("Settings")
             }
         }

@@ -116,22 +116,36 @@ public struct NestedFolderTree<Item, Leaf: View>: View {
                 .padding(.leading, MAStyle.Spacing.sm)
             } label: {
                 GroupedRow(isActive: false) {
-                    HStack {
-                        Image(systemName: "folder.fill")
-                        Text(node.name)
-                            .maText(.body)
-                        Spacer()
-                        Text("\(totalFiles(in: node)) file(s)")
-                            .maBadge(.info)
+                    Button {
+                        expandedBinding.wrappedValue.toggle()
+                    } label: {
+                        HStack {
+                            Image(systemName: expandedBinding.wrappedValue ? "folder.fill" : "folder")
+                            Text(node.name)
+                                .maText(.body)
+                            Spacer()
+                            Text("\(totalFiles(in: node)) file(s)")
+                                .maBadge(.info)
+                        }
+                        .padding(.leading, CGFloat(depth) * MAStyle.Spacing.md)
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        .contentShape(RoundedRectangle(cornerRadius: MAStyle.Radius.md))
                     }
-                    .padding(.leading, CGFloat(depth) * MAStyle.Spacing.md)
-                    .contentShape(RoundedRectangle(cornerRadius: MAStyle.Radius.md))
+                    .buttonStyle(.plain)
                 }
+                .padding(.vertical, MAStyle.Spacing.xs)
+                .accessibilityIdentifier("folder-toggle-\(node.name)")
             }
             .maCard()
             .clipShape(RoundedRectangle(cornerRadius: MAStyle.Radius.md))
             .maSheen(isActive: isActive, duration: 3.0, highlight: Color.white.opacity(0.08))
             .id(isActive ? "\(key)-\(running)" : key)
+            .accessibilityIdentifier("folder-toggle-\(node.name)")
+            .accessibilityLabel(node.name)
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isButton)
+            .contentShape(Rectangle())
+            .frame(maxWidth: .infinity, alignment: .leading)
         )
     }
 }

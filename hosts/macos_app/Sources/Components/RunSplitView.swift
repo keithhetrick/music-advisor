@@ -24,7 +24,7 @@ struct RunSplitView: View {
             VStack(alignment: .leading, spacing: MAStyle.Spacing.md) {
                 DropZoneView { urls in
                     isEnqueuingDrop = true
-                    viewModel.enqueue(files: urls)
+                    store.enqueueFromDrop(urls, baseCommand: viewModel.commandText)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                         isEnqueuingDrop = false
                     }
@@ -40,28 +40,32 @@ struct RunSplitView: View {
                 workingDirectoryStatus
 
                 JobQueueView(
-                    jobs: viewModel.queueVM.jobs,
+                    jobs: store.state.queueJobs,
                     isEnqueuing: isEnqueuingDrop,
+                    ingestPendingCount: store.state.ingestPendingCount,
+                    ingestErrorCount: store.state.ingestErrorCount,
                     onReveal: revealSidecar,
                     onPreviewRich: { richPath in onPreviewRich(richPath.replacingOccurrences(of: ".client.rich.txt", with: ".json")) },
                     onClear: {
-                        viewModel.queueVM.clear()
-                        viewModel.currentJobID = nil
+                        store.clearQueueAll()
                     },
                     onStop: {
-                        viewModel.stopQueue()
+                        store.stopQueue()
                     },
                     onRemove: { id in
-                        viewModel.queueVM.remove(jobID: id)
+                        store.clearQueueAll() // removal per-job not yet exposed
                     },
                     onCancelPending: {
-                        viewModel.queueVM.cancelPending()
+                        store.cancelPendingQueue()
                     },
                     onClearCompleted: {
-                        viewModel.queueVM.clearCompleted()
+                        store.clearQueueCompleted()
                     },
                     onClearCanceledFailed: {
-                        viewModel.queueVM.clearCanceledFailed()
+                        store.clearQueueCanceledFailed()
+                    },
+                    onResumeCanceled: {
+                        store.resumeCanceledQueue()
                     }
                 )
                 .maCard(enableLens: false)

@@ -11,13 +11,15 @@ let package = Package(
             name: "MAStyle",
             targets: ["MAStyle"]),
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/nalexn/ViewInspector", from: "0.9.4")
+    ],
     targets: [
         .target(
             name: "MAStyle",
             dependencies: []),
         .testTarget(
             name: "MAStyleTests",
-            dependencies: ["MAStyle"]),
+            dependencies: ["MAStyle", .product(name: "ViewInspector", package: "ViewInspector")]),
     ]
 )
