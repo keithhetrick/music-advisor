@@ -53,8 +53,10 @@ Testing & coverage (macOS host)
 - UI tests with coverage: `cd hosts/macos_app && scripts/ui_tests_with_coverage.sh` (or `task test-macos-ui`); outputs `build/ui-test-coverage.txt/.json`.
 - Coverage bundle: `cd hosts/macos_app && scripts/publish_coverage_artifacts.sh` (or `task publish-macos-coverage`) copies unit/UI coverage and, if present, zips the latest `.xcresult` into `build/coverage-latest/`. Run UI tests first if you need an xcresult.
 - Temp-path lint (prod sources): `cd hosts/macos_app && scripts/lint_tmp_paths.sh` (or `task lint-macos-tmp`).
+- Coverage artifact check: after publishing, verify `build/coverage-latest/coverage.txt`, `ui-test-coverage.txt`, and `ui-test-coverage.json` exist; CI uploads that folder as an artifact.
 - Taskfile targets require go-task (`brew install go-task`), but all commands above can be run directly.
 - CI guidance: per-PR run swift tests + UI tests + publish coverage; nightly run `task ci-macos-queue-all` (lint + fast + slow + stress + bench; add `RUN_SOAK=1` for longer stress) and archive `build/coverage-latest/`.
+- Automated workflow: `.github/workflows/macos-nightly.yml` runs unit/UI tests with coverage, lint, stress, and the opt-in micro-benchmark nightly and uploads `build/coverage-latest/`. Set CI secrets `MACOS_MIN_COVERAGE` (optional gate), `RUN_SOAK=1`, and/or `RUN_QUEUE_BENCH=1` to enable the gate/stress/bench legs. Keep Hardened Runtime enabled for release builds in Xcode (Signing & Capabilities); it is not forced in-repo to keep unsigned local runs working.
 
 CI notes
 

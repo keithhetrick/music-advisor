@@ -1,0 +1,66 @@
+name: macOS nightly queue/coverage
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * *" # daily at 09:00 UTC
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  macos-queue-and-coverage:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Unit tests with coverage
+        working-directory: hosts/macos_app
+        run: |
+          ./scripts/test_with_coverage.sh
+
+      - name: UI tests with coverage
+        working-directory: hosts/macos_app
+        run: |
+          ./scripts/ui_tests_with_coverage.sh
+
+      - name: Temp-path lint (prod sources)
+        working-directory: hosts/macos_app
+        run: |
+          ./scripts/lint_tmp_paths.sh
+
+      - name: Stress/soak queue suite
+        working-directory: hosts/macos_app
+        env:
+          RUN_LARGE_QUEUE_STRESS: "1"
+          RUN_SOAK: ${{ secrets.RUN_SOAK || '0' }}
+        run: |
+          swift test --filter LargeQueueRobustnessTests
+
+      - name: Queue micro-benchmark (opt-in)
+        working-directory: hosts/macos_app
+        env:
+          RUN_QUEUE_BENCH: "1"
+        run: |
+          swift test --filter QueueEngineBenchmarks
+
+      - name: Publish coverage bundle
+        working-directory: hosts/macos_app
+        run: |
+          ./scripts/publish_coverage_artifacts.sh
+
+      - name: Enforce coverage threshold (optional)
+        working-directory: hosts/macos_app
+        env:
+          MIN_COVERAGE: ${{ secrets.MACOS_MIN_COVERAGE || '' }}
+        run: |
+          ./scripts/check_coverage_threshold.sh
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-coverage-latest
+          path: hosts/macos_app/build/coverage-latest
+          if-no-files-found: warn

@@ -80,12 +80,14 @@ Testing & coverage (macOS host)
 - Optional micro-benchmark: `RUN_QUEUE_BENCH=1 swift test --filter QueueEngineBenchmarks`.
 - Temp-path lint (prod sources): `scripts/lint_tmp_paths.sh` (or `task lint-macos-tmp`).
 - Coverage bundle: `./scripts/publish_coverage_artifacts.sh` (or `task publish-macos-coverage`) collects `coverage.txt`, UI coverage, and, if present, zips the latest `.xcresult` into `build/coverage-latest/`. If you need the xcresult, run UI tests first (`scripts/ui_tests_with_coverage.sh`).
+- Coverage artifact check: after publishing, ensure `build/coverage-latest/coverage.txt`, `ui-test-coverage.txt`, and `ui-test-coverage.json` are present. CI uploads that folder as an artifact.
 - Taskfile convenience commands require go-task (`brew install go-task`), or run the scripts directly as shown.
 - CI/local validation recommendations:
   - Per-PR: `swift test`, `scripts/ui_tests_with_coverage.sh` (or `task test-macos-ui`), `scripts/publish_coverage_artifacts.sh` to surface coverage.
   - Nightly/periodic: `task ci-macos-queue-all` (runs lint + fast + slow + stress + bench; add `RUN_SOAK=1` if desired), then `task publish-macos-coverage` to archive coverage/xcresult.
   - Enable a soft coverage threshold in CI using the generated `build/coverage-latest/` artifacts.
-  - Hardened runtime / code signing: for release builds, turn on Hardened Runtime under Signing & Capabilities and use your team signing identity. (UI tests can remain with ad-hoc signing.)
+  - Hardened runtime / code signing: for release builds, turn on Hardened Runtime under Signing & Capabilities and use your team signing identity. (UI tests can remain with ad-hoc signing.) Not forced in-repo to keep unsigned local runs working.
+  - Automation: `.github/workflows/macos-nightly.yml` runs unit/UI tests with coverage, lint, stress, and the opt-in micro-benchmark nightly and uploads `build/coverage-latest/`. Optional coverage gating via `MACOS_MIN_COVERAGE` secret (uses `scripts/check_coverage_threshold.sh`). Set CI secrets `RUN_SOAK=1` and/or `RUN_QUEUE_BENCH=1` to enable long stress and micro-benchmark legs.
 
 Config overrides (no code edits)
 

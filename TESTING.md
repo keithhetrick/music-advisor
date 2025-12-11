@@ -48,11 +48,15 @@ Project shortcuts:
 - Optional queue micro-benchmark: `RUN_QUEUE_BENCH=1 swift test --filter QueueEngineBenchmarks` or `task bench-macos-queue`.
 - Lint for temp-path usage in prod sources: `task lint-macos-tmp`.
 - Coverage publishing: `task publish-macos-coverage` collects unit/UI coverage and latest xcresult into `build/coverage-latest`.
+- Coverage artifacts: after publishing, verify `hosts/macos_app/build/coverage-latest/coverage.txt`, `ui-test-coverage.txt`, and `ui-test-coverage.json` exist; CI uploads the same folder as an artifact.
 - Full queue CI sweep: `task ci-macos-queue-all` (lint + fast + slow + stress + bench; add `RUN_SOAK=1` for longer stress budgets).
 - CI guidance:
   - PR/CI: run `swift test`, `scripts/ui_tests_with_coverage.sh` (or `task test-macos-ui`), then `task publish-macos-coverage` to archive coverage/xcresult; enforce a soft coverage threshold using the artifacts in `build/coverage-latest/`.
   - Nightly: `task ci-macos-queue-all` to exercise lint, slow stop/restart, stress/soak (with `RUN_SOAK=1`), and the optional micro-benchmark.
-  - Security: keep Hardened Runtime enabled for release builds in Xcode (Signing & Capabilities) and ad-hoc signing for UI tests; use `task lint-macos-tmp` in CI to prevent hard-coded temp paths in prod sources.
+  - Security: keep Hardened Runtime enabled for release builds in Xcode (Signing & Capabilities) and ad-hoc signing for UI tests; use `task lint-macos-tmp` in CI to prevent hard-coded temp paths in prod sources. Hardened Runtime is not forced in repo to avoid blocking unsigned local runs—enable it per-release.
+  - Automated: `.github/workflows/macos-nightly.yml` runs unit/UI tests with coverage, lint, stress, and the opt-in micro-benchmark nightly and uploads `build/coverage-latest/`.
+    - Optional coverage gate via `MACOS_MIN_COVERAGE` secret; the nightly workflow runs `scripts/check_coverage_threshold.sh`.
+    - Opt-in stress/bench: set repo/org secrets `RUN_SOAK=1` and/or `RUN_QUEUE_BENCH=1` to execute long stress and micro-benchmarks in CI.
 
 Manual macOS UI checklist (when skipping UITests):
 
