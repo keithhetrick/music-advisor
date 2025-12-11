@@ -201,10 +201,11 @@ public enum MAStyle {
         var padding: CGFloat = Spacing.sm
         var isDisabled: Bool = false
         var isInteractive: Bool = false
+        var enableLens: Bool = false
         @State private var hovering = false
 
         public func body(content: Content) -> some View {
-            let corner: CGFloat = Radius.lg * 1.4
+            let corner: CGFloat = Radius.lg * 1.5
             let base = content
                 .padding(padding)
                 .background(
@@ -212,8 +213,8 @@ public enum MAStyle {
                         // Frosted material with a soft tint.
                         VisualEffectBlur(material: .menu, blendingMode: .withinWindow)
                             .clipShape(RoundedRectangle(cornerRadius: corner))
-                            .blur(radius: 14)
-                        Color.white.opacity(0.05)
+                            .blur(radius: 24)
+                        Color.white.opacity(0.015) // light veil for clarity
                             .clipShape(RoundedRectangle(cornerRadius: corner))
                         LinearGradient(
                             colors: [
@@ -225,8 +226,23 @@ public enum MAStyle {
                             endPoint: .bottomTrailing
                         )
                         .clipShape(RoundedRectangle(cornerRadius: corner))
+                        if enableLens {
+                            OrganicLensOverlay(intensity: 0.05, scale: 1.15, highlight: 0.08)
+                                .clipShape(RoundedRectangle(cornerRadius: corner))
+                                .blendMode(.screen)
+                        }
+                        // Soft top highlight to suggest ambient light.
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.06),
+                                Color.clear
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: corner))
                     }
-                    .opacity(0.58)
+                    .opacity(0.70)
                 )
                 .cornerRadius(corner)
                 .overlay(
@@ -235,7 +251,7 @@ public enum MAStyle {
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: corner)
-                        .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                        .stroke(Color.white.opacity(0.06), lineWidth: 1)
                         .blendMode(.screen)
                 )
                 // Inset feel: light inner highlight bottom/right, soft inner shadow top/left.
@@ -244,22 +260,44 @@ public enum MAStyle {
                         .stroke(
                             LinearGradient(
                                 colors: [
-                                    Color.black.opacity(0.08),
+                                    Color.black.opacity(0.06),
                                     Color.clear,
-                                    Color.white.opacity(0.08)
+                                    Color.white.opacity(0.05)
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
-                            lineWidth: 1.5
+                            lineWidth: 1.3
                         )
                 )
                 // Softer outer shadow so the glass sits over the darker backdrop.
-                .shadow(color: Color.black.opacity(0.12), radius: 10, x: 0, y: 8)
+                // Dual shadow for outward lift: tight contact + broad lift.
+                .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
+                .shadow(color: ColorToken.primary.opacity(0.12), radius: 22, x: 0, y: 12)
+                // Subtle inner shadow at bottom edge for added depth.
+                .overlay(
+                    RoundedRectangle(cornerRadius: corner)
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    Color.clear,
+                                    Color.black.opacity(0.04)
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            ),
+                            lineWidth: 1.2
+                        )
+                )
                 .opacity(isDisabled ? 0.6 : 1.0)
 
             return base
                 .scaleEffect(isInteractive && hovering ? 1.005 : 1.0)
+                .rotation3DEffect(
+                    .degrees(isInteractive && hovering ? 1 : 0),
+                    axis: (x: 1, y: -1, z: 0),
+                    perspective: 0.8
+                )
                 .animation(.easeOut(duration: 0.10), value: hovering)
                 .onHover { hovering = $0 && isInteractive && !isDisabled }
         }
@@ -410,6 +448,14 @@ public enum MAStyle {
                 }()
 
                 return styled
+                    // Minimal sheen; avoid heavy bubble effect.
+                    .overlay {
+                        if hovering || configuration.isPressed {
+                            RoundedRectangle(cornerRadius: MAStyle.Radius.md)
+                                .stroke(Color.white.opacity(0.08), lineWidth: 0.6)
+                                .blendMode(.screen)
+                        }
+                    }
                     .overlay(alignment: .leading) {
                         if variant == .busy && isBusy {
                             ProgressView()
@@ -434,11 +480,11 @@ public enum MAStyle {
             private func focusGlow(_ configuration: Configuration) -> Color {
                 switch variant {
                 case .primary, .busy:
-                    return MAStyle.ColorToken.primary.opacity(0.45)
+                    return MAStyle.ColorToken.primary.opacity(configuration.isPressed ? 0.4 : 0.3)
                 case .secondary:
-                    return MAStyle.ColorToken.primary.opacity(0.35)
+                    return MAStyle.ColorToken.primary.opacity(0.28)
                 case .ghost:
-                    return MAStyle.ColorToken.border.opacity(0.25)
+                    return MAStyle.ColorToken.border.opacity(0.22)
                 }
             }
 
@@ -453,11 +499,21 @@ public enum MAStyle {
         public var kind: Kind
         public func body(content: Content) -> some View {
             switch kind {
-            case .title: return content.font(Typography.title)
-            case .headline: return content.font(Typography.headline)
-            case .body: return content.font(Typography.body)
-            case .mono: return content.font(Typography.bodyMono)
-            case .caption: return content.font(Typography.caption)
+            case .title:
+                return content.font(Typography.title)
+                    .foregroundColor(ColorToken.muted.opacity(1.0))
+            case .headline:
+                return content.font(Typography.headline)
+                    .foregroundColor(ColorToken.muted.opacity(1.0))
+            case .body:
+                return content.font(Typography.body)
+                    .foregroundColor(ColorToken.muted.opacity(1.0))
+            case .mono:
+                return content.font(Typography.bodyMono)
+                    .foregroundColor(ColorToken.muted.opacity(0.95))
+            case .caption:
+                return content.font(Typography.caption)
+                    .foregroundColor(ColorToken.muted.opacity(0.94))
             }
         }
     }
@@ -677,8 +733,8 @@ public enum MAStyle {
             ZStack {
                 LinearGradient(
                     colors: [
-                        MAStyle.ColorToken.panel.opacity(0.78),
-                        MAStyle.ColorToken.background.opacity(0.82)
+                        Color(red: 0.07, green: 0.10, blue: 0.12, opacity: 1.0),
+                        Color(red: 0.12, green: 0.14, blue: 0.18, opacity: 1.0)
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
@@ -687,8 +743,8 @@ public enum MAStyle {
 
                 RadialGradient(
                     colors: [
-                        accent.opacity(0.12 * intensity),
-                        accent.opacity(0.04 * intensity),
+                        accent.opacity(0.10 * intensity),
+                        accent.opacity(0.03 * intensity),
                         .clear
                     ],
                     center: .topLeading,
@@ -699,8 +755,8 @@ public enum MAStyle {
 
                 RadialGradient(
                     colors: [
-                        MAStyle.ColorToken.background.opacity(0.06 * intensity),
-                        MAStyle.ColorToken.panel.opacity(0.04 * intensity),
+                        MAStyle.ColorToken.panel.opacity(0.08 * intensity),
+                        MAStyle.ColorToken.background.opacity(0.03 * intensity),
                         .clear
                     ],
                     center: .bottomTrailing,
@@ -711,15 +767,123 @@ public enum MAStyle {
 
                 LinearGradient(
                     colors: [
-                        Color.black.opacity(0.06 * intensity),
+                        Color.black.opacity(0.05 * intensity),
                         Color.clear,
-                        Color.black.opacity(0.06 * intensity)
+                        Color.black.opacity(0.04 * intensity)
                     ],
                     startPoint: .top,
                     endPoint: .bottom
                 )
                 .blendMode(.multiply)
+
+                // Optional slow organic lens glow behind everything.
+                OrganicLensOverlay(intensity: 0.008, scale: 1.8, speed: 18, highlight: 0.015, parallax: .zero)
+                    .blendMode(.screen)
+                    .allowsHitTesting(false)
+
+                // Subtle static noise to add texture and help cards pop.
+                StaticNoise(density: 180, opacity: 0.02)
+                    .blendMode(.overlay)
+                    .allowsHitTesting(false)
             }
+        }
+    }
+
+    // Organic lens effect: drifting caustic-like highlight.
+    public struct OrganicLensOverlay: View {
+        @Environment(\.colorScheme) private var scheme
+        public var intensity: Double
+        public var scale: CGFloat
+        public var speed: Double
+        public var color: Color
+        public var highlight: Double
+        public var parallax: CGSize
+
+        public init(intensity: Double = 0.05,
+                    scale: CGFloat = 1.0,
+                    speed: Double = 12.0,
+                    color: Color = Color.white,
+                    highlight: Double = 0.01,
+                    parallax: CGSize = .zero) {
+            self.intensity = intensity
+            self.scale = scale
+            self.speed = speed
+            self.color = color
+            self.highlight = highlight
+            self.parallax = parallax
+        }
+
+        public var body: some View {
+            GeometryReader { proxy in
+                let size = min(proxy.size.width, proxy.size.height)
+                TimelineView(.animation) { timeline in
+                    let t = timeline.date.timeIntervalSinceReferenceDate / speed
+                    let offsetX = 0.12 * sin(t * 1.1) + 0.08 * cos(t * 0.7)
+                    let offsetY = 0.10 * cos(t * 0.9) + 0.06 * sin(t * 1.3)
+                    let center = UnitPoint(x: 0.5 + offsetX + parallax.width, y: 0.5 + offsetY + parallax.height)
+                    let baseOpacity = scheme == .dark ? intensity : intensity * 0.85
+
+                    ZStack {
+                        RadialGradient(
+                            colors: [
+                                color.opacity(baseOpacity),
+                                color.opacity(baseOpacity * 0.45),
+                                Color.clear
+                            ],
+                            center: center,
+                            startRadius: size * 0.05,
+                            endRadius: size * 0.6 * scale
+                        )
+                        RadialGradient(
+                            colors: [
+                                Color.white.opacity(highlight),
+                                Color.white.opacity(highlight * 0.25),
+                                Color.clear
+                            ],
+                            center: center,
+                            startRadius: size * 0.02,
+                            endRadius: size * 0.25
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    /// Lightweight reproducible noise overlay for texture (no external assets).
+    private struct StaticNoise: View {
+        let density: Int
+        let opacity: Double
+
+        func makeGenerator() -> LCGRandomNumberGenerator {
+            LCGRandomNumberGenerator(state: 0x1234_5678_9abc_def0)
+        }
+
+        var body: some View {
+            Canvas { context, size in
+                var rng = makeGenerator()
+                let width = max(size.width, 1)
+                let height = max(size.height, 1)
+                for _ in 0..<density {
+                    let x = Double(rng.next() % UInt64(width))
+                    let y = Double(rng.next() % UInt64(height))
+                    let dotSize = Double(rng.next() % 2) + 0.5
+                    let rect = CGRect(x: x, y: y, width: dotSize, height: dotSize)
+                    context.fill(
+                        Path(rect),
+                        with: .color(Color.white.opacity(opacity))
+                    )
+                }
+            }
+        }
+    }
+
+    /// Simple linear congruential generator for deterministic noise.
+    private struct LCGRandomNumberGenerator: RandomNumberGenerator {
+        var state: UInt64
+        mutating func next() -> UInt64 {
+            state = 6364136223846793005 &* state &+ 1
+            return state
         }
     }
 
@@ -813,12 +977,12 @@ public enum MAStyle {
 
 // MARK: - View Extensions (syntactic sugar)
 extension View {
-    public func maCard(padding: CGFloat = MAStyle.Spacing.sm) -> some View {
-        modifier(MAStyle.Card(padding: padding, isInteractive: false))
+    public func maCard(padding: CGFloat = MAStyle.Spacing.sm, enableLens: Bool = false) -> some View {
+        modifier(MAStyle.Card(padding: padding, isInteractive: false, enableLens: enableLens))
     }
 
-    public func maCardInteractive(padding: CGFloat = MAStyle.Spacing.sm, isDisabled: Bool = false) -> some View {
-        modifier(MAStyle.Card(padding: padding, isDisabled: isDisabled, isInteractive: true))
+    public func maCardInteractive(padding: CGFloat = MAStyle.Spacing.sm, isDisabled: Bool = false, enableLens: Bool = false) -> some View {
+        modifier(MAStyle.Card(padding: padding, isDisabled: isDisabled, isInteractive: true, enableLens: enableLens))
     }
 
     public func maMetric() -> some View {

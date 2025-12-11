@@ -24,18 +24,21 @@ struct RunControlsView: View {
                 }
             }
             .maButton(.primary)
+            .maFocusRing(true)
             .disabled(isRunning || !canRun)
             .keyboardShortcut(.return, modifiers: [.command])
             .accessibilityLabel("Run")
 
             Button("Run defaults", action: onRunDefaults)
                 .maButton(.secondary)
+                .maFocusRing(true)
             .disabled(isRunning || !canRun)
             .keyboardShortcut(.return, modifiers: [.command, .shift])
             .accessibilityLabel("Run defaults")
 
             Button("Run smoke", action: onRunSmoke)
                 .maButton(.ghost)
+                .maFocusRing(true)
             .disabled(isRunning)
             .keyboardShortcut(.return, modifiers: [.command, .option])
             .accessibilityLabel("Run smoke test")
@@ -43,6 +46,7 @@ struct RunControlsView: View {
             if let onRevealLastSidecar {
                 Button("Reveal last", action: onRevealLastSidecar)
                     .maButton(.ghost)
+                    .maFocusRing(true)
                     .keyboardShortcut("r", modifiers: [.command])
                     .accessibilityLabel("Reveal last sidecar")
             }

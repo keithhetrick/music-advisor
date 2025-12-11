@@ -20,7 +20,7 @@ struct HistorySplitView: View {
     var body: some View {
         AdaptiveSplitView {
             filterBar
-                .maCard()
+                .maCard(enableLens: false)
             HistoryPanelView(
                 items: filteredItems,
                 previews: store.state.historyPreviews,
@@ -39,7 +39,7 @@ struct HistorySplitView: View {
                     onSelectContext(path)
                 }
             )
-            .maCard()
+            .maCard(enableLens: false)
             .alert("Clear history?", isPresented: $confirmClearHistory) {
                 Button("Cancel", role: .cancel) {}
                 Button("Clear", role: .destructive) {
@@ -62,7 +62,7 @@ struct HistorySplitView: View {
                 },
                 onRerun: { reRun(selected) }
             )
-            .maCard()
+            .maCard(enableLens: false)
         }
     }
 
@@ -80,6 +80,7 @@ struct HistorySplitView: View {
             TextField("Search history…", text: $searchText)
                 .maInput()
                 .focused(historySearchFocus)
+                .maFocusRing(historySearchFocus.wrappedValue)
                 .accessibilityLabel("Search history")
             Toggle("Rich only", isOn: $filterRichOnly)
                 .maToggleStyle()

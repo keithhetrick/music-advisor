@@ -64,7 +64,7 @@ struct RunSplitView: View {
                         viewModel.queueVM.clearCanceledFailed()
                     }
                 )
-                .maCard()
+                .maCard(enableLens: false)
                 .maHoverLift(enabled: false)
 
                 CommandInputsView(
@@ -96,7 +96,7 @@ struct RunSplitView: View {
                         if let url = pickDirectory() { viewModel.setWorkingDirectory(url.path) }
                     }
                 )
-                .maCard()
+                .maCard(enableLens: false)
                 .maHoverLift(enabled: false)
 
                 ResultsView(
