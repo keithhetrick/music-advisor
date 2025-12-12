@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Historical Echo Artifact",
+  "type": "object",
+  "required": [
+    "schema_id",
+    "track_id",
+    "run_id",
+    "source_hash",
+    "config_hash",
+    "generated_at",
+    "neighbors"
+  ],
+  "properties": {
+    "schema_id": { "type": "string" },
+    "track_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "source_hash": { "type": "string" },
+    "config_hash": { "type": "string" },
+    "db_hash": { "type": ["string", "null"] },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "probe_params": { "type": "object", "additionalProperties": true },
+    "feature_pipeline_meta": { "type": "object", "additionalProperties": true },
+    "neighbor_filter_notes": { "type": "object", "additionalProperties": true },
+    "decade_counts": {
+      "type": "object",
+      "additionalProperties": { "type": "integer" }
+    },
+    "primary_decade": { "type": ["string", "null"] },
+    "primary_decade_neighbor_count": { "type": ["integer", "null"] },
+    "top_neighbor": { "type": "object", "additionalProperties": true },
+    "neighbors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["year", "artist", "title", "distance", "tier"],
+        "properties": {
+          "year": { "type": ["integer", "string"] },
+          "artist": { "type": "string" },
+          "title": { "type": "string" },
+          "distance": { "type": "number" },
+          "tier": { "type": "string" },
+          "feature_source": { "type": "string" },
+          "tempo": { "type": ["number", "null"] },
+          "valence": { "type": ["number", "null"] },
+          "energy": { "type": ["number", "null"] },
+          "loudness": { "type": ["number", "null"] },
+          "tempo_band": { "type": ["string", "null"] },
+          "valence_band": { "type": ["string", "null"] },
+          "energy_band": { "type": ["string", "null"] }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

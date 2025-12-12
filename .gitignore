@@ -78,6 +78,11 @@ htmlcov/
 .pytype/
 .ruff_cache/
 .cache/
+.swiftpm-cache/
+.swiftpm-module-cache/
+.swiftpm-clang-module-cache/
+.home-swift/
+.home/
 
 # Jupyter
 .ipynb_checkpoints/

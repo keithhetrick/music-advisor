@@ -1,26 +1,41 @@
 import Foundation
 import MAQueue
 
+struct DropEntry {
+    let url: URL
+    let groupID: UUID?
+    let groupName: String?
+    let groupRoot: String?
+}
+
 enum JobsBuilder {
-    static func makeJobs(from urls: [URL], baseCommand: String) -> [Job] {
+    static func makeJobs(from entries: [DropEntry], baseCommand: String) -> [Job] {
         let baseParts = splitCommand(baseCommand)
+        let isAutomator = baseParts.first?.hasSuffix("automator.sh") ?? false
         let baseOut = extractOutPath(from: baseParts)
-        let filtered = urls.filter { isAudioFile($0) }
-        let expanded = filtered.map { url in (url, groupID: UUID(), groupName: url.deletingLastPathComponent().lastPathComponent, groupRoot: url.deletingLastPathComponent().path) }
-        return expanded.map { entry in
-            let url = entry.0
-            let outPath = baseOut ?? defaultSidecar(for: url)
+        let filtered = entries.filter { isAudioFile($0.url) }
+        return filtered.map { entry in
+            let url = entry.url
+            var outPath: String? = nil
             var parts = baseParts
-            if let idx = parts.firstIndex(of: "--audio"), parts.indices.contains(idx + 1) {
-                parts[idx + 1] = shellEscape(url.path)
+
+            if isAutomator {
+                // Automator expects positional audio paths; do not inject --audio/--out.
+                parts.append(url.path)
             } else {
-                parts.append(contentsOf: ["--audio", shellEscape(url.path)])
+                outPath = buildOutPath(for: url, baseOut: baseOut)
+                if let idx = parts.firstIndex(of: "--audio"), parts.indices.contains(idx + 1) {
+                    parts[idx + 1] = url.path
+                } else {
+                    parts.append(contentsOf: ["--audio", url.path])
+                }
+                if let outIdx = parts.firstIndex(of: "--out"), parts.indices.contains(outIdx + 1) {
+                    parts[outIdx + 1] = outPath ?? ""
+                } else if let outPath {
+                    parts.append(contentsOf: ["--out", outPath])
+                }
             }
-            if let outIdx = parts.firstIndex(of: "--out"), parts.indices.contains(outIdx + 1) {
-                parts[outIdx + 1] = shellEscape(outPath)
-            } else {
-                parts.append(contentsOf: ["--out", shellEscape(outPath)])
-            }
+
             return Job(fileURL: url,
                        displayName: url.lastPathComponent,
                        groupID: entry.groupID,
@@ -71,18 +86,35 @@ enum JobsBuilder {
         return args
     }
 
-    private static func shellEscape(_ text: String) -> String {
-        if text.rangeOfCharacter(from: .whitespacesAndNewlines) != nil {
-            return "\"" + text.replacingOccurrences(of: "\"", with: "\\\"") + "\""
-        }
-        return text
-    }
-
     private static func extractOutPath(from parts: [String]) -> String? {
         if let idx = parts.firstIndex(of: "--out"), parts.indices.contains(idx + 1) {
             return parts[idx + 1]
         }
         return nil
+    }
+
+    /// Compute a unique per-job out path. If a base --out was provided, reuse its directory/name stem
+    /// but stamp a unique filename. Otherwise, place sidecars under Application Support/sidecars.
+    private static func buildOutPath(for audioURL: URL, baseOut: String?) -> String {
+        let fm = FileManager.default
+        let sidecarDir = defaultSidecarDirectory()
+
+        let stem: String
+        let ext: String
+        if let baseOut {
+            let baseURL = URL(fileURLWithPath: baseOut)
+            let baseStem = baseURL.deletingPathExtension().lastPathComponent
+            stem = baseStem.isEmpty ? audioURL.deletingPathExtension().lastPathComponent : baseStem
+            ext = baseURL.pathExtension.isEmpty ? "json" : baseURL.pathExtension
+        } else {
+            stem = audioURL.deletingPathExtension().lastPathComponent
+            ext = "json"
+        }
+
+        let timestamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
+        let filename = "\(stem)_\(timestamp).\(ext)"
+        try? fm.createDirectory(at: sidecarDir, withIntermediateDirectories: true)
+        return sidecarDir.appendingPathComponent(filename).path
     }
 
     private static func isAudioFile(_ url: URL) -> Bool {
@@ -92,13 +124,17 @@ enum JobsBuilder {
     }
 
     private static func defaultSidecar(for audioURL: URL) -> String {
-        let supportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let appDir = supportDir.appendingPathComponent("MusicAdvisorMacApp", isDirectory: true)
-        let sidecarDir = appDir.appendingPathComponent("sidecars", isDirectory: true)
+        let sidecarDir = defaultSidecarDirectory()
         try? FileManager.default.createDirectory(at: sidecarDir, withIntermediateDirectories: true)
         let base = audioURL.deletingPathExtension().lastPathComponent
         let timestamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
         let filename = "\(base)_\(timestamp).json"
         return sidecarDir.appendingPathComponent(filename).path
+    }
+
+    private static func defaultSidecarDirectory() -> URL {
+        let supportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        let appDir = supportDir.appendingPathComponent("MusicAdvisorMacApp", isDirectory: true)
+        return appDir.appendingPathComponent("sidecars", isDirectory: true)
     }
 }

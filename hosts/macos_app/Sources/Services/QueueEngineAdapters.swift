@@ -1,7 +1,7 @@
 import Foundation
 import MAQueue
 
-struct CommandRunnerAdapter: QueueRunner {
+struct CommandRunnerAdapter: QueueRunner, QueueRunnerCancelable {
     let runner: RunnerService
 
     func run(job: Job) async -> QueueRunResult {
@@ -14,6 +14,10 @@ struct CommandRunnerAdapter: QueueRunner {
                               stdout: result.stdout,
                               stderr: result.stderr,
                               spawnError: result.spawnError)
+    }
+
+    func cancelRunning() async {
+        await runner.cancelRunningProcess()
     }
 }
 

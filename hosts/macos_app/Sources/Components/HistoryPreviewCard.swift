@@ -7,6 +7,7 @@ struct HistoryPreviewCard: View {
     let onReveal: () -> Void
     let onPreview: () -> Void
     let onRerun: () -> Void
+    let onViewEcho: (() -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
@@ -36,6 +37,11 @@ struct HistoryPreviewCard: View {
                 Button("Re-run") { onRerun() }
                     .maButton(.secondary)
                     .accessibilityLabel("Re-run this job")
+                if onViewEcho != nil {
+                    Button("View Echo") { onViewEcho?() }
+                        .maButton(.ghost)
+                        .accessibilityLabel("View Historical Echo")
+                }
             }
             if let sidecar = preview?.sidecar {
                 codeBlock(title: "Sidecar JSON", text: sidecar)

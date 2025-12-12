@@ -29,7 +29,7 @@ final class CommandViewModel: ObservableObject {
     var cancellables = Set<AnyCancellable>()
     private var currentTempSidecarPath: String?
 
-    let runnerService = RunnerService()
+    let runnerService: RunnerService
     private let initialConfig: AppConfig
     private let queuePersistence = QueuePersistence()
     private var logBuffer = PassthroughSubject<(String, Bool), Never>() // (line, isStdErr)
@@ -42,6 +42,7 @@ final class CommandViewModel: ObservableObject {
 
     init(config: AppConfig = .fromEnv()) {
         self.initialConfig = config
+        self.runnerService = RunnerService(config: config)
         self.commandText = config.command.joined(separator: " ")
         self.workingDirectory = config.workingDirectory ?? ""
         self.envText = config.extraEnv.map { "\($0.key)=\($0.value)" }.sorted().joined(separator: "\n")
@@ -166,10 +167,19 @@ final class CommandViewModel: ObservableObject {
             sidecarPreview = ""
             processingUpdater?("running", 0.0, "starting")
 
-            Task.detached {
+            let cwd = self.workingDirectory.isEmpty ? (self.initialConfig.workingDirectory ?? FileManager.default.currentDirectoryPath) : self.workingDirectory
+
+            // Fail fast if the executable is missing/unusable; encourages proper runtime config.
+            if let exe = parsedCommand.first, !FileManager.default.isExecutableFile(atPath: exe) {
+                status = "Command not found or not executable: \(exe). Configure MA_APP_DEFAULT_CMD/WORKDIR or override via env."
+                processingUpdater?("failed", 1.0, status)
+                return
+            }
+
+            Task.detached { [cwd] in
                 let start = Date()
                 let result = await self.runnerService.run(command: parsedCommand,
-                                                          workingDirectory: self.workingDirectory.isEmpty ? nil : self.workingDirectory,
+                                                          workingDirectory: cwd,
                                                           extraEnv: env)
                 let duration = Date().timeIntervalSince(start)
                 // Parse heavy-ish work off the main actor.

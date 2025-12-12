@@ -8,6 +8,8 @@ final class MusicAdvisorMacAppUITests: XCTestCase {
         continueAfterFailure = false
         app = XCUIApplication()
         app.launchEnvironment["MA_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["MA_ECHO_BROKER_ENABLE"] = "1"
+        app.launchEnvironment["MA_ECHO_BROKER_URL"] = "http://127.0.0.1:8091"
     }
 
     func testQueueStopResumeAndBadges() throws {
@@ -90,6 +92,14 @@ final class MusicAdvisorMacAppUITests: XCTestCase {
             app.buttons["Clear all"].tap()
         }
         XCTAssertTrue(app.otherElements["queue-card"].exists)
+    }
+
+    func testEchoPanelExists() throws {
+        launchToRunTab()
+        let echoHeader = app.staticTexts["Historical Echo (broker)"]
+        XCTAssertTrue(echoHeader.waitForExistence(timeout: 10))
+        let retryFetch = app.buttons["Retry fetch"]
+        XCTAssertTrue(retryFetch.exists)
     }
 
     func testHistoryTabAndThemeToggle() throws {

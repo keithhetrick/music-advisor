@@ -57,6 +57,24 @@ Targets
 - Platform: macOS 12+
 - Tools: Swift 5.7+
 
+Release checklist (publish-ready)
+
+- Tag a version (e.g., `v0.1.0`); SwiftPM resolves by git tags.
+- Run tests before tagging:
+
+  ```bash
+  cd shared/design_system
+  swift test --disable-sandbox
+  ```
+
+- If embedding via git URL, update dependent manifests to the new tag.
+
+Example Package.swift entry (git tag):
+
+```swift
+.package(url: "https://<your-repo-url>/design_system.git", from: "0.1.0")
+```
+
 Extending
 
 - Swap `MAStyle.theme` at runtime for app-wide reskin; use `useDarkTheme()`, `useHighContrastTheme()`, `applyDensity(scale:)`, and `reduceMotionEnabled`.

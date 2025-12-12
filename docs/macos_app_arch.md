@@ -62,3 +62,10 @@ This app is a thin host UI that drives the Music Advisor pipeline. It keeps UX r
 - Keep MAStyle the only source of styling; swap `MAStyle.theme` to reskin globally.
 - Host polling backs off when idle to reduce wakeups (faster while processing).
 - Logs: stdout/stderr buffered and capped (~10k chars) to avoid UI churn; preview search bounded to avoid deep walks.
+
+## Packaging / distribution considerations (future)
+
+- Keep the host a thin orchestrator: point the run command to the real pipeline entrypoint (`automator.sh`), preserve manual start, and let the pipeline own all heavy work.
+- Favor a lean bundle: ship the app + minimal runner config; rely on an existing repo/venv where possible. For a self-contained build, bundle only the runtime and fetch large models/assets on first run into Application Support.
+- Fetch assets on demand with checksums/versioning to avoid ballooning the app size; prune unused models/fixtures and avoid duplicating timestamped artifacts.
+- Keep configuration overridable via env (e.g., `REPO`, data roots) so the same app can run in “lean” (external repo) or “self-contained” modes without code changes.

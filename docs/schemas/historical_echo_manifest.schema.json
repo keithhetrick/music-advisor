@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Historical Echo Manifest",
+  "type": "object",
+  "required": ["schema_id", "artifact", "source_hash", "config_hash"],
+  "properties": {
+    "schema_id": { "type": "string" },
+    "source_hash": { "type": "string" },
+    "config_hash": { "type": "string" },
+    "db_hash": { "type": ["string", "null"] },
+    "runner": {
+      "type": "object",
+      "properties": {
+        "runner_name": { "type": "string" },
+        "version": { "type": "string" },
+        "input_features_path": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "artifact": {
+      "type": "object",
+      "required": ["path", "sha256", "size", "etag"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string" },
+        "etag": { "type": "string" },
+        "size": { "type": "integer" }
+      },
+      "additionalProperties": true
+    },
+    "versions": { "type": "object", "additionalProperties": true },
+    "signature": {
+      "type": "object",
+      "properties": {
+        "algo": { "type": "string" },
+        "value": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "lineage": { "type": "object", "additionalProperties": true }
+  },
+  "additionalProperties": true
+}

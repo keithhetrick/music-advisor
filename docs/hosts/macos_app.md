@@ -103,3 +103,5 @@ CLI runner env overrides
 - `MA_APP_ARGS="tools/cli/ma_audio_features.py --audio tone.wav --out /tmp/out.json"` (default args)
 - `MA_APP_WORKDIR="/Users/you/music-advisor"`
 - `MA_APP_ENV_FOO=bar` (extra env; prefix keys with `MA_APP_ENV_`)
+- Defaults are now absolute (no `~`): `command=/Users/keithhetrick/music-advisor/automator.sh`, `workdir=/Users/keithhetrick/music-advisor`, `PYTHONPATH/REPO` match the repo root, and the runner normalizes `PATH` to include `./.venv/bin` + system bins.
+- The queue “Clear (all)” control now fully resets the queue + ingest/outbox + persisted cache, badges drop to zero immediately, and Stop/Clear also terminates the in-flight automator process (not just pending jobs). Runner logs remain in `/tmp/macos_app_cmd.log`; timeouts are opt-in via `MA_APP_RUN_TIMEOUT` (no forced 120s kill by default).

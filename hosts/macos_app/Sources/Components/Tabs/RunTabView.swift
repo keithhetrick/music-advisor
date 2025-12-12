@@ -29,6 +29,9 @@ struct RunTabView: View {
                 onClear: {
                     store.clearQueueAll()
                 },
+                onStart: {
+                    store.startQueue()
+                },
                 onStop: {
                     store.stopQueue()
                 },
@@ -126,7 +129,102 @@ struct RunTabView: View {
                 },
                 onCopyJSON: copyJSON
             )
+            echoStatusView
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var echoStatusView: some View {
+        let statuses = Array(store.state.echoStatuses.values).sorted { $0.trackId < $1.trackId }
+        return VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
+            HStack {
+                Text("Historical Echo (broker)").maText(.headline)
+                Spacer()
+                Text("\(statuses.count) tracked")
+                    .maText(.caption)
+                    .foregroundStyle(MAStyle.ColorToken.muted)
+            }
+            if statuses.isEmpty {
+                Text("No broker submissions yet.")
+                    .maText(.caption)
+                    .foregroundStyle(MAStyle.ColorToken.muted)
+            } else {
+                ForEach(statuses, id: \.trackId) { status in
+                    echoStatusRow(status)
+                }
+            }
+        }
+        .maCardInteractive()
+    }
+
+    private func echoStatusRow(_ status: EchoStatus) -> some View {
+        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
+            HStack {
+                Text(status.trackId).maText(.body)
+                Spacer()
+                Text(status.status.uppercased())
+                    .maText(.caption)
+                    .foregroundStyle(color(for: status.status))
+            }
+            if let job = status.jobId {
+                Text("job_id: \(job)").maText(.caption).foregroundStyle(MAStyle.ColorToken.muted)
+            }
+            if let cfg = status.configHash, let src = status.sourceHash {
+                let cfgShort = String(cfg.prefix(8))
+                let srcShort = String(src.prefix(8))
+                Text("config: \(cfgShort)…  source: \(srcShort)…").maText(.caption).foregroundStyle(MAStyle.ColorToken.muted)
+            }
+            if let n = status.neighborCount {
+                Text("neighbors: \(n)").maText(.caption).foregroundStyle(MAStyle.ColorToken.muted)
+            }
+            if let dec = status.decadeSummary {
+                Text("decades: \(dec)").maText(.caption).foregroundStyle(MAStyle.ColorToken.muted)
+            }
+            if let art = status.artifact {
+                Text("artifact: \(art)").maText(.caption).foregroundStyle(MAStyle.ColorToken.muted)
+            }
+            if let cached = status.cachedPath {
+                HStack(spacing: MAStyle.Spacing.xs) {
+                    Text("cached: \(cached)").maText(.caption).foregroundStyle(MAStyle.ColorToken.muted)
+                    Button("Copy path") {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(cached, forType: .string)
+                    }
+                    .maButton(.ghost)
+                    Button("Open") {
+                        NSWorkspace.shared.open(URL(fileURLWithPath: cached))
+                    }
+                    .maButton(.ghost)
+                }
+            } else if let art = status.artifact, let url = artifactURL(for: art) {
+                Button("View JSON") {
+                    NSWorkspace.shared.open(url)
+                }
+                .maButton(.ghost)
+            }
+            if let err = status.error {
+                Text("error: \(err)").maText(.caption).foregroundStyle(Color.red)
+            }
+        }
+        .padding(MAStyle.Spacing.xs)
+        .background(Color.gray.opacity(0.06))
+        .cornerRadius(6)
+    }
+
+    private func color(for status: String) -> Color {
+        switch status.lowercased() {
+        case "done": return Color.green
+        case "error", "timeout": return Color.red
+        default: return Color.orange
+        }
+    }
+
+    private func artifactURL(for artifact: String) -> URL? {
+        let base = ProcessInfo.processInfo.environment["MA_ECHO_BROKER_URL"] ?? "http://127.0.0.1:8091"
+        if artifact.hasPrefix("http") {
+            return URL(string: artifact)
+        }
+        let trimmed = artifact.hasPrefix("/") ? String(artifact.dropFirst()) : artifact
+        return URL(string: "\(base)/\(trimmed)")
     }
 }

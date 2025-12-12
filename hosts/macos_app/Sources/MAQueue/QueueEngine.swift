@@ -1,8 +1,39 @@
 import Foundation
 import Combine
 
+private func queueLog(_ message: String) {
+    let ts = ISO8601DateFormatter().string(from: Date())
+    let line = "[echo-broker] \(ts) \(message)\n"
+    print(line.trimmingCharacters(in: .whitespacesAndNewlines))
+    let home = ProcessInfo.processInfo.environment["HOME"] ?? NSHomeDirectory()
+    let base = URL(fileURLWithPath: home)
+        .appendingPathComponent("Library", isDirectory: true)
+        .appendingPathComponent("Logs", isDirectory: true)
+        .appendingPathComponent("MusicAdvisorMacApp", isDirectory: true)
+    do {
+        try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
+        let url = base.appendingPathComponent("echo_broker.log", isDirectory: false)
+        if let data = line.data(using: .utf8) {
+            if FileManager.default.fileExists(atPath: url.path) {
+                let handle = try FileHandle(forWritingTo: url)
+                try handle.seekToEnd()
+                try handle.write(contentsOf: data)
+                try handle.close()
+            } else {
+                try data.write(to: url)
+            }
+        }
+    } catch {
+        // best-effort logging; ignore errors
+    }
+}
+
 public protocol QueueRunner {
     func run(job: Job) async -> QueueRunResult
+}
+
+public protocol QueueRunnerCancelable {
+    func cancelRunning() async
 }
 
 public struct QueueRunResult {
@@ -40,6 +71,7 @@ public final class QueueEngine: ObservableObject {
     private let runner: QueueRunner
     private let resolver: SidecarResolver
     private var ingestedJobIDs: Set<UUID> = []
+    private var tempPaths: [UUID: String] = [:]
 
     private var stopAfterCurrent = false
     private var currentJobID: UUID?
@@ -91,6 +123,14 @@ public final class QueueEngine: ObservableObject {
         jobVM.cancelPending()
         if let current = currentJobID {
             jobVM.cancelJob(jobID: current)
+            if let temp = tempPaths.removeValue(forKey: current) {
+                resolver.cleanupTemp(path: temp)
+            }
+            // Free the slot immediately even if the runner never returns
+            currentJobID = nil
+        }
+        if let cancelable = runner as? QueueRunnerCancelable {
+            Task { await cancelable.cancelRunning() }
         }
     }
 
@@ -102,6 +142,18 @@ public final class QueueEngine: ObservableObject {
         jobVM.clear()
         currentJobID = nil
         ingestedJobIDs.removeAll()
+        tempPaths.removeAll()
+        if let cancelable = runner as? QueueRunnerCancelable {
+            Task { await cancelable.cancelRunning() }
+        }
+    }
+
+    public func resetAll() {
+        clearAll()
+        Task {
+            await outbox.reset()
+            await refreshOutboxCounts()
+        }
     }
 
     public func clearCompleted() {
@@ -121,8 +173,11 @@ public final class QueueEngine: ObservableObject {
         currentJobID = next.id
 
         let paths = resolver.ensureSidecar(for: next)
+        tempPaths[next.id] = paths.temp
         jobVM.assignSidecar(jobID: next.id, sidecarPath: paths.final)
         jobVM.markRunning(jobID: next.id)
+        let cmdString = next.preparedCommand?.joined(separator: " ") ?? "(none)"
+        queueLog("queue start: \(next.displayName) cmd=\(cmdString) sidecar_final=\(paths.final) temp=\(paths.temp)")
 
         Task.detached { [weak self] in
             guard let self else { return }
@@ -133,8 +188,11 @@ public final class QueueEngine: ObservableObject {
 
     private func handleResult(for jobID: UUID, tempPath: String?, result: QueueRunResult) async {
         await MainActor.run {
+            let storedTemp = self.tempPaths.removeValue(forKey: jobID)
             let job = self.jobs.first(where: { $0.id == jobID })
             let wasCanceled = job?.status == .canceled
+            let name = job?.displayName ?? ""
+            queueLog("queue finished: \(name) exit=\(result.exitCode) spawnError=\(result.spawnError ?? "nil")")
             if result.exitCode == 0 && !wasCanceled {
                 self.resolver.finalize(tempPath: tempPath, finalPath: job?.sidecarPath)
                 self.jobVM.markDone(jobID: jobID, sidecarPath: job?.sidecarPath)
@@ -151,7 +209,7 @@ public final class QueueEngine: ObservableObject {
                 let err = result.spawnError ?? (!result.stderr.isEmpty ? result.stderr : "exit \(result.exitCode)")
                 self.jobVM.markFailed(jobID: jobID, error: err)
             } else {
-                self.resolver.cleanupTemp(path: tempPath)
+                self.resolver.cleanupTemp(path: tempPath ?? storedTemp)
             }
             self.currentJobID = nil
             self.processNext()
