@@ -79,6 +79,12 @@ public actor IngestOutbox {
         entries.count
     }
 
+    public func reset() {
+        entries.removeAll()
+        try? FileManager.default.removeItem(at: url)
+        save()
+    }
+
     private func load() async {
         guard persist else { return }
         guard let data = try? Data(contentsOf: url) else { return }

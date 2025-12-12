@@ -49,6 +49,9 @@ struct RunSplitView: View {
                     onClear: {
                         store.clearQueueAll()
                     },
+                    onStart: {
+                        store.startQueue()
+                    },
                     onStop: {
                         store.stopQueue()
                     },

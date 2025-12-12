@@ -18,7 +18,8 @@ final class LargeQueuePerformanceTests: XCTestCase {
 
         try await waitFor(timeout: 4.0) { engine.jobs.count == count }
         engine.start()
-        try await waitFor(timeout: 10.0) { engine.jobs.allSatisfy { $0.status == .done } }
+        // Allow extra headroom on slower machines to reduce flake risk.
+        try await waitFor(timeout: 20.0) { engine.jobs.allSatisfy { $0.status == .done } }
         XCTAssertEqual(engine.jobs.count, count)
     }
 

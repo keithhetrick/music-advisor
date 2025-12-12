@@ -133,6 +133,7 @@ final class QueueEngineTests: XCTestCase {
         try await waitFor(timeout: 6.0) {
             engine.jobs.first?.status == .done
         }
+        try await waitFor(timeout: 2.0) { sink.ingested.count == 1 }
 
         XCTAssertEqual(engine.jobs.first?.status, .done)
         XCTAssertEqual(sink.ingested.count, 1)
@@ -217,7 +218,7 @@ final class QueueEngineTests: XCTestCase {
             engine.jobs.contains(where: { $0.status == .done }) &&
             engine.jobs.contains(where: { $0.status == .failed })
         }
-        XCTAssertEqual(sink.ingested.count, 1)
+        try await waitFor(timeout: 2.0) { sink.ingested.count == 1 }
         XCTAssertEqual(sink.ingested.first?.path, success.fileURL.path)
     }
 

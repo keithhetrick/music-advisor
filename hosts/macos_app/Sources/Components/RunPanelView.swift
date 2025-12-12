@@ -70,6 +70,9 @@ struct RunPanelView: View {
                         onClear: {
                             store.clearQueueAll()
                         },
+                        onStart: {
+                            store.startQueue()
+                        },
                         onResumeCanceled: {
                             store.resumeCanceledQueue()
                         }

@@ -39,45 +39,54 @@ struct AppConfig {
     }
 
     private static func defaultPythonFeatures(env: [String: String], config: [String: Any]) -> (command: [String], args: [String], workingDirectory: String?, extraEnv: [String: String]) {
-        // Best-effort sensible defaults; can be overridden via env or JSON config.
-        let repoRoot = env["MA_APP_DEFAULT_WORKDIR"]
+        // Best-effort sensible defaults; expand ~ and fall back to the current user's HOME.
+        let home = env["HOME"] ?? NSHomeDirectory()
+        let repoRootRaw = env["MA_APP_DEFAULT_WORKDIR"]
             ?? config["default_workdir"] as? String
-            ?? "/Users/keithhetrick/music-advisor"
+            ?? "\(home)/music-advisor"
+        let repoRoot = expandTilde(repoRootRaw, home: home)
 
-        let cmd = env["MA_APP_DEFAULT_CMD"]
+        // Default to the real pipeline entrypoint (Automator shim).
+        let cmdRaw = env["MA_APP_DEFAULT_CMD"]
             ?? config["default_cmd"] as? String
-            ?? "/usr/local/bin/python3"
-
-        let script = env["MA_APP_DEFAULT_SCRIPT"]
-            ?? config["default_script"] as? String
-            ?? "\(repoRoot)/engines/audio_engine/tools/cli/ma_audio_features.py"
+            ?? "\(repoRoot)/automator.sh"
+        let cmd = expandTilde(cmdRaw, home: home)
 
         let audioPlaceholder = env["MA_APP_DEFAULT_AUDIO"]
             ?? config["default_audio"] as? String
-            ?? "/Users/keithhetrick/Downloads/lola.mp3"
-
-        let outPlaceholder = env["MA_APP_DEFAULT_OUT"]
-            ?? config["default_out"] as? String
-            ?? "/tmp/ma_features.json"
+        let expandedAudio = audioPlaceholder.map { expandTilde($0, home: home) }
 
         let argsFromConfig = config["default_args"] as? [String]
         let args = env["MA_APP_DEFAULT_ARGS"]?
             .split(separator: " ")
             .map(String.init)
             ?? argsFromConfig
-            ?? [script, "--audio", audioPlaceholder, "--out", outPlaceholder]
+            ?? (expandedAudio.map { [$0] } ?? [])
 
-        let pythonPath = env["MA_APP_ENV_PYTHONPATH"]
-            ?? (config["env"] as? [String: String])?["PYTHONPATH"]
-            ?? repoRoot
-
-        var extraEnv: [String: String] = ["PYTHONPATH": pythonPath]
+        var extraEnv: [String: String] = [
+            // Keep REPO available for the pipeline script.
+            "REPO": repoRoot
+        ]
+        if let pythonPathRaw = env["MA_APP_ENV_PYTHONPATH"]
+            ?? (config["env"] as? [String: String])?["PYTHONPATH"] {
+            extraEnv["PYTHONPATH"] = expandTilde(pythonPathRaw, home: home)
+        }
         if let envDict = config["env"] as? [String: String] {
             for (k, v) in envDict where extraEnv[k] == nil {
-                extraEnv[k] = v
+                extraEnv[k] = expandTilde(v, home: home)
             }
         }
         return (command: [cmd], args: args, workingDirectory: repoRoot, extraEnv: extraEnv)
+    }
+
+    private static func expandTilde(_ path: String, home: String) -> String {
+        guard path.hasPrefix("~") else { return path }
+        if path == "~" { return home }
+        if path.hasPrefix("~/") {
+            let suffix = path.dropFirst(2)
+            return "\(home)/\(suffix)"
+        }
+        return path
     }
 
     private static func loadEnvFile(using env: [String: String]) -> [String: String] {

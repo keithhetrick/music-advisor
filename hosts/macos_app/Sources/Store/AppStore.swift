@@ -78,6 +78,8 @@ final class AppStore: ObservableObject {
     private let hostCoordinator: HostCoordinator
     private var hostMonitorTask: Task<Void, Never>?
     private let ingestOutbox = IngestOutbox()
+    private let historyStore = HistoryStore()
+    private var recordedHistoryJobs = Set<UUID>()
     private var ingestProcessor: IngestProcessor?
     var queueEngine: QueueEngine?
     private let uiTestQueueController: UITestQueueController?
@@ -122,7 +124,14 @@ final class AppStore: ObservableObject {
                 self.queueEngine?.$jobs
                     .receive(on: DispatchQueue.main)
                     .sink { [weak self] jobs in
-                        self?.state.queueJobs = jobs
+                        guard let self else { return }
+                        self.state.queueJobs = jobs
+                        // Append history for newly completed jobs with sidecars.
+                        let newlyDone = jobs.filter { $0.status == .done && $0.sidecarPath != nil && !self.recordedHistoryJobs.contains($0.id) }
+                        for job in newlyDone {
+                            self.recordedHistoryJobs.insert(job.id)
+                            Task { await self.appendHistory(sidecarPath: job.sidecarPath, fileURL: job.fileURL) }
+                        }
                     }
                     .store(in: &commandVM.cancellables)
                 self.queueEngine?.$ingestPendingCount
@@ -139,6 +148,8 @@ final class AppStore: ObservableObject {
                     .store(in: &commandVM.cancellables)
             }
         }
+        // Load persisted history on launch.
+        state.historyItems = historyStore.load()
         // Seed theme from system appearance if following system.
         let systemDark = AppStore.systemPrefersDark()
         state.useDarkTheme = systemDark
@@ -155,6 +166,7 @@ final class AppStore: ObservableObject {
                     await self.ingestOutbox.enqueue(fileURL: job.fileURL, jobID: job.id)
                     await self.refreshOutboxCounts()
                     self.ingestProcessor?.kick()
+                    await self.appendHistory(sidecarPath: job.sidecarPath, fileURL: job.fileURL)
                 }
             }
             // Ensure track data is loaded even before the view appears (e.g., before scrolling).
@@ -180,10 +192,10 @@ final class AppStore: ObservableObject {
     }
 
     func enqueueFromDrop(_ urls: [URL], baseCommand: String) {
-        let jobs = JobsBuilder.makeJobs(from: urls, baseCommand: baseCommand)
+        let entries = expandSources(urls: urls)
+        let jobs = JobsBuilder.makeJobs(from: entries, baseCommand: baseCommand)
         guard !jobs.isEmpty else { return }
         enqueueJobs(jobs)
-        startQueue()
     }
 
     func startQueue() {
@@ -207,8 +219,28 @@ final class AppStore: ObservableObject {
     }
 
     func clearQueueAll() {
-        queueEngine?.clearAll()
+        queueEngine?.resetAll()
         uiTestQueueController?.clearAll()
+        state.queueJobs = []
+        state.ingestPendingCount = 0
+        state.ingestErrorCount = 0
+        // Also wipe persisted queue/cache so badges reset on next launch.
+        let supportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        let appDir = supportDir.appendingPathComponent("MusicAdvisorMacApp", isDirectory: true)
+        let queuePath = appDir.appendingPathComponent("queue.json")
+        let previewCachePath = appDir.appendingPathComponent("preview_cache.json")
+        let outboxPath = appDir.appendingPathComponent("ingest_outbox.json")
+        try? FileManager.default.removeItem(at: queuePath)
+        try? FileManager.default.removeItem(at: previewCachePath)
+        try? FileManager.default.removeItem(at: outboxPath)
+        Task {
+            await ingestOutbox.reset()
+            await MainActor.run {
+                self.state.ingestPendingCount = 0
+                self.state.ingestErrorCount = 0
+                self.state.queueJobs = []
+            }
+        }
     }
 
     func clearQueueCompleted() {
@@ -219,6 +251,49 @@ final class AppStore: ObservableObject {
     func clearQueueCanceledFailed() {
         queueEngine?.clearCanceledFailed()
         uiTestQueueController?.clearCanceledFailed()
+    }
+
+    private func appendHistory(sidecarPath: String?, fileURL: URL) async {
+        guard let path = sidecarPath else { return }
+        let fm = FileManager.default
+        guard fm.fileExists(atPath: path) else { return }
+        let attrs = try? fm.attributesOfItem(atPath: path)
+        let modified = attrs?[.modificationDate] as? Date ?? Date()
+        let item = SidecarItem(path: path, name: URL(fileURLWithPath: path).lastPathComponent, modified: modified)
+        await MainActor.run {
+            if !state.historyItems.contains(where: { $0.path == path }) {
+                state.historyItems.insert(item, at: 0)
+                historyStore.save(state.historyItems)
+            }
+        }
+    }
+
+    // Expand dropped URLs into file entries, grouping only when an actual folder was dropped.
+    private func expandSources(urls: [URL]) -> [DropEntry] {
+        var results: [DropEntry] = []
+        let fm = FileManager.default
+        for url in urls {
+            var isDir: ObjCBool = false
+            if fm.fileExists(atPath: url.path, isDirectory: &isDir), isDir.boolValue {
+                let groupID = UUID()
+                let rootName = url.lastPathComponent
+                let rootPath = url.path
+                if let enumerator = fm.enumerator(at: url, includingPropertiesForKeys: [.isRegularFileKey], options: [.skipsHiddenFiles]) {
+                    for case let fileURL as URL in enumerator {
+                        if let vals = try? fileURL.resourceValues(forKeys: [.isRegularFileKey]),
+                           vals.isRegularFile == true {
+                            results.append(DropEntry(url: fileURL,
+                                                     groupID: groupID,
+                                                     groupName: rootName,
+                                                     groupRoot: rootPath))
+                        }
+                    }
+                }
+            } else {
+                results.append(DropEntry(url: url, groupID: nil, groupName: nil, groupRoot: nil))
+            }
+        }
+        return results
     }
 
     func removeJob(_ id: UUID) {

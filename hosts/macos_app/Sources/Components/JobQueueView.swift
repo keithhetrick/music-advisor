@@ -11,6 +11,7 @@ struct JobQueueView: View {
     var onReveal: (String) -> Void
     var onPreviewRich: (String) -> Void
     var onClear: () -> Void
+    var onStart: (() -> Void)? = nil
     var onStop: (() -> Void)? = nil
     var onRemove: ((UUID) -> Void)? = nil
     var onCancelPending: (() -> Void)? = nil
@@ -120,7 +121,7 @@ struct JobQueueView: View {
         let grouped = Dictionary(grouping: jobs.filter { $0.groupID != nil }) { $0.groupID! }
         return grouped.compactMap { key, value in
             guard !value.isEmpty else { return nil }
-            let sortedJobs = value.sorted { $0.displayName.localizedCaseInsensitiveCompare($1.displayName) == .orderedAscending }
+            let sortedJobs = value.sorted { $0.createdAt < $1.createdAt }
             return JobGroup(id: key,
                             name: value.first?.groupName ?? "Folder",
                             rootPath: value.first?.groupRootPath,
@@ -131,7 +132,7 @@ struct JobQueueView: View {
 
     private func ungroupedJobs() -> [Job] {
         jobs.filter { $0.groupID == nil }
-            .sorted { $0.displayName.localizedCaseInsensitiveCompare($1.displayName) == .orderedAscending }
+            .sorted { $0.createdAt < $1.createdAt }
     }
 
     private var queueContent: some View {
@@ -151,6 +152,7 @@ struct JobQueueView: View {
                     singleSection(singles)
                 }
                 .id("queue-tree-\(expandAllToken)")
+                .animation(nil, value: jobs) // avoid row bouncing on frequent updates
             }
         }
         .onReceive(expandFoldersSignal) { _ in
@@ -163,7 +165,15 @@ struct JobQueueView: View {
     @ViewBuilder
     private func groupSection(_ groups: [JobGroup]) -> some View {
         ForEach(groups, id: \.id) { group in
-            let items: [FolderTreeItem<Job>] = group.jobs.map { job in
+            // Deduplicate by path with stable ordering to avoid ID collisions and row jumping.
+            var seen: Set<String> = []
+            let uniqueJobs = group.jobs.filter { job in
+                let path = job.fileURL.path
+                if seen.contains(path) { return false }
+                seen.insert(path)
+                return true
+            }
+            let items: [FolderTreeItem<Job>] = uniqueJobs.map { job in
                 FolderTreeItem(path: job.fileURL.path,
                                isRunning: job.status == .running,
                                item: job)
@@ -242,6 +252,11 @@ struct JobQueueView: View {
 
     private var headerButtons: some View {
         HStack(spacing: MAStyle.Spacing.xs) {
+            if let onStart {
+                Button("Start") { onStart() }
+                    .maButton(.ghost)
+                    .accessibilityIdentifier("queue-start")
+            }
             if JobQueueView.shouldShowStop(onStop: onStop) {
                 if let onStop {
                     Button("Stop") { onStop() }
