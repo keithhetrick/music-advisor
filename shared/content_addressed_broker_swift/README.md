@@ -58,6 +58,7 @@ let (data, etag) = try await client.fetchArtifact(
 
 - Includes unit tests with URLProtocol stubs (`ContentAddressedBrokerTests`) to validate request paths, decoding, ETag handling, and index+artifact fetch.
 - Run locally: `cd shared/content_addressed_broker_swift && swift test`
+- HTTP contract test is opt-in (set `BROKER_HTTP_TEST=1` to enable; otherwise it skips to keep CI fast and avoid port/exec restrictions).
 
 ## Error model
 

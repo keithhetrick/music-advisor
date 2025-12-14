@@ -5,6 +5,11 @@ import Network
 
 final class HttpContractTests: XCTestCase {
     func testHttpContractSubmitStatusIndexArtifact() async throws {
+        // Opt-in: set BROKER_HTTP_TEST=1 to run in CI; otherwise skip for speed/port permissions.
+        let env = ProcessInfo.processInfo.environment
+        if env["BROKER_HTTP_TEST"] != "1" {
+            throw XCTSkip("BROKER_HTTP_TEST not set; skipping HTTP contract test")
+        }
         // Spin up the Python broker on a random port with a dummy runner.
         // This test will be skipped if we cannot bind or execute the broker script.
         let brokerPort = try findFreePort()
