@@ -1,0 +1,246 @@
+"""Argparse builder for ma_helper CLI."""
+from __future__ import annotations
+
+import argparse
+
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(description="Music Advisor helper CLI (Nx/Turbo style UX)")
+    p.add_argument("--root", help="Override repo root (defaults to git root discovery)")
+    p.add_argument("--dry-run", action="store_true", help="Print commands without executing shell calls where supported")
+    p.add_argument("--header", action="store_true", help="Show a fixed header/status bar during the command (Rich if available; falls back to once-off banner)")
+    p.add_argument("--header-live", action="store_true", help="Keep a live header/status bar while the command runs (Rich Live if available; otherwise ignored)")
+    p.add_argument("--no-telemetry", action="store_true", help="Disable telemetry/log event emission for this run")
+    p.add_argument("--telemetry-file", help="Override telemetry NDJSON path for this run")
+    sub = p.add_subparsers(dest="command", required=True)
+
+    sub.add_parser("list", help="List projects")
+
+    tasks_p = sub.add_parser("tasks", help="Show common tasks/aliases")
+    tasks_p.add_argument("--filter", help="Filter tasks by substring")
+    tasks_p.add_argument("--json", action="store_true", help="Output tasks as JSON")
+
+    test_p = sub.add_parser("test", help="Test a project")
+    test_p.add_argument("project", help="Project name")
+    test_p.add_argument("--cache", choices=["off", "local", "restore-only"], default="off", help="Cache mode: off|local|restore-only")
+    test_p.add_argument("--retries", type=int, default=0, help="Retry count on failure")
+    test_p.add_argument("--require-preflight", action="store_true", help="Run preflight first and abort on failure")
+
+    ta_p = sub.add_parser("test-all", help="Run all tests")
+    ta_p.add_argument("--parallel", type=int, default=0, help="Run tests in parallel (workers; 0=serial)")
+    ta_p.add_argument("--cache", choices=["off", "local", "restore-only"], default="off", help="Skip unchanged projects (hash-based cache)")
+    ta_p.add_argument("--retries", type=int, default=0, help="Retry count on failure")
+    ta_p.add_argument("--require-preflight", action="store_true", help="Run preflight first and abort on failure")
+
+    aff_p = sub.add_parser("affected", help="Run affected tests vs base")
+    aff_p.add_argument("--base", default="origin/main", help="Git base ref (default: origin/main)")
+    aff_p.add_argument("--parallel", type=int, default=0, help="Run tests in parallel (workers; 0=serial)")
+    aff_p.add_argument("--no-diff", action="store_true", help="Skip git diff and run all project tests")
+    aff_p.add_argument("--base-from", choices=["last"], help="Reuse last base from config if available")
+    aff_p.add_argument("--cache", choices=["off", "local", "restore-only"], default="off", help="Skip unchanged projects (hash-based cache)")
+    aff_p.add_argument("--since", help="Use commits since <date/ref> instead of a base ref (git log --since)")
+    aff_p.add_argument("--merge-base", action="store_true", help="Diff against merge-base(base, HEAD) for accuracy")
+    aff_p.add_argument("--retries", type=int, default=0, help="Retry count on failure")
+    aff_p.add_argument("--require-preflight", action="store_true", help="Run preflight first and abort on failure")
+
+    run_p = sub.add_parser("run", help="Run a project target (if configured)")
+    run_p.add_argument("project", help="Project name or project:target (targets: run|test)")
+
+    deps_p = sub.add_parser("deps", help="Show dependencies")
+    deps_p.add_argument("--reverse", action="store_true", help="Show dependents instead")
+    deps_p.add_argument("--graph", choices=["text", "mermaid", "dot", "svg", "ansi"], default="text", help="Graph format")
+    deps_p.add_argument("--open", action="store_true", help="Open SVG output (if using --graph svg and dot available)")
+
+    sub.add_parser("select", help="Interactive picker (test/run/deps/affected/watch)")
+
+    watch_p = sub.add_parser("watch", help="Watch a project and rerun tests on change (uses entr or watchfiles)")
+    watch_p.add_argument("project", help="Project to watch")
+    watch_p.add_argument("--cmd", help="Override command to run on change (default: project test)")
+    watch_p.add_argument("--on-success", help="Command to run after a successful run")
+    watch_p.add_argument("--on-fail", help="Command to run after a failed run")
+    watch_p.add_argument("--preset", choices=["test", "lint"], help="Use a preset command (overrides --cmd)")
+    watch_p.add_argument("--rerun-last-failed", action="store_true", help="Run last failed command once before watching if recorded")
+    watch_p.add_argument("--hotkeys", action="store_true", help="Enable simple hotkeys (r/f/q) when using watchfiles backend")
+    watch_p.add_argument("--require-preflight", action="store_true", help="Run preflight first and abort on failure")
+
+    ci_plan = sub.add_parser("ci-plan", help="Print affected projects without running tests (for CI wiring)")
+    ci_plan.add_argument("--base", default="origin/main", help="Git base ref (default: origin/main)")
+    ci_plan.add_argument("--commands", action="store_true", help="Emit shell commands for affected projects")
+    ci_plan.add_argument("--matrix", action="store_true", help="Emit GitHub Actions-style matrix JSON")
+    ci_plan.add_argument("--no-diff", action="store_true", help="Skip git diff; treat all projects as affected")
+    ci_plan.add_argument("--gha", action="store_true", help="Emit a GitHub Actions job matrix snippet")
+    ci_plan.add_argument("--base-from", choices=["last"], help="Reuse last base from config if available")
+    ci_plan.add_argument("--since", help="Use commits since <date/ref> instead of a base ref (git log --since)")
+    ci_plan.add_argument("--merge-base", action="store_true", help="Diff against merge-base(base, HEAD) for accuracy")
+    ci_plan.add_argument("--targets", nargs="+", default=["test"], help="Targets to include (default: test)")
+    ci_plan.add_argument("--gitlab", action="store_true", help="Emit a GitLab-style matrix payload")
+    ci_plan.add_argument("--circle", action="store_true", help="Emit a CircleCI parameters-style payload")
+
+    info = sub.add_parser("info", help="Show project info from registry")
+    info.add_argument("project", help="Project name")
+
+    playbook = sub.add_parser("playbook", help="Run or print preset flows")
+    playbook.add_argument("name", choices=["pipeline-dev", "host-dev", "sidecar-dev"], help="Playbook name")
+    playbook.add_argument("--dry-run", action="store_true", help="Print commands without running")
+
+    shell_p = sub.add_parser("shell", help="Interactive REPL-style shell for helper commands")
+    shell_p.add_argument("--dash", action="store_true", help="Show a pinned live dashboard while in shell (Rich)")
+    shell_p.add_argument("--interval", type=float, default=1.0, help="Dashboard refresh interval when --dash is set (seconds)")
+
+    comp = sub.add_parser("completion", help="Emit shell completion script")
+    comp.add_argument("shell", choices=["bash", "zsh"], help="Target shell")
+
+    registry = sub.add_parser("registry", help="Inspect or edit project_map.json")
+    reg_sub = registry.add_subparsers(dest="reg_action", required=True)
+    reg_sub.add_parser("list", help="List projects in registry")
+    reg_show = reg_sub.add_parser("show", help="Show a project entry")
+    reg_show.add_argument("project")
+    reg_sub.add_parser("validate", help="Validate registry paths/tests")
+    reg_lint = reg_sub.add_parser("lint", help="Normalize project_map.json (sorted keys)")
+    reg_lint.add_argument("--fix", action="store_true", help="Write normalized file")
+    reg_add = reg_sub.add_parser("add", help="Add project to registry")
+    reg_add.add_argument("--name", required=True)
+    reg_add.add_argument("--path", required=True)
+    reg_add.add_argument("--tests", nargs="*", default=[])
+    reg_add.add_argument("--type", default="misc")
+    reg_add.add_argument("--run", nargs="*")
+    reg_add.add_argument("--yes", action="store_true", help="Apply changes (otherwise dry-run)")
+    reg_rm = reg_sub.add_parser("remove", help="Remove project from registry")
+    reg_rm.add_argument("--name", required=True)
+    reg_rm.add_argument("--yes", action="store_true", help="Apply changes (otherwise dry-run)")
+
+    map_p = sub.add_parser("map", help="Show architectural map/topology")
+    map_p.add_argument("--format", choices=["ansi", "mermaid", "dot", "svg", "html"], default="ansi")
+    map_p.add_argument("--filter", help="Substring to filter projects")
+    map_p.add_argument("--open", action="store_true", help="Open SVG/HTML (if generated)")
+
+    dash = sub.add_parser("dashboard", help="Show a quick monorepo dashboard (counts, last results, base)")
+    dash.add_argument("--json", action="store_true", help="Emit JSON")
+    dash.add_argument("--html", action="store_true", help="Emit HTML")
+    dash.add_argument("--live", action="store_true", help="Live refresh (Rich)")
+    dash.add_argument("--interval", type=float, default=1.0, help="Live refresh interval seconds (default 1.0)")
+    dash.add_argument("--duration", type=float, default=0.0, help="Seconds to run live (0 = until you quit)")
+
+    tui = sub.add_parser("tui", help="Rich split-pane view (dashboard + last results)")
+    tui.add_argument("--interval", type=float, default=1.0, help="Refresh interval seconds (default 1.0)")
+    tui.add_argument("--duration", type=int, default=60, help="Seconds to run (default 60)")
+
+    doctor = sub.add_parser("doctor", help="Check env/tools for the repo")
+    doctor.add_argument("--require-optional", action="store_true", help="Fail if optional deps missing (rich/watchfiles/entr/graphviz)")
+    doctor.add_argument("--interactive", action="store_true", help="Print suggested remediation steps")
+    doctor.add_argument("--check-tests", action="store_true", help="Verify projects declare tests and that paths exist")
+    sub.add_parser("check", help="Quick repo sanity check (git dirty, venv, watch deps)")
+    guard = sub.add_parser("guard", help="Show or set guard level (normal|strict)")
+    guard.add_argument("--set", choices=["normal", "strict"])
+
+    sub.add_parser("preflight", help="Check registry test/run paths exist")
+    gh_check = sub.add_parser("github-check", help="Pre-push/pre-CI readiness (clean tree, branch, preflight, verify)")
+    gh_check.add_argument("--require-branch", help="Require current branch name (e.g. main)")
+    gh_check.add_argument("--require-clean", action="store_true", help="Fail if working tree is dirty")
+    gh_check.add_argument("--preflight", action="store_true", help="Run preflight (missing paths) and fail on error")
+    gh_check.add_argument("--verify", action="store_true", help="Run verify gate and fail on error")
+    gh_check.add_argument("--ci-plan", action="store_true", help="Show affected matrix (ci-plan) vs base")
+    gh_check.add_argument("--base", default="origin/main", help="Base ref for ci-plan (default origin/main)")
+    gh_check.add_argument("--require-optional", action="store_true", help="Require optional deps (rich/watchfiles/entr/graphviz)")
+    gh_check.add_argument("--require-clean-env", action="store_true", help="Respect MA_REQUIRE_CLEAN env if set")
+    gh_check.add_argument("--require-upstream", action="store_true", help="Fail if no upstream tracking branch is set")
+
+    hook = sub.add_parser("hook", help="Git hook helper (pre-push)")
+    hook.add_argument("name", choices=["pre-push"], help="Hook name")
+    hook.add_argument("--install", action="store_true", help="Write hook file into .git/hooks")
+
+    precommit = sub.add_parser("precommit", help="Git pre-commit hook helper")
+    precommit.add_argument("action", choices=["print", "install"], help="Print or install pre-commit hook")
+    chatdev = sub.add_parser("chat-dev", help="Backend-only chat dev helper (tmux layout or printed commands)")
+    chatdev.add_argument("--log-file", default="logs/chat.log", help="Log/payload file to tail (default logs/chat.log)")
+    chatdev.add_argument("--endpoint", default="http://127.0.0.1:8000/chat", help="Chat endpoint URL for tools/chat_cli.py")
+
+    git_branch = sub.add_parser("git-branch", help="Create a project-focused branch with optional sparse setup")
+    git_branch.add_argument("project", help="Project name to include in branch name")
+    git_branch.add_argument("--desc", help="Short description for branch name", default="work")
+    git_branch.add_argument("--prefix", default="feature", help="Branch prefix (default: feature)")
+    git_branch.add_argument("--upstream", help="Push and set upstream to this remote (optional)")
+    git_branch.add_argument("--sparse", nargs="+", help="Sparse paths to set after branch creation (optional)")
+
+    git_status = sub.add_parser("git-status", help="Short git status (branch, dirty, ahead/behind)")
+    git_status.add_argument("--json", action="store_true", help="Emit JSON")
+    git_status.add_argument("--branches", action="store_true", help="List local branches with recency")
+    git_status.add_argument("--limit", type=int, default=10, help="Number of branches to show (default 10)")
+
+    git_upstream = sub.add_parser("git-upstream", help="Set upstream for current branch")
+    git_upstream.add_argument("--remote", default="origin", help="Remote name (default origin)")
+    git_upstream.add_argument("--branch", default=None, help="Branch name (default: current)")
+
+    git_rebase = sub.add_parser("git-rebase", help="Safe rebase helper")
+    git_rebase.add_argument("--onto", default="origin/main", help="Target to rebase onto (default origin/main)")
+
+    git_pull_check = sub.add_parser("git-pull-check", help="Ensure clean tree before pulling")
+    git_pull_check.add_argument("--remote", default="origin", help="Remote (default origin)")
+    git_pull_check.add_argument("--branch", default=None, help="Branch (default current)")
+
+    sub.add_parser("welcome", help="Show a guided overview of the helper and common commands")
+    sub.add_parser("help", help="Command palette style help for the helper")
+    sub.add_parser("quickstart", help="Print the top helper commands to run first")
+    sub.add_parser("tour", help="Interactive tour (rich if available)")
+    sub.add_parser("palette", help="Print a compact palette of common commands")
+
+    sparse = sub.add_parser("sparse", help="Git sparse-checkout helpers")
+    sparse.add_argument("--set", nargs="+", help="Paths to include (cone mode)")
+    sparse.add_argument("--reset", action="store_true", help="Disable sparse-checkout")
+    sparse.add_argument("--list", action="store_true", help="Show current sparse paths")
+
+    scaffold = sub.add_parser("scaffold", help="Scaffold a new project skeleton (safe defaults)")
+    scaffold.add_argument("--type", choices=["engine", "host", "shared"], required=True, help="Project type")
+    scaffold.add_argument("--name", required=True, help="Project name (folder)")
+    scaffold.add_argument("--path", help="Destination path (default: tools/scaffolds/<name>)")
+    scaffold.add_argument("--write-registry", action="store_true", help="Also add to project_map.json (sorted)")
+
+    smoke = sub.add_parser("smoke", help="Run predefined smokes")
+    smoke.add_argument("target", choices=["pipeline", "full", "menu"], help="Which smoke to run")
+
+    verify = sub.add_parser("verify", help="Run a short gate: lint + typecheck + smoke + affected(no-diff)")
+    verify.add_argument("--ignore-failures", action="store_true", help="Continue even if a step fails")
+    verify.add_argument("--require-preflight", action="store_true", help="Run preflight first and abort on failure")
+
+    sub.add_parser("ci-env", help="Print env var hints for CI jobs")
+
+    lint = sub.add_parser("lint", help="Run lint (delegates to repo scripts/ruff)")
+    typec = sub.add_parser("typecheck", help="Run typecheck (delegates to repo scripts/mypy)")
+    fmt = sub.add_parser("format", help="Format code (ruff format if available)")
+
+    rerun = sub.add_parser("rerun-last", help="Rerun the last command recorded in history")
+    history = sub.add_parser("history", help="Show recent history")
+    history.add_argument("--limit", type=int, default=10, help="Number of entries to show (default 10)")
+
+    logs_p = sub.add_parser("logs", help="Tail helper logs")
+    logs_p.add_argument("--tail", type=int, default=50, help="How many lines to show (default 50)")
+
+    cache = sub.add_parser("cache", help="Cache controls")
+    cache_sub = cache.add_subparsers(dest="action", required=True)
+    cache_sub.add_parser("stats", help="Show cache stats")
+    cache_sub.add_parser("clean", help="Clean cache (hashes/results)")
+    cache_sub.add_parser("list-artifacts", help="List artifact metadata files")
+    cache_show = cache_sub.add_parser("show-artifact", help="Show artifact metadata by name (project_target)")
+    cache_show.add_argument("--name", required=True, help="Artifact name (e.g., audio_engine_test)")
+
+    fav_parent = sub.add_parser("favorites", help="Manage favorites/history")
+    fav_sub = fav_parent.add_subparsers(dest="fav_action", required=True)
+    fav_list = fav_sub.add_parser("list", help="List favorites/history")
+    fav_list.add_argument("--json", action="store_true", help="JSON output")
+    fav_add = fav_sub.add_parser("add", help="Add or replace a favorite")
+    fav_add.add_argument("--name", required=True, help="Favorite name")
+    fav_add.add_argument("--cmd", required=True, help="Command to save")
+    fav_run = fav_sub.add_parser("run", help="Run a favorite by name")
+    fav_run.add_argument("--name", required=True, help="Favorite name")
+
+    profile = sub.add_parser("profile", help="Apply helper presets (sparse/playbooks)")
+    prof_sub = profile.add_subparsers(dest="action", required=True)
+    prof_sub.add_parser("list", help="List profiles")
+    prof_show = prof_sub.add_parser("show", help="Show profile details")
+    prof_show.add_argument("name")
+    prof_apply = prof_sub.add_parser("apply", help="Apply a profile")
+    prof_apply.add_argument("name")
+    prof_apply.add_argument("--dry-run", action="store_true")
+    prof_apply.add_argument("--ignore-errors", action="store_true", help="Continue even if a step fails")
+
+    return p

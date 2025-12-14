@@ -1,42 +1,52 @@
 {
   "shared_config": {
     "path": "shared/config",
-    "tests": ["shared/config/tests"],
+    "tests": [
+      "shared/config/tests"
+    ],
     "description": "Configuration resolution helpers and path utilities.",
     "type": "shared",
     "deps": []
   },
   "shared_calibration": {
     "path": "shared/calibration",
-    "tests": [],
+    "tests": ["shared/calibration/tests"],
     "description": "Calibration assets and helpers.",
     "type": "shared",
     "deps": []
   },
   "shared_core": {
     "path": "shared/core",
-    "tests": ["shared/core/tests"],
+    "tests": [
+      "shared/core/tests"
+    ],
     "description": "Shared primitives used across engines and hosts.",
     "type": "shared",
     "deps": []
   },
   "shared_security": {
     "path": "shared/security",
-    "tests": ["shared/security/tests"],
+    "tests": [
+      "shared/security/tests"
+    ],
     "description": "Security helpers and policies.",
     "type": "shared",
     "deps": []
   },
   "shared_utils": {
     "path": "shared/utils",
-    "tests": ["shared/utils/tests"],
+    "tests": [
+      "shared/utils/tests"
+    ],
     "description": "Shared utility helpers (re-exported shared core).",
     "type": "shared",
     "deps": []
   },
   "audio_engine": {
     "path": "engines/audio_engine",
-    "tests": ["engines/audio_engine/tests"],
+    "tests": [
+      "engines/audio_engine/tests"
+    ],
     "description": "Core audio/HCI/TTC pipeline (ma_audio_engine + adapters).",
     "type": "engine",
     "deps": [
@@ -55,7 +65,9 @@
   },
   "lyrics_engine": {
     "path": "engines/lyrics_engine",
-    "tests": ["engines/lyrics_engine/tests"],
+    "tests": [
+      "engines/lyrics_engine/tests"
+    ],
     "description": "Lyric/STT components (ma_lyrics_engine, ma_stt_engine).",
     "type": "engine",
     "deps": [
@@ -95,7 +107,9 @@
   },
   "ttc_engine": {
     "path": "engines/ttc_engine",
-    "tests": ["engines/ttc_engine/tests"],
+    "tests": [
+      "engines/ttc_engine/tests"
+    ],
     "description": "Tempo/TTC helpers (ma_ttc_engine).",
     "type": "engine",
     "deps": [
@@ -105,11 +119,18 @@
       "shared_security",
       "shared_utils"
     ],
-    "run": ["./infra/scripts/with_repo_env.sh", "-m", "ma_ttc_engine", "--help"]
+    "run": [
+      "./infra/scripts/with_repo_env.sh",
+      "-m",
+      "ma_ttc_engine",
+      "--help"
+    ]
   },
   "advisor_host_core": {
     "path": "hosts/advisor_host_core",
-    "tests": ["hosts/advisor_host_core/tests"],
+    "tests": [
+      "hosts/advisor_host_core/tests"
+    ],
     "description": "Host contracts/helpers (ma_host) used across projects.",
     "type": "host_core",
     "deps": [
@@ -122,7 +143,9 @@
   },
   "advisor_host": {
     "path": "hosts/advisor_host",
-    "tests": ["hosts/advisor_host/tests"],
+    "tests": [
+      "hosts/advisor_host/tests"
+    ],
     "description": "Host/chat shell for payloads.",
     "type": "host",
     "deps": [
@@ -133,12 +156,16 @@
       "shared_security",
       "shared_utils"
     ],
-    "run": ["./infra/scripts/run_chat_host.sh"]
+    "run": [
+      "./infra/scripts/run_chat_host.sh"
+    ]
   },
   "macos_app": {
     "name": "macos_app",
     "path": "hosts/macos_app",
-    "tests": [],
+    "tests": [
+      "hosts/macos_app/Tests"
+    ],
     "type": "host",
     "deps": [
       "advisor_host_core",
@@ -152,7 +179,9 @@
   },
   "root_integration": {
     "path": "tests",
-    "tests": ["tests"],
+    "tests": [
+      "tests"
+    ],
     "description": "Integration + pipeline coverage that exercises the full stack.",
     "type": "integration",
     "deps": [
@@ -172,7 +201,9 @@
   "mastyle": {
     "name": "mastyle",
     "path": "shared/design_system",
-    "tests": [],
+    "tests": [
+      "shared/design_system/Tests"
+    ],
     "type": "lib",
     "deps": [],
     "description": "MAStyle design system assets for macOS app."
@@ -180,7 +211,9 @@
   "task_conductor": {
     "name": "task_conductor",
     "path": "tools/task_conductor",
-    "tests": [],
+    "tests": [
+      "shared/taskconductor/Tests"
+    ],
     "type": "lib",
     "deps": [],
     "description": "TaskConductor library/tooling."
@@ -188,7 +221,9 @@
   "content_addressed_broker": {
     "name": "content_addressed_broker",
     "path": "tools/content_addressed_broker",
-    "tests": [],
+    "tests": [
+      "shared/content_addressed_broker/tests"
+    ],
     "type": "lib",
     "deps": [],
     "description": "Content-addressed broker library."
@@ -196,7 +231,9 @@
   "ma_helper": {
     "name": "ma_helper",
     "path": "ma_helper",
-    "tests": [],
+    "tests": [
+      "tests/helper_unit"
+    ],
     "type": "lib",
     "deps": [],
     "description": "Monorepo Helper Tool/CLI package."

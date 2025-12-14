@@ -13,7 +13,7 @@ from typing import Dict
 
 
 def _git_summary(root: Path) -> Dict[str, str]:
-    summary = {"branch": "unknown", "dirty": "?"}
+    summary = {"branch": "unknown", "dirty": "?", "ahead": "?", "behind": "?"}
     if shutil.which("git") is None or not (root / ".git").exists():
         return summary
     try:
@@ -41,20 +41,21 @@ def _git_summary(root: Path) -> Dict[str, str]:
     return summary
 
 
-def print_banner(root: Path, guard: str = "normal") -> None:
-    summary = _git_summary(root)
-    bar = f"branch: {summary.get('branch','?')}  |  tree: {summary.get('dirty','?')}  |  guard: {guard}"
-    banner_lines = [
-        "╔════════════════════════════════════════╗",
-        "║ Music Advisor Helper (monorepo tools)  ║",
-        "║ ma quickstart  → top commands          ║",
-        "║ ma welcome    → overview               ║",
-        "║ ma palette    → common ops             ║",
-        "║ ma list       → projects               ║",
-        "╠════════════════════════════════════════╣",
-        f"║ {bar.ljust(38)[:38]} ║",
-        "╚════════════════════════════════════════╝",
+def print_banner(root: Path, guard: str = "normal", summary: Dict[str, str] | None = None) -> None:
+    summary = summary or _git_summary(root)
+    bar = f"branch: {summary.get('branch','?')} | dirty: {summary.get('dirty','?')} | ahead: {summary.get('ahead','?')} | behind: {summary.get('behind','?')} | upstream: {summary.get('upstream','none')} | guard: {guard}"
+    content = [
+        "Music Advisor Helper (monorepo tools)",
+        "ma quickstart  → top commands",
+        "ma welcome    → overview",
+        "ma palette    → common ops",
+        "ma list       → projects",
     ]
+    width = max(len(bar), *(len(line) for line in content)) + 4
+    top = "╔" + "═" * (width - 2) + "╗"
+    sep = "╠" + "═" * (width - 2) + "╣"
+    bottom = "╚" + "═" * (width - 2) + "╝"
+    banner_lines = [top] + [f"║ {line.ljust(width - 4)} ║" for line in content] + [sep, f"║ {bar.ljust(width - 4)} ║", bottom]
     try:
         from rich.console import Console
         from rich.panel import Panel
@@ -62,9 +63,8 @@ def print_banner(root: Path, guard: str = "normal") -> None:
         console = Console()
         console.print(Panel("\n".join(banner_lines), border_style="cyan", style="bold"))
     except Exception:
-        pass
-    # Always emit a plain banner so users without rich still see it.
-    print("\n".join(banner_lines))
+        # Rich not available; fall back to plain banner.
+        print("\n".join(banner_lines))
 
 
 def heading(text: str) -> None:
