@@ -8,14 +8,23 @@ MODULE_CACHE="$SCRATCH/ModuleCache"
 
 mkdir -p "$LOCAL_HOME" "$SCRATCH" "$MODULE_CACHE"
 
-echo "Using PROJECT_DIR=$PROJECT_DIR"
-echo "Using HOME=$LOCAL_HOME"
+if [[ "${MA_APP_USE_REAL_HOME:-0}" == "1" ]]; then
+  export USE_REAL_HOME=1
+  export EFFECTIVE_HOME="$HOME"
+  echo "Using PROJECT_DIR=$PROJECT_DIR"
+  echo "Using HOME (real)=$EFFECTIVE_HOME"
+else
+  export USE_REAL_HOME=0
+  export EFFECTIVE_HOME="$LOCAL_HOME"
+  echo "Using PROJECT_DIR=$PROJECT_DIR"
+  echo "Using HOME (sandboxed)=$EFFECTIVE_HOME"
+fi
 echo "Using scratch path=$SCRATCH"
 echo "Using module cache=$MODULE_CACHE"
 
 cd "$PROJECT_DIR"
 
-HOME="$LOCAL_HOME" \
+HOME="$EFFECTIVE_HOME" \
 SWIFT_MODULE_CACHE_PATH="$MODULE_CACHE" \
 LLVM_MODULE_CACHE_PATH="$MODULE_CACHE" \
 SWIFTPM_DISABLE_SANDBOX=1 \

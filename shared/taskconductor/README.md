@@ -20,6 +20,8 @@ TaskConductor is an agnostic task runner/broker library packaged as a standalone
 ```swift
 // Add the package as a local dependency in your Package.swift:
 // .package(path: "../shared/taskconductor")
+// Or via git tag (suggested initial tag v0.1.0):
+// .package(url: "https://<your-repo-url>/taskconductor.git", from: "0.1.0")
 
 import TaskConductor
 
@@ -134,3 +136,17 @@ Ready for embedding. Future niceties you can add:
 - Richer backoff policies (jitter, caps)
 - More host integration examples
 - A tiny example target (CLI) that enqueues a mix of tasks and prints events
+
+## Release checklist (publish-ready)
+
+- Tag a version (e.g., `v0.1.0`); SwiftPM resolves by git tags.
+- Run tests before tagging:
+
+  ```bash
+  cd shared/taskconductor
+  swift test
+  ```
+
+  (or use the cached invocation above if you want isolated caches).
+
+- If embedding via git URL, update dependent manifests to the new tag.

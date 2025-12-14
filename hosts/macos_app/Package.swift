@@ -10,6 +10,7 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../../shared/design_system"),
+        .package(path: "../../shared/content_addressed_broker_swift"),
         .package(url: "https://github.com/nalexn/ViewInspector.git", exact: "0.9.6")
     ],
     targets: [
@@ -22,14 +23,15 @@ let package = Package(
             name: "MusicAdvisorMacApp",
             dependencies: [
                 "MAQueue",
-                .product(name: "MAStyle", package: "design_system")
+                .product(name: "MAStyle", package: "design_system"),
+                .product(name: "ContentAddressedBroker", package: "content_addressed_broker_swift")
             ],
             path: "Sources",
             exclude: ["MAQueue"]
         ),
         .testTarget(
             name: "MusicAdvisorMacAppTests",
-            dependencies: ["MusicAdvisorMacApp", "MAQueue", "ViewInspector"],
+            dependencies: ["MusicAdvisorMacApp", "MAQueue", "ViewInspector", .product(name: "ContentAddressedBroker", package: "content_addressed_broker_swift")],
             path: "Tests",
             exclude: ["MusicAdvisorMacAppUITests"]
         )

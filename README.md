@@ -28,6 +28,7 @@ Music Advisor is a local, feature-only toolchain that turns that mess into a rep
 - **📴 Offline-Ready**: Works completely offline after initial data bootstrap
 - **🛡️ Quality Guardrails**: Built-in QA gates, tempo confidence, and validation
 - **📦 Schema-Validated**: All outputs conform to documented JSON schemas
+- **📡 Historical Echo broker (optional)**: Local runner → broker → CAS → app delivery with hashes/ETag and cached artifacts (see docs/echo_broker.md)
 
 ---
 

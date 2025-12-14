@@ -1,0 +1,25 @@
+[project]
+name = "content-addressed-broker"
+version = "0.1.1"
+description = "Content-addressed artifact broker with ETags and a pluggable runner (TaskConductor-style)."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [
+  { name = "MusicAdvisor", email = "devnull@example.com" }
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://example.com"
+
+[project.scripts]
+content-addressed-broker = "content_addressed_broker.cli:main"
+
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["content_addressed_broker*"]

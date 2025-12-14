@@ -60,7 +60,12 @@ struct HistorySplitView: View {
                 onPreview: {
                     if let path = selected?.path { loadPreview(path) }
                 },
-                onRerun: { reRun(selected) }
+                onRerun: { reRun(selected) },
+                onViewEcho: {
+                    if let name = selected?.name {
+                        Task { await store.retryEchoFetch(trackId: name) }
+                    }
+                }
             )
             .maCard(enableLens: false)
         }

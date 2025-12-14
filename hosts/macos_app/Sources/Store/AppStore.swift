@@ -3,6 +3,33 @@ import SwiftUI
 import AppKit
 import MAQueue
 
+private func queueLog(_ message: String) {
+    let ts = ISO8601DateFormatter().string(from: Date())
+    let line = "[echo-broker] \(ts) \(message)\n"
+    print(line.trimmingCharacters(in: .whitespacesAndNewlines))
+    let home = ProcessInfo.processInfo.environment["HOME"] ?? NSHomeDirectory()
+    let base = URL(fileURLWithPath: home)
+        .appendingPathComponent("Library", isDirectory: true)
+        .appendingPathComponent("Logs", isDirectory: true)
+        .appendingPathComponent("MusicAdvisorMacApp", isDirectory: true)
+    do {
+        try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
+        let url = base.appendingPathComponent("echo_broker.log", isDirectory: false)
+        if let data = line.data(using: .utf8) {
+            if FileManager.default.fileExists(atPath: url.path) {
+                let handle = try FileHandle(forWritingTo: url)
+                try handle.seekToEnd()
+                try handle.write(contentsOf: data)
+                try handle.close()
+            } else {
+                try data.write(to: url)
+            }
+        }
+    } catch {
+        // best-effort logging
+    }
+}
+
 enum AppTab: String, CaseIterable {
     case run = "Pipeline"
     case history = "History"
@@ -23,6 +50,7 @@ enum AppAction {
     case setPreviewCache(path: String, preview: HistoryPreview)
     case clearHistory
     case setHostSnapshot(HostSnapshot)
+    case setEchoStatuses([String: EchoStatus])
     // Chat UI state
     case setChatBadge(title: String, subtitle: String)
     case setChatContextLabel(String)
@@ -31,6 +59,23 @@ enum AppAction {
     // Chat context
     case setChatSelection(String?)
     case setChatOverride(String?)
+}
+
+struct EchoStatus: Identifiable {
+    var id: String { trackId }
+    let trackId: String
+    var jobId: String?
+    var status: String
+    var configHash: String?
+    var sourceHash: String?
+    var artifact: String?
+    var manifest: String?
+    var etag: String?
+    var cachedPath: String?
+    var error: String?
+    var neighborCount: Int?
+    var decadeSummary: String?
+    var neighborsPreview: [String]?
 }
 
 struct AppState {
@@ -66,6 +111,8 @@ struct AppState {
     var ingestErrorCount: Int = 0
     // Queue jobs (engine-driven)
     var queueJobs: [Job] = []
+    // Echo broker statuses by track_id
+    var echoStatuses: [String: EchoStatus] = [:]
 }
 
 @MainActor
@@ -80,10 +127,52 @@ final class AppStore: ObservableObject {
     private let ingestOutbox = IngestOutbox()
     private let historyStore = HistoryStore()
     private var recordedHistoryJobs = Set<UUID>()
+    private var recordedBrokerJobs = Set<UUID>()
     private var ingestProcessor: IngestProcessor?
     var queueEngine: QueueEngine?
     private let uiTestQueueController: UITestQueueController?
+    private let echoBrokerClient: EchoBrokerClient?
+    private var echoBrokerEtags: [String: String] = [:]
     private static let isUITestMode = UITestSupport.isEnabled
+
+    @MainActor
+    private func updateEchoStatus(trackId: String, build: (inout EchoStatus) -> Void) {
+        var status = state.echoStatuses[trackId] ?? EchoStatus(trackId: trackId,
+                                                               jobId: nil,
+                                                               status: "pending",
+                                                               artifact: nil,
+                                                               manifest: nil,
+                                                               etag: nil,
+                                                               cachedPath: nil,
+                                                               error: nil,
+                                                               neighborCount: nil,
+                                                               decadeSummary: nil,
+                                                               neighborsPreview: nil)
+        build(&status)
+        // If we don't yet have a cachedPath but one exists on disk, fill it in so UI can show Open/Copy.
+        if status.cachedPath == nil {
+            let cacheDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?
+                .appendingPathComponent("MusicAdvisorMacApp/echo_cache", isDirectory: true)
+            let safeTrack = trackId.replacingOccurrences(of: "/", with: "_")
+            let fname = "\(safeTrack)_historical_echo.json"
+            if let dir = cacheDir {
+                let candidate = dir.appendingPathComponent(fname)
+                if FileManager.default.fileExists(atPath: candidate.path) {
+                    status.cachedPath = candidate.path
+                    // If we can, derive a quick summary from the cached file.
+                    if status.neighborCount == nil || status.decadeSummary == nil || status.neighborsPreview == nil {
+                        if let data = try? Data(contentsOf: candidate) {
+                            let summary = parseEchoSummary(data: data)
+                            status.neighborCount = summary.neighborCount
+                            status.decadeSummary = summary.decadeSummary
+                            status.neighborsPreview = summary.neighborsPreview
+                        }
+                    }
+                }
+            }
+        }
+        state.echoStatuses[trackId] = status
+    }
 
     func dispatch(_ action: AppAction) {
         reduce(&state, action: action)
@@ -92,6 +181,8 @@ final class AppStore: ObservableObject {
     init(uiTestMode: Bool = AppStore.isUITestMode) {
         self.hostCoordinator = HostCoordinator()
         self.commandVM = CommandViewModel()
+        let brokerEnabled = ProcessInfo.processInfo.environment["MA_ECHO_BROKER_ENABLE"] == "1"
+        self.echoBrokerClient = brokerEnabled ? EchoBrokerClient(config: .fromEnv()) : nil
         if uiTestMode {
             self.trackVM = nil
             let controller = UITestSupport.makeQueueController()
@@ -132,6 +223,13 @@ final class AppStore: ObservableObject {
                             self.recordedHistoryJobs.insert(job.id)
                             Task { await self.appendHistory(sidecarPath: job.sidecarPath, fileURL: job.fileURL) }
                         }
+                        // Submit to broker for newly done jobs (with sidecar) that haven't been submitted yet.
+                        let newlyDoneBroker = jobs.filter { $0.status == .done && $0.sidecarPath != nil && !self.recordedBrokerJobs.contains($0.id) }
+                        for job in newlyDoneBroker {
+                            self.recordedBrokerJobs.insert(job.id)
+                            queueLog("broker submit queued: \(job.displayName) sidecar=\(job.sidecarPath ?? "nil")")
+                            Task { await self.submitEchoBrokerIfEnabled(job: job) }
+                        }
                     }
                     .store(in: &commandVM.cancellables)
                 self.queueEngine?.$ingestPendingCount
@@ -161,12 +259,20 @@ final class AppStore: ObservableObject {
         }
         if !uiTestMode, let trackVM {
             self.commandVM.jobCompletionHandler = { job, success in
+                let sidecarPath = job.sidecarPath ?? "nil"
+                let sidecarExists = job.sidecarPath.flatMap { FileManager.default.fileExists(atPath: $0) } ?? false
+                if let prepared = job.preparedCommand {
+                    queueLog("jobCompletionHandler: \(job.displayName) success=\(success) status=\(job.status) sidecar=\(sidecarPath) exists=\(sidecarExists) prepared=\(prepared.joined(separator: " "))")
+                } else {
+                    queueLog("jobCompletionHandler: \(job.displayName) success=\(success) status=\(job.status) sidecar=\(sidecarPath) exists=\(sidecarExists)")
+                }
                 guard success, job.status == .done else { return }
                 Task {
                     await self.ingestOutbox.enqueue(fileURL: job.fileURL, jobID: job.id)
                     await self.refreshOutboxCounts()
                     self.ingestProcessor?.kick()
                     await self.appendHistory(sidecarPath: job.sidecarPath, fileURL: job.fileURL)
+                    await self.submitEchoBrokerIfEnabled(job: job)
                 }
             }
             // Ensure track data is loaded even before the view appears (e.g., before scrolling).
@@ -174,6 +280,15 @@ final class AppStore: ObservableObject {
         }
         if !uiTestMode {
             startHostMonitor()
+        }
+        let homeEnv = ProcessInfo.processInfo.environment["HOME"] ?? "(nil)"
+        let cwd = FileManager.default.currentDirectoryPath
+        if brokerEnabled, echoBrokerClient != nil {
+            let url = EchoBrokerClient.Config.fromEnv().baseURL
+            queueLog("enabled url=\(url) home=\(homeEnv) cwd=\(cwd)")
+            state.messages.append("Echo broker enabled")
+        } else {
+            queueLog("disabled (env not set or client nil) home=\(homeEnv) cwd=\(cwd)")
         }
     }
 
@@ -198,6 +313,14 @@ final class AppStore: ObservableObject {
         enqueueJobs(jobs)
     }
 
+    @MainActor
+    func retryEchoSubmit(trackId: String) async {
+        guard let job = state.queueJobs.first(where: { $0.displayName == trackId && $0.sidecarPath != nil }) else {
+            return
+        }
+        await submitEchoBrokerIfEnabled(job: job)
+    }
+
     func startQueue() {
         queueEngine?.start()
         uiTestQueueController?.start()
@@ -213,9 +336,290 @@ final class AppStore: ObservableObject {
         uiTestQueueController?.cancelPending()
     }
 
+    private func resolveRepoRoot() -> URL {
+        let env = ProcessInfo.processInfo.environment
+        if let repo = env["REPO"], !repo.isEmpty {
+            return URL(fileURLWithPath: repo)
+        }
+        if let pwd = env["PWD"], !pwd.isEmpty {
+            return URL(fileURLWithPath: pwd)
+        }
+        let cwd = FileManager.default.currentDirectoryPath
+        if !cwd.isEmpty {
+            return URL(fileURLWithPath: cwd)
+        }
+        return FileManager.default.homeDirectoryForCurrentUser
+    }
+
     func resumeCanceledQueue() {
         queueEngine?.resumeCanceled()
         uiTestQueueController?.resumeCanceled()
+    }
+
+    /// Submit features to the local echo broker (opt-in via MA_ECHO_BROKER_ENABLE=1).
+    private func submitEchoBrokerIfEnabled(job: Job) async {
+        guard let client = echoBrokerClient else {
+            print("[echo-broker] skipped: disabled")
+            await MainActor.run { state.messages.append("Echo broker skipped: disabled") }
+            return
+        }
+        var featuresPath: String?
+        if let sidecarPath = job.sidecarPath, FileManager.default.fileExists(atPath: sidecarPath) {
+            featuresPath = sidecarPath
+        } else {
+            // Fallback: if automator.sh was used, locate features.json under data/features_output/YYYY/MM/DD/<stem>
+            if let cmd = job.preparedCommand, cmd.first?.hasSuffix("automator.sh") == true {
+                let stem = job.fileURL.deletingPathExtension().lastPathComponent
+                let now = Date()
+                let cal = Calendar.current
+                let comps = cal.dateComponents([.year, .month, .day], from: now)
+                if let y = comps.year, let m = comps.month, let d = comps.day {
+                    let repoRoot = resolveRepoRoot()
+                    let outDir = repoRoot
+                        .appendingPathComponent("data/features_output", isDirectory: true)
+                        .appendingPathComponent(String(format: "%04d", y), isDirectory: true)
+                        .appendingPathComponent(String(format: "%02d", m), isDirectory: true)
+                        .appendingPathComponent(String(format: "%02d", d), isDirectory: true)
+                        .appendingPathComponent(stem, isDirectory: true)
+                    if let latest = latestFeaturesJSON(in: outDir) {
+                        featuresPath = latest.path
+                        queueLog("broker fallback features found: \(featuresPath!)")
+                    } else {
+                        queueLog("broker fallback features missing in \(outDir.path)")
+                    }
+                }
+            }
+        }
+        guard let featPath = featuresPath, FileManager.default.fileExists(atPath: featPath) else {
+            queueLog("Echo broker skipped: no features for \(job.displayName)")
+            await MainActor.run {
+                state.messages.append("Echo broker skipped: no features for \(job.displayName)")
+                updateEchoStatus(trackId: job.displayName) { s in
+                    s.status = "no_features"
+                    s.error = "features not found"
+                }
+            }
+            return
+        }
+        let trackId = job.displayName
+        do {
+            let resp = try await client.submitJob(featuresPath: URL(fileURLWithPath: featPath), trackId: trackId, probe: [:], dbPath: nil, configHash: nil, runId: nil)
+            print("[echo-broker] submitted track_id=\(trackId) job_id=\(resp.jobId) path=\(featPath)")
+            await MainActor.run {
+                state.messages.append("Echo broker submitted for \(trackId) job_id=\(resp.jobId)")
+                updateEchoStatus(trackId: trackId) { status in
+                    status.jobId = resp.jobId
+                    status.status = "pending"
+                    status.error = nil
+                }
+            }
+            Task.detached { [weak self] in
+                await self?.pollEchoJobAndFetch(client: client, jobId: resp.jobId, trackId: trackId)
+            }
+        } catch {
+            await MainActor.run {
+                state.messages.append("Echo broker submit failed: \(error)")
+                updateEchoStatus(trackId: trackId) { status in
+                    status.status = "error"
+                    status.error = "\(error)"
+                }
+            }
+        }
+    }
+
+    /// Poll broker for completion and cache artifact with ETag.
+    private func pollEchoJobAndFetch(client: EchoBrokerClient, jobId: String, trackId: String) async {
+        var delay: UInt64 = 1_000_000_000  // 1s
+        for _ in 0..<12 {  // ~1 minute max
+            do {
+                let status = try await client.fetchJob(jobId: jobId)
+                if status.status == "done", let result = status.result, let artPath = result.artifactPath {
+                    print("[echo-broker] done job_id=\(jobId) artifact=\(artPath)")
+                    await MainActor.run {
+                        state.messages.append("Echo broker done for \(trackId)")
+                        updateEchoStatus(trackId: trackId) { s in
+                            s.status = "done"
+                            s.jobId = jobId
+                            s.artifact = artPath
+                            s.manifest = result.manifestPath
+                        }
+                    }
+                    if let cachedPath = await fetchEchoArtifact(client: client, artifactPath: artPath, trackId: trackId) {
+                        await MainActor.run {
+                            state.messages.append("Echo artifact cached: \(cachedPath)")
+                            updateEchoStatus(trackId: trackId) { s in
+                                s.cachedPath = cachedPath
+                            }
+                        }
+                    }
+                    return
+                }
+                if status.status == "error" {
+                    print("[echo-broker] error job_id=\(jobId) err=\(status.error ?? "unknown")")
+                    await MainActor.run {
+                        state.messages.append("Echo broker error for \(trackId): \(status.error ?? "unknown")")
+                        updateEchoStatus(trackId: trackId) { s in
+                            s.status = "error"
+                            s.error = status.error ?? "unknown"
+                        }
+                    }
+                    return
+                }
+            } catch {
+                await MainActor.run {
+                    state.messages.append("Echo broker poll failed: \(error)")
+                    updateEchoStatus(trackId: trackId) { s in
+                        s.status = "error"
+                        s.error = "\(error)"
+                    }
+                }
+            }
+            try? await Task.sleep(nanoseconds: delay)
+            delay = min(delay * 2, 8_000_000_000)  // cap at 8s
+        }
+        await MainActor.run {
+            state.messages.append("Echo broker timed out for \(trackId)")
+            updateEchoStatus(trackId: trackId) { s in
+                s.status = "timeout"
+            }
+        }
+    }
+
+    /// Fetch artifact via broker with ETag and cache to disk.
+    private func fetchEchoArtifact(client: EchoBrokerClient, artifactPath: String, trackId: String) async -> String? {
+        // artifactPath looks like .../echo/<config_hash>/<source_hash>/historical_echo.json
+        let comps = artifactPath.split(separator: "/")
+        guard comps.count >= 3 else {
+            await MainActor.run {
+                state.messages.append("Echo broker artifact path malformed for \(trackId)")
+            }
+            return nil
+        }
+        let sourceHash = String(comps[comps.count - 2])
+        let configHash = String(comps[comps.count - 3])
+        await MainActor.run {
+            updateEchoStatus(trackId: trackId) { s in
+                s.configHash = configHash
+                s.sourceHash = sourceHash
+            }
+        }
+        do {
+            let etag = echoBrokerEtags[trackId]
+            let result = try await client.fetchArtifact(configHash: configHash, sourceHash: sourceHash, etag: etag)
+            echoBrokerEtags[trackId] = result.etag ?? etag
+            let cached = cacheEchoArtifact(trackId: trackId, data: result.data)
+            await MainActor.run {
+                updateEchoStatus(trackId: trackId) { s in
+                    s.etag = result.etag ?? etag
+                    let summary = parseEchoSummary(data: result.data)
+                    s.neighborCount = summary.neighborCount
+                    s.decadeSummary = summary.decadeSummary
+                    s.neighborsPreview = summary.neighborsPreview
+                }
+            }
+            return cached
+        } catch EchoBrokerClient.BrokerError.notModified {
+            await MainActor.run {
+                state.messages.append("Echo artifact up-to-date for \(trackId)")
+                updateEchoStatus(trackId: trackId) { s in
+                    s.status = "done"
+                }
+            }
+            return nil
+        } catch {
+            await MainActor.run {
+                state.messages.append("Echo broker fetch failed: \(error)")
+                updateEchoStatus(trackId: trackId) { s in
+                    s.status = "error"
+                    s.error = "\(error)"
+                }
+            }
+            return nil
+        }
+    }
+
+    private func cacheEchoArtifact(trackId: String, data: Data) -> String {
+        let supportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        let cacheDir = supportDir.appendingPathComponent("MusicAdvisorMacApp/echo_cache", isDirectory: true)
+        try? FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
+        let safeTrack = trackId.replacingOccurrences(of: "/", with: "_")
+        let fname = "\(safeTrack)_historical_echo.json"
+        let path = cacheDir.appendingPathComponent(fname)
+        try? data.write(to: path)
+        return path.path
+    }
+
+    func parseEchoSummary(data: Data) -> (neighborCount: Int?, decadeSummary: String?, neighborsPreview: [String]?) {
+        guard
+            let json = try? JSONSerialization.jsonObject(with: data, options: []),
+            let dict = json as? [String: Any]
+        else { return (nil, nil, nil) }
+        let neighbors = dict["neighbors"] as? [Any] ?? []
+        let neighborCount = neighbors.count
+        var decadeSummary: String?
+        var neighborsPreview: [String]?
+        if let decades = dict["decade_counts"] as? [String: Any] {
+            let parts = decades.compactMap { (k, v) -> String? in
+                if let n = v as? Int { return "\(k): \(n)" }
+                return nil
+            }
+            if !parts.isEmpty {
+                decadeSummary = parts.sorted().joined(separator: ", ")
+            }
+        }
+        if !neighbors.isEmpty {
+            neighborsPreview = neighbors.prefix(5).compactMap { item -> String? in
+                guard let n = item as? [String: Any] else { return nil }
+                let artist = n["artist"] as? String ?? "?"
+                let title = n["title"] as? String ?? "?"
+                let dist = n["distance"] as? Double
+                if let d = dist {
+                    return "\(artist) – \(title) (d=\(String(format: "%.2f", d)))"
+                }
+                return "\(artist) – \(title)"
+            }
+        }
+        return (neighborCount, decadeSummary, neighborsPreview)
+    }
+
+    // Manual refetch for a given track_id (uses artifact if present; otherwise fetchLatest then fetch artifact).
+    @MainActor
+    func retryEchoFetch(trackId: String) async {
+        guard let client = echoBrokerClient else { return }
+        var artifactPath = state.echoStatuses[trackId]?.artifact
+        if artifactPath == nil {
+            do {
+                let latest = try await client.fetchLatest(trackId: trackId)
+                artifactPath = latest.artifact
+                updateEchoStatus(trackId: trackId) { s in
+                    s.artifact = latest.artifact
+                    s.manifest = latest.manifest
+                    s.configHash = latest.configHash
+                    s.sourceHash = latest.sourceHash
+                    s.etag = latest.etag
+                }
+            } catch {
+                updateEchoStatus(trackId: trackId) { s in
+                    s.status = "error"
+                    s.error = "\(error)"
+                }
+                return
+            }
+        }
+        guard let art = artifactPath else { return }
+        _ = await fetchEchoArtifact(client: client, artifactPath: art, trackId: trackId)
+    }
+
+    private func latestFeaturesJSON(in dir: URL) -> URL? {
+        guard let contents = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: [.contentModificationDateKey], options: [.skipsHiddenFiles]) else {
+            return nil
+        }
+        let candidates = contents.filter { $0.lastPathComponent.hasSuffix(".features.json") }
+        return candidates.sorted {
+            let a = (try? $0.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+            let b = (try? $1.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+            return a > b
+        }.first
     }
 
     func clearQueueAll() {
@@ -466,6 +870,8 @@ private func reduce(_ state: inout AppState, action: AppAction) {
         state.chatSelection = sel
     case .setChatOverride(let path):
         state.chatOverridePath = path
+    case .setEchoStatuses(let echo):
+        state.echoStatuses = echo
     }
 }
 
