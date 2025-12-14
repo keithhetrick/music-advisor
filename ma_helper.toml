@@ -1,0 +1,31 @@
+# ma_helper configuration for the Music Advisor monorepo.
+# These defaults mirror the existing helper behavior; customize per repo as needed.
+
+[paths]
+registry = "project_map.json"
+cache_dir = ".ma_cache"
+# state_dir = "~/.ma_helper"  # override helper state/log location if desired
+
+[scripts]
+lint = "./infra/scripts/with_repo_env.sh -m ruff check hosts/advisor_host engines/recommendation_engine/recommendation_engine"
+typecheck = "./infra/scripts/with_repo_env.sh -m mypy --config-file hosts/advisor_host/pyproject.toml hosts/advisor_host"
+format = "./infra/scripts/with_repo_env.sh -m ruff format hosts/advisor_host engines/recommendation_engine/recommendation_engine"
+
+[plugins.smokes]
+pipeline = "./infra/scripts/quick_check.sh"
+full = "./infra/scripts/e2e_app_smoke.sh"
+
+[plugins.playbooks]
+pipeline-dev = ["python -m ma_helper doctor", "python -m ma_helper smoke pipeline"]
+host-dev = ["python -m ma_helper doctor", "python -m ma_helper smoke full"]
+sidecar-dev = ["python -m ma_helper doctor", "python -m ma_helper watch audio_engine"]
+
+[plugins.profiles.dev]
+sparse = ["hosts", "shared", "tools"]
+playbook = "host-dev"
+
+[plugins.profiles.pipeline]
+playbook = "pipeline-dev"
+
+[plugins.profiles.minimal]
+sparse = ["shared", "tools"]
