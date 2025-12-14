@@ -46,3 +46,7 @@ filterwarnings = [
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["ma_*", "ma_host", "ma_helper", "tools", "adapters", "aee_ml", "ma_audiotools"]
+
+[project.scripts]
+ma = "ma_helper.cli:main"
+ma-helper = "ma_helper.cli:main"

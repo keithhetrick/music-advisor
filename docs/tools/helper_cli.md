@@ -1,6 +1,13 @@
 # Helper CLI (ma.py)
 
-`ma_helper` is a lightweight, Nx/Turborepo-like helper for the monorepo. Code lives under `tools/ma_helper/` with a root wrapper (`python -m ma_helper`) and a console script (`ma`) when installed in editable mode. It wraps `ma_orchestrator` and adds interactive/fuzzy UX, parallelism, graphs, favorites/history, CI planning, and rich summaries. Set an alias for brevity: `alias ma="python -m ma_helper"`.
+`ma_helper` is a lightweight, Nx/Turborepo-like helper for the monorepo. Code lives under `tools/ma_helper/` with a root wrapper (`python3 -m ma_helper`) and a console script (`ma`) when installed in editable mode (`python3 -m pip install -e .`). It wraps `ma_orchestrator` and adds interactive/fuzzy UX, parallelism, graphs, favorites/history, CI planning, and rich summaries. Set an alias if you prefer: `alias ma="python3 -m ma_helper"` (once installed, `ma` should be available on PATH).
+
+## Installation & Running
+
+- Editable install (recommended for dev): `python3 -m pip install -e .`
+- Run via console script: `ma palette` (or any command)
+- Run via package entry: `python3 -m ma_helper palette`
+- Back-compat: `python3 tools/ma_helper/cli.py palette`
 
 ## Commands
 
@@ -68,13 +75,13 @@
 ## Live dashboard + tmux split
 
 - Minimal two-terminal setup (no tmux required):
-  - Terminal A: `python -m ma_helper shell`
-  - Terminal B: `python -m ma_helper dashboard --live --duration 0 --interval 2` (Ctrl-C to stop)
+  - Terminal A: `python3 -m ma_helper shell`
+  - Terminal B: `python3 -m ma_helper dashboard --live --duration 0 --interval 2` (Ctrl-C to stop)
 - tmux split (keeps shell + live dash in one window; uses a dedicated socket so it won’t collide with other sessions):
   ```bash
   cd ~/music-advisor && source .venv/bin/activate && \
-  tmux -L mahelper new-session -s mahelper 'python -m ma_helper shell' \; \
-    split-window -h 'python -m ma_helper dashboard --live --duration 0 --interval 2' \; \
+  tmux -L mahelper new-session -s mahelper 'python3 -m ma_helper shell' \; \
+    split-window -h 'python3 -m ma_helper dashboard --live --duration 0 --interval 2' \; \
     select-pane -t 0
   ```
 - Pane switch: `Ctrl-b` + arrows; detach: `Ctrl-b d`; kill all: `tmux -L mahelper kill-server`.
@@ -93,7 +100,7 @@
     - Reattach: `tmux -L mahelper attach -t mahelper`
     - Pane switch: `Ctrl-b` + arrows; show numbers: `Ctrl-b q` then number
     - Detach: `Ctrl-b d`; close pane: `Ctrl-b x`
-  - Completions: `ma completion zsh` or `ma completion bash` prints a completion script; source it in your shell (e.g., `eval "$(python -m ma_helper completion zsh)"`) for helper command completion.
+  - Completions: `ma completion zsh` or `ma completion bash` prints a completion script; source it in your shell (e.g., `eval "$(python3 -m ma_helper completion zsh)"`) for helper command completion.
 
 ## Codex entrypoints (review/optimize)
 

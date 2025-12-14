@@ -93,6 +93,18 @@ music-advisor/
 - 🛠️ Codex optimize-fix (auto-fix lint): `make optimize-fix` (ruff --fix, mypy, CI plan).
 - 🎨 macOS custom toolkit: SwiftUI app + MAStyle (our Tailwind-like design system) lives under `hosts/macos_app` and `shared/design_system`. Build/run headless via `hosts/macos_app/scripts/swift_run_local.sh` and package via `hosts/macos_app/scripts/package_release.sh`. Style guide: `docs/MAStyle_styleguide.md`.
 
+## Getting Started (ma_helper)
+
+1) Install helper (console script `ma`): `python3 -m pip install -e .`
+2) Discover commands: `ma quickstart`, `ma welcome`, or `ma palette`
+3) Common first runs:
+   - `ma list`
+   - `ma affected --base origin/main`
+   - `ma verify`
+   - `ma dashboard --json` (or `ma tui`)
+   - `ma watch <project> [--hotkeys]`
+4) Package/back-compat: `python3 -m ma_helper <cmd>` or `python3 tools/ma_helper/cli.py <cmd>`
+
 ## Root essentials (what to look at first)
 
 - Top-level files: `README.md` (this), `Makefile`/`Taskfile.yml` (bootstrap/commands), `CHANGELOG.md`, `LICENSE`, `SECURITY.md`.

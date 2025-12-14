@@ -135,6 +135,21 @@
     ],
     "run": ["./infra/scripts/run_chat_host.sh"]
   },
+  "macos_app": {
+    "name": "macos_app",
+    "path": "hosts/macos_app",
+    "tests": [],
+    "type": "host",
+    "deps": [
+      "advisor_host_core",
+      "shared_config",
+      "shared_calibration",
+      "shared_core",
+      "shared_security",
+      "shared_utils"
+    ],
+    "description": "macOS SwiftUI host application (MAStyle)."
+  },
   "root_integration": {
     "path": "tests",
     "tests": ["tests"],
@@ -153,5 +168,37 @@
       "shared_security",
       "shared_utils"
     ]
+  },
+  "mastyle": {
+    "name": "mastyle",
+    "path": "shared/design_system",
+    "tests": [],
+    "type": "lib",
+    "deps": [],
+    "description": "MAStyle design system assets for macOS app."
+  },
+  "task_conductor": {
+    "name": "task_conductor",
+    "path": "tools/task_conductor",
+    "tests": [],
+    "type": "lib",
+    "deps": [],
+    "description": "TaskConductor library/tooling."
+  },
+  "content_addressed_broker": {
+    "name": "content_addressed_broker",
+    "path": "tools/content_addressed_broker",
+    "tests": [],
+    "type": "lib",
+    "deps": [],
+    "description": "Content-addressed broker library."
+  },
+  "ma_helper": {
+    "name": "ma_helper",
+    "path": "ma_helper",
+    "tests": [],
+    "type": "lib",
+    "deps": [],
+    "description": "Mono repo Helper/CLI package."
   }
 }
