@@ -951,10 +951,57 @@ def enforce_clean_tree() -> bool:
     return True
 
 
+def _git_summary() -> Dict[str, str]:
+    summary = {"branch": "unknown", "dirty": "?"}
+    if shutil.which("git") is None or not (ROOT / ".git").exists():
+        return summary
+    try:
+        res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True)
+        summary["branch"] = res.stdout.strip()
+    except Exception:
+        pass
+    try:
+        res = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True, check=True)
+        summary["dirty"] = "dirty" if res.stdout.strip() else "clean"
+    except Exception:
+        pass
+    return summary
+
+
+def print_ma_banner():
+    """Print a short banner to signal the Music Advisor helper context."""
+    try:
+        from ma_helper.ui_world import print_banner
+        print_banner(ROOT, guard_level())
+    except Exception:
+        summary = _git_summary()
+        guard = guard_level()
+        bar = f"branch: {summary.get('branch','?')}  |  tree: {summary.get('dirty','?')}  |  guard: {guard}"
+        banner_lines = [
+            "╔════════════════════════════════════════╗",
+            "║ Music Advisor Helper (monorepo tools)  ║",
+            "║ ma quickstart  → top commands          ║",
+            "║ ma welcome    → overview               ║",
+            "║ ma palette    → common ops             ║",
+            "║ ma list       → projects               ║",
+            "╠════════════════════════════════════════╣",
+            f"║ {bar.ljust(38)[:38]} ║",
+            "╚════════════════════════════════════════╝",
+        ]
+        print("\n".join(banner_lines))
+
+
 def cmd_welcome() -> int:
+    try:
+        from ma_helper.ui_world import print_banner
+        print_banner(ROOT, guard_level())
+        from ma_helper.ui_world import hint
+    except Exception:
+        hint = lambda msg: None  # type: ignore
+        print_ma_banner()
     intro = (
-        "Music Advisor helper (ma_helper): monorepo-friendly CLI with project-aware commands, "
-        "affected logic, interactive picker, smokes, and utilities."
+        "You are in the Music Advisor helper: monorepo-friendly commands with project awareness, "
+        "affected logic, interactive picker, smokes, and utilities. Use quickstart/palette to explore."
     )
     cmds = [
         ("list", "List projects/paths"),
@@ -993,10 +1040,19 @@ def cmd_welcome() -> int:
             print(f"- {cmd}: {desc}")
         print("Tip: install prompt_toolkit and rich for best UX; watchfiles for watch fallback; entr/graphviz are optional.")
         return 0
+    try:
+        hint("Next: ma quickstart | ma palette | ma list")
+    except Exception:
+        pass
 
 
 def cmd_help() -> int:
     """Slightly richer help/command palette."""
+    try:
+        from ma_helper.ui_world import heading, hint
+        heading("Music Advisor helper: command palette")
+    except Exception:
+        hint = lambda msg: None  # type: ignore
     sections = {
         "Core": [
             ("list", "List projects/paths"),
@@ -1056,7 +1112,6 @@ def cmd_help() -> int:
                 table.add_row(cmd, desc)
             console.print(Panel(table, title=title, border_style="magenta"))
         console.print("[dim]Tip: set alias `ma=\"python -m ma_helper\"` for shorter commands. Global --dry-run goes before the command (e.g. `python -m ma_helper --dry-run test-all`).[/]")
-        return 0
     except Exception:
         pass
     for title, rows in sections.items():
@@ -1064,10 +1119,21 @@ def cmd_help() -> int:
         for cmd, desc in rows:
             print(f"- {cmd}: {desc}")
     print("Tip: set alias `ma=\"python -m ma_helper\"` and use --dry-run before the command.")
+    try:
+        hint("Next: ma quickstart | ma palette | ma list")
+    except Exception:
+        pass
     return 0
 
 
 def cmd_quickstart() -> int:
+    try:
+        from ma_helper.ui_world import print_banner
+        print_banner(ROOT, guard_level())
+        from ma_helper.ui_world import hint
+    except Exception:
+        hint = lambda msg: None  # type: ignore
+        print_ma_banner()
     tips = [
         "ma list                    # list projects",
         "ma test <proj> --cache local",
@@ -1080,10 +1146,19 @@ def cmd_quickstart() -> int:
     for t in tips:
         print(f"- {t}")
     print("More: ma help / ma palette / docs/tools/helper_cli.md")
+    hint("Next: ma list | ma affected --base origin/main | ma dashboard --json")
     return 0
 
 
 def cmd_palette() -> int:
+    try:
+        from ma_helper.ui_world import print_banner
+        print_banner(ROOT, guard_level())
+        from ma_helper.ui_world import hint
+    except Exception:
+        hint = lambda msg: None  # type: ignore
+        print_ma_banner()
+    print("You are in the Music Advisor helper. Common commands:")
     palette = {
         "list": "list projects",
         "tasks": "common aliases",
@@ -1113,7 +1188,24 @@ def cmd_palette() -> int:
     except Exception:
         for k, v in palette.items():
             print(f"- {k}: {v}")
+    hint("Next: ma list | ma select | ma quickstart")
     return 0
+
+
+def _post_list_hint():
+    try:
+        from ma_helper.ui_world import hint
+        hint("Tip: ma select for an interactive picker; ma affected --base origin/main to run just changed projects.")
+    except Exception:
+        pass
+
+
+def _post_affected_hint():
+    try:
+        from ma_helper.ui_world import hint
+        hint("Tip: ma ci-plan --base origin/main --matrix | ma verify | ma dashboard --json")
+    except Exception:
+        pass
 
 
 def load_registry() -> Dict[str, Any]:
@@ -2557,7 +2649,9 @@ def main(argv=None) -> int:
             return 1
 
     if args.command == "list":
-        return orch.list_projects(projects)
+        rc = orch.list_projects(projects)
+        _post_list_hint()
+        return rc
     if args.command == "tasks":
         return cmd_tasks(getattr(args, "filter", None), getattr(args, "json", False))
     if args.command == "test":
@@ -2613,17 +2707,20 @@ def main(argv=None) -> int:
         print(f"[ma] affected projects ({mode}): {', '.join(names)}")
         if dry_run:
             print(f"[ma] dry-run: would run tests for: {', '.join(names)}")
+            _post_affected_hint()
             return 0
         if args.parallel and args.parallel > 0:
             rc, results = run_projects_parallel(projects, names, args.parallel, getattr(args, "cache", "off"), getattr(args, "retries", 0))
             _print_summary(results, f"affected ({mode}, parallel)")
             _log_event({"cmd": f"affected --base {base}", "rc": rc})
             record_results(results, f"affected-{mode}")
+            _post_affected_hint()
             return rc
         rc, results = run_projects_serial(projects, names, getattr(args, "cache", "off"), getattr(args, "retries", 0))
         _print_summary(results, f"affected ({mode})")
         _log_event({"cmd": f"affected --base {base}", "rc": rc})
         record_results(results, f"affected-{mode}")
+        _post_affected_hint()
         return rc
     if args.command == "run":
         target = None

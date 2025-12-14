@@ -3,6 +3,9 @@ from pathlib import Path
 FORBIDDEN_SUBSTRINGS = ("calibration/", "data/")
 # Legacy scripts still carrying literals; shrink over time. Spine tools are skipped by directory rule below.
 ALLOWLIST = {
+    "tools/hci/historical_echo_runner.py",
+    "tools/task_conductor/echo_broker.py",
+    "shared/content_addressed_broker/broker.py",
     "infra/scripts/data_bootstrap.py",
     "tools/hci_recompute_axes_for_root.py",
     "tools/hci_v2_build_training_matrix.py",

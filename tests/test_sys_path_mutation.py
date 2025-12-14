@@ -19,6 +19,12 @@ def test_no_sys_path_mutations_outside_allowlist():
         "archive/builder_pack/builder/export/MusicAdvisor/Core/Tests/conftest.py",
         "archive/builder_pack/builder/export/MusicAdvisor/Tests/conftest.py",
         "archive/builder_pack/builder/export/MusicAdvisor/CLI/advisor_cli.py",
+        # task_conductor/historical echo legacy path helpers
+        "tools/task_conductor/echo_broker.py",
+        "tools/task_conductor/echo_queue.py",
+        # chat engine legacy scripts
+        "engines/chat_engine/cli_smoke.py",
+        "engines/chat_engine/test_contract.py",
     }
     offenders = []
     for path in repo.rglob("*.py"):

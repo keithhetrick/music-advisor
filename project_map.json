@@ -199,6 +199,6 @@
     "tests": [],
     "type": "lib",
     "deps": [],
-    "description": "Mono repo Helper/CLI package."
+    "description": "Monorepo Helper Tool/CLI package."
   }
 }
