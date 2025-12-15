@@ -29,3 +29,26 @@ playbook = "pipeline-dev"
 
 [plugins.profiles.minimal]
 sparse = ["shared", "tools"]
+
+[tasks.lint]
+command = "python3 -m ma_helper lint && mkdir -p build && touch build/lint.ok"
+inputs = ["hosts/advisor_host", "engines/recommendation_engine/recommendation_engine"]
+outputs = ["build/lint.ok"]
+
+[tasks.typecheck]
+command = "python3 -m ma_helper typecheck && mkdir -p build && touch build/typecheck.ok"
+deps = ["lint"]
+inputs = ["hosts/advisor_host"]
+outputs = ["build/typecheck.ok"]
+
+[tasks.test-all]
+command = "python3 -m ma_helper test-all && mkdir -p build && touch build/test-all.ok"
+deps = ["lint", "typecheck"]
+inputs = ["engines", "hosts", "shared", "tests"]
+outputs = ["build/test-all.ok"]
+
+[tasks.verify]
+command = "python3 -m ma_helper verify && mkdir -p build && touch build/verify.ok"
+deps = ["lint", "typecheck"]
+inputs = ["engines", "hosts", "shared", "tests"]
+outputs = ["build/verify.ok"]

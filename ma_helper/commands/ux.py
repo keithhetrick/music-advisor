@@ -1,14 +1,14 @@
 """UX/help/welcome commands."""
 from __future__ import annotations
 
+import os
+import sys
 from contextlib import contextmanager
 from typing import Dict, Any
 
-from ma_helper.core.state import guard_level
 from ma_helper.core.env import ROOT
 from ma_helper.core.git import git_summary
-import os
-
+from ma_helper.core.state import guard_level
 
 def _git_mode() -> str:
     return os.environ.get("MA_GIT_MODE", "on")
@@ -183,3 +183,21 @@ def live_header(status_text_fn):
             console_live.stop()
     except Exception:
         yield lambda: None
+
+
+def prompt_if_missing(arg_name: str, current_value, prompt_text: str) -> str:
+    """Prompt for a required arg if it is missing."""
+    if current_value:
+        return current_value
+    try:
+        val = input(prompt_text).strip()
+        if not val:
+            print(f"[ma] {arg_name} is required.", file=sys.stderr)
+            sys.exit(2)
+        return val
+    except KeyboardInterrupt:
+        print("\n[ma] cancelled.")
+        sys.exit(1)
+    except Exception:
+        print(f"[ma] failed to read {arg_name}.", file=sys.stderr)
+        sys.exit(1)

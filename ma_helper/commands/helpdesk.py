@@ -9,7 +9,7 @@ import subprocess
 import tempfile
 from typing import Any, Dict, List
 
-from ma_helper.core.env import ROOT
+from ma_helper.core.env import ROOT, STATE_HOME, CACHE_ENABLED
 from ma_helper.core.registry import filter_projects, load_registry
 from ma_helper.core.state import guard_level
 from ma_helper.commands.ux import print_ma_banner, show_world
@@ -116,6 +116,12 @@ def handle_help(palette: Dict[str, str]) -> int:
         "precommit": "print/install pre-commit hook",
     }
     for k, v in git_cmds.items():
+        print(f"- {k:<14} {v}")
+    print("\nTasks/graph:")
+    task_cmds = {
+        "tasks-run": "run tasks from ma_helper.toml with deps/outputs (Nx-style)",
+    }
+    for k, v in task_cmds.items():
         print(f"- {k:<14} {v}")
     print("\nTip: ma palette | ma quickstart | ma list")
     return 0
@@ -259,6 +265,115 @@ def handle_completion(shell: str, parser_builder) -> int:
     return 0
 
 
-def handle_tour() -> int:
-    print("Tour: ma list -> ma select -> ma affected --base origin/main -> ma dashboard --live")
+def _load_idx(progress_path) -> int:
+    if progress_path.exists():
+        try:
+            return json.loads(progress_path.read_text()).get("idx", 0)
+        except Exception:
+            return 0
     return 0
+
+
+def _save_idx(progress_path, idx: int) -> None:
+    if not CACHE_ENABLED:
+        return
+    try:
+        STATE_HOME.mkdir(parents=True, exist_ok=True)
+        progress_path.write_text(json.dumps({"idx": idx}))
+    except Exception:
+        print("[ma] warning: could not save tour progress.")
+
+
+def handle_tour(reset: bool = False, advance: bool = False) -> int:
+    """Guided breadcrumb/tour with lightweight progress tracking."""
+    steps = [
+        {"title": "Discover projects", "cmd": "ma list", "desc": "See all projects and paths."},
+        {"title": "Pick a target", "cmd": "ma select", "desc": "Interactive picker for test/run/deps."},
+        {"title": "Check changes", "cmd": "ma affected --base origin/main", "desc": "Run tests for changed projects."},
+        {"title": "Watch health", "cmd": "ma dashboard --live", "desc": "Live repo dashboard (Rich)."},
+        {"title": "Run gate", "cmd": "ma verify", "desc": "Lint + type + smoke + affected."},
+        {"title": "Full sweep", "cmd": "ma test-all --cache", "desc": "Run the full suite with cache hints."},
+        {"title": "Task graph", "cmd": "ma tasks-run test-all --cache", "desc": "Nx/Turbo-style task runner demo."},
+        {"title": "Git status", "cmd": "ma git-status --branches", "desc": "Check branch/dirty/ahead/behind and recents."},
+        {"title": "Branch helper", "cmd": "ma git-branch <project> --desc work", "desc": "Create a scoped feature branch."},
+        {"title": "Preflight push", "cmd": "ma github-check --require-clean --require-upstream", "desc": "Pre-push/CI readiness gate."},
+        {"title": "Doctor tests", "cmd": "ma doctor --check-tests", "desc": "Ensure test paths are wired."},
+    ]
+    progress_path = STATE_HOME / "tour_progress.json"
+    idx = 0 if reset else _load_idx(progress_path)
+    idx = max(0, min(idx, len(steps)))
+
+    if advance:
+        idx = min(idx + 1, len(steps))
+        _save_idx(progress_path, idx)
+
+    def render(idx_val: int):
+        try:
+            from rich.table import Table
+            from rich.console import Console
+            table = Table(title="ma helper tour", show_header=True, header_style="bold cyan", expand=True)
+            table.add_column("step")
+            table.add_column("status")
+            table.add_column("command")
+            table.add_column("description")
+            for i, step in enumerate(steps):
+                status = "✅ done" if i < idx_val else ("▶ next" if i == idx_val else "… pending")
+                table.add_row(f"{i+1}", status, step["cmd"], step["desc"])
+            Console().print(table)
+        except Exception:
+            print("ma helper tour:")
+            for i, step in enumerate(steps):
+                status = "[done]" if i < idx_val else ("[next]" if i == idx_val else "[ ]")
+                print(f"{status} {i+1}. {step['cmd']} — {step['desc']}")
+
+    render(idx)
+    if idx < len(steps):
+        next_step = steps[idx]
+        print(f"Next: {next_step['cmd']}  ({next_step['desc']})")
+        print("Auto-advance: run the command or use --advance. Reset with: ma tour --reset")
+    else:
+        print("Tour complete. Reset anytime with: ma tour --reset")
+
+    if reset:
+        _save_idx(progress_path, 0)
+    elif advance:
+        _save_idx(progress_path, idx)
+    return 0
+
+
+# --- Tour auto-advance helper (called from CLI dispatcher) ---
+def maybe_advance_tour(cmd_name: str) -> None:
+    """Auto-advance the tour when a matching command succeeds."""
+    if not CACHE_ENABLED:
+        return
+    steps = [
+        "list",
+        "select",
+        "affected",
+        "dashboard",
+        "verify",
+        "test-all",
+        "tasks-run",
+        "git-status",
+        "git-branch",
+        "github-check",
+        "doctor",
+    ]
+    if cmd_name not in steps:
+        return
+    progress_path = STATE_HOME / "tour_progress.json"
+    idx = 0
+    try:
+        if progress_path.exists():
+            idx = json.loads(progress_path.read_text()).get("idx", 0)
+    except Exception:
+        idx = 0
+    # Only advance if we are at or before the matching step.
+    target = steps.index(cmd_name)
+    if idx <= target:
+        idx = target + 1
+        try:
+            STATE_HOME.mkdir(parents=True, exist_ok=True)
+            progress_path.write_text(json.dumps({"idx": idx}))
+        except Exception:
+            pass

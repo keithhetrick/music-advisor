@@ -78,7 +78,7 @@ def _test_gaps(projects) -> tuple[list[str], list[str]]:
 def handle_doctor(require_optional: bool, interactive: bool = False, check_tests: bool = False, projects=None) -> int:
     missing = []
     required = ["python3", "git"]
-    optional = ["rich", "watchfiles", "entr", "dot"]
+    optional = ["rich", "textual", "watchfiles", "entr", "dot"]
     for tool in required:
         if shutil.which(tool) is None:
             missing.append(tool)

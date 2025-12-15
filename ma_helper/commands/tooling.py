@@ -41,34 +41,47 @@ def handle_verify(args, run_affected, post_hint) -> int:
     try:
         from rich.live import Live
         from rich.table import Table
+        from rich.layout import Layout
+        from rich.panel import Panel
 
-        state = {name: {"rc": None, "duration": 0.0} for name, _ in steps}
+        state = {name: {"rc": None, "duration": 0.0, "last": ""} for name, _ in steps}
+        logs = []
 
         def _table():
             tbl = Table(title="verify", expand=True)
             tbl.add_column("step")
             tbl.add_column("rc")
             tbl.add_column("duration")
+            tbl.add_column("last")
             for name, vals in state.items():
                 rc = vals["rc"]
                 rc_txt = "-" if rc is None else ("✅" if rc == 0 else "❌")
-                tbl.add_row(name, rc_txt, f"{vals['duration']:.1f}s")
+                tbl.add_row(name, rc_txt, f"{vals['duration']:.1f}s", vals.get("last", ""))
             return tbl
 
-        live = Live(_table(), refresh_per_second=4)
+        def _layout():
+            lay = Layout()
+            lay.split_column(Layout(name="steps"), Layout(name="logs", size=6))
+            lay["steps"].update(_table())
+            log_text = "\n".join(logs[-5:]) if logs else "..."
+            lay["logs"].update(Panel(log_text, title="recent logs", padding=(0, 1)))
+            return lay
+
+        live = Live(_layout(), refresh_per_second=4)
         live.start()
         try:
             for label, fn in steps:
                 start = time.time()
-                live.update(_table())
+                live.update(_layout())
                 rc = fn()
                 state[label]["rc"] = rc
                 state[label]["duration"] = time.time() - start
-                live.update(_table())
+                logs.append(f"{label}: rc={rc}")
+                live.update(_layout())
                 if rc != 0 and not args.ignore_failures:
                     return rc
         finally:
-            live.update(_table())
+            live.update(_layout())
             live.stop()
     except Exception:
         for label, fn in steps:
@@ -99,7 +112,14 @@ def handle_rerun_last(load_favs, run_cmd) -> int:
         print("[ma] no last failed command recorded.")
         return 0
     print(f"[ma] rerunning last failed: {last}")
-    return run_cmd(last)
+    try:
+        return run_cmd(last)
+    except TypeError:
+        # Fallback for runners that expect dry_run kwarg
+        try:
+            return run_cmd(last, dry_run=False)
+        except Exception:
+            return run_cmd(last)
 
 
 def handle_history(load_favs, limit: int) -> int:
@@ -112,3 +132,18 @@ def handle_history(load_favs, limit: int) -> int:
     for h in hist:
         print(f"- {h}")
     return 0
+
+
+# Cache commands
+def handle_cache(args) -> int:
+    from ma_helper.commands.cache_cmds import cache_stats, cache_clear, cache_explain
+
+    action = getattr(args, "action", "stats")
+    if action == "stats":
+        return cache_stats(getattr(args, "json", False))
+    if action == "clear":
+        return cache_clear()
+    if action == "explain":
+        return cache_explain(args.task, getattr(args, "json", False))
+    print(f"[ma] unknown cache action {action}")
+    return 1

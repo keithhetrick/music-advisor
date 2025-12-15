@@ -54,7 +54,7 @@ Music Advisor is a local, feature-only toolchain that turns that mess into a rep
 - Sparse checkout lets you work on a single component (chat host, a sidecar, or one engine) without pulling everything.
 - Each main component has its own `pyproject.toml`, tests, and run targets; the orchestrator (`tools/ma_orchestrator.py`) lets you run/test just that project.
 - This keeps dependencies clear and reduces collisions when developing in isolation.
-- Helper CLI (ma_helper) makes this fast: `ma sparse --set hosts shared tools`, `ma test <proj>`, `ma affected --base origin/main`, `ma ci-plan --matrix`, `ma watch <proj> [--hotkeys]`, and git-safe checks (`ma github-check`, pre-push/pre-commit hooks). See docs/tools/helper_cli.md for the full surface.
+- Helper CLI (ma_helper) makes this fast: `ma sparse --set hosts shared tools`, `ma test <proj>`, `ma affected --base origin/main`, `ma ci-plan --matrix`, `ma watch <proj> [--hotkeys]`, git-safe checks (`ma github-check`, pre-push/pre-commit hooks), graph views (`ma graph`), cache explain (`ma cache explain --task …`), and a Textual TUI (`ma ui`) for live runs. See docs/tools/helper_cli.md for the full surface.
 
 Example tree (high level)
 
@@ -104,6 +104,7 @@ music-advisor/
    - `ma dashboard --json` (or `ma tui`)
    - `ma watch <project> [--hotkeys]`
 4) Package/back-compat: `python3 -m ma_helper <cmd>` or `python3 tools/ma_helper/cli.py <cmd>`
+5) Live UI (optional): `ma ui` to watch runs + logs (install `textual>=0.55` if prompted). Graph: `ma graph --format mermaid` or `--format dot`. Cache: `ma cache stats|explain --task <name>`.
 
 ## Root essentials (what to look at first)
 

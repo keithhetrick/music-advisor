@@ -72,3 +72,5 @@
 - Added basic tests to guarantee payload schema stability.
 
 v1.1.2 / 0.1.7 — HCI_v1 is always present (CLI & Builder), added --round in both CLI paths, stabilized TTC gate reporting.
+
+- Helper CLI/TUI upgrade: Rich summaries with `--json`, cache controls (`ma cache stats|clear|explain`), graph views (`ma graph`), and a Textual TUI (`ma ui`) with live run updates, filters, graph overlay, rerun/cancel hooks, and per-project log focus. Docs added (`docs/ma_helper_ui.md`); `ma doctor` now checks for `textual` optionally.

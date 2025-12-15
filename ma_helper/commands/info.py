@@ -14,6 +14,7 @@ def handle_palette(hint_fn) -> int:
     palette = {
         "list": "list projects",
         "tasks": "common aliases",
+        "tasks-run": "run tasks from ma_helper.toml (deps/outputs, Nx-style)",
         "test": "test <project> [--cache off|local|restore-only]",
         "test-all": "test-all [--parallel N] [--cache ...] [--require-preflight]",
         "affected": "affected --base origin/main [--require-preflight]",

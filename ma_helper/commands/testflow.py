@@ -5,53 +5,125 @@ import json
 import os
 import subprocess
 import sys
+import time
+from pathlib import Path
 from typing import Dict, List, Optional
 
 from ma_helper.commands.ux import render_error_panel, render_hint_panel
+from ma_helper.ui.render import render_task_summary
 from ma_helper.core.cache import hash_project, should_skip_cached, update_cache, write_artifact
 from ma_helper.core.changes import collect_changes, compute_affected, resolve_base
-from ma_helper.core.env import ROOT
+from ma_helper.core.env import ROOT, STATE_HOME
 from ma_helper.core.graph import topo_sort
 from ma_helper.core.run import _print_summary, record_results, run_projects_parallel, run_projects_serial
 from ma_helper.core.state import add_history, guard_level
 
 
-def _live_table(names):
-    """Return (cb, finish) live table helpers using rich if available."""
+def _live_table(names, enabled: bool = True):
+    """Return (cb, finish) live split-pane helpers using rich if available."""
+    if not enabled:
+        return None, lambda: None
     try:
         from rich.live import Live
         from rich.table import Table
+        from rich.layout import Layout
+        from rich.panel import Panel
 
-        state = {name: {"project": name, "rc": None, "duration": 0.0, "cached": False} for name in names}
+        state = {name: {"project": name, "rc": None, "duration": 0.0, "cached": False, "last": ""} for name in names}
+        logs = []
 
         def _table():
-            tbl = Table(title="ma_helper run", expand=True)
+            tbl = Table(title="ma live (opt-in)", expand=True)
             tbl.add_column("project")
             tbl.add_column("rc")
             tbl.add_column("duration")
             tbl.add_column("cached")
+            tbl.add_column("last")
             for name, entry in state.items():
                 rc = entry.get("rc")
                 rc_txt = "-" if rc is None else ("✅" if rc == 0 else "❌")
                 dur = entry.get("duration", 0.0)
                 cached = "yes" if entry.get("cached") else ""
-                tbl.add_row(name, rc_txt, f"{dur:.1f}s", cached)
+                last = entry.get("last", "")
+                tbl.add_row(name, rc_txt, f"{dur:.1f}s", cached, last)
             return tbl
 
-        live = Live(_table(), refresh_per_second=4)
+        def _layout():
+            lay = Layout()
+            lay.split_column(Layout(name="tasks"), Layout(name="logs", size=6))
+            lay["tasks"].update(_table())
+            log_text = "\n".join(logs[-5:]) if logs else "..."
+            lay["logs"].update(Panel(log_text, title="recent logs", padding=(0, 1)))
+            return lay
+
+        # Use screen=True so the live view stays in-place instead of spamming lines.
+        live = Live(_layout(), refresh_per_second=4, screen=True)
         live.start()
 
         def cb(entry):
             state[entry["project"]] = entry
-            live.update(_table())
+            if entry.get("last"):
+                logs.append(f"{entry['project']}: {entry['last']}")
+            live.update(_layout())
 
         def finish():
-            live.update(_table())
+            live.update(_layout())
             live.stop()
 
         return cb, finish
     except Exception:
         return None, lambda: None
+
+
+def _event_writer() -> Optional[callable]:
+    path = os.environ.get("MA_UI_EVENTS")
+    if not path:
+        path = STATE_HOME / "ui_events.ndjson"
+    else:
+        path = Path(path)
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        return None
+
+    def cb(entry: Dict[str, object]):
+        payload = dict(entry)
+        payload["ts"] = time.time()
+        try:
+            with path.open("a") as f:
+                f.write(json.dumps(payload) + "\n")
+        except Exception:
+            pass
+
+    return cb
+
+
+def _combine_cbs(*cbs):
+    active = [c for c in cbs if c]
+
+    def cb(entry):
+        for fn in active:
+            try:
+                fn(entry)
+            except Exception:
+                pass
+
+    finishers = []
+    for c in cbs:
+        if hasattr(c, "__self__") and hasattr(c.__self__, "stop"):
+            finishers.append(c.__self__.stop)
+    def finish():
+        for fn in finishers:
+            try:
+                fn()
+            except Exception:
+                pass
+    return cb if active else None, finish
+
+
+def _render_results(results, title: str):
+    """Pretty-print final results table (Rich if available)."""
+    render_task_summary(results, title)
 
 
 def handle_test(args, orch, projects, *, dry_run: bool, log_event) -> int:
@@ -86,18 +158,32 @@ def handle_test_all(args, orch, projects, *, dry_run: bool, log_event) -> int:
     if dry_run:
         print(f"[ma] dry-run: would run tests for: {', '.join(names)}")
         return 0
-    progress_cb, finish = _live_table(names)
+    live_enabled = bool(getattr(args, "_live_requested", False) and not getattr(args, "no_live", False))
+    live_cb, live_finish = _live_table(names, enabled=live_enabled)
+    event_cb = _event_writer()
+    progress_cb, finish = _combine_cbs(live_cb, event_cb)
+    if finish is None:
+        finish = lambda: None
+    if event_cb:
+        for n in names:
+            event_cb({"project": n, "rc": None, "duration": 0.0, "cached": "", "last": "pending"})
     try:
         if args.parallel and args.parallel > 0:
             rc, results = run_projects_parallel(
                 orch, projects, names, args.parallel, getattr(args, "cache", "off"), getattr(args, "retries", 0), progress_cb
             )
-            _print_summary(results, "test-all (parallel)")
+            if getattr(args, "json", False):
+                print(json.dumps({"label": "test-all", "parallel": True, "results": results, "rc": rc}, indent=2))
+            else:
+                _render_results(results, "ma_helper run (test-all, parallel)")
         else:
             rc, results = run_projects_serial(
                 orch, projects, names, getattr(args, "cache", "off"), getattr(args, "retries", 0), progress_cb
             )
-            _print_summary(results, "test-all")
+            if getattr(args, "json", False):
+                print(json.dumps({"label": "test-all", "parallel": False, "results": results, "rc": rc}, indent=2))
+            else:
+                _render_results(results, "ma_helper run (test-all)")
     finally:
         finish()
     record_results(results, "test-all")
@@ -128,18 +214,32 @@ def handle_affected(args, orch, projects, *, dry_run: bool, log_event, post_hint
         print(f"[ma] dry-run: would run tests for: {', '.join(names)}")
         post_hint()
         return 0
-    progress_cb, finish = _live_table(names)
+    live_enabled = bool(getattr(args, "_live_requested", False) and not getattr(args, "no_live", False))
+    live_cb, live_finish = _live_table(names, enabled=live_enabled)
+    event_cb = _event_writer()
+    progress_cb, finish = _combine_cbs(live_cb, event_cb)
+    if finish is None:
+        finish = lambda: None
+    if event_cb:
+        for n in names:
+            event_cb({"project": n, "rc": None, "duration": 0.0, "cached": "", "last": "pending"})
     try:
         if args.parallel and args.parallel > 0:
             rc, results = run_projects_parallel(
                 orch, projects, names, args.parallel, getattr(args, "cache", "off"), getattr(args, "retries", 0), progress_cb
             )
-            _print_summary(results, f"affected ({mode}, parallel)")
+            if getattr(args, "json", False):
+                print(json.dumps({"label": f"affected-{mode}", "parallel": True, "base": base, "results": results, "rc": rc}, indent=2))
+            else:
+                _render_results(results, f"affected ({mode}, parallel)")
         else:
             rc, results = run_projects_serial(
                 orch, projects, names, getattr(args, "cache", "off"), getattr(args, "retries", 0), progress_cb
             )
-            _print_summary(results, f"affected ({mode})")
+            if getattr(args, "json", False):
+                print(json.dumps({"label": f"affected-{mode}", "parallel": False, "base": base, "results": results, "rc": rc}, indent=2))
+            else:
+                _render_results(results, f"affected ({mode})")
     finally:
         finish()
     log_event({"cmd": f"affected --base {base}", "rc": rc})

@@ -14,6 +14,7 @@ import argparse
 import json
 import os
 import sys
+import time
 from functools import partial
 from pathlib import Path
 from typing import Any, Dict, List
@@ -38,6 +39,7 @@ from ma_helper.commands.helpdesk import (
     handle_tasks,
     handle_tour,
     handle_welcome,
+    maybe_advance_tour,
 )
 from ma_helper.commands.parser import build_parser
 from ma_helper.commands.registry_cmds import handle_registry
@@ -46,9 +48,12 @@ from ma_helper.commands.dashboard import run_dashboard
 from ma_helper.commands.scaffold import handle_scaffold
 from ma_helper.commands.shell import handle_shell
 from ma_helper.commands.smoke import run_smoke
+from ma_helper.commands.taskgraph import handle_tasks_run
+from ma_helper.commands.ux import prompt_if_missing
 from ma_helper.commands.system import handle_check, handle_doctor, handle_guard, handle_preflight
 from ma_helper.commands.system_ops import run_github_check
-from ma_helper.commands.tooling import handle_ci_env, handle_history, handle_rerun_last, run_format, run_lint, run_typecheck
+from ma_helper.commands.tooling import handle_ci_env, handle_history, handle_rerun_last, run_format, run_lint, run_typecheck, handle_cache
+from ma_helper.commands.graph_cmds import handle_graph
 from ma_helper.commands.verify import run_verify
 from ma_helper.commands.ux import maybe_first_run_hint, post_affected_hint, post_list_hint, post_verify_hint, show_world, render_header, live_header
 from ma_helper.commands.visual import _dashboard_payload
@@ -85,7 +90,10 @@ def cmd_dashboard() -> int:
 def cmd_shell(with_dash: bool = False, interval: float = 1.0) -> int:
     return handle_shell(with_dash, interval, main)
 def main(argv=None) -> int:
+    start_time = time.time()
     raw = list(argv) if argv is not None else sys.argv[1:]
+    # Track presence of --live explicitly so defaults stay off unless requested.
+    live_requested = "--live" in raw
     # Allow --header/--header-live even after the subcommand by stripping first.
     header_flag = False
     header_live_flag = False
@@ -111,6 +119,8 @@ def main(argv=None) -> int:
         env.apply_config(config)
         adapter_factory = get_orch_adapter(config.adapter)
         orch_adapter = adapter_factory(config.root)
+    # Persist whether the user explicitly asked for --live (defaults stay off).
+    setattr(args, "_live_requested", live_requested)
     if getattr(args, "telemetry_file", None):
         env.TELEMETRY_FILE = Path(args.telemetry_file).resolve()
     telemetry_enabled = not getattr(args, "no_telemetry", False) and env.TELEMETRY_FILE is not None
@@ -125,6 +135,12 @@ def main(argv=None) -> int:
     banner_skips = {"palette", "quickstart", "welcome", "tour", "help"}
     header_live_ctx = None
     live_update_fn = None
+    heavy_no_live_header = {"test-all", "affected", "verify"}
+    if getattr(args, "header_live", False) and args.command in heavy_no_live_header:
+        setattr(args, "header_live", False)
+        # fall back to single header if requested
+        if header_flag:
+            render_header()
     if args.command not in banner_skips:
         if getattr(args, "header_live", False):
             def _status_text():
@@ -144,6 +160,8 @@ def main(argv=None) -> int:
             show_world(args.command)
     if args.command not in {"palette", "quickstart", "welcome", "tour"}:
         maybe_first_run_hint(args.command, save_favorites, load_favorites)
+    if telemetry_enabled and env.TELEMETRY_FILE:
+        print(f"[ma] telemetry → {env.TELEMETRY_FILE}")
     projects = orch_adapter.load_projects()
     dry_run = getattr(args, "dry_run", False)
     global DRY_RUN
@@ -162,11 +180,24 @@ def main(argv=None) -> int:
             print("[ma] preflight failed; aborting as requested.")
             return 1
 
+    rc = None
     if getattr(args, "header_live", False) and header_live_ctx:
         with header_live_ctx as update_fn:
             live_update_fn = update_fn
-            return _dispatch(args, projects, dry_run, log_event, require_confirm, status_update=live_update_fn)
-    return _dispatch(args, projects, dry_run, log_event, require_confirm, status_update=live_update_fn)
+            rc = _dispatch(args, projects, dry_run, log_event, require_confirm, status_update=live_update_fn)
+    else:
+        rc = _dispatch(args, projects, dry_run, log_event, require_confirm, status_update=live_update_fn)
+    if telemetry_enabled and log_event:
+        try:
+            log_event({"cmd": args.command, "rc": rc, "duration_sec": round(time.time() - start_time, 3)})
+        except Exception:
+            pass
+    if rc == 0:
+        try:
+            maybe_advance_tour(args.command)
+        except Exception:
+            pass
+    return rc
 
 
 def _dispatch(args, projects, dry_run, log_event, require_confirm, status_update=None):
@@ -271,10 +302,14 @@ def _dispatch(args, projects, dry_run, log_event, require_confirm, status_update
         return handle_playbook(args.name, args.dry_run)
     if args.command == "registry":
         return handle_registry(args, config.registry_path)
+    if args.command == "tasks-run":
+        return handle_tasks_run(args, _run_cmd, log_event)
     if args.command == "map":
         if args.format == "svg" and args.open:
             emit_graph.open_svg = True
         return handle_map(args.format, args.filter, args.open)
+    if args.command == "graph":
+        return handle_graph(getattr(args, "format", "ansi"), getattr(args, "filter", None))
     if args.command == "dashboard":
         cmd_dashboard.as_json = getattr(args, "json", False)
         cmd_dashboard.as_html = getattr(args, "html", False)
@@ -284,8 +319,25 @@ def _dispatch(args, projects, dry_run, log_event, require_confirm, status_update
         return handle_dashboard(args)
     if args.command == "tui":
         return handle_tui_cli(args)
+    if args.command == "ui":
+        try:
+            try:
+                from ma_helper.tui.app import HelperTUI
+            except Exception:
+                print("[ma] textual is not installed; install with: python3 -m pip install 'textual>=0.55'")
+                return 1
+            reg = orch_adapter.load_projects()
+            from ma_helper.core.env import LAST_RESULTS_FILE, LOG_FILE
+            results_path = Path(args.results) if getattr(args, "results", None) else LAST_RESULTS_FILE
+            log_path = Path(args.logs) if getattr(args, "logs", None) else LOG_FILE
+            app = HelperTUI(list(reg.keys()), results_path=results_path, log_path=log_path, interval=getattr(args, "interval", 1.0))
+            app.run()
+            return 0
+        except Exception as exc:
+            print(f"[ma] TUI failed: {exc}")
+            return 1
     if args.command == "tour":
-        return handle_tour()
+        return handle_tour(getattr(args, "reset", False), getattr(args, "advance", False))
     if args.command == "logs":
         return handle_logs(args, env.LOG_FILE)
     if args.command == "profile":
@@ -297,6 +349,8 @@ def _dispatch(args, projects, dry_run, log_event, require_confirm, status_update
     if args.command == "completion":
         return handle_completion(args.shell, build_parser)
     if args.command == "git-branch":
+        if not getattr(args, "project", None):
+            args.project = prompt_if_missing("project", None, "Project for branch name: ")
         return handle_git_branch(args)
     if args.command == "chat-dev":
         return handle_chat_dev(args)
