@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: scripts/make_dist.sh [--name NAME] [--dirty-ok]
+Usage: scripts/make_dist.sh [--name NAME] [--dirty-ok] [--slim]
 
 Creates dist/<name>.zip from HEAD tracked files via git archive (small, reproducible).
 Refuses to run on a dirty git tree unless --dirty-ok is set (uncommitted files are not included).
@@ -11,6 +11,7 @@ Refuses to run on a dirty git tree unless --dirty-ok is set (uncommitted files a
 Options:
   --name NAME   Override archive base name (default: music-advisor-YYYYMMDD)
   --dirty-ok    Allow running with uncommitted changes (still only HEAD files will be packaged)
+  --slim        Exclude bulky assets (essentia wheel, doc wireframe PNGs) to reduce size
   -h, --help    Show this help
 EOF
 }
@@ -21,6 +22,7 @@ cd "$ROOT"
 NAME_DEFAULT="music-advisor-$(date +%Y%m%d)"
 ARCHIVE_NAME="$NAME_DEFAULT"
 DIRTY_OK=0
+SLIM=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -30,6 +32,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --dirty-ok)
       DIRTY_OK=1
+      shift
+      ;;
+    --slim)
+      SLIM=1
       shift
       ;;
     -h|--help)
@@ -57,7 +63,14 @@ ARCHIVE_PATH="$OUTDIR/$ARCHIVE_NAME.zip"
 
 echo "Building archive at $ARCHIVE_PATH"
 
+PATHS=(.)
+if [[ $SLIM -eq 1 ]]; then
+  PATHS+=(':!wheels/essentia-2.1b6.dev1110-cp311-cp311-macosx_10_9_x86_64.whl')
+  PATHS+=(':!docs/host_chat/ui_mock/*')
+  PATHS+=(':!hosts/macos_app/AppIcon.appiconset/*')
+fi
+
 # Package only tracked files at HEAD for maximum reproducibility and small size.
-git archive --format zip --output "$ARCHIVE_PATH" HEAD
+git archive --format zip --output "$ARCHIVE_PATH" HEAD "${PATHS[@]}"
 
 echo "Archive ready: $ARCHIVE_PATH"

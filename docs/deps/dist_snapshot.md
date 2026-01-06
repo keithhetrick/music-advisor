@@ -9,6 +9,7 @@ Use this when you need a clean, reproducible archive of the repo (source, docs, 
 - Output: `dist/music-advisor-YYYYMMDD.zip`
 - Override name: `./scripts/make_dist.sh --name music-advisor-review`
 - Allow dirty tree: `./scripts/make_dist.sh --dirty-ok` (still archives only HEAD tracked files; uncommitted changes are not included).
+- Slim bundle (excludes Essentia wheel, doc wireframe PNGs, and macOS AppIcon set): `./scripts/make_dist.sh --slim`
 
 ## What’s included
 
@@ -19,6 +20,7 @@ Use this when you need a clean, reproducible archive of the repo (source, docs, 
 
 - Anything untracked or uncommitted (git archive only packages tracked files at HEAD).
 - Generated outputs and caches that are gitignored (e.g., `.venv`, `.iconvenv`, `dist/`, `build/`, `logs/`, `data/features_output/`, `data/tmp/`, `node_modules`, `__pycache__`, `.pytest_cache`, `.mypy_cache`, editor folders, `.DS_Store`, swap files).
+- If `--slim` is used: the Essentia wheel, doc wireframe PNGs under `docs/host_chat/ui_mock/`, and macOS app icon set under `hosts/macos_app/AppIcon.appiconset/` are also excluded.
 - If you need to include additional data artifacts, add/commit them before running the script.
 
 ## Rebuild reminder
