@@ -57,14 +57,20 @@ fi
 echo "[sidecar:deps] librosa $lb_ver (ok)"
 
 # Essentia is required
+ALLOW_MISSING_ESSENTIA="${ALLOW_MISSING_ESSENTIA:-0}"
 if ! "$PY_BIN" - <<'PY' >/dev/null 2>&1; then
 import essentia.standard as es  # noqa: F401
 print("essentia ok")
 PY
-  echo "[sidecar:deps] ERROR: Essentia import failed" >&2
-  exit 1
+  if [[ "$ALLOW_MISSING_ESSENTIA" == "1" ]]; then
+    echo "[sidecar:deps] WARN: Essentia import failed (ALLOW_MISSING_ESSENTIA=1; will fall back to other backends)" >&2
+  else
+    echo "[sidecar:deps] ERROR: Essentia import failed" >&2
+    exit 1
+  fi
+else
+  echo "[sidecar:deps] essentia import ok"
 fi
-echo "[sidecar:deps] essentia import ok"
 
 # Madmom is optional; warn only
 if "$PY_BIN" - <<'PY' >/dev/null 2>&1; then

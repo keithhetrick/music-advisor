@@ -50,11 +50,13 @@ def root_name_to_pc(name: str) -> int | None:
     if not name:
         return None
     raw = name.strip().replace("♭", "b").replace("♯", "#")
-    up = raw.upper()
-    if up in PITCH_CLASS_NAMES:
-        return PITCH_CLASS_NAMES.index(up)
-    # flats
-    equiv = ENHARMONIC_EQUIV.get(up)
+    # Canonicalize case so values like "Eb", "eB", or "eb" all parse.
+    if raw:
+        raw = raw[0].upper() + raw[1:].lower()
+    if raw in PITCH_CLASS_NAMES:
+        return PITCH_CLASS_NAMES.index(raw)
+    # flats / enharmonic equivalents
+    equiv = ENHARMONIC_EQUIV.get(raw)
     if equiv and equiv in PITCH_CLASS_NAMES:
         return PITCH_CLASS_NAMES.index(equiv)
     return None

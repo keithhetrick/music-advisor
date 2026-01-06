@@ -24,6 +24,7 @@ Desktop.ini
 .envrc
 .direnv/
 .venv/
+.iconvenv/
 venv/
 ENV/
 env/
