@@ -16,7 +16,7 @@ struct ResultsView: View {
     var onCopyJSON: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
+        VStack(alignment: .leading, spacing: MAStyle.Spacing.md) {
             HStack(spacing: MAStyle.Spacing.sm) {
                 Text("Result").maText(.headline)
                 Picker("", selection: $selectedPane) {
@@ -41,6 +41,7 @@ struct ResultsView: View {
                     Label("Copy pane", systemImage: "doc.on.doc")
                 }
                 .maButton(.ghost)
+                .maHoverLift()
                 .disabled(paneText(selectedPane).isEmpty)
                 .accessibilityLabel("Copy current result pane")
             }
@@ -49,6 +50,7 @@ struct ResultsView: View {
                 HStack(spacing: MAStyle.Spacing.sm) {
                     ForEach(summaryMetrics) { metric in
                         MetricTile(label: metric.label, value: metric.value)
+                            .maHoverLift()
                     }
                     if sidecarPath != nil {
                         Button("Reveal sidecar", action: onRevealSidecar).maButton(.ghost).accessibilityLabel("Reveal sidecar")
@@ -66,11 +68,13 @@ struct ResultsView: View {
             HStack(spacing: MAStyle.Spacing.sm) {
                 Button("Copy JSON", action: onCopyJSON)
                     .maButton(.ghost)
+                    .maHoverLift()
                     .disabled(parsedJSON.isEmpty)
                     .accessibilityLabel("Copy JSON result")
                 if sidecarPath != nil {
                     Button("Copy sidecar path", action: onCopySidecarPath)
                         .maButton(.ghost)
+                        .maHoverLift()
                         .accessibilityLabel("Copy sidecar path")
                 }
                 Spacer()

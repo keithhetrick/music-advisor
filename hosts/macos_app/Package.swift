@@ -27,13 +27,16 @@ let package = Package(
                 .product(name: "ContentAddressedBroker", package: "content_addressed_broker_swift")
             ],
             path: "Sources",
-            exclude: ["MAQueue"]
+            exclude: ["MAQueue"],
+            resources: [
+                .process("../AppIcon.appiconset")
+            ]
         ),
         .testTarget(
             name: "MusicAdvisorMacAppTests",
             dependencies: ["MusicAdvisorMacApp", "MAQueue", "ViewInspector", .product(name: "ContentAddressedBroker", package: "content_addressed_broker_swift")],
             path: "Tests",
-            exclude: ["MusicAdvisorMacAppUITests"]
+            exclude: ["MusicAdvisorMacAppUITests", "test_import_smoke.py", "__pycache__"]
         )
     ]
 )

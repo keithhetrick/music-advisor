@@ -15,7 +15,7 @@ struct RunControlsView: View {
     var onRevealLastSidecar: (() -> Void)? = nil
 
     var body: some View {
-        HStack(spacing: MAStyle.Spacing.sm) {
+        HStack(spacing: MAStyle.Spacing.md) {
             Button(action: onRun) {
                 if isRunning {
                     ProgressView().progressViewStyle(.circular)
@@ -25,6 +25,7 @@ struct RunControlsView: View {
             }
             .maButton(.primary)
             .maFocusRing(true)
+            .maHoverLift()
             .disabled(isRunning || !canRun)
             .keyboardShortcut(.return, modifiers: [.command])
             .accessibilityLabel("Run")
@@ -32,6 +33,7 @@ struct RunControlsView: View {
             Button("Run defaults", action: onRunDefaults)
                 .maButton(.secondary)
                 .maFocusRing(true)
+                .maHoverLift()
             .disabled(isRunning || !canRun)
             .keyboardShortcut(.return, modifiers: [.command, .shift])
             .accessibilityLabel("Run defaults")
@@ -39,6 +41,7 @@ struct RunControlsView: View {
             Button("Run smoke", action: onRunSmoke)
                 .maButton(.ghost)
                 .maFocusRing(true)
+                .maHoverLift()
             .disabled(isRunning)
             .keyboardShortcut(.return, modifiers: [.command, .option])
             .accessibilityLabel("Run smoke test")
@@ -47,6 +50,7 @@ struct RunControlsView: View {
                 Button("Reveal last", action: onRevealLastSidecar)
                     .maButton(.ghost)
                     .maFocusRing(true)
+                    .maHoverLift()
                     .keyboardShortcut("r", modifiers: [.command])
                     .accessibilityLabel("Reveal last sidecar")
             }
@@ -74,5 +78,9 @@ struct RunControlsView: View {
             }
             Spacer()
         }
+        .padding(.vertical, MAStyle.Spacing.xs)
+        .padding(.horizontal, MAStyle.Spacing.sm)
+        .background(MAStyle.ColorToken.panel.opacity(0.75))
+        .cornerRadius(MAStyle.Radius.sm)
     }
 }

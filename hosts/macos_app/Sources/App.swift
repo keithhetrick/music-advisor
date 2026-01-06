@@ -14,6 +14,7 @@ struct MusicAdvisorMacApp: App {
             if phase == .active {
                 NSApplication.shared.activate(ignoringOtherApps: true)
                 NSApplication.shared.windows.first?.makeKeyAndOrderFront(nil)
+                AppIconLoader.applyBundleIcon()
             }
         }
     }
