@@ -5,13 +5,13 @@ import XCTest
 final class AppStoreTests: XCTestCase {
     func testRoutePaneAndAlert() async {
         let store = AppStore()
-        XCTAssertEqual(store.state.route, .run(.json))
+        XCTAssertEqual(store.state.route, .analyze(.json))
 
-        store.dispatch(.setRoute(.history))
-        XCTAssertEqual(store.state.route.tab, .history)
+        store.dispatch(.setRoute(.results(.json)))
+        XCTAssertEqual(store.state.route.tab, .results)
 
-        store.dispatch(.setRoute(store.state.route.updatingTab(.run)))
-        XCTAssertEqual(store.state.route.tab, .run)
+        store.dispatch(.setRoute(store.state.route.updatingTab(.analyze)))
+        XCTAssertEqual(store.state.route.tab, .analyze)
         store.dispatch(.setRoute(store.state.route.updatingRunPane(.stderr)))
         XCTAssertEqual(store.state.route.runPane, .stderr)
 

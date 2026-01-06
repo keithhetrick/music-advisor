@@ -31,9 +31,12 @@ private func queueLog(_ message: String) {
 }
 
 enum AppTab: String, CaseIterable {
-    case run = "Pipeline"
-    case history = "History"
-    case style = "MAStyle"
+    case library = "Library"
+    case analyze = "Analyze"
+    case results = "Results"
+    case echo = "Historical Echo"
+    case guide = "Guide"
+    case settings = "Settings"
 }
 
 enum AppAction {
@@ -80,7 +83,7 @@ struct EchoStatus: Identifiable {
 
 struct AppState {
     var alert: AlertState? = nil
-    var route: AppRoute = .run(.json)
+    var route: AppRoute = .analyze(.json)
     var useDarkTheme: Bool = true
     var followSystemTheme: Bool = true
     var promptText: String = ""

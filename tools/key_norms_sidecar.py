@@ -198,20 +198,29 @@ def _parse_song_key_string(raw: str) -> Optional[SongKey]:
     if not raw:
         return None
     txt = raw.replace("_", " ").replace("-", " ").strip()
-    m = re.match(r"^([A-Ga-g][#b]?)\s+(major|minor|maj|min)$", txt, flags=re.IGNORECASE)
+    # Normalize accidental casing so values like "EB" or "Db" both parse.
+    def _canonical_root(token: str) -> str:
+        if not token:
+            return token
+        head, tail = token[0], token[1:]
+        tail_norm = tail.replace("B", "b") if tail else tail
+        return head.upper() + tail_norm
+
+    m = re.match(r"^([A-Ga-g][#bB]?)\s+(major|minor|maj|min)$", txt, flags=re.IGNORECASE)
     if m:
-        return _normalize_key_pair(m.group(1), m.group(2))
+        root = _canonical_root(m.group(1))
+        return _normalize_key_pair(root, m.group(2))
     if " " not in txt:
         # Allow compact forms like "C#m" or "Am"
         low = txt.lower()
         if low.endswith("min"):
-            return _normalize_key_pair(txt[:-3], "minor")
+            return _normalize_key_pair(_canonical_root(txt[:-3]), "minor")
         if low.endswith("m"):
-            return _normalize_key_pair(txt[:-1], "minor")
-        return _normalize_key_pair(txt, "major")
+            return _normalize_key_pair(_canonical_root(txt[:-1]), "minor")
+        return _normalize_key_pair(_canonical_root(txt), "major")
     parts = txt.split()
     if len(parts) >= 2:
-        return _normalize_key_pair(parts[0], parts[1])
+        return _normalize_key_pair(_canonical_root(parts[0]), parts[1])
     return None
 
 

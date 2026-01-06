@@ -1,7 +1,6 @@
 import SwiftUI
 import AppKit
 import MAStyle
-import UniformTypeIdentifiers
 import os
 
 struct ContentView: View {
@@ -30,6 +29,10 @@ struct ContentView: View {
     @State private var runWarnings: [String] = []
     @State private var missingAudioWarning: String? = nil
     @State private var showSettingsSheet: Bool = false
+    @State private var historyLoading: Bool = false
+    @State private var showPalette: Bool = false
+    @State private var paletteQuery: String = ""
+    private let echoEnabled: Bool = ProcessInfo.processInfo.environment["MA_ECHO_BROKER_ENABLE"] == "1"
     init() {
         let s = AppStore()
         _store = StateObject(wrappedValue: s)
@@ -37,137 +40,21 @@ struct ContentView: View {
         self.trackVM = s.trackVM
     }
 
-    private func handleRunDrop(providers: [NSItemProvider]) -> Bool {
-        var handled = false
-        for provider in providers {
-            if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) ||
-                provider.hasItemConformingToTypeIdentifier(UTType.audio.identifier) {
-                handled = true
-                provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
-                    if let data = item as? Data,
-                       let url = URL(dataRepresentation: data, relativeTo: nil) {
-                        Task { @MainActor in
-                            store.enqueueFromDrop([url], baseCommand: viewModel.commandText)
-                            trackVM?.ingestDropped(urls: [url])
-                        }
-                    }
-                }
-            }
-        }
-        return handled
-    }
-
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            MAStyle.Backdrop(intensity: 1.0, accent: MAStyle.ColorToken.primary)
+            LinearGradient(colors: DesignTokens.Gradient.backdrop,
+                           startPoint: .topLeading,
+                           endPoint: .bottomTrailing)
                 .ignoresSafeArea()
 
-            HStack(spacing: MAStyle.Spacing.md) {
-                NavigationRail(
-                    selection: Binding(get: { store.state.route.tab },
-                                       set: { tab in
-                                           showSettingsSheet = false
-                                           store.dispatch(.setRoute(store.state.route.updatingTab(tab)))
-                                       }),
-                    isDarkTheme: store.state.useDarkTheme,
-                    followSystemTheme: store.state.followSystemTheme,
-                    onToggleTheme: {
-                        let systemDark = MAStyle.systemPrefersDark()
-                        if store.state.followSystemTheme {
-                            // Switch to manual using current system appearance.
-                            store.dispatch(.setFollowSystemTheme(false))
-                            let applied = MAStyle.applyTheme(followSystem: false, manualDark: systemDark)
-                            store.dispatch(.setTheme(applied))
-                        } else {
-                            let newValue = !store.state.useDarkTheme
-                            let applied = MAStyle.applyTheme(followSystem: false, manualDark: newValue)
-                            store.dispatch(.setTheme(applied))
-                        }
-                    },
-                    onSettings: { showSettingsSheet = true }
-                )
-
-                VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
-                    HeaderView(hostStatus: store.state.hostSnapshot.status,
-                               progress: store.state.hostSnapshot.processing.progress,
-                               showProgress: store.state.hostSnapshot.processing.status == "running",
-                               lastUpdated: store.state.hostSnapshot.lastUpdated)
-                        .maSheen(isActive: store.commandVM.isRunning, duration: 4.5)
-                    HStack {
-                        Text(tabTitle(for: store.state.route.tab))
-                            .maText(.headline)
-                        Spacer()
-                    }
-                    Divider()
-                    ScrollView(.vertical) {
-                        switch store.state.route.tab {
-                        case .run:
-                    RunSplitView(
-                        store: store,
-                        viewModel: viewModel,
-                        trackVM: trackVM,
-                        pickFile: { services.filePicker.pickFile() },
-                        pickDirectory: { services.filePicker.pickDirectory() },
-                        revealSidecar: revealSidecar(path:),
-                        copyJSON: copyJSON,
-                        onPreviewRich: { path in loadHistoryPreview(path: path) },
-                        canRun: canRun,
-                        disabledReason: disabledReason,
-                        runWarnings: runWarnings,
-                        missingAudioWarning: missingAudioWarning,
-                        onPickAudio: {
-                            services.filePicker.pickFile().map { url in
-                                viewModel.insertAudioPath(url.path)
-                                return url
-                            }
-                        },
-                        onShowHistory: {
-                            store.dispatch(.setRoute(store.state.route.updatingTab(.history)))
-                        }
-                    )
-                case .history:
-                    HistorySplitView(
-                        store: store,
-                        reloadHistory: reloadHistory,
-                                revealSidecar: revealSidecar(path:),
-                                loadPreview: { path in loadHistoryPreview(path: path) },
-                                reRun: { item in
-                                    guard let path = item?.path else { return }
-                                    let fm = FileManager.default
-                                    if fm.fileExists(atPath: path) {
-                                        viewModel.insertAudioPath(path)
-                                    } else {
-                                        store.dispatch(.setAlert(AlertHelper.toast("File missing",
-                                                                                    message: "Cannot re-run; file not found at \(URL(fileURLWithPath: path).lastPathComponent)",
-                                                                                    level: .warning)))
-                                    }
-                                },
-                onSelectContext: { path in
-                    setChatContext(selection: "history", overridePath: path)
-                },
-                                historySearchFocus: $historySearchFocused,
-                                confirmClearHistory: $confirmClearHistory
-                            )
-                        case .style:
-                            PlaybookView(
-                                references: referenceOptions(),
-                                onAnalyze: { card, ref in
-                                    let result = analyzePlaybook(card: card, reference: ref)
-                                    return result
-                                },
-                                onAskChat: { card, ref, context in
-                                    openChat(for: card, mode: .ask, reference: ref, context: context)
-                                }
-                            )
-                        }
-                    }
-                    .padding(.horizontal, MAStyle.Spacing.md)
-                }
-                .padding(MAStyle.Spacing.md)
-                .frame(minWidth: 720, minHeight: 480, alignment: .top)
+            HStack(spacing: DesignTokens.Spacing.md) {
+                sidebar
+                Divider()
+                    .padding(.vertical, DesignTokens.Spacing.lg)
+                mainScaffold
             }
-            .padding(.horizontal, MAStyle.Spacing.md)
-            .padding(.vertical, MAStyle.Spacing.md)
+            .padding(.horizontal, DesignTokens.Spacing.lg)
+            .padding(.vertical, DesignTokens.Spacing.lg)
 
             if let alert = store.state.alert {
                 VStack {
@@ -179,11 +66,12 @@ struct ContentView: View {
                         presentAsToast: alert.presentAsToast,
                         onClose: { store.dispatch(.setAlert(nil)) }
                     )
-                    .padding(MAStyle.Spacing.md)
+                    .padding(DesignTokens.Spacing.md)
                     .transition(.move(edge: alert.presentAsToast ? .bottom : .top).combined(with: .opacity))
                     .zIndex(1)
                 }
             }
+
             if showGettingStarted {
                 VStack {
                     GettingStartedOverlay {
@@ -192,13 +80,21 @@ struct ContentView: View {
                     .frame(maxWidth: 520)
                     Spacer()
                 }
-                .padding(MAStyle.Spacing.lg)
+                .padding(DesignTokens.Spacing.lg)
                 .transition(.opacity)
                 .zIndex(2)
             }
         }
         .preferredColorScheme(store.state.followSystemTheme ? nil : (store.state.useDarkTheme ? .dark : .light))
         .overlay(shortcutButtons.opacity(0))
+        .overlay {
+            if showPalette {
+                CommandPalette(isPresented: $showPalette,
+                               query: $paletteQuery,
+                               entries: paletteEntries())
+                .zIndex(4)
+            }
+        }
         .overlay {
             if showSettingsSheet {
                 ZStack {
@@ -234,7 +130,7 @@ struct ContentView: View {
                         .onTapGesture { showChatOverlay = false }
                     VStack(spacing: 0) {
                         HStack(spacing: MAStyle.Spacing.sm) {
-                            Text("Chat")
+                            Text("Guide")
                                 .maText(.headline)
                                 .foregroundStyle(MAStyle.ColorToken.muted)
                             Spacer()
@@ -279,7 +175,7 @@ struct ContentView: View {
                             contextBadgeSubtitle: store.state.chatBadgeSubtitle,
                             contextLastUpdated: store.state.chatContextLastUpdated
                         )
-                        .frame(minWidth: 480, maxWidth: 720, minHeight: 360, maxHeight: 600)
+                        .frame(minWidth: 520, maxWidth: 760, minHeight: 360, maxHeight: 620)
                         .padding(.horizontal)
                         .padding(.bottom)
                         .maHoverLift(enabled: false)
@@ -431,126 +327,389 @@ struct ContentView: View {
         .onChange(of: viewModel.queueVM.jobs) { _ in refreshRunReadiness() }
     }
 
-    // MARK: - Drop handling
-    // Drop handling is scoped to DropZoneView to avoid blocking scroll/gestures.
+    // MARK: - Shell layout
 
-    private var header: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
-                Text("Music Advisor")
-                    .maText(.headline)
-                Text("SwiftUI shell; configure any local CLI and pipeline.")
-                    .maText(.caption)
-                    .foregroundStyle(MAStyle.ColorToken.muted)
-            }
-            Spacer()
-            Text("Live")
-                .maBadge(.success)
-        }
-        .maCard(padding: MAStyle.Spacing.sm)
+    private var sidebar: some View {
+        NavigationRail(
+            selection: Binding(get: { store.state.route.tab },
+                               set: { tab in
+                                   showSettingsSheet = false
+                                   store.dispatch(.setRoute(store.state.route.updatingTab(tab)))
+                               }),
+            isDarkTheme: store.state.useDarkTheme,
+            followSystemTheme: store.state.followSystemTheme,
+            onToggleTheme: {
+                let systemDark = MAStyle.systemPrefersDark()
+                if store.state.followSystemTheme {
+                    // Switch to manual and invert current system to make change visible.
+                    store.dispatch(.setFollowSystemTheme(false))
+                    let newValue = !systemDark
+                    store.dispatch(.setTheme(newValue))
+                    _ = MAStyle.applyTheme(followSystem: false, manualDark: newValue)
+                } else {
+                    let newValue = !store.state.useDarkTheme
+                    store.dispatch(.setTheme(newValue))
+                    _ = MAStyle.applyTheme(followSystem: false, manualDark: newValue)
+                }
+            },
+            onSettings: { showSettingsSheet = true }
+        )
+        .frame(maxHeight: .infinity, alignment: .top)
+        .padding(.vertical, DesignTokens.Spacing.sm)
     }
 
-    private var settings: some View {
-        HStack {
-            HStack(spacing: MAStyle.Spacing.sm) {
-                Text("Theme")
-                    .maText(.caption)
-                Toggle("", isOn: Binding(get: { store.state.useDarkTheme },
-                                         set: { store.dispatch(.setTheme($0)) }))
-                    .toggleStyle(.switch)
-                    .labelsHidden()
+    private var mainScaffold: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
+            headerBar
+            if store.state.route.tab == .results, (viewModel.sidecarPath != nil || !viewModel.summaryMetrics.isEmpty) {
+                contextRibbon
             }
-            Spacer()
-            if !viewModel.status.isEmpty {
-                Text(viewModel.status)
-                    .maBadge(.info)
+            ScrollView(.vertical) {
+                detailContent
+                    .padding(.bottom, DesignTokens.Spacing.lg)
             }
         }
-        .maCard(padding: MAStyle.Spacing.sm)
+        .frame(minWidth: 960, minHeight: 560, alignment: .topLeading)
     }
 
-    private var mainSplit: some View {
-        HStack(alignment: .top, spacing: MAStyle.Spacing.md) {
-            leftColumn
-                .frame(maxWidth: 260)
-            VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
-                TrackHeaderView(title: store.state.mockTrackTitle, badgeText: "Norms Badge")
-                    .maSheen(isActive: viewModel.isRunning, duration: 5.5, highlight: Color.white.opacity(0.12))
-                DropZoneView { urls in
-                    store.enqueueFromDrop(urls, baseCommand: viewModel.commandText)
+    private var headerBar: some View {
+        HStack(alignment: .center, spacing: DesignTokens.Spacing.sm) {
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                Text(tabTitle(for: store.state.route.tab))
+                    .font(DesignTokens.Typography.title)
+                Text(routeSubtitle(for: store.state.route.tab))
+                    .font(DesignTokens.Typography.caption)
+                    .foregroundStyle(DesignTokens.Color.muted)
+            }
+            Spacer()
+            HStack(spacing: DesignTokens.Spacing.sm) {
+                VStack(alignment: .trailing, spacing: DesignTokens.Spacing.xs) {
+                    Text(store.state.hostSnapshot.status.capitalized)
+                        .maBadge(store.commandVM.isRunning ? .warning : .info)
+                    if store.state.hostSnapshot.processing.status == "running" {
+                        ProgressView(value: store.state.hostSnapshot.processing.progress)
+                            .frame(width: 120)
+                            .maProgressStyle()
+                    }
+                    if let last = store.state.hostSnapshot.lastUpdated {
+                        let rel = RelativeDateTimeFormatter().localizedString(for: last, relativeTo: Date())
+                        Text("Updated \(rel)")
+                            .maText(.caption)
+                            .foregroundStyle(DesignTokens.Color.muted)
+                    }
                 }
-                JobQueueView(
-                    jobs: store.state.queueJobs,
-                    ingestPendingCount: store.state.ingestPendingCount,
-                    ingestErrorCount: store.state.ingestErrorCount,
-                    onReveal: revealSidecar(path:),
-                    onPreviewRich: { richPath in loadHistoryPreview(path: richPath.replacingOccurrences(of: ".client.rich.txt", with: ".json")) },
-                    onClear: {
-                        store.clearQueueAll()
-                    },
-                    onStart: {
-                        store.startQueue()
-                    },
-                    onResumeCanceled: {
-                        store.resumeCanceledQueue()
+                Divider()
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                    Text(store.state.chatBadgeTitle)
+                        .maText(.body)
+                    Text(store.state.chatBadgeSubtitle)
+                        .maText(.caption)
+                        .foregroundStyle(DesignTokens.Color.muted)
+                    HStack(spacing: DesignTokens.Spacing.xs) {
+                        Button {
+                            setChatContext(selection: "last-run", overridePath: viewModel.sidecarPath)
+                            showChatOverlay = true
+                        } label: {
+                            Label("Guide", systemImage: "bubble.left.and.bubble.right")
+                        }
+                        .maButton(.secondary)
+                        Button {
+                            store.dispatch(.setShowAdvanced(!store.state.showAdvanced))
+                        } label: {
+                            Image(systemName: store.state.showAdvanced ? "sidebar.trailing" : "sidebar.right")
+                                .font(.system(size: 13, weight: .medium))
+                        }
+                        .maButton(.ghost)
+                        .help("Toggle inspector")
                     }
-                )
-                QuickActionsView(actions: store.state.quickActions)
-                SectionsView(sections: store.state.sections)
-                if let trackVM {
-                    TrackListView(viewModel: trackVM)
                 }
-                CommandInputsView(
-                    profiles: viewModel.profiles,
-                    selectedProfile: Binding(get: { viewModel.selectedProfile },
-                                             set: { viewModel.selectedProfile = $0 }),
-                    onApplyProfile: {
-                        Task { @MainActor in
-                            viewModel.applySelectedProfile()
+            }
+        }
+        .cardSurface(padding: DesignTokens.Spacing.xs, cornerRadius: DesignTokens.Radius.lg)
+        .frame(maxHeight: 110)
+    }
+
+    @ViewBuilder
+    private var detailContent: some View {
+        switch store.state.route.tab {
+        case .library:
+            libraryView
+        case .analyze:
+            analyzeView
+        case .results:
+            resultsDashboard
+        case .echo:
+            echoView
+        case .guide:
+            guidePanel
+        case .settings:
+            settingsPanel
+        }
+    }
+
+    private var libraryView: some View {
+        VStack(spacing: DesignTokens.Spacing.md) {
+            HStack(alignment: .top, spacing: DesignTokens.Spacing.md) {
+                quickStartCard
+                    .frame(maxWidth: 380)
+                VStack(spacing: DesignTokens.Spacing.md) {
+                    historyPeekCard
+                    latestResultCard
+                }
+            }
+            HistorySplitView(
+                store: store,
+                reloadHistory: reloadHistory,
+                revealSidecar: revealSidecar(path:),
+                loadPreview: { path in loadHistoryPreview(path: path) },
+                reRun: { item in
+                    guard let path = item?.path else { return }
+                    let fm = FileManager.default
+                    if fm.fileExists(atPath: path) {
+                        viewModel.insertAudioPath(path)
+                    } else {
+                        store.dispatch(.setAlert(AlertHelper.toast("File missing",
+                                                                    message: "Cannot re-run; file not found at \(URL(fileURLWithPath: path).lastPathComponent)",
+                                                                    level: .warning)))
+                    }
+                },
+                onSelectContext: { path in
+                    setChatContext(selection: "history", overridePath: path)
+                },
+                historySearchFocus: $historySearchFocused,
+                confirmClearHistory: $confirmClearHistory,
+                isLoading: historyLoading
+            )
+            .cardSurface(padding: DesignTokens.Spacing.sm, cornerRadius: DesignTokens.Radius.lg, shadow: DesignTokens.Shadow.subtle)
+        }
+        .padding(.trailing, DesignTokens.Spacing.md)
+    }
+
+    private var quickStartCard: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
+            Text("Import a track")
+                .font(DesignTokens.Typography.headline)
+            Text("Drop or pick audio to queue it instantly. Analysis runs in the Analyze tab.")
+                .font(DesignTokens.Typography.caption)
+                .foregroundStyle(DesignTokens.Color.muted)
+            HStack(spacing: DesignTokens.Spacing.sm) {
+                Button {
+                    if let url = services.filePicker.pickFile() {
+                        viewModel.insertAudioPath(url.path)
+                        trackVM?.ingestDropped(urls: [url])
+                        store.dispatch(.setRoute(.analyze(store.state.route.runPane)))
+                    }
+                } label: {
+                    Label("Import audio", systemImage: "square.and.arrow.down")
+                }
+                .maButton(.primary)
+                Button {
+                    services.filePicker.pickDirectory().map { url in
+                        viewModel.setWorkingDirectory(url.path)
+                    }
+                } label: {
+                    Label("Set working directory", systemImage: "folder")
+                }
+                .maButton(.ghost)
+            }
+            DropZoneView { urls in
+                store.enqueueFromDrop(urls, baseCommand: viewModel.commandText)
+                trackVM?.ingestDropped(urls: urls)
+            }
+            .frame(height: 120)
+            .cardSurface(padding: DesignTokens.Spacing.sm, cornerRadius: DesignTokens.Radius.md, shadow: DesignTokens.Shadow.subtle)
+        }
+        .cardSurface(padding: DesignTokens.Spacing.md, cornerRadius: DesignTokens.Radius.lg, shadow: DesignTokens.Shadow.medium)
+    }
+
+    private var historyPeekCard: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
+            HStack {
+                Text("Recent sidecars")
+                    .font(DesignTokens.Typography.headline)
+                Spacer()
+                Button("Refresh", action: reloadHistory)
+                    .maButton(.ghost)
+            }
+            let recent = store.state.historyItems.prefix(3)
+            if historyLoading {
+                ForEach(0..<3) { _ in
+                    SkeletonView(height: 48, cornerRadius: DesignTokens.Radius.sm)
+                }
+            } else if recent.isEmpty {
+                Text("No history yet. Run an analysis to see results here.")
+                    .font(DesignTokens.Typography.caption)
+                    .foregroundStyle(DesignTokens.Color.muted)
+            } else {
+                ForEach(recent) { item in
+                    Button {
+                        loadHistoryPreview(path: item.path)
+                        setChatContext(selection: "history", overridePath: item.path)
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                                Text(item.name)
+                                    .maText(.body)
+                                Text(item.modified, style: .relative)
+                                    .maText(.caption)
+                                    .foregroundStyle(DesignTokens.Color.muted)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundStyle(DesignTokens.Color.muted)
                         }
-                    },
-                    onReloadConfig: {
-                        Task { @MainActor in
-                            viewModel.reloadConfig()
+                        .padding(.vertical, DesignTokens.Spacing.xs)
+                    }
+                    .buttonStyle(.plain)
+                    .contentShape(Rectangle())
+                    .overlay(alignment: .trailing) {
+                        Button {
+                            setChatContext(selection: "history", overridePath: item.path)
+                            store.dispatch(.setPrompt("Explain the history item \(item.name) and what to do next."))
+                            showChatOverlay = true
+                        } label: {
+                            Image(systemName: "questionmark.circle")
+                                .font(.system(size: 12, weight: .medium))
                         }
-                    },
-                    showAdvanced: Binding(get: { store.state.showAdvanced },
-                                          set: { store.dispatch(.setShowAdvanced($0)) }),
-                    commandText: Binding(get: { viewModel.commandText },
-                                         set: { viewModel.commandText = $0 }),
-                    workingDirectory: Binding(get: { viewModel.workingDirectory },
-                                              set: { viewModel.workingDirectory = $0 }),
-                    envText: Binding(get: { viewModel.envText },
-                                     set: { viewModel.envText = $0 }),
-                    onPickAudio: {
-                        if let url = pickFile() {
-                            viewModel.insertAudioPath(url.path)
+                        .maButton(.ghost)
+                        .padding(.trailing, DesignTokens.Spacing.xs)
+                    }
+                }
+            }
+        }
+        .cardSurface(padding: DesignTokens.Spacing.md, cornerRadius: DesignTokens.Radius.lg, shadow: DesignTokens.Shadow.subtle)
+    }
+
+    private var latestResultCard: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
+            HStack {
+                Text("Latest result")
+                    .font(DesignTokens.Typography.headline)
+                Spacer()
+                Button("Open Analyze") {
+                    store.dispatch(.setRoute(.analyze(store.state.route.runPane)))
+                }
+                .maButton(.ghost)
+            }
+            if viewModel.summaryMetrics.isEmpty && viewModel.sidecarPath == nil {
+                Text("Run analysis to see HCI, axes, and sidecar previews.")
+                    .font(DesignTokens.Typography.caption)
+                    .foregroundStyle(DesignTokens.Color.muted)
+            } else {
+                HStack(spacing: DesignTokens.Spacing.sm) {
+                    ForEach(viewModel.summaryMetrics) { metric in
+                        VStack(alignment: .leading) {
+                            Text(metric.label).maText(.caption).foregroundStyle(DesignTokens.Color.muted)
+                            Text(metric.value).maText(.body)
                         }
+                        .maMetric()
+                    }
+                    if let path = viewModel.sidecarPath {
+                        Button("Reveal sidecar") { revealSidecar(path: path) }
+                            .maButton(.ghost)
+                    }
+                    Spacer()
+                }
+            }
+        }
+        .cardSurface(padding: DesignTokens.Spacing.md, cornerRadius: DesignTokens.Radius.lg, shadow: DesignTokens.Shadow.subtle)
+    }
+
+    private var analyzeView: some View {
+        HStack(alignment: .top, spacing: DesignTokens.Spacing.md) {
+            RunSplitView(
+                store: store,
+                viewModel: viewModel,
+                trackVM: trackVM,
+                pickFile: { services.filePicker.pickFile() },
+                pickDirectory: { services.filePicker.pickDirectory() },
+                revealSidecar: revealSidecar(path:),
+                copyJSON: copyJSON,
+                onPreviewRich: { path in loadHistoryPreview(path: path) },
+                canRun: canRun,
+                disabledReason: disabledReason,
+                runWarnings: runWarnings,
+                missingAudioWarning: missingAudioWarning,
+                onPickAudio: {
+                    services.filePicker.pickFile().map { url in
+                        viewModel.insertAudioPath(url.path)
+                        return url
+                    }
+                },
+                onShowHistory: {
+                    store.dispatch(.setRoute(store.state.route.updatingTab(.library)))
+                }
+            )
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+
+            if store.state.showAdvanced {
+                InspectorPanel(
+                    mode: .analyze,
+                    workingDirectory: viewModel.workingDirectory,
+                    envText: viewModel.envText,
+                    sidecarPath: viewModel.sidecarPath,
+                    lastStatus: viewModel.status,
+                    echoStatuses: Array(store.state.echoStatuses.values),
+                    onRevealSidecar: {
+                        if let path = viewModel.sidecarPath { revealSidecar(path: path) }
                     },
-                    onBrowseDir: {
-                        if let url = pickDirectory() {
-                            viewModel.setWorkingDirectory(url.path)
+                    onCopySidecar: {
+                        if let path = viewModel.sidecarPath {
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(path, forType: .string)
                         }
                     }
                 )
-                RunControlsView(
-                    isRunning: viewModel.isRunning,
-                    status: viewModel.status,
-                    lastRunTime: viewModel.lastRunTime,
-                    lastDuration: viewModel.lastDuration,
-                    onRun: {
-                        Task { @MainActor in viewModel.run() }
-                    },
-                    onRunDefaults: {
-                        Task { @MainActor in
-                            viewModel.loadDefaults()
-                            viewModel.run()
+                .frame(width: 320)
+            }
+        }
+        .padding(.trailing, DesignTokens.Spacing.md)
+    }
+
+    private var resultsDashboard: some View {
+        HStack(alignment: .top, spacing: DesignTokens.Spacing.md) {
+            VStack(spacing: DesignTokens.Spacing.md) {
+                if let last = viewModel.lastRunTime {
+                    HStack(spacing: DesignTokens.Spacing.sm) {
+                        VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                            Text("Last run")
+                                .maText(.caption)
+                                .foregroundStyle(DesignTokens.Color.muted)
+                            let rel = RelativeDateTimeFormatter().localizedString(for: last, relativeTo: Date())
+                            Text(rel)
+                                .maText(.body)
                         }
-                    },
-                    onRunSmoke: {
-                        Task { @MainActor in viewModel.runSmoke() }
+                        if let path = viewModel.sidecarPath {
+                            Text(URL(fileURLWithPath: path).lastPathComponent)
+                                .maText(.caption)
+                                .foregroundStyle(DesignTokens.Color.muted)
+                        }
+                        Spacer()
                     }
-                )
+                    .cardSurface(padding: DesignTokens.Spacing.sm, cornerRadius: DesignTokens.Radius.md, shadow: DesignTokens.Shadow.subtle)
+                }
+                if viewModel.isRunning && viewModel.summaryMetrics.isEmpty {
+                    HStack(spacing: DesignTokens.Spacing.sm) {
+                        ForEach(0..<3) { _ in
+                            SkeletonView(height: 48, cornerRadius: DesignTokens.Radius.sm)
+                        }
+                    }
+                    .cardSurface(padding: DesignTokens.Spacing.md, cornerRadius: DesignTokens.Radius.lg)
+                } else if !viewModel.summaryMetrics.isEmpty {
+                    HStack(spacing: DesignTokens.Spacing.sm) {
+                        ForEach(viewModel.summaryMetrics) { metric in
+                            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                                Text(metric.label).maText(.caption).foregroundStyle(DesignTokens.Color.muted)
+                                Text(metric.value).maText(.body)
+                            }
+                            .maMetric()
+                            .maHoverLift()
+                        }
+                        Spacer()
+                    }
+                    .cardSurface(padding: DesignTokens.Spacing.md, cornerRadius: DesignTokens.Radius.lg)
+                }
                 ResultsView(
                     selectedPane: Binding(get: { store.state.route.runPane },
                                           set: { pane in
@@ -577,287 +736,98 @@ struct ContentView: View {
                     },
                     onCopyJSON: copyJSON
                 )
+                .cardSurface(padding: DesignTokens.Spacing.md, cornerRadius: DesignTokens.Radius.lg)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
+            .frame(maxWidth: .infinity, alignment: .topLeading)
 
-private var historyPane: some View {
-    HistoryPanelView(
-        items: store.state.historyItems,
-        previews: store.state.historyPreviews,
-        onRefresh: reloadHistory,
-        onReveal: revealSidecar(path:),
-        onPreview: { path in
-            loadHistoryPreview(path: path)
-        },
-        onClear: {
-            confirmClearHistory = true
-        }
-    )
-    .alert("Clear history?", isPresented: $confirmClearHistory) {
-        Button("Cancel", role: .cancel) {}
-        Button("Clear", role: .destructive) {
-            store.dispatch(.clearHistory)
-            try? SpecialActions.clearSidecarsOnDisk()
-            reloadHistory()
-        }
-    } message: {
-        Text("This will remove saved sidecars from disk and clear in-memory history.")
-    }
-}
-
-    private var leftColumn: some View {
-        VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
-            ConsoleView(messages: store.state.messages)
-            PromptBar(
-                text: Binding(get: { store.state.promptText },
-                              set: { store.dispatch(.setPrompt($0)) }),
-                placeholder: "Type a message…",
-                isThinking: chatIsThinking,
-                focus: $promptFocused,
-                onSend: sendMessage,
-                onClear: { store.dispatch(.setPrompt("")) }
-            )
-        }
-    }
-
-    private var trackHeader: some View {
-        HStack {
-            Text(store.state.mockTrackTitle)
-                .maText(.headline)
-            Spacer()
-            Text("Norms Badge")
-                .maChip(style: .solid, color: MAStyle.ColorToken.info)
-        }
-        .maCard()
-    }
-
-    private var quickActionsCard: some View {
-        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
-            HStack {
-                Text("Warnings")
-                    .maText(.headline)
-                Spacer()
-            }
-            HStack(spacing: MAStyle.Spacing.sm) {
-            ForEach(store.state.quickActions, id: \.title) { action in
-                    Label(action.title, systemImage: action.symbol)
-                        .maChip(style: .outline, color: MAStyle.ColorToken.primary)
-                }
-                Spacer()
-            }
-        }
-        .maCard()
-    }
-
-    private var sectionCards: some View {
-        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
-            ForEach(store.state.sections, id: \.self) { section in
-                HStack {
-                    Text(section)
-                        .maText(.body)
-                    Spacer()
-                }
-                .maCard(padding: MAStyle.Spacing.sm)
-            }
-        }
-    }
-
-    private var commandInputs: some View {
-        VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
-            if !viewModel.profiles.isEmpty {
-                HStack(spacing: MAStyle.Spacing.sm) {
-                    Text("Profile").maText(.headline)
-                    Picker("Profile", selection: $viewModel.selectedProfile) {
-                        ForEach(viewModel.profiles.map { $0.name }, id: \.self) { name in
-                            Text(name).tag(name)
-                        }
-                    }
-                    .labelsHidden()
-                    Button("Apply profile") {
-                        viewModel.applySelectedProfile()
-                    }
-                    .maButton(.secondary)
-                    .disabled(viewModel.selectedProfile.isEmpty)
-                    Button("Reload config") {
-                        viewModel.reloadConfig()
-                    }
-                    .maButton(.ghost)
-                    Spacer()
-                }
-            }
-
-            Text("Command").maText(.headline)
-            HStack(spacing: MAStyle.Spacing.sm) {
-                TextField("/usr/bin/python3 tools/cli/ma_audio_features.py --audio /path/to/audio.wav --out /tmp/out.json", text: $viewModel.commandText)
-                    .textFieldStyle(.roundedBorder)
-                    .foregroundColor(.primary)
-                Button("Pick audio…") {
-                    if let url = pickFile() {
-                        viewModel.insertAudioPath(url.path)
-                    }
-                }
-                .maButton(.ghost)
-            }
-
-            Text("Working directory (optional)").maText(.headline)
-            HStack(spacing: MAStyle.Spacing.sm) {
-                TextField("e.g. /Users/you/music-advisor", text: $viewModel.workingDirectory)
-                    .textFieldStyle(.roundedBorder)
-                    .foregroundColor(.primary)
-                Button("Browse…") {
-                    if let url = pickDirectory() {
-                        viewModel.setWorkingDirectory(url.path)
-                    }
-                }
-                .maButton(.ghost)
-            }
-
-            Text("Extra env (KEY=VALUE per line)").maText(.headline)
-            TextEditor(text: $viewModel.envText)
-                .font(.system(.body, design: .monospaced))
-                .foregroundColor(.primary)
-                .frame(minHeight: 80)
-                .overlay(RoundedRectangle(cornerRadius: MAStyle.Radius.sm).stroke(MAStyle.ColorToken.border))
-        }
-    }
-
-    private var runButtons: some View {
-        HStack(spacing: MAStyle.Spacing.sm) {
-            Button(action: { viewModel.run() }) {
-                if viewModel.isRunning {
-                    ProgressView().progressViewStyle(.circular)
-                } else {
-                    Text("Run CLI")
-                }
-            }
-            .maButton(.primary)
-            .disabled(viewModel.isRunning)
-
-            Button("Run defaults") {
-                viewModel.loadDefaults()
-                viewModel.run()
-            }
-            .maButton(.secondary)
-            .disabled(viewModel.isRunning)
-
-            Button("Run smoke") {
-                viewModel.runSmoke()
-            }
-            .maButton(.ghost)
-            .disabled(viewModel.isRunning)
-
-            if !viewModel.status.isEmpty {
-                Text(viewModel.status)
-                    .font(MAStyle.Typography.body)
-                    .foregroundStyle(MAStyle.ColorToken.muted)
-                    .maChip(style: .solid, color: MAStyle.ColorToken.info)
-            }
-
-            if let last = viewModel.lastRunTime {
-                let durationText = viewModel.lastDuration.map { String(format: " (%.2fs)", $0) } ?? ""
-                Text("Last run: \(last.formatted(date: .omitted, time: .standard))\(durationText)")
-                    .maText(.caption)
-                    .foregroundStyle(MAStyle.ColorToken.muted)
-            }
-            Spacer()
-        }
-    }
-
-    private var results: some View {
-        VStack(alignment: .leading, spacing: MAStyle.Spacing.sm) {
-            Text("Result").maText(.headline)
-            Picker("", selection: Binding(get: { store.state.route.runPane },
-                                          set: { pane in
-                                              store.dispatch(.setRoute(store.state.route.updatingRunPane(pane)))
-                                          })) {
-                Text("JSON").tag(ResultPane.json)
-                Text("stdout").tag(ResultPane.stdout)
-                Text("stderr").tag(ResultPane.stderr)
-            }
-            .pickerStyle(.segmented)
-            .onChange(of: viewModel.parsedJSON, perform: { _ in
-                if store.state.route.runPane == .json && viewModel.parsedJSON.isEmpty {
-                    store.dispatch(.setRoute(store.state.route.updatingRunPane(.stdout)))
-                }
-            })
-
-            if !viewModel.summaryMetrics.isEmpty || viewModel.sidecarPath != nil {
-                HStack(spacing: MAStyle.Spacing.sm) {
-                    ForEach(viewModel.summaryMetrics) { metric in
-                        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
-                            Text(metric.label).maText(.caption).foregroundStyle(MAStyle.ColorToken.muted)
-                            Text(metric.value).maText(.body)
-                        }
-                        .maMetric()
-                    }
-                    if let path = viewModel.sidecarPath {
-                        Button("Reveal sidecar") {
-                            revealSidecar(path: path)
-                        }
-                        .maButton(.ghost)
-                        Button("Copy path") {
+            if store.state.showAdvanced {
+                InspectorPanel(
+                    mode: .results,
+                    workingDirectory: viewModel.workingDirectory,
+                    envText: viewModel.envText,
+                    sidecarPath: viewModel.sidecarPath,
+                    lastStatus: viewModel.status,
+                    echoStatuses: Array(store.state.echoStatuses.values),
+                    onRevealSidecar: {
+                        if let path = viewModel.sidecarPath { revealSidecar(path: path) }
+                    },
+                    onCopySidecar: {
+                        if let path = viewModel.sidecarPath {
                             NSPasteboard.general.clearContents()
                             NSPasteboard.general.setString(path, forType: .string)
                         }
-                        .maButton(.ghost)
-                        Button("Preview sidecar") {
-                            viewModel.loadSidecarPreview()
-                        }
-                        .maButton(.ghost)
                     }
-                    Spacer()
-                }
+                )
+                .frame(width: 320)
             }
-
-            HStack(spacing: MAStyle.Spacing.sm) {
-                Button("Copy JSON") {
-                    copyJSON()
-                }
-                .maButton(.ghost)
-                .disabled(viewModel.parsedJSON.isEmpty)
-                if let path = viewModel.sidecarPath {
-                    Button("Copy sidecar path") {
-                        NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(path, forType: .string)
-                    }
-                    .maButton(.ghost)
-                }
-                Spacer()
-            }
-
-            resultBlock(title: store.state.route.runPane.title,
-                        text: paneText(store.state.route.runPane),
-                        color: store.state.route.runPane.color)
-
-            if !viewModel.sidecarPreview.isEmpty {
-                resultBlock(title: "sidecar preview",
-                            text: viewModel.sidecarPreview,
-                            color: .purple)
-            }
-
-            Text("Exit code: \(viewModel.exitCode)")
-                .maText(.caption)
-                .foregroundStyle(MAStyle.ColorToken.muted)
         }
-        .maCard(padding: MAStyle.Spacing.md)
+        .padding(.trailing, DesignTokens.Spacing.md)
     }
 
-    private func resultBlock(title: String, text: String, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: MAStyle.Spacing.xs) {
-            Text(title).font(MAStyle.Typography.headline)
-            ScrollView {
-                Text(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "(empty)" : text.trimmingCharacters(in: .whitespacesAndNewlines))
-                    .font(MAStyle.Typography.bodyMono)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(MAStyle.Spacing.sm)
-                    .background(color.opacity(0.05))
-                    .cornerRadius(MAStyle.Radius.sm)
-            }
-            .frame(minHeight: 80)
+    private var echoView: some View {
+        HistoricalEchoPanel(store: store,
+                            isLoading: store.state.echoStatuses.isEmpty && viewModel.isRunning,
+                            isEnabled: echoEnabled)
+            .cardSurface(padding: DesignTokens.Spacing.md, cornerRadius: DesignTokens.Radius.lg)
+            .padding(.trailing, DesignTokens.Spacing.md)
+    }
+
+    private var guidePanel: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
+            ConsoleTabView(
+                prompt: Binding(get: { store.state.promptText },
+                                set: { store.dispatch(.setPrompt($0)) }),
+                messages: store.state.messages,
+                onSend: sendMessage,
+                onClear: { store.dispatch(.setMessages([])) },
+                onSnippet: { snippet in
+                    store.dispatch(.setPrompt(snippet))
+                    promptFocused = true
+                    if let last = viewModel.sidecarPath {
+                        setChatContext(selection: "last-run", overridePath: last)
+                    }
+                },
+                onStop: stopChat,
+                onDevSmoke: runChatEngineSmoke,
+                promptFocus: $promptFocused,
+                isThinking: chatIsThinking,
+                contextOptions: chatContextOptions(),
+                selectedContext: chatSelectionBinding(),
+                contextLabel: store.state.chatContextLabel,
+                contextBadgeTitle: store.state.chatBadgeTitle,
+                contextBadgeSubtitle: store.state.chatBadgeSubtitle,
+                contextLastUpdated: store.state.chatContextLastUpdated
+            )
+        }
+        .cardSurface(padding: DesignTokens.Spacing.md, cornerRadius: DesignTokens.Radius.lg)
+        .padding(.trailing, DesignTokens.Spacing.md)
+    }
+
+    private var settingsPanel: some View {
+        SettingsView(useDarkTheme: Binding(get: { store.state.useDarkTheme },
+                                           set: { value in
+                                               store.dispatch(.setFollowSystemTheme(false))
+                                               store.dispatch(.setTheme(value))
+                                               applyTheme(value)
+                                           }),
+                     statusText: store.commandVM.status,
+                     dataPath: applicationSupportPath())
+            .cardSurface(padding: DesignTokens.Spacing.md, cornerRadius: DesignTokens.Radius.lg)
+            .padding(.trailing, DesignTokens.Spacing.md)
+    }
+
+    private func routeSubtitle(for tab: AppTab) -> String {
+        switch tab {
+        case .library: return "Import, queue, and browse recent runs."
+        case .analyze: return "Configure and run analysis with zero lag."
+        case .results: return "Review HCI, axes, logs, and sidecars."
+        case .echo: return "Historical Echo submissions and cache."
+        case .guide: return "Chat-based guide with contextual snippets."
+        case .settings: return "Appearance, paths, and diagnostics."
         }
     }
+
+    // MARK: - Formatting helpers
 
     private func prettyJSON(_ dict: [String: AnyHashable]) -> String {
         guard let data = try? JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted]),
@@ -865,6 +835,37 @@ private var historyPane: some View {
             return dict.isEmpty ? "(no JSON parsed)" : dict.description
         }
         return str
+    }
+
+    private func paletteEntries() -> [CommandPalette.Entry] {
+        var entries: [CommandPalette.Entry] = [
+            CommandPalette.Entry(title: "Import audio…", subtitle: "Pick audio and prep Analyze", action: {
+                if let url = services.filePicker.pickFile() {
+                    viewModel.insertAudioPath(url.path)
+                    trackVM?.ingestDropped(urls: [url])
+                    store.dispatch(.setRoute(.analyze(store.state.route.runPane)))
+                }
+            }),
+            CommandPalette.Entry(title: "Run analysis", subtitle: "Run current command or queue", action: {
+                Task { @MainActor in viewModel.runQueueOrSingle() }
+            }),
+            CommandPalette.Entry(title: "Open Results", subtitle: "Latest run outputs", action: {
+                store.dispatch(.setRoute(.results(store.state.route.runPane)))
+            }),
+            CommandPalette.Entry(title: "Open Historical Echo", subtitle: "Broker status and cache", action: {
+                store.dispatch(.setRoute(.echo))
+            }),
+            CommandPalette.Entry(title: "Open Guide", subtitle: "Chat with context", action: {
+                showChatOverlay = true
+            })
+        ]
+        if let path = viewModel.sidecarPath {
+            entries.append(CommandPalette.Entry(title: "Copy sidecar path", subtitle: path, action: {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(path, forType: .string)
+            }))
+        }
+        return entries
     }
 
     private func sendMessage() {
@@ -959,6 +960,37 @@ private var historyPane: some View {
         }
     }
 
+    private var contextRibbon: some View {
+        let hci = viewModel.summaryMetrics.first(where: { $0.label.lowercased().contains("hci") })?.value
+        let axes = viewModel.summaryMetrics.filter { !$0.label.lowercased().contains("hci") }.map { ($0.label, $0.value) }
+        let nextMove: String
+        if viewModel.isRunning {
+            nextMove = "Running…"
+        } else if viewModel.sidecarPath != nil {
+            nextMove = "Review sidecar and Echo"
+        } else if !viewModel.commandText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            nextMove = "Run analysis"
+        } else {
+            nextMove = "Import audio"
+        }
+        let steps: [ContextRibbon.Step] = [
+            .init(title: "Import", status: viewModel.commandText.isEmpty ? "idle" : "done", action: { setChatContext(selection: "none", overridePath: nil) }),
+            .init(title: "Run", status: viewModel.isRunning ? "running" : (viewModel.sidecarPath != nil ? "done" : "ready"), action: { store.dispatch(.setRoute(.analyze(store.state.route.runPane))) }),
+            .init(title: "Review", status: viewModel.sidecarPath != nil ? "ready" : "idle", action: { store.dispatch(.setRoute(.results(store.state.route.runPane))) }),
+            .init(title: "Echo", status: store.state.echoStatuses.isEmpty ? "idle" : "ready", action: { store.dispatch(.setRoute(.echo)) })
+        ]
+
+        return ContextRibbon(
+            hciValue: hci,
+            axes: axes,
+            nextMove: nextMove,
+            contextLabel: store.state.chatBadgeTitle,
+            contextSubtitle: store.state.chatBadgeSubtitle,
+            steps: steps
+        )
+        .frame(maxHeight: 74)
+    }
+
     private func stopChat() {
         chatTask?.cancel()
         chatIsThinking = false
@@ -1045,47 +1077,182 @@ private var historyPane: some View {
                 .keyboardShortcut("f", modifiers: [.command])
             Button(action: { promptFocused = true }) { EmptyView() }
                 .keyboardShortcut("l", modifiers: [.command])
+            Button(action: { showPalette = true }) { EmptyView() }
+                .keyboardShortcut("k", modifiers: [.command])
         }
     }
-
-    private func trackStorePaths() -> (trackURL: URL, artistURL: URL) {
-        let supportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let appDir = supportDir.appendingPathComponent("MusicAdvisorMacApp", isDirectory: true)
-        let trackURL = appDir.appendingPathComponent("tracks.json")
-        let artistURL = appDir.appendingPathComponent("artists.json")
-        return (trackURL, artistURL)
-    }
-
-    private func makeTrackViewModel() -> TrackListViewModel {
-        let paths = trackStorePaths()
-        let trackStore = JsonTrackStore(url: paths.trackURL)
-        let artistStore = JsonArtistStore(url: paths.artistURL)
-        return TrackListViewModel(trackStore: trackStore, artistStore: artistStore)
-    }
-
-    private func paneText(_ pane: ResultPane) -> String {
-        switch pane {
-        case .json:
-            return viewModel.parsedJSON.isEmpty ? "(no JSON parsed)" : prettyJSON(viewModel.parsedJSON)
-        case .stdout:
-            return truncated(viewModel.stdout, label: "stdout")
-        case .stderr:
-            return truncated(viewModel.stderr, label: "stderr")
-        }
-    }
-
-    private func truncated(_ text: String, label: String, limit: Int = 8000) -> String {
-        guard text.count > limit else { return text }
-        let tail = text.suffix(limit)
-        return "[\(label) truncated to last \(limit) chars]\n\(tail)"
-    }
-
-    private var railHiddenPadding: CGFloat { MAStyle.Spacing.md }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+    }
+}
+
+struct HistoricalEchoPanel: View {
+    @ObservedObject var store: AppStore
+    var isLoading: Bool = false
+    var isEnabled: Bool = true
+    @State private var retryingFetch: Set<String> = []
+
+    var body: some View {
+        let statuses = Array(store.state.echoStatuses.values).sorted { $0.trackId < $1.trackId }
+        return VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
+            HStack {
+                Text("Historical Echo")
+                    .maText(.headline)
+                Spacer()
+                Text("\(statuses.count) tracked")
+                    .maText(.caption)
+                    .foregroundStyle(DesignTokens.Color.muted)
+            }
+            let cachePath = cacheBasePath()
+            Text("Cache base: \(cachePath)")
+                .maText(.caption)
+                .foregroundStyle(isSandboxPath(cachePath) ? MAStyle.ColorToken.warning : DesignTokens.Color.muted)
+            if !isEnabled {
+                Text("Historical Echo disabled (set MA_ECHO_BROKER_ENABLE=1)")
+                    .maText(.caption)
+                    .foregroundStyle(DesignTokens.Color.muted)
+            } else if isLoading {
+                VStack(spacing: DesignTokens.Spacing.sm) {
+                    ForEach(0..<3) { _ in
+                        SkeletonView(height: 52, cornerRadius: DesignTokens.Radius.sm)
+                    }
+                }
+            } else if statuses.isEmpty {
+                Text("No broker submissions yet.")
+                    .maText(.caption)
+                    .foregroundStyle(DesignTokens.Color.muted)
+            } else {
+                ForEach(statuses, id: \.trackId) { status in
+                    echoStatusRow(status)
+                        .padding(DesignTokens.Spacing.xs)
+                        .background(DesignTokens.Color.surface.opacity(0.35))
+                        .cornerRadius(DesignTokens.Radius.sm)
+                }
+            }
+        }
+    }
+
+    private func echoStatusRow(_ status: EchoStatus) -> some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+            HStack {
+                Text(status.trackId).maText(.body)
+                Spacer()
+                Text(status.status.uppercased())
+                    .maText(.caption)
+                    .foregroundStyle(color(for: status.status))
+            }
+            if let job = status.jobId {
+                Text("job_id: \(job)").maText(.caption).foregroundStyle(DesignTokens.Color.muted)
+            }
+            if let cfg = status.configHash, let src = status.sourceHash {
+                let cfgShort = String(cfg.prefix(8))
+                let srcShort = String(src.prefix(8))
+                Text("config: \(cfgShort)…  source: \(srcShort)…").maText(.caption).foregroundStyle(DesignTokens.Color.muted)
+            }
+            if let n = status.neighborCount {
+                Text("neighbors: \(n)").maText(.caption).foregroundStyle(DesignTokens.Color.muted)
+            }
+            if let dec = status.decadeSummary {
+                Text("decades: \(dec)").maText(.caption).foregroundStyle(DesignTokens.Color.muted)
+            }
+            if let preview = status.neighborsPreview, !preview.isEmpty {
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                    Text("neighbors:").maText(.caption).foregroundStyle(DesignTokens.Color.muted)
+                    ForEach(preview, id: \.self) { line in
+                        Text("• \(line)").maText(.caption).foregroundStyle(DesignTokens.Color.muted)
+                    }
+                }
+            }
+            if let art = status.artifact {
+                Text("artifact: \(art)").maText(.caption).foregroundStyle(DesignTokens.Color.muted)
+            }
+            if let cached = status.cachedPath {
+                HStack(spacing: DesignTokens.Spacing.xs) {
+                    Text("cached: \(cached)").maText(.caption).foregroundStyle(DesignTokens.Color.muted)
+                    Button("Copy path") {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(cached, forType: .string)
+                    }
+                    .maButton(.ghost)
+                    Button("Open") {
+                        NSWorkspace.shared.open(URL(fileURLWithPath: cached))
+                    }
+                    .maButton(.ghost)
+                }
+            } else if let art = status.artifact, let url = artifactURL(for: art) {
+                Button("View JSON") {
+                    NSWorkspace.shared.open(url)
+                }
+                .maButton(.ghost)
+            }
+            HStack(spacing: DesignTokens.Spacing.xs) {
+                let isFetching = retryingFetch.contains(status.trackId)
+                Button("Retry fetch") {
+                    startRetryFetch(trackId: status.trackId)
+                }
+                .disabled(isFetching)
+                .maButton(.ghost)
+                if canRetrySubmit(status.trackId) && status.status != "done" {
+                    Button("Retry submit") {
+                        Task { await store.retryEchoSubmit(trackId: status.trackId) }
+                    }
+                    .maButton(.ghost)
+                }
+                if isFetching {
+                    ProgressView()
+                        .scaleEffect(0.6)
+                } else if status.status == "error" || status.status == "timeout" {
+                    Text("retry if stale or failed").maText(.caption).foregroundStyle(DesignTokens.Color.muted)
+                }
+            }
+            if let err = status.error {
+                Text("error: \(err)").maText(.caption).foregroundStyle(Color.red)
+            }
+        }
+    }
+
+    private func color(for status: String) -> Color {
+        switch status.lowercased() {
+        case "done": return Color.green
+        case "no_features": return Color.yellow
+        case "error", "timeout": return Color.red
+        default: return Color.orange
+        }
+    }
+
+    private func artifactURL(for artifact: String) -> URL? {
+        let base = ProcessInfo.processInfo.environment["MA_ECHO_BROKER_URL"] ?? "http://127.0.0.1:8091"
+        if artifact.hasPrefix("http") {
+            return URL(string: artifact)
+        }
+        let trimmed = artifact.hasPrefix("/") ? String(artifact.dropFirst()) : artifact
+        return URL(string: "\(base)/\(trimmed)")
+    }
+
+    private func startRetryFetch(trackId: String) {
+        if retryingFetch.contains(trackId) { return }
+        retryingFetch.insert(trackId)
+        Task {
+            defer { Task { @MainActor in retryingFetch.remove(trackId) } }
+            await store.retryEchoFetch(trackId: trackId)
+        }
+    }
+
+    private func canRetrySubmit(_ trackId: String) -> Bool {
+        return store.state.queueJobs.contains { $0.displayName == trackId && $0.sidecarPath != nil }
+    }
+
+    private func cacheBasePath() -> String {
+        let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?
+            .appendingPathComponent("MusicAdvisorMacApp/echo_cache", isDirectory: true)
+        return dir?.path ?? "(unknown)"
+    }
+
+    private func isSandboxPath(_ path: String) -> Bool {
+        return path.contains("/hosts/macos_app/build/home")
     }
 }
 
@@ -1136,7 +1303,11 @@ extension ContentView {
 
     private func reloadHistory() {
         historyReloadTask?.cancel()
-        historyReloadTask = Task(priority: .utility) { await reloadHistoryAsync() }
+        historyReloadTask = Task(priority: .utility) {
+            await MainActor.run { historyLoading = true }
+            await reloadHistoryAsync()
+            await MainActor.run { historyLoading = false }
+        }
     }
 
     private func reloadHistoryAsync() async {
@@ -1175,8 +1346,10 @@ extension ContentView {
     private func scheduleHistoryReload() {
         historyReloadTask?.cancel()
         historyReloadTask = Task(priority: .utility) {
+            await MainActor.run { historyLoading = true }
             try? await Task.sleep(nanoseconds: 350_000_000)
             await reloadHistoryAsync()
+            await MainActor.run { historyLoading = false }
         }
     }
 
@@ -1346,9 +1519,12 @@ extension ContentView {
 
     private func tabTitle(for tab: AppTab) -> String {
         switch tab {
-        case .run: return "Run"
-        case .history: return "History"
-        case .style: return "Playbook"
+        case .library: return "Library"
+        case .analyze: return "Analyze"
+        case .results: return "Results"
+        case .echo: return "Historical Echo"
+        case .guide: return "Guide"
+        case .settings: return "Settings"
         }
     }
 }

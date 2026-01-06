@@ -32,6 +32,10 @@ struct RunSplitView: View {
                         isEnqueuingDrop = false
                     }
                 }
+                .maCard(enableLens: false)
+                .maHoverLift(enabled: false)
+                .frame(maxWidth: .infinity)
+                .frame(height: 80)
 
                 if let warning = missingAudioWarning {
                     Text(warning)
@@ -41,6 +45,7 @@ struct RunSplitView: View {
                 }
 
                 workingDirectoryStatus
+                    .padding(.horizontal, MAStyle.Spacing.sm)
 
                 JobQueueView(
                     jobs: store.state.queueJobs,
@@ -76,6 +81,7 @@ struct RunSplitView: View {
                 )
                 .maCard(enableLens: false)
                 .maHoverLift(enabled: false)
+                .frame(maxWidth: .infinity)
 
                 CommandInputsView(
                     profiles: viewModel.profiles,
@@ -108,6 +114,7 @@ struct RunSplitView: View {
                 )
                 .maCard(enableLens: false)
                 .maHoverLift(enabled: false)
+                .frame(maxWidth: .infinity)
 
                 ResultsView(
                     selectedPane: Binding(get: { store.state.route.runPane },
@@ -136,10 +143,13 @@ struct RunSplitView: View {
                     onCopyJSON: copyJSON
                 )
                 .maCard()
+                .maHoverLift(enabled: false)
+                .frame(maxWidth: .infinity)
 
                 if showEchoPanel {
                     echoStatusCard
                         .maCard()
+                        .maHoverLift(enabled: false)
                 } else {
                     HStack {
                         Text("Historical Echo (broker) hidden").maText(.caption).foregroundStyle(MAStyle.ColorToken.muted)

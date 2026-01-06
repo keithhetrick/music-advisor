@@ -10,6 +10,7 @@ struct HistorySplitView: View {
     let onSelectContext: (String) -> Void
     let historySearchFocus: FocusState<Bool>.Binding
     @Binding var confirmClearHistory: Bool
+    var isLoading: Bool = false
     @State private var searchText: String = ""
     @State private var filterRichOnly: Bool = false
     @State private var selected: SidecarItem? = nil
@@ -19,26 +20,31 @@ struct HistorySplitView: View {
 
     var body: some View {
         AdaptiveSplitView {
-            filterBar
-                .maCard(enableLens: false)
-            HistoryPanelView(
-                items: filteredItems,
-                previews: store.state.historyPreviews,
-                onRefresh: reloadHistory,
-                onReveal: { path in
-                    revealSidecar(path)
-                    selected = store.state.historyItems.first(where: { $0.path == path })
-                },
-                onPreview: { path in
-                    loadPreview(path)
-                    selected = store.state.historyItems.first(where: { $0.path == path })
-                },
-                onClear: { confirmClearHistory = true },
-                onSelectContext: { path in
-                    selected = store.state.historyItems.first(where: { $0.path == path })
-                    onSelectContext(path)
+            VStack(spacing: MAStyle.Spacing.sm) {
+                filterBar
+                if isLoading {
+                    skeletonList
+                } else {
+                    HistoryPanelView(
+                        items: filteredItems,
+                        previews: store.state.historyPreviews,
+                        onRefresh: reloadHistory,
+                        onReveal: { path in
+                            revealSidecar(path)
+                            selected = store.state.historyItems.first(where: { $0.path == path })
+                        },
+                        onPreview: { path in
+                            loadPreview(path)
+                            selected = store.state.historyItems.first(where: { $0.path == path })
+                        },
+                        onClear: { confirmClearHistory = true },
+                        onSelectContext: { path in
+                            selected = store.state.historyItems.first(where: { $0.path == path })
+                            onSelectContext(path)
+                        }
+                    )
                 }
-            )
+            }
             .maCard(enableLens: false)
             .alert("Clear history?", isPresented: $confirmClearHistory) {
                 Button("Cancel", role: .cancel) {}
@@ -81,31 +87,33 @@ struct HistorySplitView: View {
     }
 
     private var filterBar: some View {
-        HStack(spacing: MAStyle.Spacing.sm) {
-            TextField("Search history…", text: $searchText)
-                .maInput()
-                .focused(historySearchFocus)
-                .maFocusRing(historySearchFocus.wrappedValue)
-                .accessibilityLabel("Search history")
-                .overlay(alignment: .trailing) {
-                    if !searchText.isEmpty {
-                        Button {
-                            searchText = ""
-                            debouncedSearch = ""
-                        } label: {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundStyle(MAStyle.ColorToken.muted)
+            HStack(spacing: MAStyle.Spacing.sm) {
+                TextField("Search history…", text: $searchText)
+                    .maInput()
+                    .focused(historySearchFocus)
+                    .maFocusRing(historySearchFocus.wrappedValue)
+                    .accessibilityLabel("Search history")
+                    .overlay(alignment: .trailing) {
+                        if !searchText.isEmpty {
+                            Button {
+                                searchText = ""
+                                debouncedSearch = ""
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundStyle(MAStyle.ColorToken.muted)
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.trailing, MAStyle.Spacing.xs)
+                            .accessibilityLabel("Clear search")
+                            .maHoverLift()
                         }
-                        .buttonStyle(.plain)
-                        .padding(.trailing, MAStyle.Spacing.xs)
-                        .accessibilityLabel("Clear search")
                     }
-                }
-            Toggle("Rich only", isOn: $filterRichOnly)
-                .maToggleStyle()
-                .accessibilityLabel("Filter rich previews")
-            Spacer()
-        }
+                Toggle("Rich only", isOn: $filterRichOnly)
+                    .maToggleStyle()
+                    .accessibilityLabel("Filter rich previews")
+                    .maFocusRing(historySearchFocus.wrappedValue)
+                Spacer()
+            }
         .maStackSpacing(MAStyle.Spacing.xs)
         .padding(.horizontal, MAStyle.Spacing.sm)
         .onChange(of: searchText) { newValue in
@@ -114,5 +122,14 @@ struct HistorySplitView: View {
             debounceTask = task
             DispatchQueue.main.asyncAfter(deadline: .now() + debounceInterval, execute: task)
         }
+    }
+
+    private var skeletonList: some View {
+        VStack(spacing: MAStyle.Spacing.sm) {
+            ForEach(0..<4) { _ in
+                SkeletonView(height: 56, cornerRadius: MAStyle.Radius.sm)
+            }
+        }
+        .padding(.vertical, MAStyle.Spacing.xs)
     }
 }
