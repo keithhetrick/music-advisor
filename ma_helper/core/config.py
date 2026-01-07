@@ -76,3 +76,111 @@ class HelperConfig:
             adapter=adapter,
             cache_dir=cache_dir if cache_dir is None or cache_dir.is_absolute() else root / cache_dir,
         )
+
+
+@dataclass(frozen=True)
+class RuntimeConfig:
+    """Immutable runtime configuration computed from HelperConfig and environment.
+
+    This replaces the mutable globals in ma_helper.core.env with a frozen dataclass
+    that is computed once and passed through the application.
+
+    All paths are absolute and fully resolved. Environment variable overrides are
+    applied during construction.
+    """
+    # Core paths
+    root: Path
+    state_home: Path
+
+    # Cache paths
+    cache_dir: Path
+    cache_file: Path
+    last_results_file: Path
+    artifact_dir: Path
+
+    # Log paths
+    log_dir: Path
+    log_file: Path | None
+    telemetry_file: Path | None
+
+    # User state
+    favorites_path: Path
+
+    # Flags
+    cache_enabled: bool
+
+    @classmethod
+    def from_helper_config(cls, cfg: HelperConfig) -> "RuntimeConfig":
+        """Create RuntimeConfig from HelperConfig, applying environment overrides.
+
+        This method implements the same logic as env.apply_config() but creates
+        an immutable object instead of mutating global variables.
+
+        Environment variable precedence (highest to lowest):
+        1. MA_HELPER_NO_WRITE=1 disables all caching/logging
+        2. MA_LOG_FILE overrides log_file
+        3. MA_TELEMETRY_FILE overrides telemetry_file
+        4. MA_HELPER_HOME overrides default state_home
+        5. HelperConfig fields (from ma_helper.toml)
+        6. Defaults (ROOT/.ma_cache, ~/.ma_helper, etc.)
+
+        Args:
+            cfg: The HelperConfig loaded from ma_helper.toml and env vars
+
+        Returns:
+            Immutable RuntimeConfig with all paths resolved
+        """
+        # Compute state_home
+        state_home = cfg.state_dir
+        if state_home is None:
+            ma_helper_home = os.environ.get("MA_HELPER_HOME", "")
+            if ma_helper_home:
+                state_home = Path(ma_helper_home)
+            else:
+                state_home = Path.home() / ".ma_helper"
+
+        # Compute cache_dir and derived paths
+        cache_dir = cfg.cache_dir
+        if cache_dir is None:
+            cache_dir = cfg.root / ".ma_cache"
+        cache_file = cache_dir / "cache.json"
+        last_results_file = cache_dir / "last_results.json"
+        artifact_dir = cache_dir / "artifacts"
+
+        # Compute log paths
+        log_dir = state_home / "logs"
+        log_file = cfg.log_file
+        if log_file is None:
+            log_file = log_dir / "ma.log"
+        telemetry_file = cfg.telemetry_file
+        if telemetry_file is None:
+            telemetry_file = log_file
+
+        # Environment variable overrides (highest precedence)
+        if os.environ.get("MA_LOG_FILE"):
+            log_file = Path(os.environ["MA_LOG_FILE"])
+        if os.environ.get("MA_TELEMETRY_FILE"):
+            telemetry_file = Path(os.environ["MA_TELEMETRY_FILE"])
+
+        # Check cache enabled
+        cache_enabled = os.environ.get("MA_HELPER_NO_WRITE") != "1"
+        if not cache_enabled:
+            log_file = None
+            telemetry_file = None
+
+        # Compute favorites path
+        favorites_path = state_home / "config.json"
+
+        return cls(
+            root=cfg.root,
+            state_home=state_home,
+            cache_dir=cache_dir,
+            cache_file=cache_file,
+            last_results_file=last_results_file,
+            artifact_dir=artifact_dir,
+            log_dir=log_dir,
+            log_file=log_file,
+            telemetry_file=telemetry_file,
+            favorites_path=favorites_path,
+            cache_enabled=cache_enabled,
+        )
