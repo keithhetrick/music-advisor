@@ -84,6 +84,35 @@ def build_pack(merged: Dict[str, Any], audio_name: str, anchor: str, lyric_axis:
     prov.setdefault("calibration_version", os.getenv("HCI_CAL_VERSION", "unknown"))
     prov.setdefault("calibration_date", os.getenv("HCI_CAL_DATE", utc_now_iso()))
 
+    def _pick_meta(key: str) -> Any:
+        for src in (merged, features_meta):
+            if isinstance(src, dict) and src.get(key) is not None:
+                return src[key]
+        return None
+
+    meta_src = merged.get("feature_pipeline_meta") or (features_meta or {}).get("feature_pipeline_meta") or {}
+    meta_src = dict(meta_src) if isinstance(meta_src, dict) else {}
+    meta_src.setdefault("source_hash", _pick_meta("source_hash") or "")
+    meta_src.setdefault("config_fingerprint", _pick_meta("config_fingerprint") or "")
+    meta_src.setdefault("pipeline_version", _pick_meta("pipeline_version") or "")
+    meta_src.setdefault("generated_utc", _pick_meta("generated_utc") or _pick_meta("processed_utc"))
+    meta_src.setdefault("sidecar_status", _pick_meta("sidecar_status"))
+    meta_src.setdefault("sidecar_attempts", _pick_meta("sidecar_attempts"))
+    meta_src.setdefault("sidecar_timeout_seconds", _pick_meta("sidecar_timeout_seconds"))
+    meta_src.setdefault("tempo_backend", _pick_meta("tempo_backend"))
+    meta_src.setdefault("tempo_backend_detail", _pick_meta("tempo_backend_detail"))
+    if isinstance(_pick_meta("tempo_backend_meta"), dict):
+        meta_src.setdefault("tempo_backend_meta", _pick_meta("tempo_backend_meta"))
+    meta_src.setdefault("tempo_backend_source", _pick_meta("tempo_backend_source"))
+    meta_src.setdefault("qa_gate", _pick_meta("qa_gate"))
+
+    # Prefer canonical source_hash derived from meta for downstream provenance.
+    if isinstance(meta_src.get("source_hash"), str):
+        source_hash = meta_src["source_hash"]
+    if not track_id and isinstance(source_hash, str):
+        track_id = source_hash[:12]
+    if track_id:
+        prov["track_id"] = track_id
     pack = {
       "region": "US",
       "profile": "Pop",
@@ -120,13 +149,16 @@ def build_pack(merged: Dict[str, Any], audio_name: str, anchor: str, lyric_axis:
       "anchor": anchor,
       "provenance": prov,
       "feature_pipeline_meta": {
-        "source_hash": source_hash or "",
-        "config_fingerprint": (features_meta or {}).get("config_fingerprint", ""),
-        "pipeline_version": (features_meta or {}).get("pipeline_version", ""),
-        "generated_utc": (features_meta or {}).get("generated_utc"),
-        "sidecar_status": (features_meta or {}).get("sidecar_status"),
-        "sidecar_attempts": (features_meta or {}).get("sidecar_attempts"),
-        "sidecar_timeout_seconds": (features_meta or {}).get("sidecar_timeout_seconds"),
+        "source_hash": meta_src.get("source_hash", ""),
+        "config_fingerprint": meta_src.get("config_fingerprint", ""),
+        "pipeline_version": meta_src.get("pipeline_version", ""),
+        "generated_utc": meta_src.get("generated_utc"),
+        "sidecar_status": meta_src.get("sidecar_status"),
+        "sidecar_attempts": meta_src.get("sidecar_attempts"),
+        "sidecar_timeout_seconds": meta_src.get("sidecar_timeout_seconds"),
+        "tempo_backend": meta_src.get("tempo_backend"),
+        "tempo_backend_detail": meta_src.get("tempo_backend_detail"),
+        "qa_gate": meta_src.get("qa_gate"),
       },
     }
     ttc_fields = {
@@ -159,7 +191,12 @@ def build_client_helper_payload(pack: Dict[str, Any]) -> Dict[str, Any]:
         or pack.get("features", {}).get("duration_sec")
         or pack.get("features_full", {}).get("duration_sec")
     )
-    duration_sec = runtime_sec if runtime_sec is not None else pack.get("features_full", {}).get("duration_sec")
+    if runtime_sec is None and pack.get("features_full", {}).get("duration_sec") is not None:
+        runtime_sec = pack["features_full"]["duration_sec"]
+    if runtime_sec is None:
+        runtime_sec = pack.get("duration_sec") or 0
+    duration_sec = runtime_sec if runtime_sec is not None else pack.get("features_full", {}).get("duration_sec") or 0
+    meta_src = dict(pack.get("feature_pipeline_meta") or {})
     payload = {
       "region": pack["region"],
       "profile": pack["profile"],
@@ -196,9 +233,18 @@ def build_client_helper_payload(pack: Dict[str, Any]) -> Dict[str, Any]:
         "valence": pack["features_full"]["valence"],
       },
       "feature_pipeline_meta": {
-        "source_hash": pack.get("inputs", {}).get("paths", {}).get("source_audio", ""),
-        "config_fingerprint": "",
-        "pipeline_version": "",
+        "source_hash": meta_src.get("source_hash") or pack.get("inputs", {}).get("paths", {}).get("source_audio", ""),
+        "config_fingerprint": meta_src.get("config_fingerprint", ""),
+        "pipeline_version": meta_src.get("pipeline_version", ""),
+        "generated_utc": meta_src.get("generated_utc"),
+        "sidecar_status": meta_src.get("sidecar_status"),
+        "sidecar_attempts": meta_src.get("sidecar_attempts"),
+        "sidecar_timeout_seconds": meta_src.get("sidecar_timeout_seconds"),
+        "tempo_backend": meta_src.get("tempo_backend"),
+        "tempo_backend_detail": meta_src.get("tempo_backend_detail"),
+        "tempo_backend_meta": meta_src.get("tempo_backend_meta"),
+        "tempo_backend_source": meta_src.get("tempo_backend_source"),
+        "qa_gate": meta_src.get("qa_gate"),
       },
       "historical_echo_meta": None,
       "historical_echo_v1": None,
@@ -290,6 +336,10 @@ def main() -> None:
         candidate = pathlib.Path(args.merged).with_suffix(".features.json")
         if candidate.exists():
             feat_path = str(candidate)
+        else:
+            alt = candidate.with_name(candidate.name.replace(".merged", ".features"))
+            if alt.exists():
+                feat_path = str(alt)
     if feat_path and os.path.exists(feat_path):
         try:
             features_meta = load_json(feat_path)

@@ -59,6 +59,8 @@ from ma_config.paths import get_repo_root
 ensure_repo_root()
 REPO_ROOT = get_repo_root()
 
+SIDECAR_CACHE_SCHEMA_V = 1
+
 from ma_audio_engine.adapters import (
     TEMPO_CONF_DEFAULTS,
     build_config_components,
@@ -94,7 +96,7 @@ from ma_audio_engine.adapters.service_registry import (
     scrub_payload_for_sandbox,
 )
 from ma_audio_engine.adapters.logging_adapter import log_stage_start, log_stage_end
-from tools.sidecar_adapter import DEFAULT_SIDECAR_CMD as HITCH_DEFAULT_SIDECAR_CMD, run_sidecar
+from tools.sidecar_adapter import DEFAULT_SIDECAR_CMD as HITCH_DEFAULT_SIDECAR_CMD, run_sidecar, atomic_write_json
 from security import files as sec_files
 from security.config import CONFIG as SEC_CONFIG
 from security import subprocess as sec_subprocess
@@ -168,6 +170,35 @@ def _sanitize_tempo_backend_fields(payload: Dict[str, Any]) -> Dict[str, Any]:
     cleaned["tempo_backend_meta"] = {"backend": meta_backend, "backend_version": meta_version}
     cleaned["tempo_backend_source"] = source_val
     return cleaned
+
+
+def _ensure_feature_pipeline_meta(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Populate feature_pipeline_meta from existing top-level fields without altering schema."""
+    meta_raw = payload.get("feature_pipeline_meta")
+    meta: Dict[str, Any] = dict(meta_raw) if isinstance(meta_raw, dict) else {}
+
+    def pick(key: str) -> Any:
+        for src in (meta, payload):
+            if isinstance(src, dict) and src.get(key) is not None:
+                return src[key]
+        return None
+
+    meta.setdefault("source_hash", pick("source_hash") or "")
+    meta.setdefault("config_fingerprint", pick("config_fingerprint") or "")
+    meta.setdefault("pipeline_version", pick("pipeline_version") or "")
+    meta.setdefault("generated_utc", pick("generated_utc") or pick("processed_utc"))
+    meta.setdefault("sidecar_status", pick("sidecar_status"))
+    meta.setdefault("sidecar_attempts", pick("sidecar_attempts"))
+    meta.setdefault("sidecar_timeout_seconds", pick("sidecar_timeout_seconds"))
+    meta.setdefault("tempo_backend", pick("tempo_backend"))
+    meta.setdefault("tempo_backend_detail", pick("tempo_backend_detail"))
+    if isinstance(pick("tempo_backend_meta"), dict):
+        meta.setdefault("tempo_backend_meta", pick("tempo_backend_meta"))
+    meta.setdefault("tempo_backend_source", pick("tempo_backend_source"))
+    meta.setdefault("qa_gate", pick("qa_gate"))
+
+    payload["feature_pipeline_meta"] = meta
+    return payload
 
 # --- Runtime dependency sanity (warn-only) ---
 def _warn_if_dep_out_of_range() -> None:
@@ -977,7 +1008,7 @@ def analyze_pipeline(
             cache_dir = Path(SIDECAR_CACHE_DIR) if SIDECAR_CACHE_DIR else (REPO_ROOT / ".ma_cache" / "sidecar")
             cache_dir.mkdir(parents=True, exist_ok=True)
             sidecar_cache_dir = cache_dir
-            cache_key = f"{source_hash}_{hashlib.sha1((cmd or DEFAULT_SIDECAR_CMD).encode()).hexdigest()}.json"
+            cache_key = f"{source_hash}_{hashlib.sha1((cmd or DEFAULT_SIDECAR_CMD).encode()).hexdigest()}_v{SIDECAR_CACHE_SCHEMA_V}.json"
             sidecar_cache_path = cache_dir / cache_key
             if sidecar_cache_path.exists():
                 cached_payload = load_json_guarded(sidecar_cache_path, max_bytes=MAX_JSON_BYTES, expect_mapping=True, logger=debug)
@@ -1031,9 +1062,9 @@ def analyze_pipeline(
             sidecar_status = "cache_hit"
         if external_data and sidecar_status == "used" and sidecar_cache_path and not sidecar_cache_path.exists():
             try:
-                # Only cache payloads that passed validation
+                # Only cache payloads that passed validation; write atomically.
                 if "sidecar_data" in locals() and sidecar_data:
-                    sidecar_cache_path.write_text(json.dumps(sidecar_data))
+                    atomic_write_json(sidecar_cache_path, sidecar_data)
             except Exception:
                 pass
 
@@ -1088,6 +1119,7 @@ def analyze_pipeline(
                 if "qa_status" not in cached and isinstance(cached.get("qa"), dict) and "status" in cached["qa"]:
                     cached["qa_status"] = cached["qa"].get("status")
                 cached = _sanitize_tempo_backend_fields(cached)
+                cached = _ensure_feature_pipeline_meta(cached)
                 cached["cache_status"] = "hit"
                 return cached
 
@@ -1461,6 +1493,7 @@ def analyze_pipeline(
         data.setdefault("sandbox_warnings", []).append("payload_sandbox_scrubbed")
 
     data = _sanitize_tempo_backend_fields(data)
+    data = _ensure_feature_pipeline_meta(data)
 
     if external_data:
         # Keep a lean main payload: drop the full beat grid from the feature JSON, but leave count/meta.
@@ -1665,6 +1698,13 @@ def main(argv=None) -> int:
         _log(f"[ma_audio_features] lint warnings: {lint_warns}")
 
     if LOG_JSON:
+        meta_log: Dict[str, Any] | None = None
+        meta_src = result.get("feature_pipeline_meta")
+        if isinstance(meta_src, dict):
+            meta_log = dict(meta_src)
+            if LOG_REDACT:
+                for k in ("tempo_backend_source", "source_hash", "config_fingerprint"):
+                    meta_log.pop(k, None)
         log_stage_end(
             _log,
             "analyze_pipeline",
@@ -1678,6 +1718,7 @@ def main(argv=None) -> int:
             cache_status=result.get("cache_status"),
             qa_status=result.get("qa_status"),
             qa_gate=result.get("qa_gate"),
+            feature_pipeline_meta=meta_log,
             sidecar_lint_warnings=len(lint_warns),
             warnings=lint_warns,
         )

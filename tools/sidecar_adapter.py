@@ -22,6 +22,7 @@ Failure semantics:
 """
 from __future__ import annotations
 
+import json
 import os
 import shlex
 import shutil
@@ -42,6 +43,26 @@ DEFAULT_SIDECAR_CMD = os.getenv(
     "MA_TEMPO_SIDECAR_CMD",
     os.getenv("DEFAULT_SIDECAR_CMD", "python3 tools/tempo_sidecar_runner.py --audio {audio} --out {out}"),
 )
+
+def atomic_write_json(path: Path, payload: Dict[str, Any]) -> None:
+    """Write JSON atomically to avoid partial cache files."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    try:
+        tmp.write_text(json.dumps(payload))
+        try:
+            with open(tmp, "r+b") as fh:
+                fh.flush()
+                os.fsync(fh.fileno())
+        except Exception:
+            pass
+        tmp.replace(path)
+    finally:
+        if tmp.exists() and tmp != path:
+            try:
+                tmp.unlink()
+            except Exception:
+                pass
 
 
 def run_sidecar(

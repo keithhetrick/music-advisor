@@ -74,6 +74,16 @@ PY
 )"
 }
 
+on_exit() {
+  local code=$?
+  if [[ $code -ne 0 ]]; then
+    if typeset -f stage_end >/dev/null; then
+      stage_end "smoke_full_chain" status="error" exit_code="$code" out_dir="${OUT_DIR:-}"
+    fi
+  fi
+}
+trap 'on_exit' EXIT
+
 # Minimal end-to-end smoke test for the HCI/client pipeline on a single audio file.
 # Usage: scripts/smoke_full_chain.sh /path/to/audio.wav
 
@@ -179,45 +189,11 @@ stage_start "equilibrium_merge" merged="$MERGED_JSON"
 stage_end "equilibrium_merge" out="$MERGED_JSON"
 stage_start "pack_writer" out_dir="$OUT_DIR"
 if [[ -n "$PACK_SCRIPT" ]]; then
-  "${PACK_CLI[@]}" "$PACK_SCRIPT" --merged "$MERGED_JSON" --out-dir "$OUT_DIR" --client-json "$CLIENT_JSON" --client-txt "$CLIENT_TXT" --no-pack
+  "${PACK_CLI[@]}" "$PACK_SCRIPT" --merged "$MERGED_JSON" --features "$FEATURES_JSON" --out-dir "$OUT_DIR" --client-json "$CLIENT_JSON" --client-txt "$CLIENT_TXT" --no-pack
 else
-  "${PACK_CLI[@]}" --merged "$MERGED_JSON" --out-dir "$OUT_DIR" --client-json "$CLIENT_JSON" --client-txt "$CLIENT_TXT" --no-pack
+  "${PACK_CLI[@]}" --merged "$MERGED_JSON" --features "$FEATURES_JSON" --out-dir "$OUT_DIR" --client-json "$CLIENT_JSON" --client-txt "$CLIENT_TXT" --no-pack
 fi
 stage_end "pack_writer" out_dir="$OUT_DIR"
-
-# Ensure runtime_sec exists in client helper (smoke sanity).
-"$PY" - "$CLIENT_JSON" <<'PY'
-import json, sys
-path = sys.argv[1]
-data = json.loads(open(path).read())
-feat = data.get("features") or {}
-if "runtime_sec" not in feat and "duration_sec" in feat:
-    feat["runtime_sec"] = feat["duration_sec"]
-data["features"] = feat
-with open(path, "w") as f:
-    json.dump(data, f, indent=2)
-PY
-
-# Ensure feature_pipeline_meta has minimal defaults (helps lint/echo_hci), with a best-effort hash.
-"$PY" - <<'PY' "$FEATURES_JSON" "$IN_AUDIO" "${SMOKE_GEN_AUDIO:-0}"
-import json, sys, hashlib, os
-feat_path, audio_path, is_smoke = sys.argv[1], sys.argv[2], sys.argv[3] == "1"
-data = json.loads(open(feat_path).read())
-meta = data.get("feature_pipeline_meta") or {}
-src = data.get("source_audio") or audio_path
-expanded = os.path.expanduser(src) if isinstance(src, str) else src
-if not meta.get("source_hash"):
-    if expanded and os.path.exists(expanded):
-        with open(expanded, "rb") as f:
-            meta["source_hash"] = hashlib.sha256(f.read()).hexdigest()
-    else:
-        meta["source_hash"] = os.path.basename(src) if src else "unknown"
-meta.setdefault("config_fingerprint", "smoke_synth" if is_smoke else "auto_fill")
-meta.setdefault("pipeline_version", "smoke_synth" if is_smoke else "auto_fill")
-data["feature_pipeline_meta"] = meta
-with open(feat_path, "w") as f:
-    json.dump(data, f, indent=2)
-PY
 
 # Dummy HCI bootstrap: if no HCI exists, synthesize a minimal one from merged.json so downstream steps can run.
 if [[ ! -f "$HCI_JSON" ]]; then
@@ -267,10 +243,10 @@ client_stub = {
         "source_hash": m.get("source_audio", ""),
         "config_fingerprint": "smoke-test",
         "pipeline_version": "smoke",
-        "sidecar_status": "missing",
+        "sidecar_status": "synthetic",
         "qa_gate": "unknown",
-        "tempo_backend": "sidecar",
-        "tempo_backend_detail": "essentia",
+        "tempo_backend": "synthetic",
+        "tempo_backend_detail": "synthetic",
     },
     "historical_echo_meta": {
         "neighbors_file": "",
@@ -313,10 +289,10 @@ hci = {
         "source_hash": m.get("source_audio", ""),
         "config_fingerprint": "smoke-test",
         "pipeline_version": "smoke",
-        "sidecar_status": "missing",
+        "sidecar_status": "synthetic",
         "qa_gate": "unknown",
-        "tempo_backend": "sidecar",
-        "tempo_backend_detail": "essentia",
+        "tempo_backend": "synthetic",
+        "tempo_backend_detail": "synthetic",
         "tempo_primary": m.get("tempo_bpm"),
         "tempo_alternates": [m.get("tempo_bpm", 0) / 2, m.get("tempo_bpm", 0) * 2],
         "tempo_confidence": "low",
@@ -370,7 +346,7 @@ stage_start "echo_hci" root="$OUT_DIR"
 "$PY" "$REPO/tools/ma_add_echo_to_hci_v1.py" --root "$OUT_DIR"
 stage_end "echo_hci" root="$OUT_DIR"
 # Rebuild client helpers right before merge to guarantee runtime_sec + fresh schema fields.
-"$PY" "$REPO/tools/pack_writer.py" --merged "$MERGED_JSON" --out-dir "$OUT_DIR" --client-json "$CLIENT_JSON" --client-txt "$CLIENT_TXT" --no-pack
+"$PY" "$REPO/tools/pack_writer.py" --merged "$MERGED_JSON" --features "$FEATURES_JSON" --out-dir "$OUT_DIR" --client-json "$CLIENT_JSON" --client-txt "$CLIENT_TXT" --no-pack
 stage_start "merge_client_hci" out="$CLIENT_TXT"
 "$PY" "$REPO/tools/ma_merge_client_and_hci.py" --client-json "$CLIENT_JSON" --hci "$HCI_JSON" --client-out "$CLIENT_TXT"
 stage_end "merge_client_hci" out="$CLIENT_TXT"
