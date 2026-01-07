@@ -25,7 +25,7 @@ echo "== Pipeline smoke =="
 echo "Audio: $AUDIO"
 echo "Out:   $OUT"
 
-PYTHONPATH="$ROOT" "$PYTHON_BIN" "$ROOT/tools/cli/ma_audio_features.py" \
+PYTHONPATH="$ROOT" "$PYTHON_BIN" "$ROOT/engines/audio_engine/tools/cli/ma_audio_features.py" \
   --audio "$AUDIO" \
   --out "$OUT"
 
