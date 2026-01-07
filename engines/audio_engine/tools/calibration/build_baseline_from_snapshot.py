@@ -10,7 +10,6 @@ from adapters import utc_now_iso
 
 LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
 LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
-_log = make_logger("build_baseline_from_snapshot", redact=LOG_REDACT, secrets=LOG_REDACT_VALUES)
 
 def quarter_of(dt):
     return (dt.month-1)//3 + 1
@@ -68,13 +67,12 @@ def main():
         [v for v in (args.log_redact_values.split(",") if args.log_redact_values else []) if v]
         or LOG_REDACT_VALUES
     )
-    global _log
-    _log = make_logger("build_baseline_from_snapshot", redact=redact_flag, secrets=redact_values)
+    log = make_logger("build_baseline_from_snapshot", redact=redact_flag, secrets=redact_values)
 
     snap = json.load(open(args.snapshot))
     packs = [p for p in snap.get("packs",[]) if p.get("region")==args.region and p.get("profile")==args.profile]
     if not packs:
-        _log("[baseline] no packs in snapshot for region/profile"); return 1
+        log("[baseline] no packs in snapshot for region/profile"); return 1
 
     bpms, durs, keys, modes = [], [], [], []
     for p in packs:
@@ -134,7 +132,7 @@ def main():
     out_path = os.path.join(out_dir, out_id)
     with open(out_path, "w") as f:
         json.dump(out, f, indent=2)
-    _log(f"[baseline] wrote {out_path} @ {utc_now_iso()}")
+    log(f"[baseline] wrote {out_path} @ {utc_now_iso()}")
     return 0
 
 if __name__=="__main__":

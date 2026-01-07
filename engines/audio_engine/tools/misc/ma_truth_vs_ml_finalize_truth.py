@@ -12,7 +12,7 @@ from adapters import make_logger
 from adapters import utc_now_iso
 
 
-def finalize_truth(in_csv: str, out_csv: str) -> None:
+def finalize_truth(in_csv: str, out_csv: str, log) -> None:
     in_path = Path(in_csv)
     out_path = Path(out_csv)
 
@@ -47,9 +47,9 @@ def finalize_truth(in_csv: str, out_csv: str) -> None:
         writer.writeheader()
         writer.writerows(rows_out)
 
-    _log(f"[OK] Wrote finalized truth CSV to {out_path}")
-    _log("     energy_truth <- energy_truth_final_band")
-    _log("     dance_truth  <- dance_truth_final_band")
+    log(f"[OK] Wrote finalized truth CSV to {out_path}")
+    log("     energy_truth <- energy_truth_final_band")
+    log("     dance_truth  <- dance_truth_final_band")
 
 
 def main():
@@ -88,11 +88,10 @@ def main():
         [v for v in (args.log_redact_values.split(",") if args.log_redact_values else []) if v]
         or redact_values_env
     )
-    global _log
-    _log = make_logger("truth_finalize", use_rich=False, redact=redact_flag, secrets=redact_values)
+    log = make_logger("truth_finalize", use_rich=False, redact=redact_flag, secrets=redact_values)
 
-    finalize_truth(args.csv, args.out)
-    _log(f"[DONE] Finished at {utc_now_iso()}")
+    finalize_truth(args.csv, args.out, log)
+    log(f"[DONE] Finished at {utc_now_iso()}")
 
 
 if __name__ == "__main__":

@@ -86,7 +86,7 @@ def compute_lyrics_metrics(lyrics: str):
     }
 
 
-def load_spine_map(conn):
+def load_spine_map(conn, log):
     cur = conn.cursor()
     # Prefer spine_master_v1_lanes; fall back to spine_v1
     table = None
@@ -100,7 +100,7 @@ def load_spine_map(conn):
             "[ERROR] Neither spine_master_v1_lanes nor spine_v1 found in DB."
         )
 
-    _log(f"[INFO] Using spine table: {table}")
+    log(f"[INFO] Using spine table: {table}")
     cur = sec_db.safe_execute(conn, f"SELECT spine_track_id, year, artist, title FROM {table}")
     rows = cur.fetchall()
 
@@ -109,7 +109,7 @@ def load_spine_map(conn):
     for spine_track_id, year, artist, title in rows:
         key = (int(year), make_slug(title or "", artist or ""))
         mapping[key] = spine_track_id
-    _log(f"[INFO] Built spine map with {len(mapping)} entries")
+    log(f"[INFO] Built spine map with {len(mapping)} entries")
     return mapping
 
 
@@ -190,8 +190,7 @@ def main():
         [v for v in (args.log_redact_values.split(",") if args.log_redact_values else []) if v]
         or redact_values_env
     )
-    global _log
-    _log = make_logger("import_kaylin_lyrics", use_rich=False, redact=redact_flag, secrets=redact_values)
+    log = make_logger("import_kaylin_lyrics", use_rich=False, redact=redact_flag, secrets=redact_values)
 
     db_path = Path(args.db)
     kaylin_path = Path(args.kaylin_csv)
@@ -199,13 +198,13 @@ def main():
     if not kaylin_path.is_file():
         raise SystemExit(f"[ERROR] Kaylin CSV not found: {kaylin_path}")
 
-    _log(f"[INFO] Connecting to DB: {db_path}")
+    log(f"[INFO] Connecting to DB: {db_path}")
     conn = sqlite3.connect(db_path)
 
-    spine_map = load_spine_map(conn)
+    spine_map = load_spine_map(conn, log)
     create_lyrics_tables(conn, reset=args.reset)
 
-    _log(f"[INFO] Loading Kaylin lyrics from {kaylin_path} ...")
+    log(f"[INFO] Loading Kaylin lyrics from {kaylin_path} ...")
     matched = 0
     unmatched = 0
 
@@ -272,12 +271,12 @@ def main():
             )
 
     conn.commit()
-    _log(f"[INFO] Lyrics import complete.")
-    _log(f"[INFO] Matched   : {matched}")
-    _log(f"[INFO] Unmatched : {unmatched}")
+    log(f"[INFO] Lyrics import complete.")
+    log(f"[INFO] Matched   : {matched}")
+    log(f"[INFO] Unmatched : {unmatched}")
 
     conn.close()
-    _log(f"[DONE] Finished at {utc_now_iso()}")
+    log(f"[DONE] Finished at {utc_now_iso()}")
 
 
 if __name__ == "__main__":

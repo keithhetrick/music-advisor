@@ -17,18 +17,13 @@ from adapters import utc_now_iso
 
 LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
 LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
-_log = make_logger("pack_show_hci", redact=LOG_REDACT, secrets=LOG_REDACT_VALUES)
 
 
-def _log_info(msg: str) -> None:
-    _log(msg)
-
-
-def show_one(p: Path) -> Dict[str, Any] | None:
+def show_one(p: Path, log) -> Dict[str, Any] | None:
     try:
         d = json.loads(p.read_text())
     except Exception as e:
-        _log_info(f"[pack_show_hci] bad json: {p} ({e})")
+        log(f"[pack_show_hci] bad json: {p} ({e})")
         return None
     name = d.get("audio_name") or p.stem
     hv1 = d.get("HCI_v1") or {}
@@ -75,24 +70,23 @@ def main() -> None:
         [v for v in (args.log_redact_values.split(",") if args.log_redact_values else []) if v]
         or LOG_REDACT_VALUES
     )
-    global _log
-    _log = make_logger("pack_show_hci", redact=redact_flag, secrets=redact_values)
+    log = make_logger("pack_show_hci", redact=redact_flag, secrets=redact_values)
 
     root = Path(args.root)
     files = sorted(root.rglob(args.glob))
     if not files:
-        _log_info(f"[pack_show_hci] not found: {root}/{args.glob}")
+        log(f"[pack_show_hci] not found: {root}/{args.glob}")
         sys.exit(1)
 
     if args.json:
         for p in files:
-            res = show_one(p)
+            res = show_one(p, log)
             if res is not None:
                 print(json.dumps(res))
         return
 
     for p in files:
-        show_one(p)
+        show_one(p, log)
 
 
 if __name__ == "__main__":

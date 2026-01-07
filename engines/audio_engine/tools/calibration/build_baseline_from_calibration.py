@@ -15,7 +15,6 @@ from shared.security.config import CONFIG as SEC_CONFIG
 
 LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
 LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
-_log = make_logger("build_baseline_from_calibration", redact=LOG_REDACT, secrets=LOG_REDACT_VALUES)
 
 # ---- Helpers ----
 
@@ -175,13 +174,12 @@ def main():
         [v for v in (args.log_redact_values.split(",") if args.log_redact_values else []) if v]
         or LOG_REDACT_VALUES
     )
-    global _log
-    _log = make_logger("build_baseline_from_calibration", redact=redact_flag, secrets=redact_values)
+    log = make_logger("build_baseline_from_calibration", redact=redact_flag, secrets=redact_values)
 
     try:
         import yaml
     except Exception:
-        _log("Please `pip install pyyaml` in your venv.")
+        log("Please `pip install pyyaml` in your venv.")
         return 2
 
     cfg = yaml.safe_load(Path(args.config).read_text())
@@ -255,7 +253,7 @@ def main():
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(out, indent=2))
-    _log(f"[calibration] wrote {out_path} @ {utc_now_iso()}")
+    log(f"[calibration] wrote {out_path} @ {utc_now_iso()}")
 
 if __name__ == "__main__":
     sys.exit(main())
