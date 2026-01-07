@@ -1085,6 +1085,8 @@ def analyze_pipeline(
             if not isinstance(cached, dict) or "tempo_backend" not in cached or "source_audio" not in cached:
                 debug("cache entry missing required fields; ignoring")
             else:
+                if "qa_status" not in cached and isinstance(cached.get("qa"), dict) and "status" in cached["qa"]:
+                    cached["qa_status"] = cached["qa"].get("status")
                 cached = _sanitize_tempo_backend_fields(cached)
                 cached["cache_status"] = "hit"
                 return cached
@@ -1349,8 +1351,16 @@ def analyze_pipeline(
     now_ts = utc_now_iso(timespec="seconds")
 
     external_used = bool(external_data)
-    tempo_backend_used = _sanitize_tempo_backend_value(tempo_backend_used, external_used, sidecar_warnings)
-    backend_detail = _sanitize_tempo_backend_value(external_backend_hint or tempo_backend_used, external_used, sidecar_warnings)
+    allowed_details = {"essentia", "madmom", "librosa", "auto", "external"}
+    tempo_backend_used = "external" if external_used else "librosa"
+    backend_detail_hint = external_backend_hint if isinstance(external_backend_hint, str) else None
+    if tempo_backend_used == "librosa":
+        backend_detail = "librosa"
+    else:
+        if backend_detail_hint and backend_detail_hint in allowed_details:
+            backend_detail = backend_detail_hint if backend_detail_hint != "auto" else "external"
+        else:
+            backend_detail = "external"
 
     key_confidence_score_norm = normalize_key_confidence(external_key_strength_raw) if (external_data and external_key_strength_raw is not None and math.isfinite(external_key_strength_raw)) else None
 
@@ -1412,6 +1422,9 @@ def analyze_pipeline(
         data["source_audio_info"] = source_info
     if qa:
         data["qa"] = qa
+        data["qa_status"] = qa.get("status", "unknown")
+    else:
+        data["qa_status"] = "unknown"
     if cache:
         data["cache_status"] = "miss"
         cache.store(

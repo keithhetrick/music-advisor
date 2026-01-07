@@ -224,13 +224,14 @@ if [[ ! -f "$HCI_JSON" ]]; then
   stage_start "synthesize_hci" merged="$MERGED_JSON"
   "$PY" - <<'PY' "$MERGED_JSON" "$HCI_JSON"
 import json, sys
+from pathlib import Path
 if len(sys.argv) < 3:
     raise SystemExit("usage: synth merged.json out.json")
-merged = sys.argv[1]
-out = sys.argv[2]
+merged = Path(sys.argv[1])
+out = Path(sys.argv[2])
 with open(merged) as f:
     m = json.load(f)
-# Build a minimal client payload to align lint expectations
+# Build a minimal client payload to align lint expectations; keep primary client untouched.
 client_stub = {
     "region": "US",
     "profile": "Pop",
@@ -299,7 +300,8 @@ client_stub = {
         "top_neighbor": {},
     },
 }
-with open(out.replace(".hci.json", ".client.json"), "w") as f:
+stub_client_path = out.with_name("smoke.synth.client.json")
+with open(stub_client_path, "w") as f:
     json.dump(client_stub, f, indent=2)
 hci = {
     "HCI_v1_score_raw": 0.5,
@@ -383,6 +385,18 @@ stage_end "echo_client" root="$OUT_DIR"
 stage_start "log_summary" out_dir="$OUT_DIR"
 "$PY" "$REPO/tools/log_summary.py" --out-dir "$OUT_DIR"
 stage_end "log_summary" out_dir="$OUT_DIR"
+
+# Optional local validation of smoke outputs.
+if [[ "${SMOKE_VALIDATE:-1}" != "0" ]]; then
+  stage_start "smoke_validate_outputs" root="$OUT_DIR"
+  if "$PY" "$REPO/tools/smoke_validate_outputs.py" --root "$OUT_DIR"; then
+    echo "[smoke] validation passed for $OUT_DIR"
+    stage_end "smoke_validate_outputs" root="$OUT_DIR"
+  else
+    echo "[ERR] smoke output validation failed for $OUT_DIR" >&2
+    exit 1
+  fi
+fi
 set +x
 
 echo "[smoke] complete -> $OUT_DIR"
