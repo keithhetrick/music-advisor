@@ -682,10 +682,11 @@ $ pytest tests/test_*.py -v --tb=no -q
 - Further extraction has diminishing returns
 
 **Global State Remediation:**
-- 18 logger globals (Priority 1)
-- 3 config globals (Priority 2)
-- 2 calibration globals (Priority 3)
-- See `docs/audits/GLOBAL_STATE_AUDIT.md` for detailed plan
+
+- ✅ **18 logger globals eliminated** (Priority 1 - COMPLETE, Tasks 25-29)
+- 3 config globals (Priority 2 - deferred)
+- 2 calibration globals (Priority 3 - deferred)
+- See `docs/audits/GLOBAL_STATE_AUDIT.md` for detailed plan and completion status
 
 **Additional Extraction Candidates:**
 - Caching orchestration (~80 lines) - Medium value, high coupling
@@ -694,9 +695,113 @@ $ pytest tests/test_*.py -v --tb=no -q
 
 ---
 
+### Tasks 25-29: Logger Global Elimination (Priority 1)
+
+**Objective**: Eliminate all 18 `global _log` statements throughout the codebase by refactoring to explicit logger passing.
+
+**Scope**: 19 files across tools/, engines/, and supporting modules
+
+**Commits**:
+
+1. **Task 25** (`3927408`) - tools/calibration/ (3 files)
+   - backfill_features_meta.py
+   - calibration_readiness.py
+   - equilibrium_merge_full.py
+
+2. **Task 26** (`e1bb291`) - tools/hci/ (3 files)
+   - hci_rank_from_folder.py
+   - ma_add_echo_to_hci_v1.py
+   - ma_add_echo_to_client_rich_v1.py
+   - Special case: Also handled `global _QUIET` flag
+
+3. **Task 27** (`39f4cc9`) - tools/ top-level (5 files)
+   - tools/lyrics/import_kaylin_lyrics_into_db_v1.py
+   - spotify_apply_overrides_to_core_corpus.py
+   - hci_final_score.py
+   - ma_add_philosophy_to_hci.py
+   - ma_merge_client_and_hci.py
+
+4. **Task 28** (`6fc6122`) - tools/audio/ + pack_writer.py (3 files)
+   - tempo_sidecar_runner.py
+   - ma_audio_features.py (1,300+ lines, used lambda wrapper pattern)
+   - pack_writer.py
+
+5. **Task 29** (`01d67e8`) - engines/ (5 files)
+   - engines/audio_engine/tools/misc/ma_truth_vs_ml_finalize_truth.py
+   - engines/audio_engine/tools/misc/pack_show_hci.py
+   - engines/audio_engine/tools/calibration/build_baseline_from_snapshot.py
+   - engines/audio_engine/tools/calibration/build_baseline_from_calibration.py
+   - engines/lyrics_engine/tools/lyrics/import_kaylin_lyrics_into_db_v1.py (discovered during final verification)
+
+**Refactoring Pattern**:
+
+```python
+# BEFORE (global state)
+_log = get_configured_logger("tool_name")
+
+def helper_function():
+    global _log
+    _log("message")
+
+def main():
+    global _log
+    _log = make_logger(...)
+    helper_function()
+
+# AFTER (explicit passing)
+def helper_function(log):
+    log("message")
+
+def main():
+    log = make_logger(...)
+    helper_function(log)
+```
+
+**Additional fixes**:
+
+- Fixed LOG_REDACT handling: `os.getenv("LOG_REDACT", "0") == "1"`
+- Used lambda wrappers for compatibility: `logger=lambda msg: log(msg)`
+- Passed `quiet` flag alongside logger where needed
+
+**Verification**:
+
+```bash
+$ grep -rn "global _log" --include="*.py" . | grep -v archive | wc -l
+0
+```
+
+**Results**:
+
+- ✅ All 18 logger globals eliminated
+- ✅ All refactored files compile successfully
+- ✅ Logger dependencies now explicit
+- ✅ Improved testability (can inject mock loggers)
+- ✅ 69% of all global usage eliminated
+
+---
+
+### Task 30: Update Audit Documentation
+
+**Objective**: Document completion of Priority 1 (Logger Global Elimination) in audit files.
+
+**Changes**:
+
+1. Updated `docs/audits/GLOBAL_STATE_AUDIT.md`:
+   - Marked Priority 1 as ✅ COMPLETE
+   - Updated Executive Summary (26 → 8 global statements)
+   - Added completion dates and commit references
+   - Updated appendix with current vs. original state
+
+2. Updated `docs/audits/REPO_ANALYSIS_2026Q1.md` (this file):
+   - Added Tasks 25-30 to summary
+   - Updated key metrics
+   - Documented refactoring approach and results
+
+---
+
 ## Summary: Audit Accomplishments
 
-**24 Tasks Completed:**
+**30 Tasks Completed:**
 1. ✅ Star import elimination (4 tasks)
 2. ✅ Logger factory creation and migration (4 tasks)
 3. ✅ Feature extractor modularization (5 tasks)
@@ -705,7 +810,9 @@ $ pytest tests/test_*.py -v --tb=no -q
 6. ✅ Shim consolidation (5 tasks)
 7. ✅ Global state audit (1 task)
 8. ✅ Loudness analyzer extraction (1 task)
-9. ✅ Final status update (1 task - this document)
+9. ✅ Final status update (1 task)
+10. ✅ **Logger global elimination** (5 tasks: 25-29)
+11. ✅ **Audit documentation update** (1 task: 30 - this update)
 
 **Key Metrics:**
 - **392 lines removed** from ma_audio_features.py (22.4% reduction)
@@ -713,13 +820,15 @@ $ pytest tests/test_*.py -v --tb=no -q
 - **108 new tests** (1,641 test lines, 100% pass rate)
 - **24 shim files removed** (~366 lines)
 - **26 global usages documented** with remediation plan
+- **✅ 18 logger globals eliminated** (100% of Priority 1)
 
 **Impact:**
 - Improved modularity and testability
 - Cleaner imports and reduced coupling
 - Comprehensive test coverage for critical audio processing
+- **Eliminated all logger globals** - explicit logger passing throughout codebase
 - Clear documentation of remaining technical debt
 
 ---
 
-*Final progress update completed 2026-01-07. See commit history for detailed implementation.*
+*Progress update completed 2026-01-07 (Tasks 1-30). See commit history for detailed implementation.*

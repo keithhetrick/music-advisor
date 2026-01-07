@@ -8,15 +8,15 @@
 
 ## Executive Summary
 
-- **Total `global` statements**: 26
-- **Type A (Logger reconfiguration)**: 18 (69%)
-- **Type B (Module-level caches)**: 3 (12%)
-- **Type C (Mutable config)**: 3 (12%)
-- **Type D (In-process calibration)**: 2 (7%)
+- **Total `global` statements**: 8 (down from 26)
+- **Type A (Logger reconfiguration)**: ✅ **0** - COMPLETE (was 18)
+- **Type B (Module-level caches)**: 3 (38%)
+- **Type C (Mutable config)**: 3 (38%)
+- **Type D (In-process calibration)**: 2 (24%)
 
 ### Key Findings
 
-1. **Logger globals dominate** - 18/26 (69%) of all global usage is `global _log` for CLI reconfiguration
+1. **✅ Logger globals eliminated** - All 18 logger globals removed (Tasks 25-29, completed 2026-01-07)
 2. **Caching is minimal** - Only 3 cache-related globals, all legitimate lazy-load patterns
 3. **Config mutation exists** - 3 config-related globals with varying risk levels
 4. **No critical issues** - All global usage is deliberate and documented
@@ -25,37 +25,51 @@
 
 ## Detailed Categorization
 
-### Type A: Logger Reconfiguration (18 instances)
+### Type A: Logger Reconfiguration ✅ **COMPLETE** (0 instances, was 18)
 
-**Pattern**: CLI tools use `global _log` to reconfigure module-level logger based on CLI args.
+**Status**: ✅ **All logger globals eliminated** (Tasks 25-29, completed 2026-01-07)
 
-| File                                                                            | Variable       | Purpose                 | Risk | Remediation                 |
-| ------------------------------------------------------------------------------- | -------------- | ----------------------- | ---- | --------------------------- |
-| `tools/lyrics/import_kaylin_lyrics_into_db_v1.py:194`                           | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
-| `tools/spotify_apply_overrides_to_core_corpus.py:289`                           | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
-| `tools/hci_final_score.py:364`                                                  | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
-| `tools/ma_add_philosophy_to_hci.py:71`                                          | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
-| `tools/hci/ma_add_echo_to_client_rich_v1.py:1001`                               | `_log, _QUIET` | CLI logger + quiet flag | Low  | Pass logger/config as param |
-| `tools/hci/ma_add_echo_to_hci_v1.py:473`                                        | `_log, _QUIET` | CLI logger + quiet flag | Low  | Pass logger/config as param |
-| `tools/hci/hci_rank_from_folder.py:278`                                         | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
-| `tools/calibration/backfill_features_meta.py:131`                               | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
-| `tools/calibration/calibration_readiness.py:88`                                 | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
-| `tools/calibration/equilibrium_merge_full.py:43`                                | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
-| `tools/audio/tempo_sidecar_runner.py:406`                                       | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
-| `tools/audio/ma_audio_features.py:1259`                                         | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
-| `tools/ma_merge_client_and_hci.py:793`                                          | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
-| `tools/pack_writer.py:313`                                                      | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
-| `engines/audio_engine/tools/misc/ma_truth_vs_ml_finalize_truth.py:91`           | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
-| `engines/audio_engine/tools/misc/pack_show_hci.py:78`                           | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
-| `engines/audio_engine/tools/calibration/build_baseline_from_snapshot.py:71`     | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
-| `engines/audio_engine/tools/calibration/build_baseline_from_calibration.py:178` | `_log`         | CLI logger setup        | Low  | Pass logger as param        |
+**Commits**:
 
-**Analysis**:
+- Task 25: `3927408` - tools/calibration/ (3 files)
+- Task 26: `e1bb291` - tools/hci/ (3 files)
+- Task 27: `39f4cc9` - tools/ top-level (5 files)
+- Task 28: `6fc6122` - tools/audio/ + pack_writer.py (3 files)
+- Task 29: `01d67e8` - engines/ (5 files)
 
-- All 18 instances follow same pattern: CLI `main()` reconfigures module-level `_log` based on args
-- Logger is then used by multiple helper functions in the same module
-- Risk is LOW - confined to single module, no cross-module state
-- Remediation path: Pass logger as explicit parameter to functions
+**Original instances** (now refactored):
+
+| File                                                                            | Variable       | Status    | Commit  |
+| ------------------------------------------------------------------------------- | -------------- | --------- | ------- |
+| `tools/lyrics/import_kaylin_lyrics_into_db_v1.py:194`                           | `_log`         | ✅ Fixed  | 39f4cc9 |
+| `tools/spotify_apply_overrides_to_core_corpus.py:289`                           | `_log`         | ✅ Fixed  | 39f4cc9 |
+| `tools/hci_final_score.py:364`                                                  | `_log`         | ✅ Fixed  | 39f4cc9 |
+| `tools/ma_add_philosophy_to_hci.py:71`                                          | `_log`         | ✅ Fixed  | 39f4cc9 |
+| `tools/hci/ma_add_echo_to_client_rich_v1.py:1001`                               | `_log, _QUIET` | ✅ Fixed  | e1bb291 |
+| `tools/hci/ma_add_echo_to_hci_v1.py:473`                                        | `_log, _QUIET` | ✅ Fixed  | e1bb291 |
+| `tools/hci/hci_rank_from_folder.py:278`                                         | `_log`         | ✅ Fixed  | e1bb291 |
+| `tools/calibration/backfill_features_meta.py:131`                               | `_log`         | ✅ Fixed  | 3927408 |
+| `tools/calibration/calibration_readiness.py:88`                                 | `_log`         | ✅ Fixed  | 3927408 |
+| `tools/calibration/equilibrium_merge_full.py:43`                                | `_log`         | ✅ Fixed  | 3927408 |
+| `tools/audio/tempo_sidecar_runner.py:406`                                       | `_log`         | ✅ Fixed  | 6fc6122 |
+| `tools/audio/ma_audio_features.py:1259`                                         | `_log`         | ✅ Fixed  | 6fc6122 |
+| `tools/ma_merge_client_and_hci.py:793`                                          | `_log`         | ✅ Fixed  | 39f4cc9 |
+| `tools/pack_writer.py:313`                                                      | `_log`         | ✅ Fixed  | 6fc6122 |
+| `engines/audio_engine/tools/misc/ma_truth_vs_ml_finalize_truth.py:91`           | `_log`         | ✅ Fixed  | 01d67e8 |
+| `engines/audio_engine/tools/misc/pack_show_hci.py:78`                           | `_log`         | ✅ Fixed  | 01d67e8 |
+| `engines/audio_engine/tools/calibration/build_baseline_from_snapshot.py:71`     | `_log`         | ✅ Fixed  | 01d67e8 |
+| `engines/audio_engine/tools/calibration/build_baseline_from_calibration.py:178` | `_log`         | ✅ Fixed  | 01d67e8 |
+| `engines/lyrics_engine/tools/lyrics/import_kaylin_lyrics_into_db_v1.py:193`     | `_log`         | ✅ Fixed  | 01d67e8 |
+
+**Refactoring approach**:
+
+- Removed module-level `_log` initialization and `global _log` statements
+- Changed `_log` to local `log` variable in `main()`
+- Added `log` (and `quiet` where applicable) parameters to helper functions
+- Used lambda wrappers for compatibility: `logger=lambda msg: log(msg)`
+- Fixed LOG_REDACT handling with `os.getenv("LOG_REDACT", "0") == "1"`
+
+**Verification**: `grep -rn "global _log" --include="*.py" . | grep -v archive` returns 0 results
 
 ---
 
@@ -149,24 +163,34 @@
 
 ## Remediation Recommendations
 
-### Priority 1: Standardize Logger Passing (18 files)
+### ✅ Priority 1: Standardize Logger Passing - **COMPLETE**
 
-**Effort**: Medium (8-12 hours)
-**Impact**: Eliminates 69% of global usage
-**Risk**: Low - purely mechanical refactor
+**Status**: ✅ **100% Complete** (Tasks 25-29, completed 2026-01-07)
+**Files refactored**: 19 files across 5 commits
+**Impact**: Eliminated 18 global statements (69% of all globals)
 
-**Steps**:
+**Commits**:
 
-1. Add `logger: Callable` parameter to helper functions
-2. Pass `_log` explicitly from `main()`
-3. Remove `global _log` statements
-4. Verify tests pass
+- Task 25 (`3927408`): tools/calibration/ - 3 files
+- Task 26 (`e1bb291`): tools/hci/ - 3 files
+- Task 27 (`39f4cc9`): tools/ top-level - 5 files
+- Task 28 (`6fc6122`): tools/audio/ + pack_writer.py - 3 files
+- Task 29 (`01d67e8`): engines/ - 5 files
 
-**Benefits**:
+**Approach taken**:
 
-- Eliminates largest category of global state
-- Makes logger dependency explicit
-- Improves testability (can inject mock loggers)
+1. Removed module-level `_log` and `global _log` statements
+2. Changed to local `log` variable in `main()`
+3. Added `log` parameter to helper functions
+4. Used lambda wrappers for compatibility
+5. Fixed LOG_REDACT environment variable handling
+
+**Results**:
+
+- ✅ All 18 logger globals eliminated
+- ✅ All refactored files compile successfully
+- ✅ Logger dependencies now explicit
+- ✅ Improved testability (can inject mock loggers)
 
 ---
 
@@ -254,8 +278,25 @@
 
 ## Appendix: Full Global Usage List
 
+### Current State (8 remaining, as of 2026-01-07)
+
 ```bash
-# Non-archive global statements (26 total)
+# Non-archive global statements (8 total, down from 26)
+./tools/ma_benchmark_check.py:367:    global ENERGY_THRESHOLDS, DANCE_THRESHOLDS, VALENCE_THRESHOLDS
+./tools/aee_band_thresholds.py:92:    global _THRESHOLDS_CACHE
+./engines/lyrics_engine/src/ma_lyrics_engine/export.py:20:    global _NORMS_CACHE, _NORMS_PATH_CACHE
+./hosts/advisor_host/auth/auth.py:38:    global _JWKS_CACHE, _JWKS_FETCH_TS
+./ma_helper/core/env.py:30:    global CACHE_DIR, CACHE_FILE, LAST_RESULTS_FILE, ARTIFACT_DIR, STATE_HOME, LOG_DIR, LOG_FILE, TELEMETRY_FILE, FAVORITES_PATH, CACHE_ENABLED, ROOT
+./ma_helper/cli_app.py:119:        global config, orch_adapter
+./ma_helper/cli_app.py:169:    global DRY_RUN
+```
+
+### Original State (26 total, as of initial audit)
+
+All Type A (Logger) globals have been eliminated. The 18 removed instances were:
+
+```bash
+# ELIMINATED - Logger globals (18 total) ✅
 ./tools/lyrics/import_kaylin_lyrics_into_db_v1.py:194:    global _log
 ./tools/spotify_apply_overrides_to_core_corpus.py:289:    global _log
 ./tools/hci_final_score.py:364:    global _log
@@ -266,22 +307,15 @@
 ./tools/calibration/backfill_features_meta.py:131:    global _log
 ./tools/calibration/calibration_readiness.py:88:    global _log
 ./tools/calibration/equilibrium_merge_full.py:43:    global _log
-./tools/ma_benchmark_check.py:367:    global ENERGY_THRESHOLDS, DANCE_THRESHOLDS, VALENCE_THRESHOLDS
 ./tools/audio/tempo_sidecar_runner.py:406:    global _log
 ./tools/audio/ma_audio_features.py:1259:    global _log
 ./tools/ma_merge_client_and_hci.py:793:    global _log
-./tools/aee_band_thresholds.py:92:    global _THRESHOLDS_CACHE
 ./tools/pack_writer.py:313:    global _log
 ./engines/audio_engine/tools/misc/ma_truth_vs_ml_finalize_truth.py:91:    global _log
 ./engines/audio_engine/tools/misc/pack_show_hci.py:78:    global _log
 ./engines/audio_engine/tools/calibration/build_baseline_from_snapshot.py:71:    global _log
 ./engines/audio_engine/tools/calibration/build_baseline_from_calibration.py:178:    global _log
 ./engines/lyrics_engine/tools/lyrics/import_kaylin_lyrics_into_db_v1.py:193:    global _log
-./engines/lyrics_engine/src/ma_lyrics_engine/export.py:20:    global _NORMS_CACHE, _NORMS_PATH_CACHE
-./hosts/advisor_host/auth/auth.py:38:    global _JWKS_CACHE, _JWKS_FETCH_TS
-./ma_helper/core/env.py:30:    global CACHE_DIR, CACHE_FILE, LAST_RESULTS_FILE, ARTIFACT_DIR, STATE_HOME, LOG_DIR, LOG_FILE, TELEMETRY_FILE, FAVORITES_PATH, CACHE_ENABLED, ROOT
-./ma_helper/cli_app.py:119:        global config, orch_adapter
-./ma_helper/cli_app.py:169:    global DRY_RUN
 ```
 
 ---
