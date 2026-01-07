@@ -5,7 +5,7 @@ import os
 import subprocess
 import time
 
-from ma_helper.core.env import ROOT
+from ma_helper.core.config import RuntimeConfig
 from ma_helper.core.state import add_history, guard_level
 
 
@@ -26,7 +26,7 @@ def handle_tui(args) -> int:
     return render_tui(args.interval, args.duration)
 
 
-def handle_dashboard(args) -> int:
+def handle_dashboard(args, runtime: RuntimeConfig = None) -> int:
     from ma_helper.commands.visual import render_dashboard
 
     return render_dashboard(
@@ -35,24 +35,32 @@ def handle_dashboard(args) -> int:
         live=getattr(args, "live", False),
         interval=getattr(args, "interval", 1.0),
         duration=getattr(args, "duration", 0.0),
+        runtime=runtime,
     )
 
 
-def handle_sparse(args, require_confirm, run_cmd) -> int:
+def handle_sparse(args, require_confirm, run_cmd, runtime: RuntimeConfig = None) -> int:
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import ROOT
+        root = ROOT
+    else:
+        root = runtime.root
+
     if args.list:
-        return run_cmd("git sparse-checkout list", cwd=ROOT)
+        return run_cmd("git sparse-checkout list", cwd=root)
     if args.reset:
         if not require_confirm("Disable sparse-checkout?"):
             print("[ma] aborting (strict guard).")
             return 1
-        return run_cmd("git sparse-checkout disable", cwd=ROOT)
+        return run_cmd("git sparse-checkout disable", cwd=root)
     if args.set:
         paths = args.set
         print(f"[ma] enabling cone mode and setting paths: {paths}")
-        rc = run_cmd("git sparse-checkout init --cone", cwd=ROOT)
+        rc = run_cmd("git sparse-checkout init --cone", cwd=root)
         if rc != 0:
             return rc
-        return run_cmd("git sparse-checkout set " + " ".join(paths), cwd=ROOT)
+        return run_cmd("git sparse-checkout set " + " ".join(paths), cwd=root)
     print("Usage: sparse --list | --reset | --set <paths...>")
     return 1
 

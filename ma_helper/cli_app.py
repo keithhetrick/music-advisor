@@ -277,11 +277,11 @@ def _dispatch(args, runtime: RuntimeConfig, helper_config: HelperConfig, orch_ad
         runner = _run_cmd
         if status_update:
             runner = partial(base_run_cmd, orch_root=runtime.root, log_event_fn=log_event, set_last_failed=set_last_failed, status_update=status_update)
-        return handle_sparse(args, require_confirm, runner)
+        return handle_sparse(args, require_confirm, runner, runtime)
     if args.command == "scaffold":
-        return handle_scaffold(args)
+        return handle_scaffold(args, runtime)
     if args.command == "smoke":
-        return run_smoke(Path(args.audio).expanduser().resolve(), py_bin)
+        return run_smoke(Path(args.audio).expanduser().resolve(), py_bin, runtime)
     if args.command == "verify":
         return run_verify(args, lambda: main(["affected", "--no-diff"]), post_verify_hint)
     if args.command == "ci-env":
@@ -329,7 +329,7 @@ def _dispatch(args, runtime: RuntimeConfig, helper_config: HelperConfig, orch_ad
         cmd_dashboard.live = getattr(args, "live", False)
         cmd_dashboard.interval = getattr(args, "interval", 1.0)
         cmd_dashboard.duration = getattr(args, "duration", 0.0)
-        return handle_dashboard(args)
+        return handle_dashboard(args, runtime)
     if args.command == "tui":
         return handle_tui_cli(args)
     if args.command == "ui":
@@ -365,7 +365,7 @@ def _dispatch(args, runtime: RuntimeConfig, helper_config: HelperConfig, orch_ad
             args.project = prompt_if_missing("project", None, "Project for branch name: ")
         return handle_git_branch(args)
     if args.command == "chat-dev":
-        return handle_chat_dev(args)
+        return handle_chat_dev(args, runtime)
     if args.command == "git-status":
         return handle_git_status(args)
     if args.command == "git-upstream":

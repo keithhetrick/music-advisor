@@ -4,10 +4,16 @@ from __future__ import annotations
 import shutil
 import subprocess
 
-from ma_helper.core.env import ROOT
+from ma_helper.core.config import RuntimeConfig
 
 
-def handle_chat_dev(args) -> int:
+def handle_chat_dev(args, runtime: RuntimeConfig = None) -> int:
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import ROOT
+        root = ROOT
+    else:
+        root = runtime.root
     chat_cmd = f"CHAT_ENDPOINT={args.endpoint} python tools/chat_cli.py"
     tail_cmd = f"tail -f {args.log_file}"
     helper_cmd = "python -m ma_helper shell"
@@ -21,7 +27,7 @@ def handle_chat_dev(args) -> int:
             f"attach-session -t {session}"
         )
         print(f"[ma] launching tmux session '{session}' with chat/tail/shell panes")
-        rc = subprocess.call(["bash", "-lc", layout], cwd=ROOT)
+        rc = subprocess.call(["bash", "-lc", layout], cwd=root)
         if rc == 0:
             return rc
         print("[ma] tmux launch failed; falling back to manual commands.")

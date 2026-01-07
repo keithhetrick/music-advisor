@@ -6,11 +6,18 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from ma_helper.core.env import ROOT
+from ma_helper.core.config import RuntimeConfig
 
 
-def handle_scaffold(args) -> int:
-    dest = Path(args.path) if args.path else (ROOT / "tools" / "scaffolds" / args.name)
+def handle_scaffold(args, runtime: RuntimeConfig = None) -> int:
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import ROOT
+        root = ROOT
+    else:
+        root = runtime.root
+
+    dest = Path(args.path) if args.path else (root / "tools" / "scaffolds" / args.name)
     dest.mkdir(parents=True, exist_ok=True)
     (dest / "README.md").write_text(f"# {args.name}\n\nType: {args.type}\n")
     print(f"[ma] scaffolded {args.type} at {dest}")
