@@ -28,16 +28,14 @@ from ma_audio_engine.adapters import (
     di,
     load_log_settings,
     load_qa_policy,
-    make_logger,
     require_file,
     resolve_config_value,
     validate_root_dir,
 )
 from tools.hci.hci_rank_service import RankOptions, effective_score, filter_entries, load_hci_score, render_report
+from shared.ma_utils.logger_factory import get_configured_logger
 
-LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
-LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
-_log = make_logger("hci_rank", redact=LOG_REDACT, secrets=LOG_REDACT_VALUES)
+_log = get_configured_logger("hci_rank")
 
 
 def _log_info(msg: str) -> None:

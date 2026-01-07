@@ -31,18 +31,16 @@ from ma_audio_engine.adapters import (  # noqa: E402
     apply_log_sandbox_env,
     apply_log_format_env,
     run_preflight_if_requested,
-    make_logger,
     require_file,
 )
 from ma_audio_engine.adapters import load_log_settings, load_runtime_settings
 from ma_audio_engine.adapters.logging_adapter import log_stage_start, log_stage_end
 from ma_audio_engine.adapters import di
 from tools.schema_utils import lint_json_file
+from shared.ma_utils.logger_factory import get_configured_logger
 
 # Logging setup (allows LOG_SANDBOX via CLI/env)
-LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
-LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
-_log = di.make_logger("tempo_sidecar", structured=os.getenv("LOG_JSON") == "1", defaults={"tool": "tempo_sidecar"}, redact=LOG_REDACT, secrets=LOG_REDACT_VALUES)
+_log = get_configured_logger("tempo_sidecar")
 
 # Madmom uses collections.Mutable* and np.float on older releases; add small shims for 3.11+/NumPy>=1.20
 import collections  # noqa: E402
@@ -404,11 +402,9 @@ def main() -> int:
     # Load runtime settings up front so env/config defaults are consistent across CLIs.
     _ = load_runtime_settings(args)
     # Rebuild logger after potential log-sandbox toggle and runtime redaction inputs
-    log_settings = load_log_settings(args)
-    redact_flag = log_settings.log_redact or LOG_REDACT
-    redact_values = log_settings.log_redact_values or LOG_REDACT_VALUES
+    _ = load_log_settings(args)
     global _log
-    _log = di.make_logger("tempo_sidecar", structured=os.getenv("LOG_JSON") == "1", defaults={"tool": "tempo_sidecar"}, redact=redact_flag, secrets=redact_values)
+    _log = get_configured_logger("tempo_sidecar")
     if not require_file(args.audio, logger=lambda m: _log(m)):
         return 2
 

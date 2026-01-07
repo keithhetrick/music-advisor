@@ -33,7 +33,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from ma_audio_engine.adapters import add_log_sandbox_arg, apply_log_sandbox_env
-from ma_audio_engine.adapters import make_logger
 from ma_audio_engine.adapters import utc_now_iso
 from ma_audio_engine.adapters.bootstrap import ensure_repo_root
 from ma_config.audio import (
@@ -42,12 +41,11 @@ from ma_config.audio import (
     resolve_hci_v2_training_out,
 )
 from shared.config.paths import get_hci_v2_corpus_csv, get_hci_v2_targets_csv, get_hci_v2_training_csv
+from shared.ma_utils.logger_factory import get_configured_logger
 
 ensure_repo_root()
 
-LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
-LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
-_log = make_logger("hci_v2_training_matrix", redact=LOG_REDACT, secrets=LOG_REDACT_VALUES)
+_log = get_configured_logger("hci_v2_training_matrix")
 
 
 def _warn(msg: str) -> None:

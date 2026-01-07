@@ -52,7 +52,6 @@ from ma_audio_engine.adapters import (
     is_backend_enabled,
     list_supported_backends,
     load_json_guarded,
-    make_logger,
     load_log_settings,
     load_runtime_settings,
     require_file,
@@ -66,10 +65,9 @@ from tools.hci_echo_probe_from_spine_v1 import run_echo_probe_for_features
 from tools.schema_utils import lint_json_file
 from tools.echo_services import inject_echo_into_hci
 from ma_config.paths import get_historical_echo_db_path
+from shared.ma_utils.logger_factory import get_configured_logger
 
-LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
-LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
-_log = make_logger("echo_hci", redact=LOG_REDACT, secrets=LOG_REDACT_VALUES)
+_log = get_configured_logger("echo_hci")
 _QUIET = False
 
 

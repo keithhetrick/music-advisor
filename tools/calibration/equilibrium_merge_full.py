@@ -15,13 +15,10 @@ from ma_audio_engine.adapters import (
     add_log_sandbox_arg,
     apply_log_sandbox_env,
     load_json_guarded,
-    make_logger,
     require_file,
     utc_now_iso,
 )
-
-LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
-LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
+from shared.ma_utils.logger_factory import get_configured_logger
 
 
 def main() -> int:
@@ -43,20 +40,8 @@ def main() -> int:
     args = ap.parse_args()
 
     apply_log_sandbox_env(args)
-    redact_env = os.getenv("LOG_REDACT", "0") == "1"
-    redact_values_env = [v for v in (os.getenv("LOG_REDACT_VALUES") or "").split(",") if v]
-    redact_flag = args.log_redact or redact_env
-    redact_values = (
-        [v for v in (args.log_redact_values.split(",") if args.log_redact_values else []) if v]
-        or redact_values_env
-    )
     global _log
-    _log = make_logger(
-        "equilibrium_merge",
-        use_rich=False,
-        redact=redact_flag,
-        secrets=redact_values,
-    )
+    _log = get_configured_logger("equilibrium_merge")
 
     internal_path = Path(args.internal).expanduser().resolve()
     external_path = Path(args.external).expanduser().resolve() if args.external else None

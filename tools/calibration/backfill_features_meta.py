@@ -20,15 +20,13 @@ from typing import List, Dict, Any
 import os
 
 from ma_audio_engine.adapters import add_log_sandbox_arg, apply_log_sandbox_env
-from ma_audio_engine.adapters import make_logger
 from ma_audio_engine.adapters import utc_now_iso
 from ma_audio_engine.adapters.bootstrap import ensure_repo_root
 from ma_audio_features import analyze_pipeline
 from ma_config.paths import get_features_output_root, get_repo_root
+from shared.ma_utils.logger_factory import get_configured_logger
 
-LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
-LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
-_log = make_logger("backfill_features_meta", redact=LOG_REDACT, secrets=LOG_REDACT_VALUES)
+_log = get_configured_logger("backfill_features_meta")
 ensure_repo_root()
 
 

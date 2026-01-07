@@ -54,7 +54,6 @@ from ma_audio_engine.adapters import (
     list_supported_backends,
     is_backend_enabled,
     load_json_guarded,
-    make_logger,
     load_log_settings,
     load_runtime_settings,
     require_file,
@@ -70,6 +69,7 @@ from tools.hci_echo_probe_from_spine_v1 import run_echo_probe_for_features
 from tools.schema_utils import lint_json_file
 from tools.echo_services import inject_echo_into_client, write_neighbors_file
 from ma_config.paths import get_historical_echo_db_path
+from shared.ma_utils.logger_factory import get_configured_logger
 
 # Optional client-rich support; falls back to generic structures if the schema package
 # hasn't been updated yet.
@@ -79,9 +79,7 @@ except Exception:  # noqa: BLE001
     CLIENTRich = CLIENTRich  # type: ignore
     lint_client_rich_text = lint_client_rich_text  # type: ignore
 
-LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
-LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
-_log = make_logger("echo_inject", redact=LOG_REDACT, secrets=LOG_REDACT_VALUES)
+_log = get_configured_logger("echo_inject")
 _QUIET = False
 _SUPPORTED_BACKENDS = set(list_supported_backends())
 # Calibration/version tags for transparency in rich text; override via env.

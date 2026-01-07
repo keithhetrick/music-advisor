@@ -37,12 +37,10 @@ import hci_axes  # type: ignore
 from ma_config.audio import DEFAULT_MARKET_NORMS_PATH, resolve_market_norms
 
 from ma_audio_engine.adapters import add_log_sandbox_arg, apply_log_sandbox_env
-from ma_audio_engine.adapters import make_logger
 from ma_audio_engine.adapters import utc_now_iso
+from shared.ma_utils.logger_factory import get_configured_logger
 
-LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
-LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
-_log = make_logger("hci_recompute_axes", redact=LOG_REDACT, secrets=LOG_REDACT_VALUES)
+_log = get_configured_logger("hci_recompute_axes")
 
 
 AXES_ORDER: List[str] = [
