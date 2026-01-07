@@ -229,3 +229,8 @@ def coverage_report(conn: sqlite3.Connection, core_csv: Optional[Path], log) -> 
             if not found:
                 missing += 1
     log(f"[INFO] Coverage report: total={total}, present={total - missing}, missing={missing}")
+
+__all__ = [
+    "coverage_report",
+    "export_bridge_payload",
+]

@@ -1,4 +1,46 @@
 """
 Compatibility wrapper: delegates to shared.config.audio (source of truth).
 """
-from shared.config.audio import *  # noqa: F401,F403
+from shared.config.audio import (
+    DEFAULT_HCI_PROFILE,
+    DEFAULT_HCI_CALIBRATION_PATH,
+    DEFAULT_MARKET_NORMS_PATH,
+    DEFAULT_AUDIO_POLICY_PATH,
+    DEFAULT_AUDIO_V2_CALIBRATION_PATH,
+    DEFAULT_HCI_V2_TARGETS_CSV,
+    DEFAULT_HCI_V2_CORPUS_CSV,
+    DEFAULT_HCI_V2_TRAINING_CSV,
+    DEFAULT_LOUDNESS_NORMS_LOCAL_PATH,
+    DEFAULT_MARKET_NORMS_LOUDNESS_PATH,
+    load_json_safe,
+    resolve_hci_calibration,
+    resolve_market_norms,
+    resolve_audio_policy,
+    resolve_audio_v2_calibration,
+    resolve_hci_v2_targets,
+    resolve_hci_v2_corpus,
+    resolve_hci_v2_training_out,
+    resolve_loudness_norms_out,
+)
+
+__all__ = [
+    "DEFAULT_HCI_PROFILE",
+    "DEFAULT_HCI_CALIBRATION_PATH",
+    "DEFAULT_MARKET_NORMS_PATH",
+    "DEFAULT_AUDIO_POLICY_PATH",
+    "DEFAULT_AUDIO_V2_CALIBRATION_PATH",
+    "DEFAULT_HCI_V2_TARGETS_CSV",
+    "DEFAULT_HCI_V2_CORPUS_CSV",
+    "DEFAULT_HCI_V2_TRAINING_CSV",
+    "DEFAULT_LOUDNESS_NORMS_LOCAL_PATH",
+    "DEFAULT_MARKET_NORMS_LOUDNESS_PATH",
+    "load_json_safe",
+    "resolve_hci_calibration",
+    "resolve_market_norms",
+    "resolve_audio_policy",
+    "resolve_audio_v2_calibration",
+    "resolve_hci_v2_targets",
+    "resolve_hci_v2_corpus",
+    "resolve_hci_v2_training_out",
+    "resolve_loudness_norms_out",
+]

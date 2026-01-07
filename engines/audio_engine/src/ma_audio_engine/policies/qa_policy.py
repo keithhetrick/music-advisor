@@ -23,3 +23,10 @@ POLICIES = {
 
 def get_policy(name: str) -> QAPolicy:
     return POLICIES.get(name, POLICIES["default"])
+
+
+__all__ = [
+    "QAPolicy",
+    "POLICIES",
+    "get_policy",
+]

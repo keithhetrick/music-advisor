@@ -180,3 +180,7 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
     if "ttc_confidence" not in cols:
         cur.execute("ALTER TABLE features_ttc ADD COLUMN ttc_confidence TEXT;")
     conn.commit()
+
+__all__ = [
+    "ensure_schema",
+]

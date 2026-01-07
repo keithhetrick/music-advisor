@@ -175,3 +175,14 @@ def sectionize(clean_text: str) -> tuple[list[dict[str, str]], list[str]]:
     for sec in sections:
         flat_lines.extend(sec["lines"])
     return sections, flat_lines
+
+__all__ = [
+    "clean_lyrics_text",
+    "count_syllables",
+    "normalize_text",
+    "rhyme_key",
+    "section_label_from_tag",
+    "sectionize",
+    "slugify_song",
+    "tokenize_words",
+]

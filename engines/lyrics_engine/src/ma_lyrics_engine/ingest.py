@@ -201,3 +201,13 @@ def ingest_billboard_spine(conn: sqlite3.Connection, csv_path: Path, log) -> int
     conn.commit()
     log(f"[INFO] Ingested Billboard spine rows: {count}")
     return count
+
+__all__ = [
+    "ingest_billboard_spine",
+    "ingest_fallback_top100",
+    "ingest_hot100_lyrics_audio",
+    "ingest_kaggle_year_end",
+    "should_replace",
+    "upsert_lyrics",
+    "upsert_song",
+]
