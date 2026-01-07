@@ -56,6 +56,11 @@ from tools.audio.tempo_estimator import (
     robust_tempo,
     select_tempo_with_folding,
 )
+from tools.audio.feature_calculator import (
+    estimate_danceability,
+    estimate_energy,
+    estimate_valence,
+)
 from shared.ma_utils.logger_factory import get_configured_logger
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -522,161 +527,6 @@ def normalize_audio(y: np.ndarray, sr: int, target_lufs: float = TARGET_LUFS) ->
     return y_norm, gain_db, norm_lufs
 
 
-def estimate_energy(y, sr) -> Optional[float]:
-    """
-    Estimate perceptual energy on a 0..1 scale.
-
-    - High (~0.7–0.9) for dense, consistently loud mixes.
-    - Low (~0.1–0.3) for sparse/quiet ballads.
-    - Relatively robust to uniform gain changes.
-    """
-    if librosa is None:
-        return None
-    if y is None or len(y) == 0:
-        return None
-
-    hop_length = 512
-    frame_length = 2048
-    try:
-        rms = librosa.feature.rms(
-            y=y,
-            frame_length=frame_length,
-            hop_length=hop_length,
-            center=True
-        )[0]
-    except Exception:
-        rms = np.array([np.sqrt(float(np.mean(y * y)) + 1e-12)])
-
-    rms = np.maximum(rms, 1e-8)
-    med = float(np.median(rms))
-    if med <= 0.0:
-        med = float(np.mean(rms))
-
-    # Relative RMS vs median
-    rms_rel = rms / (med + 1e-12)
-    rms_rel = np.clip(rms_rel, 0.25, 5.0)
-
-    x = float(np.mean(rms_rel))
-    energy_core = 1.0 / (1.0 + np.exp(-(x - 1.5)))
-    energy_core = 0.1 + 0.85 * float(np.clip(energy_core, 0.0, 1.0))
-
-    # Add a brightness term from spectral centroid
-    try:
-        cent = librosa.feature.spectral_centroid(y=y, sr=sr)[0]
-        cent_norm = float(
-            np.clip(
-                np.mean(cent) / (sr / 2.0 + 1e-9),
-                0.0,
-                1.0
-            )
-        )
-    except Exception:
-        cent_norm = 0.5
-
-    energy = 0.8 * energy_core + 0.2 * cent_norm
-    return float(np.clip(energy, 0.0, 1.0))
-
-
-def estimate_danceability(y, sr, tempo) -> Optional[float]:
-    """
-    Estimate danceability on a 0..1 scale.
-
-    Factors:
-    - Tempo closeness to a comfortable dance window (~70–140 BPM, centered ~110).
-    - Strength of beat pulses (onset energy on beats).
-    - Regularity of beat energy across time.
-    """
-    if librosa is None:
-        return None
-    if y is None or len(y) == 0:
-        return None
-
-    # Tempo term: prefer typical dance tempo
-    felt_tempo = float(tempo or 0.0)
-    if felt_tempo <= 0:
-        tempo_term = 0.5
-    else:
-        while felt_tempo < 60.0:
-            felt_tempo *= 2.0
-        while felt_tempo > 180.0:
-            felt_tempo /= 2.0
-        center = 110.0
-        spread = 50.0
-        delta = abs(felt_tempo - center)
-        tempo_term = float(np.clip(1.0 - (delta / spread), 0.0, 1.0))
-
-    # Beat strength & regularity
-    try:
-        oenv = librosa.onset.onset_strength(y=y, sr=sr)
-        if np.max(oenv) <= 0:
-            return float(tempo_term)
-
-        tempo_est, beats = librosa.beat.beat_track(onset_envelope=oenv, sr=sr)
-        if beats is None or len(beats) < 4:
-            beat_strength = float(
-                np.clip(
-                    np.mean(oenv) / (np.max(oenv) + 1e-9),
-                    0.0,
-                    1.0
-                )
-            )
-            regularity = 0.5
-        else:
-            beat_env = oenv[beats].astype(float)
-            if np.max(beat_env) > 0:
-                beat_env = beat_env / np.max(beat_env)
-
-            beat_strength = float(np.clip(np.mean(beat_env), 0.0, 1.0))
-
-            if len(beat_env) > 1:
-                mu = float(np.mean(beat_env))
-                sigma = float(np.std(beat_env))
-                cv = sigma / (mu + 1e-9)
-                regularity = float(np.clip(1.0 - cv, 0.0, 1.0))
-            else:
-                regularity = 0.5
-    except Exception:
-        try:
-            oenv = librosa.onset.onset_strength(y=y, sr=sr)
-            if np.max(oenv) > 0:
-                beat_strength = float(
-                    np.clip(
-                        np.mean(oenv) / (np.max(oenv) + 1e-9),
-                        0.0,
-                        1.0
-                    )
-                )
-            else:
-                beat_strength = 0.5
-        except Exception:
-            beat_strength = 0.5
-        regularity = 0.5
-
-    dance = (
-        0.4 * beat_strength +
-        0.3 * regularity +
-        0.3 * tempo_term
-    )
-    return float(np.clip(dance, 0.0, 1.0))
-
-
-def estimate_valence(mode, energy) -> Optional[float]:
-    """
-    Estimate valence on 0..1 scale.
-
-    - Major keys bias upward, minor downward.
-    - Higher energy nudges valence up.
-    """
-    if mode == "major":
-        base = 0.7
-    elif mode == "minor":
-        base = 0.3
-    else:
-        base = 0.5
-
-    e = 0.5 if energy is None else float(np.clip(energy, 0.0, 1.0))
-    valence = 0.6 * base + 0.4 * e
-    return float(np.clip(valence, 0.0, 1.0))
 
 
 
