@@ -96,16 +96,16 @@ music-advisor/
 
 ## Getting Started (ma_helper)
 
-1) Install helper (console script `ma`): `python3 -m pip install -e .`
-2) Discover commands: `ma quickstart`, `ma welcome`, or `ma palette`
-3) Common first runs:
+1. Install helper (console script `ma`): `python3 -m pip install -e .`
+2. Discover commands: `ma quickstart`, `ma welcome`, or `ma palette`
+3. Common first runs:
    - `ma list`
    - `ma affected --base origin/main`
    - `ma verify`
    - `ma dashboard --json` (or `ma tui`)
    - `ma watch <project> [--hotkeys]`
-4) Package/back-compat: `python3 -m ma_helper <cmd>` or `python3 tools/ma_helper/cli.py <cmd>`
-5) Live UI (optional): `ma ui` to watch runs + logs (install `textual>=0.55` if prompted). Graph: `ma graph --format mermaid` or `--format dot`. Cache: `ma cache stats|explain --task <name>`.
+4. Package/back-compat: `python3 -m ma_helper <cmd>` or `python3 tools/ma_helper/cli.py <cmd>`
+5. Live UI (optional): `ma ui` to watch runs + logs (install `textual>=0.55` if prompted). Graph: `ma graph --format mermaid` or `--format dot`. Cache: `ma cache stats|explain --task <name>`.
 
 ## Root essentials (what to look at first)
 

@@ -50,6 +50,12 @@ from typing import Any, Dict, Optional, Tuple
 
 from tools.audio.qa_checker import compute_qa_metrics, determine_qa_status, validate_qa_strict
 from tools.audio.audio_loader import load_audio, probe_audio_duration
+from tools.audio.tempo_estimator import (
+    compute_tempo_confidence,
+    estimate_tempo_with_folding,
+    robust_tempo,
+    select_tempo_with_folding,
+)
 from shared.ma_utils.logger_factory import get_configured_logger
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -673,126 +679,10 @@ def estimate_valence(mode, energy) -> Optional[float]:
     return float(np.clip(valence, 0.0, 1.0))
 
 
-def robust_tempo(y: np.ndarray, sr: int) -> Optional[float]:
-    """
-    Tempo estimate using librosa.beat.beat_track with SciPy shim applied.
-    """
-    if librosa is None:
-        return None
-    try:
-        tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
-        if isinstance(tempo, (list, np.ndarray)):
-            tempo = float(tempo[0])
-        return float(tempo)
-    except Exception as e:
-        debug(f"tempo estimation failed: {e}")
-        return None
-
-
-def _fold_tempo_to_window(bpm: float, low: float = 60.0, high: float = 180.0) -> float:
-    folded = float(bpm)
-    steps = 0
-    while folded < low and steps < 6:
-        folded *= 2.0
-        steps += 1
-    while folded > high and steps < 6:
-        folded /= 2.0
-        steps += 1
-    return folded
-
-
-def select_tempo_with_folding(base_tempo: Optional[float]) -> Tuple[Optional[float], Optional[float], Optional[float], str]:
-    if base_tempo is None or base_tempo <= 0:
-        return None, None, None, "no_tempo"
-
-    candidates = [
-        ("base", float(base_tempo)),
-        ("half", float(base_tempo) / 2.0),
-        ("double", float(base_tempo) * 2.0),
-    ]
-    best = None
-    for label, bpm in candidates:
-        if bpm <= 0:
-            continue
-        folded = _fold_tempo_to_window(bpm)
-        # Prefer tempos that fold into the comfortable 60–180 window and near 110 BPM
-        delta = abs(folded - 110.0)
-        score = delta
-        if best is None or score < best[0]:
-            best = (score, label, bpm, folded)
-
-    if best is None:
-        return None, None, None, "no_valid_tempo"
-
-    _, label, bpm, folded = best
-    reason = f"{label}_selected_folded_to_{folded:.1f}_bpm"
-    primary = folded
-    alt_half = candidates[1][1]
-    alt_double = candidates[2][1]
-    return primary, alt_half, alt_double, reason
-
-
-def estimate_tempo_with_folding(y: np.ndarray, sr: int) -> Tuple[Optional[float], Optional[float], Optional[float], str]:
-    if librosa is None or y is None or len(y) == 0:
-        return None, None, None, "librosa_unavailable_or_empty_audio"
-    y = _pad_short_signal(y, min_len=1024, label="tempo_fold")
-    base = robust_tempo(y, sr)
-    if base is None:
-        try:
-            oenv = librosa.onset.onset_strength(y=y, sr=sr)
-            temp = librosa.beat.tempo(onset_envelope=oenv, sr=sr, aggregate=np.median)
-            if isinstance(temp, (list, np.ndarray)):
-                base = float(temp[0])
-            else:
-                base = float(temp)
-        except Exception as e:  # noqa: BLE001
-            debug(f"fallback tempo estimation failed: {e}")
-            base = None
-
-    return select_tempo_with_folding(base)
 
 
 def key_confidence_label(key_root: Optional[str]) -> str:
     return "med" if key_root else "low"
-
-
-def compute_tempo_confidence(y: np.ndarray, sr: int, tempo_primary: Optional[float]) -> Tuple[float, str]:
-    """
-    Estimate tempo confidence using onset strength contrast, beat count, and tempogram peak near tempo.
-    Returns (score 0..1, label low/med/high).
-    """
-    if tempo_primary is None or tempo_primary <= 0 or librosa is None or y is None or len(y) == 0:
-        return 0.2, "low"
-    y = _pad_short_signal(y, min_len=1024, label="tempo_conf")
-    try:
-        hop_length = 512
-        oenv = librosa.onset.onset_strength(y=y, sr=sr, hop_length=hop_length)
-        if oenv.size == 0:
-            return 0.2, "low"
-        contrast = float(np.max(oenv) / (np.mean(oenv) + 1e-9))
-        contrast_norm = float(np.clip((contrast - 1.0) / 4.0, 0.0, 1.0))
-
-        tempo_est, beats = librosa.beat.beat_track(onset_envelope=oenv, sr=sr, hop_length=hop_length)
-        beat_count = len(beats) if beats is not None else 0
-        beat_norm = float(np.clip(beat_count / 32.0, 0.0, 1.0))
-
-        tempogram = librosa.feature.tempogram(onset_envelope=oenv, sr=sr, hop_length=hop_length)
-        tempos = librosa.tempo_frequencies(tempogram.shape[0], sr=sr, hop_length=hop_length)
-        idx = int(np.argmin(np.abs(tempos - tempo_primary)))
-        peak_near = float(tempogram[idx].max()) if tempogram.shape[1] > 0 else 0.0
-        peak_global = float(tempogram.max()) if tempogram.size > 0 else 0.0
-        peak_ratio = float(peak_near / (peak_global + 1e-9)) if peak_global > 0 else 0.0
-
-        score = float(np.clip(0.4 * contrast_norm + 0.3 * beat_norm + 0.3 * peak_ratio, 0.0, 1.0))
-        if score >= 0.66:
-            label = "high"
-        elif score >= 0.33:
-            label = "med"
-        else:
-            label = "low"
-        return score, label
-    except Exception:
-        return 0.2, "low"
 
 
 def estimate_mode_and_key(y: np.ndarray, sr: int) -> Tuple[Optional[str], Optional[str]]:
