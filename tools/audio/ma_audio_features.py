@@ -49,6 +49,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
 from tools.audio.qa_checker import compute_qa_metrics, determine_qa_status, validate_qa_strict
+from tools.audio.audio_loader import load_audio, probe_audio_duration
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -469,38 +470,6 @@ def compute_file_hash(path: str, chunk_size: int = None) -> str:
     return hash_file(path, algorithm=algo, chunk_size=chunk_size or default_chunk)
 
 
-def _probe_audio_duration(path: str) -> Optional[float]:
-    """
-    Best-effort duration probe to reject obviously oversized inputs before decode.
-    Prefers soundfile; falls back to ffprobe if available.
-    """
-    probe_capable = bool(sf) or bool(shutil.which("ffprobe"))
-    if sf:
-        try:
-            info = sf.info(path)
-            dur = float(info.duration)
-            if math.isfinite(dur) and dur > 0:
-                return dur
-        except Exception:
-            pass
-    if shutil.which("ffprobe"):
-        try:
-            completed = subprocess.run(
-                ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", path],
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            out = completed.stdout.decode().strip()
-            if out:
-                dur = float(out)
-                if math.isfinite(dur) and dur > 0:
-                    return dur
-        except Exception:
-            pass
-    return None if probe_capable else None
-
-
 def _warn_if_schema_mismatch(payload: Dict[str, Any]) -> None:
     required = {"source_audio", "tempo_bpm", "tempo_backend", "key", "mode", "pipeline_version"}
     missing = [k for k in required if k not in payload]
@@ -511,9 +480,6 @@ def _warn_if_schema_mismatch(payload: Dict[str, Any]) -> None:
         debug("schema warning: tempo_bpm should be numeric")
     if "tempo_backend" in payload and not isinstance(payload["tempo_backend"], str):
         debug("schema warning: tempo_backend should be a string")
-
-def load_audio(path: str, sr: int = 44100) -> Tuple[np.ndarray, int]:
-    return load_audio_mono(path, sr=sr)
 
 
 def estimate_lufs(y: np.ndarray, sr: int) -> Optional[float]:
@@ -942,7 +908,7 @@ def analyze_pipeline(
     ext = os.path.splitext(path_abs)[1].lower()
     sec_files.ensure_allowed_extension(path_abs, SEC_CONFIG.allowed_exts)
     sec_files.ensure_max_size(path_abs, SEC_CONFIG.max_file_bytes)
-    duration_sec = _probe_audio_duration(path_abs)
+    duration_sec = probe_audio_duration(path_abs)
     probe_capable = bool(sf) or bool(shutil.which("ffprobe"))
     if probe_capable and duration_sec is None:
         raise RuntimeError("audio preflight failed or unsupported/invalid audio format")
