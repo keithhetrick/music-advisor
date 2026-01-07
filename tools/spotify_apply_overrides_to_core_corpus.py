@@ -123,6 +123,7 @@ def load_overrides(path: Path) -> List[Dict[str, Any]]:
 def apply_overrides(
     base_rows: List[Dict[str, Any]],
     override_rows: List[Dict[str, Any]],
+    log,
 ) -> List[Dict[str, Any]]:
     """
     Apply overrides in-place and return updated rows.
@@ -154,7 +155,7 @@ def apply_overrides(
 
         index.setdefault(key, []).append(i)
 
-    _log(f"[INFO] Built index for {len(index)} unique (year,title,artist) keys.")
+    log(f"[INFO] Built index for {len(index)} unique (year,title,artist) keys.")
 
     # Determine which optional spotify_* columns exist in base corpus
     base_fieldnames = set(base_rows[0].keys())
@@ -175,7 +176,7 @@ def apply_overrides(
         spotify_id = (o_row.get("spotify_id") or "").strip()
 
         if not (year_str and title and artist and spotify_id):
-            _log(
+            log(
                 f"[WARN] Override row {o_idx} missing required fields "
                 f"(year/title/artist/spotify_id); skipping: {o_row}"
             )
@@ -184,20 +185,20 @@ def apply_overrides(
         try:
             year = int(year_str)
         except Exception:
-            _log(f"[WARN] Override row {o_idx} has invalid year '{year_str}'; skipping.")
+            log(f"[WARN] Override row {o_idx} has invalid year '{year_str}'; skipping.")
             continue
 
         key = _build_key(year, title, artist)
         matches = index.get(key, [])
 
         if not matches:
-            _log(
+            log(
                 f"[WARN] Override row {o_idx}: no base corpus match for "
                 f"({year}, '{title}', '{artist}')."
             )
             continue
 
-        _log(
+        log(
             f"[INFO] Override {o_idx}: applying spotify_id={spotify_id} to "
             f"{len(matches)} matching base row(s) for "
             f"({year}, '{title}', '{artist}')."
@@ -217,11 +218,11 @@ def apply_overrides(
 
             updated_count += 1
 
-    _log(f"[DONE] Applied overrides to {updated_count} base row(s).")
+    log(f"[DONE] Applied overrides to {updated_count} base row(s).")
     return base_rows
 
 
-def write_patched_corpus(path: Path, rows: List[Dict[str, Any]]) -> None:
+def write_patched_corpus(path: Path, rows: List[Dict[str, Any]], log) -> None:
     if not rows:
         raise SystemExit("[ERROR] No rows to write in patched corpus.")
 
@@ -234,7 +235,7 @@ def write_patched_corpus(path: Path, rows: List[Dict[str, Any]]) -> None:
         for row in rows:
             writer.writerow(row)
 
-    _log(f"[DONE] Wrote patched corpus to {path}")
+    log(f"[DONE] Wrote patched corpus to {path}")
 
 
 def main() -> None:
@@ -286,8 +287,7 @@ def main() -> None:
         [v for v in (args.log_redact_values.split(",") if args.log_redact_values else []) if v]
         or redact_values_env
     )
-    global _log
-    _log = make_logger("spotify_apply_overrides", use_rich=False, redact=redact_flag, secrets=redact_values)
+    log = make_logger("spotify_apply_overrides", use_rich=False, redact=redact_flag, secrets=redact_values)
 
     base_path = Path(args.base_csv) if args.base_csv else resolve_hci_v2_targets(None)
     overrides_path = Path(args.overrides_csv)
@@ -301,9 +301,9 @@ def main() -> None:
     base_rows = load_base_corpus(base_path)
     overrides = load_overrides(overrides_path)
 
-    updated_rows = apply_overrides(base_rows, overrides)
-    write_patched_corpus(out_path, updated_rows)
-    _log(f"[DONE] Finished at {utc_now_iso()}")
+    updated_rows = apply_overrides(base_rows, overrides, log)
+    write_patched_corpus(out_path, updated_rows, log)
+    log(f"[DONE] Finished at {utc_now_iso()}")
 
 
 if __name__ == "__main__":

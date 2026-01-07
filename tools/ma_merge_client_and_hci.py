@@ -29,8 +29,6 @@ try:  # pragma: no cover - guarded import
     from ma_audio_engine.schemas import CLIENTRich  # type: ignore
 except Exception:  # noqa: BLE001
     CLIENTRich = None  # type: ignore
-
-_log = get_configured_logger("ma_merge_client_and_hci")
 DEFAULT_TEMPO_LANE_ID = os.environ.get("TEMPO_LANE_ID", "tier1__2015_2024")
 DEFAULT_TEMPO_BIN_WIDTH = float(os.environ.get("TEMPO_BIN_WIDTH", "2.0"))
 DEFAULT_TEMPO_DB = os.environ.get("TEMPO_DB") or None
@@ -120,7 +118,7 @@ def _format_tempo_overlay(payload: Dict[str, Any]) -> Optional[str]:
     return "\n".join(lines)
 
 
-def load_tempo_overlay_block(audio_name: Optional[str], base_dir: Path) -> Optional[str]:
+def load_tempo_overlay_block(audio_name: Optional[str], base_dir: Path, log) -> Optional[str]:
     """Best-effort load/format tempo overlay block from a sidecar JSON in base_dir."""
     if not audio_name:
         return None
@@ -151,7 +149,7 @@ def load_tempo_overlay_block(audio_name: Optional[str], base_dir: Path) -> Optio
                     else:
                         candidate_db = Path(tns.get_lyric_intel_db_path()).expanduser().resolve()
                     if not candidate_db.exists():
-                        _log(f"[WARN] tempo overlay skipped: DB not found at {candidate_db}")
+                        log(f"[WARN] tempo overlay skipped: DB not found at {candidate_db}")
                         return None
 
                     conn = sqlite3.connect(str(candidate_db))
@@ -160,18 +158,18 @@ def load_tempo_overlay_block(audio_name: Optional[str], base_dir: Path) -> Optio
                     if lane_bpms:
                         payload = tns.build_sidecar_payload(DEFAULT_TEMPO_LANE_ID, float(tempo_bpm), DEFAULT_TEMPO_BIN_WIDTH, lane_bpms)
                         sidecar_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-                        _log(f"[tempo_overlay] built tempo norms sidecar at {sidecar_path} using DB={candidate_db}")
+                        log(f"[tempo_overlay] built tempo norms sidecar at {sidecar_path} using DB={candidate_db}")
                     else:
-                        _log(f"[WARN] tempo overlay skipped: no lane BPMS for lane_id={DEFAULT_TEMPO_LANE_ID} in DB={candidate_db}")
+                        log(f"[WARN] tempo overlay skipped: no lane BPMS for lane_id={DEFAULT_TEMPO_LANE_ID} in DB={candidate_db}")
                     conn.close()
             except Exception as exc:  # noqa: BLE001
-                _log(f"[WARN] tempo overlay auto-build failed: {exc}")
+                log(f"[WARN] tempo overlay auto-build failed: {exc}")
         if not sidecar_path.exists():
             return None
     try:
         payload = json.loads(sidecar_path.read_text())
     except Exception as exc:  # noqa: BLE001
-        _log(f"[WARN] Failed to read tempo norms sidecar {sidecar_path}: {exc}")
+        log(f"[WARN] Failed to read tempo norms sidecar {sidecar_path}: {exc}")
         return None
     return _format_tempo_overlay(payload)
 
@@ -304,7 +302,7 @@ def _format_key_overlay(payload: Dict[str, Any]) -> Optional[str]:
     return "\n".join(lines)
 
 
-def load_key_overlay_block(audio_name: Optional[str], base_dir: Path) -> Optional[str]:
+def load_key_overlay_block(audio_name: Optional[str], base_dir: Path, log) -> Optional[str]:
     if not audio_name:
         return None
     sidecar_path = base_dir / f"{audio_name}{names.key_norms_sidecar_suffix()}"
@@ -313,7 +311,7 @@ def load_key_overlay_block(audio_name: Optional[str], base_dir: Path) -> Optiona
     try:
         payload = json.loads(sidecar_path.read_text())
     except Exception as exc:  # noqa: BLE001
-        _log(f"[WARN] Failed to read key norms sidecar {sidecar_path}: {exc}")
+        log(f"[WARN] Failed to read key norms sidecar {sidecar_path}: {exc}")
         return None
     return _format_key_overlay(payload)
 
@@ -790,8 +788,7 @@ def main() -> None:
     _ = load_runtime_settings(args)
 
     log_settings = load_log_settings(args)
-    global _log
-    _log = get_configured_logger("ma_merge_client_and_hci", defaults={"tool": "ma_merge_client_and_hci"})
+    log = get_configured_logger("ma_merge_client_and_hci", defaults={"tool": "ma_merge_client_and_hci"})
 
     if not args.client_json:
         raise SystemExit("The --client-json path is required.")
@@ -806,9 +803,9 @@ def main() -> None:
 
     start_ts = time.perf_counter()
     if os.getenv("LOG_JSON") == "1":
-        _log("start", {"event": "start", "tool": "ma_merge_client_and_hci", "client": str(client_path), "hci": str(hci_path), "out": str(out_path)})
+        log("start", {"event": "start", "tool": "ma_merge_client_and_hci", "client": str(client_path), "hci": str(hci_path), "out": str(out_path)})
         log_stage_start(
-            _log,
+            log,
             "merge_client_hci",
             client=str(client_path),
             hci=str(hci_path),
@@ -821,8 +818,8 @@ def main() -> None:
     # The schema object drops unknown fields, which caused raw/calibrated scores
     # to be lost and rendered as 0.000 in the rich text header.
     hci_data = json.loads(hci_path.read_text())
-    tempo_overlay_block = load_tempo_overlay_block(client_data.get("audio_name"), out_path.parent)
-    key_overlay_block = load_key_overlay_block(client_data.get("audio_name"), out_path.parent)
+    tempo_overlay_block = load_tempo_overlay_block(client_data.get("audio_name"), out_path.parent, log)
+    key_overlay_block = load_key_overlay_block(client_data.get("audio_name"), out_path.parent, log)
 
     warns: list[str] = []
     client_warns, _ = lint_json_file(client_path, "pack")
@@ -846,26 +843,26 @@ def main() -> None:
 
     status = "ok"
     if warns:
-        _log(f"[ma_merge_client_and_hci] lint warnings: {warns}")
+        log(f"[ma_merge_client_and_hci] lint warnings: {warns}")
         status = "error" if args.strict else "ok"
 
     label = names.CLIENT_TOKEN
-    _log(f"[ma_merge_client_and_hci] Wrote {label} rich pack to {out_path}")
-    _log(
+    log(f"[ma_merge_client_and_hci] Wrote {label} rich pack to {out_path}")
+    log(
         "[ma_merge_client_and_hci] "
         f"HCI_v1_final_score={final:.3f}, role={role}, generated={utc_now_iso(timespec='seconds')}"
     )
     if os.getenv("LOG_JSON") == "1":
         duration_ms = int((time.perf_counter() - start_ts) * 1000)
         log_stage_end(
-            _log,
+            log,
             "merge_client_hci",
             status=status,
             out=str(out_path),
             duration_ms=duration_ms,
             warnings=warns,
         )
-        _log("end", {"event": "end", "tool": "ma_merge_client_and_hci", "out": str(out_path), "status": status, "duration_ms": duration_ms, "warnings": warns})
+        log("end", {"event": "end", "tool": "ma_merge_client_and_hci", "out": str(out_path), "status": status, "duration_ms": duration_ms, "warnings": warns})
 
     if status == "error":
         raise SystemExit("strict mode: lint warnings present")

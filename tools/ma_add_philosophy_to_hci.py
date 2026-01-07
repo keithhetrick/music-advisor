@@ -38,9 +38,6 @@ from shared.ma_utils import get_configured_logger
 from tools.philosophy_services import write_hci_with_philosophy, PHILOSOPHY_PAYLOAD
 
 
-_log = get_configured_logger("add_philosophy_hci")
-
-
 def main() -> None:
     ap = argparse.ArgumentParser(description="Inject HCI_v1 philosophy metadata into .hci.json files.")
     ap.add_argument(
@@ -68,16 +65,15 @@ def main() -> None:
     run_preflight_if_requested(args)
     # Load runtime settings to keep env/config defaults aligned.
     _ = load_runtime_settings(args)
-    global _log
-    _log = get_configured_logger("add_philosophy_hci", defaults={"tool": "add_philosophy_hci"})
+    log = get_configured_logger("add_philosophy_hci", defaults={"tool": "add_philosophy_hci"})
 
     root = Path(args.root).expanduser().resolve()
     if not root.exists():
         raise SystemExit(f"Root does not exist: {root}")
     start_ts = time.perf_counter()
     if os.getenv("LOG_JSON") == "1":
-        _log("start", {"event": "start", "tool": "add_philosophy_hci", "root": str(root)})
-        log_stage_start(_log, "add_philosophy_hci", root=str(root), force=bool(args.force))
+        log("start", {"event": "start", "tool": "add_philosophy_hci", "root": str(root)})
+        log_stage_start(log, "add_philosophy_hci", root=str(root), force=bool(args.force))
 
     hci_files = sorted(root.rglob("*.hci.json"))
     if not hci_files:
@@ -93,14 +89,14 @@ def main() -> None:
         warnings.extend(warns)
 
     timestamp = utc_now_iso()
-    _log(f"[DONE] {timestamp} processed {len(hci_files)} .hci.json files; updated {changed} of them.")
+    log(f"[DONE] {timestamp} processed {len(hci_files)} .hci.json files; updated {changed} of them.")
     status = "ok"
     if warnings and args.strict:
         status = "error"
     if os.getenv("LOG_JSON") == "1":
         duration_ms = int((time.perf_counter() - start_ts) * 1000)
         log_stage_end(
-            _log,
+            log,
             "add_philosophy_hci",
             status=status,
             root=str(root),
@@ -109,7 +105,7 @@ def main() -> None:
             duration_ms=duration_ms,
             warnings=warnings,
         )
-        _log("end", {"event": "end", "tool": "add_philosophy_hci", "root": str(root), "status": status, "processed": len(hci_files), "updated": changed, "duration_ms": duration_ms, "warnings": warnings})
+        log("end", {"event": "end", "tool": "add_philosophy_hci", "root": str(root), "status": status, "processed": len(hci_files), "updated": changed, "duration_ms": duration_ms, "warnings": warnings})
 
     if warnings and args.strict:
         raise SystemExit("strict mode: lint warnings present")

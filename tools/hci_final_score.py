@@ -361,14 +361,13 @@ def main() -> None:
     log_settings = load_log_settings(args)
     redact_flag = log_settings.log_redact or args.log_redact
     redact_values = log_settings.log_redact_values or [v for v in (args.log_redact_values.split(",") if args.log_redact_values else []) if v]
-    global _log
-    _log = make_logger("hci_final_score", redact=redact_flag, secrets=redact_values)
+    log = make_logger("hci_final_score", redact=redact_flag, secrets=redact_values)
 
-    _log(
+    log(
         f"[INFO] Applying final-score policy under roots: "
         f"{', '.join(str(Path(r).resolve()) for r in args.root)}"
     )
-    _log(
+    log(
         f"[INFO] Policy: wip_anchor={args.wip_anchor}, "
         f"wip_alpha={args.wip_alpha}, wip_cap={args.wip_cap}, "
         f"recompute={args.recompute}"
@@ -380,7 +379,7 @@ def main() -> None:
     for root_str in args.root:
         root = Path(root_str).expanduser().resolve()
         if not root.exists():
-            _log(f"[WARN] Root does not exist; skipping: {root}")
+            log(f"[WARN] Root does not exist; skipping: {root}")
             continue
 
         for hci_path in sorted(root.rglob("*.hci.json")):
@@ -398,10 +397,10 @@ def main() -> None:
                 _save_json(hci_path, hci)
                 updated += 1
             except Exception as exc:
-                _log(f"[WARN] Could not process {hci_path}: {exc}")
+                log(f"[WARN] Could not process {hci_path}: {exc}")
                 skipped += 1
 
-    _log(
+    log(
         f"[DONE] Updated {updated} file(s); skipped {skipped}. "
         f"finished_at={utc_now_iso()}Z"
     )
