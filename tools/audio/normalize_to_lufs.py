@@ -20,8 +20,8 @@ from pathlib import Path
 import soundfile as sf
 import numpy as np
 import pyloudnorm as pyln
-from security import subprocess as sec_subprocess
-from security.config import CONFIG as SEC_CONFIG
+from shared.security import subprocess as sec_subprocess
+from shared.security.config import CONFIG as SEC_CONFIG
 
 def sh(cmd: list[str]) -> None:
     p = sec_subprocess.run_safe(

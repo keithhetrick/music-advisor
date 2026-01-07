@@ -10,8 +10,8 @@ from adapters import add_log_sandbox_arg, apply_log_sandbox_env
 from adapters import make_logger
 from adapters import utc_now_iso
 from ma_config.paths import get_calibration_root
-from security import subprocess as sec_subprocess
-from security.config import CONFIG as SEC_CONFIG
+from shared.security import subprocess as sec_subprocess
+from shared.security.config import CONFIG as SEC_CONFIG
 
 LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
 LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]

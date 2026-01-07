@@ -16,8 +16,8 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-from security import subprocess as sec_subprocess
-from security.config import CONFIG
+from shared.security import subprocess as sec_subprocess
+from shared.security.config import CONFIG
 
 try:
     import mutagen  # type: ignore[import-not-found]

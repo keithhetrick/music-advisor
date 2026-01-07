@@ -3,8 +3,8 @@ import argparse, json, sys
 from pathlib import Path
 from datetime import datetime
 
-from security import subprocess as sec_subprocess
-from security.config import CONFIG as SEC_CONFIG
+from shared.security import subprocess as sec_subprocess
+from shared.security.config import CONFIG as SEC_CONFIG
 
 FFMPEG = "ffmpeg"  # must be on PATH
 

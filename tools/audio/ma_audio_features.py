@@ -118,9 +118,9 @@ from ma_audio_engine.adapters.service_registry import (
 )
 from ma_audio_engine.adapters.logging_adapter import log_stage_start, log_stage_end
 from tools.sidecar_adapter import DEFAULT_SIDECAR_CMD as HITCH_DEFAULT_SIDECAR_CMD, run_sidecar, atomic_write_json
-from security import files as sec_files
-from security.config import CONFIG as SEC_CONFIG
-from security import subprocess as sec_subprocess
+from shared.security import files as sec_files
+from shared.security.config import CONFIG as SEC_CONFIG
+from shared.security import subprocess as sec_subprocess
 
 # Cache dirs for librosa/numba to avoid failures when the Automator lacks a writable
 # default cache location. Set early so imports honor them.

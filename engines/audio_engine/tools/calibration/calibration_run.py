@@ -9,8 +9,8 @@ Usage:
 from __future__ import annotations
 import argparse, os, sys
 from pathlib import Path
-from security import subprocess as sec_subprocess
-from security.config import CONFIG as SEC_CONFIG
+from shared.security import subprocess as sec_subprocess
+from shared.security.config import CONFIG as SEC_CONFIG
 
 def run(cmd, env=None):
     sec_subprocess.run_safe(

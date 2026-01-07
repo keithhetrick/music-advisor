@@ -2,10 +2,10 @@ from pathlib import Path
 
 import pytest
 
-from security import files as sec_files
-from security import paths as sec_paths
-from security.config import CONFIG as SEC_CONFIG
-from security import db as sec_db
+from shared.security import files as sec_files
+from shared.security import paths as sec_paths
+from shared.security.config import CONFIG as SEC_CONFIG
+from shared.security import db as sec_db
 
 
 def test_safe_join_allows_subpath(tmp_path):

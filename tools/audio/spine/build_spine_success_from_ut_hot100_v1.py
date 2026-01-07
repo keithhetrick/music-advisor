@@ -38,7 +38,7 @@ from datetime import datetime
 from pathlib import Path
 import re
 
-from security import db as sec_db
+from shared.security import db as sec_db
 from shared.config.paths import get_external_data_root, get_historical_echo_db_path
 
 

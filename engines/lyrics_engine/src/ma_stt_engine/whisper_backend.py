@@ -10,8 +10,8 @@ import subprocess
 from pathlib import Path
 from typing import Dict
 
-from security import subprocess as sec_subprocess
-from security.config import CONFIG as SEC_CONFIG
+from shared.security import subprocess as sec_subprocess
+from shared.security.config import CONFIG as SEC_CONFIG
 
 def extract_vocals(audio_path: Path, log) -> Path:
     """

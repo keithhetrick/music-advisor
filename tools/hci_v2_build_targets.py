@@ -32,7 +32,7 @@ import math
 import sqlite3
 import statistics
 from typing import Any, Dict, List, Optional, Tuple
-from security import db as sec_db
+from shared.security import db as sec_db
 from shared.config.paths import get_hci_v2_targets_csv, get_historical_echo_db_path
 
 

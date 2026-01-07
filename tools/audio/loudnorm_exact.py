@@ -14,8 +14,8 @@ Usage:
 from __future__ import annotations
 import argparse, json, sys
 from pathlib import Path
-from security import subprocess as sec_subprocess
-from security.config import CONFIG as SEC_CONFIG
+from shared.security import subprocess as sec_subprocess
+from shared.security.config import CONFIG as SEC_CONFIG
 
 def run(cmd: list[str]) -> tuple[int, str, str]:
     p = sec_subprocess.run_safe(

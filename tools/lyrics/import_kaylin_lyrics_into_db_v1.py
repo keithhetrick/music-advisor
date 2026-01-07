@@ -39,7 +39,7 @@ from ma_audio_engine.adapters import make_logger
 from ma_audio_engine.adapters import utc_now_iso
 from ma_config.paths import get_historical_echo_db_path
 from shared.config.paths import get_external_data_root
-from security import db as sec_db
+from shared.security import db as sec_db
 
 
 def norm_text(s: str) -> str:

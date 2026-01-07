@@ -36,7 +36,7 @@ from adapters import utc_now_iso
 from adapters.bootstrap import ensure_repo_root
 from ma_config.paths import get_historical_echo_db_path
 from shared.config.paths import get_external_data_root
-from security import db as sec_db
+from shared.security import db as sec_db
 
 ensure_repo_root()
 

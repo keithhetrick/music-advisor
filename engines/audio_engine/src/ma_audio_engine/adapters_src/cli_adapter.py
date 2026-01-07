@@ -15,8 +15,8 @@ import os
 import argparse
 import sys
 from pathlib import Path
-from security import subprocess as sec_subprocess
-from security.config import CONFIG as SEC_CONFIG
+from shared.security import subprocess as sec_subprocess
+from shared.security.config import CONFIG as SEC_CONFIG
 
 __all__ = [
     "add_log_sandbox_arg",

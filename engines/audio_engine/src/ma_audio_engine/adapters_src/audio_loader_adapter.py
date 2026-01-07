@@ -31,8 +31,8 @@ from typing import Optional, Tuple
 import shutil
 
 import numpy as np
-from security import subprocess as sec_subprocess
-from security.config import CONFIG as SEC_CONFIG
+from shared.security import subprocess as sec_subprocess
+from shared.security.config import CONFIG as SEC_CONFIG
 
 _CFG_PATH = Path(__file__).resolve().parents[1] / "config" / "audio_loader.json"
 _DEFAULT_BACKEND = "librosa"

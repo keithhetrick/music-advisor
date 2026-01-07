@@ -22,8 +22,8 @@ REPO_ROOT = HERE.parent.parent
 ensure_repo_root()
 
 from tools.ma_audio_features import normalize_external_confidence, TARGET_SR  # noqa: E402
-from security import subprocess as sec_subprocess
-from security.config import CONFIG as SEC_CONFIG
+from shared.security import subprocess as sec_subprocess
+from shared.security.config import CONFIG as SEC_CONFIG
 
 
 AUDIO_EXTS = {".wav", ".mp3", ".flac", ".m4a", ".aiff", ".aif", ".ogg"}

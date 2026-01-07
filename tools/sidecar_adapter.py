@@ -35,8 +35,8 @@ import resource
 from ma_audio_engine.adapters import di
 from tools import names
 from ma_audio_engine.adapters.error_adapter import load_json_guarded
-from security.config import CONFIG
-from security import subprocess as sec_subprocess
+from shared.security.config import CONFIG
+from shared.security import subprocess as sec_subprocess
 
 # Allow env override so Automator/CI can force venv python and correct PYTHONPATH.
 DEFAULT_SIDECAR_CMD = os.getenv(

@@ -20,7 +20,7 @@ import argparse
 import sqlite3
 from pathlib import Path
 from typing import Dict, Optional, Tuple
-from security import db as sec_db
+from shared.security import db as sec_db
 from adapters.bootstrap import ensure_repo_root
 from ma_config.paths import get_historical_echo_db_path
 

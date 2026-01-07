@@ -38,8 +38,8 @@ AUDIO_EXTS = {".wav", ".aiff", ".aif", ".flac", ".mp3"}
 from ma_audio_engine.adapters import add_log_sandbox_arg, apply_log_sandbox_env
 from ma_audio_engine.adapters import make_logger
 from ma_audio_engine.adapters import utc_now_iso
-from security import subprocess as sec_subprocess
-from security.config import CONFIG as SEC_CONFIG
+from shared.security import subprocess as sec_subprocess
+from shared.security.config import CONFIG as SEC_CONFIG
 
 def iter_audio_files(folder: Path):
     for p in sorted(folder.glob("*")):

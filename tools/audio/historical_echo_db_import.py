@@ -29,7 +29,7 @@ import csv
 import sqlite3
 from pathlib import Path
 from typing import Any, Dict, Optional
-from security import db as sec_db
+from shared.security import db as sec_db
 
 
 # -------------------------------------------------------------------

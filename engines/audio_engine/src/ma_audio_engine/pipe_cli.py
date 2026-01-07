@@ -5,8 +5,8 @@ import os
 import sys
 import tempfile
 from pathlib import Path
-from security import subprocess as sec_subprocess
-from security.config import CONFIG as SEC_CONFIG
+from shared.security import subprocess as sec_subprocess
+from shared.security.config import CONFIG as SEC_CONFIG
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="MusicAdvisor pipe: extract → host scorer → write advisory")
