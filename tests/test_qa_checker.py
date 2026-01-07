@@ -232,8 +232,12 @@ class TestEndToEndWorkflow:
 
     def test_full_qa_workflow_ok(self):
         """Test complete workflow for a good signal."""
-        # Create a normal signal
-        signal = np.random.randn(44100).astype(np.float32) * 0.3
+        # Create a deterministic signal (440 Hz sine wave at safe amplitude)
+        # This ensures consistent test results without random clipping
+        sr = 44100
+        duration = 1.0
+        t = np.linspace(0, duration, int(sr * duration), dtype=np.float32)
+        signal = (0.3 * np.sin(2 * np.pi * 440 * t)).astype(np.float32)
 
         # Compute metrics
         qa = compute_qa_metrics(signal)
