@@ -18,17 +18,15 @@ from ma_audio_engine.adapters.bootstrap import ensure_repo_root
 ensure_repo_root()
 
 from ma_audio_engine.adapters import add_log_sandbox_arg, add_log_format_arg, add_preflight_arg, apply_log_sandbox_env, apply_log_format_env, run_preflight_if_requested
-from ma_audio_engine.adapters import make_logger
 from ma_audio_engine.adapters import utc_now_iso
 from ma_audio_engine.adapters import di, load_log_settings, load_runtime_settings
 from ma_audio_engine.adapters.logging_adapter import log_stage_start, log_stage_end
 from ma_audio_engine.schemas import dump_json
+from shared.ma_utils import get_configured_logger
 from tools import names
 from tools.schema_utils import lint_merged_payload, lint_pack_payload
 
-LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
-LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
-_log = make_logger("pack_writer", redact=LOG_REDACT, secrets=LOG_REDACT_VALUES)
+_log = get_configured_logger("pack_writer")
 
 
 def load_json(p: str | os.PathLike[str]) -> Dict[str, Any]:
@@ -312,10 +310,8 @@ def main() -> None:
     # Align runtime/config defaults across CLIs
     _ = load_runtime_settings(args)
     settings = load_log_settings(args)
-    redact_flag = settings.log_redact or LOG_REDACT
-    redact_values = settings.log_redact_values or LOG_REDACT_VALUES
     global _log
-    _log = di.make_logger("pack_writer", structured=os.getenv("LOG_JSON") == "1", defaults={"tool": "pack_writer"}, redact=redact_flag, secrets=redact_values)
+    _log = get_configured_logger("pack_writer", defaults={"tool": "pack_writer"})
 
     start_ts = time.perf_counter()
     if os.getenv("LOG_JSON") == "1":

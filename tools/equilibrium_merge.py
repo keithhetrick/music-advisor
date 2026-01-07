@@ -21,10 +21,8 @@ from ma_audio_engine.adapters import add_log_sandbox_arg, add_log_format_arg, ad
 from ma_audio_engine.adapters import di, load_log_settings
 from ma_audio_engine.adapters.logging_adapter import log_stage_start, log_stage_end
 from ma_audio_engine.schemas import dump_json
+from shared.ma_utils import get_configured_logger
 from tools.schema_utils import lint_merged_payload
-
-LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
-LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
 
 ESSENTIAL_KEYS = ["duration_sec", "tempo_bpm", "key", "mode", "loudness_LUFS"]
 
@@ -125,10 +123,7 @@ def main() -> int:
     apply_log_sandbox_env(args)
     apply_log_format_env(args)
     run_preflight_if_requested(args)
-    log_settings = load_log_settings(args)
-    redact_flag = log_settings.log_redact
-    redact_values = log_settings.log_redact_values or LOG_REDACT_VALUES
-    log = di.make_logger("equilibrium_merge", structured=os.getenv("LOG_JSON") == "1", defaults={"tool": "equilibrium_merge"}, redact=redact_flag, secrets=redact_values)
+    log = get_configured_logger("equilibrium_merge", defaults={"tool": "equilibrium_merge"})
 
     internal = load_json(args.internal)
     external = load_json(args.external) if args.external and os.path.exists(args.external) else None

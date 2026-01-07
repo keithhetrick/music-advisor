@@ -14,11 +14,11 @@ from ma_audio_engine.adapters.bootstrap import ensure_repo_root
 ensure_repo_root()
 
 from ma_audio_engine.adapters import add_log_sandbox_arg, apply_log_sandbox_env, add_log_format_arg, apply_log_format_env, add_preflight_arg, run_preflight_if_requested, di
-from ma_audio_engine.adapters import make_logger
 from ma_audio_engine.adapters import utc_now_iso
 from ma_audio_engine.adapters import load_log_settings, load_runtime_settings
 from ma_audio_engine.adapters.logging_adapter import log_stage_start, log_stage_end
 from ma_audio_engine.schemas import dump_json, HCI
+from shared.ma_utils import get_configured_logger
 from tools.schema_utils import lint_json_file
 from ma_audio_engine.schemas import lint_client_rich_text
 from tools import names
@@ -30,9 +30,7 @@ try:  # pragma: no cover - guarded import
 except Exception:  # noqa: BLE001
     CLIENTRich = None  # type: ignore
 
-LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
-LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
-_log = make_logger("ma_merge_client_and_hci", redact=LOG_REDACT, secrets=LOG_REDACT_VALUES)
+_log = get_configured_logger("ma_merge_client_and_hci")
 DEFAULT_TEMPO_LANE_ID = os.environ.get("TEMPO_LANE_ID", "tier1__2015_2024")
 DEFAULT_TEMPO_BIN_WIDTH = float(os.environ.get("TEMPO_BIN_WIDTH", "2.0"))
 DEFAULT_TEMPO_DB = os.environ.get("TEMPO_DB") or None
@@ -792,10 +790,8 @@ def main() -> None:
     _ = load_runtime_settings(args)
 
     log_settings = load_log_settings(args)
-    redact_flag = log_settings.log_redact or LOG_REDACT
-    redact_values = log_settings.log_redact_values or LOG_REDACT_VALUES
     global _log
-    _log = di.make_logger("ma_merge_client_and_hci", structured=os.getenv("LOG_JSON") == "1", defaults={"tool": "ma_merge_client_and_hci"}, redact=redact_flag, secrets=redact_values)
+    _log = get_configured_logger("ma_merge_client_and_hci", defaults={"tool": "ma_merge_client_and_hci"})
 
     if not args.client_json:
         raise SystemExit("The --client-json path is required.")

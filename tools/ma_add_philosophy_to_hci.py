@@ -30,14 +30,15 @@ from ma_audio_engine.adapters.bootstrap import ensure_repo_root
 ensure_repo_root()
 
 from ma_audio_engine.adapters import add_log_sandbox_arg, add_log_format_arg, add_preflight_arg, apply_log_sandbox_env, apply_log_format_env, run_preflight_if_requested
-from ma_audio_engine.adapters import LOG_REDACT, LOG_REDACT_VALUES, make_logger, load_log_settings, load_runtime_settings
+from ma_audio_engine.adapters import load_log_settings, load_runtime_settings
 from ma_audio_engine.adapters import utc_now_iso
 from ma_audio_engine.adapters import di
 from ma_audio_engine.adapters.logging_adapter import log_stage_start, log_stage_end
+from shared.ma_utils import get_configured_logger
 from tools.philosophy_services import write_hci_with_philosophy, PHILOSOPHY_PAYLOAD
 
 
-_log = make_logger("add_philosophy_hci", redact=LOG_REDACT, secrets=LOG_REDACT_VALUES)
+_log = get_configured_logger("add_philosophy_hci")
 
 
 def main() -> None:
@@ -68,8 +69,7 @@ def main() -> None:
     # Load runtime settings to keep env/config defaults aligned.
     _ = load_runtime_settings(args)
     global _log
-    settings = load_log_settings(args)
-    _log = di.make_logger("add_philosophy_hci", structured=os.getenv("LOG_JSON") == "1", defaults={"tool": "add_philosophy_hci"}, redact=settings.log_redact or LOG_REDACT, secrets=settings.log_redact_values or LOG_REDACT_VALUES)
+    _log = get_configured_logger("add_philosophy_hci", defaults={"tool": "add_philosophy_hci"})
 
     root = Path(args.root).expanduser().resolve()
     if not root.exists():
