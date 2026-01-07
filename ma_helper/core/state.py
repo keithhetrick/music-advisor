@@ -7,10 +7,13 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
-from .env import FAVORITES_PATH, LOG_FILE
 
+def load_favorites(path: Path | None = None) -> Dict[str, Any]:
+    # Resolve path inside function to avoid import-time evaluation
+    if path is None:
+        from .env import FAVORITES_PATH
+        path = FAVORITES_PATH
 
-def load_favorites(path: Path = FAVORITES_PATH) -> Dict[str, Any]:
     if not path.exists():
         return {"favorites": [], "history": [], "theme": {}, "last_failed": "", "last_base": "", "guard": "normal"}
     try:
@@ -22,7 +25,12 @@ def load_favorites(path: Path = FAVORITES_PATH) -> Dict[str, Any]:
         return {"favorites": [], "history": [], "theme": {}, "last_failed": "", "last_base": "", "guard": "normal"}
 
 
-def save_favorites(data: Dict[str, Any], path: Path = FAVORITES_PATH) -> None:
+def save_favorites(data: Dict[str, Any], path: Path | None = None) -> None:
+    # Resolve path inside function to avoid import-time evaluation
+    if path is None:
+        from .env import FAVORITES_PATH
+        path = FAVORITES_PATH
+
     if os.environ.get("MA_HELPER_NO_WRITE") == "1":
         return
     try:

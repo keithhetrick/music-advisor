@@ -17,7 +17,6 @@ from rich.table import Table
 from rich.console import Group
 from asyncio import create_task
 import time
-from ma_helper.core.env import STATE_HOME
 from rich.progress import Progress, BarColumn, TextColumn, TimeElapsedColumn, ProgressColumn
 from ma_helper.core.registry import load_registry
 import re
@@ -45,12 +44,17 @@ class HelperTUI(App):
     help_visible: reactive[bool] = reactive(False)
     focus_logs_for: reactive[str | None] = reactive(None)
 
-    def __init__(self, projects: List[str], results_path: Path | None = None, log_path: Path | None = None, interval: float = 1.0, **kwargs):
+    def __init__(self, projects: List[str], results_path: Path | None = None, log_path: Path | None = None, interval: float = 1.0, state_home: Path | None = None, **kwargs):
         super().__init__(**kwargs)
         self.projects = projects
         self.results_path = results_path
         self.log_path = log_path
         self.interval = interval
+        # Backward compatibility
+        if state_home is None:
+            from ma_helper.core.env import STATE_HOME
+            state_home = STATE_HOME
+        self.state_home = state_home
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=False)
@@ -188,7 +192,7 @@ class HelperTUI(App):
 
     def refresh_events(self) -> None:
         # Read latest events (if any) and merge into timeline
-        event_path = Path(STATE_HOME) / "ui_events.ndjson"
+        event_path = self.state_home / "ui_events.ndjson"
         if not event_path.exists():
             return
         try:

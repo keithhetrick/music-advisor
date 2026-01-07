@@ -211,7 +211,7 @@ def main(argv=None) -> int:
 
 
 def _dispatch(args, runtime: RuntimeConfig, helper_config: HelperConfig, orch_adapter, projects, dry_run, log_event, require_confirm, status_update=None):
-    py_bin = resolve_python()
+    py_bin = resolve_python(runtime)
     if args.command == "list":
         rc = orch_adapter.list_projects(projects)
         post_list_hint()
@@ -342,7 +342,7 @@ def _dispatch(args, runtime: RuntimeConfig, helper_config: HelperConfig, orch_ad
             reg = orch_adapter.load_projects()
             results_path = Path(args.results) if getattr(args, "results", None) else runtime.last_results_file
             log_path = Path(args.logs) if getattr(args, "logs", None) else runtime.log_file
-            app = HelperTUI(list(reg.keys()), results_path=results_path, log_path=log_path, interval=getattr(args, "interval", 1.0))
+            app = HelperTUI(list(reg.keys()), results_path=results_path, log_path=log_path, interval=getattr(args, "interval", 1.0), state_home=runtime.state_home)
             app.run()
             return 0
         except Exception as exc:

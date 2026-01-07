@@ -7,12 +7,15 @@ from pathlib import Path
 from typing import Dict
 
 from ma_helper.core.adapters import OrchestratorAdapter, Project
-from ma_helper.core.env import ROOT
 
 
 class MaOrchestratorAdapter(OrchestratorAdapter):
     def __init__(self, orch_path: Path | None = None) -> None:
-        self._orch_path = orch_path or ROOT / "tools" / "ma_orchestrator.py"
+        # Backward compatibility: resolve ROOT if orch_path is None
+        if orch_path is None:
+            from ma_helper.core.env import ROOT
+            orch_path = ROOT / "tools" / "ma_orchestrator.py"
+        self._orch_path = orch_path
         self._orch = self._load_orch()
         self.ROOT = getattr(self._orch, "ROOT", self._orch_path.parent.parent)
 
