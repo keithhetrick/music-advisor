@@ -70,3 +70,11 @@ def resolve_neighbors_config(
         or DEFAULT_NEIGHBORS_DISTANCE
     )
     return limit, distance
+
+
+__all__ = [
+    "DEFAULT_NEIGHBORS_LIMIT",
+    "DEFAULT_NEIGHBORS_DISTANCE",
+    "DEFAULT_NEIGHBORS_CONFIG_PATH",
+    "resolve_neighbors_config",
+]

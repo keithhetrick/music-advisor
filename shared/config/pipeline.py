@@ -22,3 +22,9 @@ NEIGHBORS_PROFILE_DEFAULT = "echo_neighbors_us_pop"
 
 # Default sidecar timeout (seconds); override via env SIDECAR_TIMEOUT_SECONDS - default 5 minutes
 SIDECAR_TIMEOUT_DEFAULT = 300
+
+__all__ = [
+    "HCI_BUILDER_PROFILE_DEFAULT",
+    "NEIGHBORS_PROFILE_DEFAULT",
+    "SIDECAR_TIMEOUT_DEFAULT",
+]

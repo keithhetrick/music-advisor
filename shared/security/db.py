@@ -39,3 +39,10 @@ def safe_execute(conn, sql: str, params: Iterable | None = None):
     if isinstance(params, (str, bytes)):
         raise DBSecurityError("params must not be a string; use a tuple/list of parameters")
     return conn.execute(sql, tuple(params))
+
+
+__all__ = [
+    "DBSecurityError",
+    "validate_table_name",
+    "safe_execute",
+]

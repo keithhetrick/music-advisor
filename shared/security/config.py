@@ -76,3 +76,8 @@ class SecurityConfig:
 
 
 CONFIG = SecurityConfig()
+
+__all__ = [
+    "SecurityConfig",
+    "CONFIG",
+]

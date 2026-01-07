@@ -17,3 +17,10 @@ DEFAULT_PYTHON = ".venv/bin/python"
 # Lyric profiles (env passed through scripts)
 DEFAULT_LYRIC_LCI_PROFILE = "lci_us_pop_v1"
 DEFAULT_LYRIC_LCI_CALIBRATION = "calibration/lci_calibration_us_pop_v1.json"
+
+__all__ = [
+    "DEFAULT_REPO_ENV",
+    "DEFAULT_PYTHON",
+    "DEFAULT_LYRIC_LCI_PROFILE",
+    "DEFAULT_LYRIC_LCI_CALIBRATION",
+]

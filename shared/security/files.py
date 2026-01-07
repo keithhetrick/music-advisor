@@ -63,3 +63,12 @@ def ensure_max_size(path: Path, max_bytes: int, *, config: SecurityConfig | None
     size = os.path.getsize(path)
     if size > max_bytes:
         raise FileValidationError(f"file too large: {size} bytes (max {max_bytes})")
+
+
+__all__ = [
+    "FileValidationError",
+    "validate_filename",
+    "ensure_allowed_extension",
+    "ensure_size_ok",
+    "ensure_max_size",
+]

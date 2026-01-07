@@ -119,3 +119,26 @@ def resolve_loudness_norms_out(cli_path: Optional[str | Path]) -> Path:
     env_path = os.getenv("AUDIO_LOUDNESS_NORMS_OUT")
     path = Path(cli_path).expanduser() if cli_path else (Path(env_path).expanduser() if env_path else DEFAULT_MARKET_NORMS_LOUDNESS_PATH)
     return path
+
+
+__all__ = [
+    "DEFAULT_HCI_PROFILE",
+    "DEFAULT_HCI_CALIBRATION_PATH",
+    "DEFAULT_MARKET_NORMS_PATH",
+    "DEFAULT_AUDIO_POLICY_PATH",
+    "DEFAULT_AUDIO_V2_CALIBRATION_PATH",
+    "DEFAULT_HCI_V2_TARGETS_CSV",
+    "DEFAULT_HCI_V2_CORPUS_CSV",
+    "DEFAULT_HCI_V2_TRAINING_CSV",
+    "DEFAULT_LOUDNESS_NORMS_LOCAL_PATH",
+    "DEFAULT_MARKET_NORMS_LOUDNESS_PATH",
+    "load_json_safe",
+    "resolve_hci_calibration",
+    "resolve_market_norms",
+    "resolve_audio_policy",
+    "resolve_audio_v2_calibration",
+    "resolve_hci_v2_targets",
+    "resolve_hci_v2_corpus",
+    "resolve_hci_v2_training_out",
+    "resolve_loudness_norms_out",
+]

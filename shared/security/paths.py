@@ -24,3 +24,9 @@ def safe_join(base: str | Path | None, user_path: str, *, config: SecurityConfig
     except ValueError as exc:
         raise PathValidationError(f"path escapes base: {candidate}") from exc
     return candidate
+
+
+__all__ = [
+    "PathValidationError",
+    "safe_join",
+]

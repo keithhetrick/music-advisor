@@ -51,3 +51,9 @@ def run_safe(
         text=text if capture_output else False,
         env=env,
     )
+
+
+__all__ = [
+    "SubprocessValidationError",
+    "run_safe",
+]
