@@ -787,3 +787,19 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+__all__ = [
+    "KeyAdvisory",
+    "KeyLaneStats",
+    "KeySongPlacement",
+    "SongKey",
+    "build_key_advisory",
+    "build_sidecar_payload",
+    "compute_lane_stats",
+    "compute_song_placement",
+    "derive_out_path",
+    "format_key_name",
+    "load_lane_keys",
+    "main",
+    "resolve_song_key",
+]

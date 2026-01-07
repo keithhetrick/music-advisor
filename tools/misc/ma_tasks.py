@@ -1,2 +1,3 @@
 """Shim to relocated misc tool."""
-from engines.audio_engine.tools.misc import *  # noqa: F401,F403
+# Note: This tool has been relocated but the specific implementation
+# was not found in engines/audio_engine/tools/misc/

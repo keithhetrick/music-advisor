@@ -108,3 +108,11 @@ def write_client_with_philosophy(client_path: Path, default_tagline: str = PHILO
     lint_warns, _ = lint_json_file(client_path, "client_rich")
     warns.extend([f"{client_path.name}:{w}" for w in lint_warns])
     return True, warns
+
+__all__ = [
+    "build_philosophy_line",
+    "inject_philosophy_into_hci",
+    "inject_philosophy_line_into_client",
+    "write_client_with_philosophy",
+    "write_hci_with_philosophy",
+]

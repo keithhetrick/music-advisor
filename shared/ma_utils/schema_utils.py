@@ -128,3 +128,14 @@ def lint_json_file(path: Path, kind: str) -> Tuple[List[str], Dict[str, Any]]:
     if kind == "pack":
         return lint_pack_payload(data), data
     return [f"unknown_kind:{kind}"], data
+
+__all__ = [
+    "lint_features_payload",
+    "lint_hci_payload",
+    "lint_json_file",
+    "lint_merged_payload",
+    "lint_neighbors_payload",
+    "lint_pack_payload",
+    "lint_run_summary",
+    "validate_with_schema",
+]

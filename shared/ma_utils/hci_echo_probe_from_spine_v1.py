@@ -957,3 +957,28 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+__all__ = [
+    "band_energy",
+    "band_loudness",
+    "band_tempo",
+    "band_valence",
+    "bucket_decade",
+    "compute_distance",
+    "compute_feature_stats",
+    "connect_db",
+    "load_acousticbrainz_feature_map",
+    "load_spine_rows",
+    "load_tier3_acousticbrainz_rows",
+    "load_wip_features",
+    "main",
+    "merge_rows_prefer_highest_tier",
+    "parse_args",
+    "print_neighbors",
+    "run_echo_probe_for_features",
+    "select_top_neighbors",
+    "summarize_neighbors",
+    "table_exists",
+    "tier_priority",
+    "zscore",
+]

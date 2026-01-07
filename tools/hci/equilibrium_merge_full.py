@@ -1,2 +1,2 @@
-"""Shim to relocated HCI tool."""
-from engines.audio_engine.tools.hci import *  # noqa: F401,F403
+"""Shim delegating to engines.audio_engine.tools.hci.equilibrium_merge_full."""
+# This is a runnable script with no public exports.

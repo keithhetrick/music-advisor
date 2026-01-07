@@ -1,3 +1,50 @@
-#!/usr/bin/env python3
-"""Shim to shared hci echo probe helpers."""
-from shared.ma_utils.hci_echo_probe_from_spine_v1 import *  # noqa: F401,F403
+"""Compatibility shim delegating to shared.ma_utils.hci_echo_probe_from_spine_v1."""
+from shared.ma_utils.hci_echo_probe_from_spine_v1 import (
+    band_energy,
+    band_loudness,
+    band_tempo,
+    band_valence,
+    bucket_decade,
+    compute_distance,
+    compute_feature_stats,
+    connect_db,
+    load_acousticbrainz_feature_map,
+    load_spine_rows,
+    load_tier3_acousticbrainz_rows,
+    load_wip_features,
+    main,
+    merge_rows_prefer_highest_tier,
+    parse_args,
+    print_neighbors,
+    run_echo_probe_for_features,
+    select_top_neighbors,
+    summarize_neighbors,
+    table_exists,
+    tier_priority,
+    zscore,
+)
+
+__all__ = [
+    "band_energy",
+    "band_loudness",
+    "band_tempo",
+    "band_valence",
+    "bucket_decade",
+    "compute_distance",
+    "compute_feature_stats",
+    "connect_db",
+    "load_acousticbrainz_feature_map",
+    "load_spine_rows",
+    "load_tier3_acousticbrainz_rows",
+    "load_wip_features",
+    "main",
+    "merge_rows_prefer_highest_tier",
+    "parse_args",
+    "print_neighbors",
+    "run_echo_probe_for_features",
+    "select_top_neighbors",
+    "summarize_neighbors",
+    "table_exists",
+    "tier_priority",
+    "zscore",
+]

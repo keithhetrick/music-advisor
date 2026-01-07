@@ -97,3 +97,24 @@ def key_norms_sidecar_suffix() -> str:
 
 def key_norms_sidecar_globs() -> List[str]:
     return [f"*{key_norms_sidecar_suffix()}"]
+
+__all__ = [
+    "client_header_label",
+    "client_json_globs",
+    "client_json_suffix",
+    "client_rich_globs",
+    "client_rich_suffix",
+    "client_txt_globs",
+    "client_txt_suffix",
+    "key_norms_sidecar_globs",
+    "key_norms_sidecar_suffix",
+    "legacy_json_globs",
+    "legacy_rich_globs",
+    "legacy_txt_globs",
+    "lyric_sidecar_globs",
+    "lyric_sidecar_suffix",
+    "tempo_norms_sidecar_globs",
+    "tempo_norms_sidecar_suffix",
+    "tempo_sidecar_globs",
+    "tempo_sidecar_suffix",
+]
