@@ -255,13 +255,13 @@ def _dispatch(args, runtime: RuntimeConfig, helper_config: HelperConfig, orch_ad
     if args.command == "favorites":
         return handle_favorites(args)
     if args.command == "doctor":
-        return handle_doctor(getattr(args, "require_optional", False), getattr(args, "interactive", False), getattr(args, "check_tests", False), projects)
+        return handle_doctor(getattr(args, "require_optional", False), getattr(args, "interactive", False), getattr(args, "check_tests", False), projects, runtime)
     if args.command == "guard":
         return handle_guard(args)
     if args.command == "check":
         return handle_check()
     if args.command == "preflight":
-        return handle_preflight(orch_adapter)
+        return handle_preflight(orch_adapter, runtime)
     if args.command == "github-check":
         return run_github_check(
             args,
@@ -270,9 +270,9 @@ def _dispatch(args, runtime: RuntimeConfig, helper_config: HelperConfig, orch_ad
             orch=orch_adapter,
         )
     if args.command == "hook":
-        return handle_hook(args)
+        return handle_hook(args, runtime)
     if args.command == "precommit":
-        return handle_precommit(args)
+        return handle_precommit(args, runtime)
     if args.command == "sparse":
         runner = _run_cmd
         if status_update:
@@ -314,7 +314,7 @@ def _dispatch(args, runtime: RuntimeConfig, helper_config: HelperConfig, orch_ad
     if args.command == "playbook":
         return handle_playbook(args.name, args.dry_run)
     if args.command == "registry":
-        return handle_registry(args, helper_config.registry_path)
+        return handle_registry(args, helper_config.registry_path, runtime)
     if args.command == "tasks-run":
         return handle_tasks_run(args, _run_cmd, log_event)
     if args.command == "map":

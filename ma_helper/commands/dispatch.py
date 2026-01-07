@@ -11,10 +11,9 @@ import time
 
 from ma_helper.core.state import guard_level
 from ma_helper.core.git import git_summary
-from ma_helper.core.env import ROOT
 
 
-def log_event(load_favorites: Callable[[], dict], log_file: Path | None, entry: dict[str, Any]) -> None:
+def log_event(load_favorites: Callable[[], dict], log_file: Path | None, entry: dict[str, Any], root: Path | None = None) -> None:
     """Append a structured log entry if logging is enabled."""
     try:
         cfg = load_favorites()
@@ -22,7 +21,8 @@ def log_event(load_favorites: Callable[[], dict], log_file: Path | None, entry: 
             return
         payload = dict(entry)
         payload.setdefault("ts", time.time())
-        payload.setdefault("root", str(ROOT))
+        if root is not None:
+            payload.setdefault("root", str(root))
         payload.setdefault("git", git_summary())
         with log_file.open("a", encoding="utf-8") as fh:
             fh.write(__import__("json").dumps(payload) + "\n")

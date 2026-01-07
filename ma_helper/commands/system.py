@@ -7,7 +7,7 @@ import subprocess
 import sys
 from typing import Dict
 
-from ma_helper.core.env import ROOT
+from ma_helper.core.config import RuntimeConfig
 from ma_helper.commands.ux import render_error_panel
 from ma_helper.core.state import guard_level, set_guard_level
 
@@ -40,15 +40,15 @@ def handle_check() -> int:
     return 0
 
 
-def handle_preflight(orch) -> int:
+def handle_preflight(orch, runtime: RuntimeConfig) -> int:
     reg = orch.load_projects()
     missing = []
     for name, proj in reg.items():
-        p = ROOT / proj.path
+        p = runtime.root / proj.path
         if not p.exists():
             missing.append((name, proj.path))
         for t in proj.tests:
-            if not (ROOT / t).exists():
+            if not (runtime.root / t).exists():
                 missing.append((name, t))
     if not missing:
         print("[ma] preflight OK")
@@ -59,7 +59,7 @@ def handle_preflight(orch) -> int:
     return 1
 
 
-def _test_gaps(projects) -> tuple[list[str], list[str]]:
+def _test_gaps(projects, runtime: RuntimeConfig) -> tuple[list[str], list[str]]:
     missing_decl = []
     missing_paths = []
     if not projects:
@@ -70,20 +70,26 @@ def _test_gaps(projects) -> tuple[list[str], list[str]]:
             missing_decl.append(proj.name)
             continue
         for t in tests:
-            if not (ROOT / t).exists():
+            if not (runtime.root / t).exists():
                 missing_paths.append(f"{proj.name}: {t}")
     return missing_decl, missing_paths
 
 
-def handle_doctor(require_optional: bool, interactive: bool = False, check_tests: bool = False, projects=None) -> int:
-    print(f"[ma] repo root: {ROOT}")
+def handle_doctor(require_optional: bool, interactive: bool = False, check_tests: bool = False, projects=None, runtime: RuntimeConfig = None) -> int:
+    # For backward compatibility, accept runtime as optional
+    if runtime is None:
+        from ma_helper.core.env import ROOT
+        root = ROOT
+    else:
+        root = runtime.root
+    print(f"[ma] repo root: {root}")
     print(f"[ma] python: {sys.version.split()[0]} ({sys.executable})")
-    venv_py = ROOT / ".venv" / "bin" / "python"
+    venv_py = root / ".venv" / "bin" / "python"
     if venv_py.exists():
         print(f"[ma] venv: {venv_py}")
     else:
         print("[ma] venv: not found (.venv/bin/python missing)")
-    project_map = ROOT / "project_map.json"
+    project_map = root / "project_map.json"
     if project_map.exists():
         print(f"[ma] project_map: {project_map}")
     else:
@@ -118,7 +124,9 @@ def handle_doctor(require_optional: bool, interactive: bool = False, check_tests
     test_decl_missing: list[str] = []
     test_path_missing: list[str] = []
     if check_tests and projects:
-        test_decl_missing, test_path_missing = _test_gaps(projects)
+        # Only call _test_gaps if we have runtime
+        if runtime is not None:
+            test_decl_missing, test_path_missing = _test_gaps(projects, runtime)
         if test_decl_missing or test_path_missing:
             msgs = []
             if test_decl_missing:

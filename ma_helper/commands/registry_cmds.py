@@ -9,10 +9,16 @@ from pathlib import Path
 from typing import Dict
 
 from ma_helper.core.registry import filter_projects, load_registry
-from ma_helper.core.env import ROOT
+from ma_helper.core.config import RuntimeConfig
 
 
-def handle_registry(args, registry_path=None) -> int:
+def handle_registry(args, registry_path=None, runtime: RuntimeConfig = None) -> int:
+    # For backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import ROOT
+        root = ROOT
+    else:
+        root = runtime.root
     reg = load_registry(registry_path)
     action = args.reg_action
     if action == "list":
@@ -29,12 +35,12 @@ def handle_registry(args, registry_path=None) -> int:
     if action == "validate":
         ok = True
         for name, meta in reg.items():
-            p = ROOT / meta.get("path", "")
+            p = root / meta.get("path", "")
             if not p.exists():
                 ok = False
                 print(f"[ma] missing path for {name}: {p}")
             for t in meta.get("tests", []):
-                tp = ROOT / t
+                tp = root / t
                 if not tp.exists():
                     ok = False
                     print(f"[ma] missing test path for {name}: {tp}")
@@ -42,7 +48,7 @@ def handle_registry(args, registry_path=None) -> int:
     if action == "lint":
         sorted_items = {k: reg[k] for k in sorted(reg.keys())}
         if args.fix:
-            (ROOT / "project_map.json").write_text(json.dumps(sorted_items, indent=2) + "\n")
+            (root / "project_map.json").write_text(json.dumps(sorted_items, indent=2) + "\n")
             print("[ma] project_map.json normalized.")
         else:
             print(json.dumps(sorted_items, indent=2))
@@ -62,7 +68,7 @@ def handle_registry(args, registry_path=None) -> int:
         reg[name] = entry
         print("[ma] dry-run only" if not args.yes else "[ma] writing update")
         if args.yes:
-            (ROOT / "project_map.json").write_text(json.dumps({k: reg[k] for k in sorted(reg.keys())}, indent=2) + "\n")
+            (root / "project_map.json").write_text(json.dumps({k: reg[k] for k in sorted(reg.keys())}, indent=2) + "\n")
         else:
             print(json.dumps(entry, indent=2))
         return 0
@@ -74,7 +80,7 @@ def handle_registry(args, registry_path=None) -> int:
         print(f"[ma] removing {name}" + (" (dry-run)" if not args.yes else ""))
         if args.yes:
             reg.pop(name, None)
-            (ROOT / "project_map.json").write_text(json.dumps({k: reg[k] for k in sorted(reg.keys())}, indent=2) + "\n")
+            (root / "project_map.json").write_text(json.dumps({k: reg[k] for k in sorted(reg.keys())}, indent=2) + "\n")
         return 0
     return 1
 
