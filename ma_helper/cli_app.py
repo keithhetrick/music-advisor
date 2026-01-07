@@ -58,7 +58,7 @@ from ma_helper.commands.verify import run_verify
 from ma_helper.commands.ux import maybe_first_run_hint, post_affected_hint, post_list_hint, post_verify_hint, show_world, render_header, live_header
 from ma_helper.commands.visual import _dashboard_payload
 from ma_helper.core import env
-from ma_helper.core.config import HelperConfig
+from ma_helper.core.config import HelperConfig, RuntimeConfig
 from ma_helper.core.root import discover_root
 from ma_helper.core.git import enforce_clean_tree, enforce_permissions, git_summary
 from ma_helper.core.graph import emit_graph
@@ -114,22 +114,32 @@ def main(argv=None) -> int:
         setattr(args, "header", True)
     if header_live_flag:
         setattr(args, "header_live", True)
-    if getattr(args, "root", None):
-        env.ROOT = Path(args.root).resolve()
-        global config, orch_adapter
-        config = HelperConfig.load(env.ROOT)
-        env.apply_config(config)
-        adapter_factory = get_orch_adapter(config.adapter)
-        orch_adapter = adapter_factory(config.root)
+
+    # Create immutable runtime config (replaces global config/orch_adapter mutations)
+    root = Path(args.root).resolve() if getattr(args, "root", None) else ROOT_ACTUAL
+    helper_config = HelperConfig.load(root)
+    runtime = RuntimeConfig.from_helper_config(helper_config)
+
+    # Create adapter from runtime config
+    adapter_factory = get_orch_adapter(helper_config.adapter)
+    orch_adapter = adapter_factory(runtime.root)
+
+    # Temporary: also update legacy globals for consumers not yet migrated
+    env.apply_config(helper_config)
     # Persist whether the user explicitly asked for --live (defaults stay off).
     setattr(args, "_live_requested", live_requested)
+
+    # Handle telemetry file override
+    telemetry_file = runtime.telemetry_file
     if getattr(args, "telemetry_file", None):
-        env.TELEMETRY_FILE = Path(args.telemetry_file).resolve()
-    telemetry_enabled = not getattr(args, "no_telemetry", False) and env.TELEMETRY_FILE is not None
-    log_event = partial(base_log_event, load_favorites, env.TELEMETRY_FILE if telemetry_enabled else None)
+        telemetry_file = Path(args.telemetry_file).resolve()
+        env.TELEMETRY_FILE = telemetry_file  # Also update legacy global
+
+    telemetry_enabled = not getattr(args, "no_telemetry", False) and telemetry_file is not None
+    log_event = partial(base_log_event, load_favorites, telemetry_file if telemetry_enabled else None)
     _run_cmd = partial(
         base_run_cmd,
-        orch_root=config.root,
+        orch_root=runtime.root,
         log_event_fn=log_event if telemetry_enabled else None,
         set_last_failed=set_last_failed,
     )
@@ -162,13 +172,11 @@ def main(argv=None) -> int:
             show_world(args.command)
     if args.command not in {"palette", "quickstart", "welcome", "tour"}:
         maybe_first_run_hint(args.command, save_favorites, load_favorites)
-    if telemetry_enabled and env.TELEMETRY_FILE:
-        print(f"[ma] telemetry → {env.TELEMETRY_FILE}")
+    if telemetry_enabled and telemetry_file:
+        print(f"[ma] telemetry → {telemetry_file}")
     projects = orch_adapter.load_projects()
     dry_run = getattr(args, "dry_run", False)
-    global DRY_RUN
-    DRY_RUN = dry_run
-    enforce_permissions(env.ROOT)  # warn-only
+    enforce_permissions(runtime.root)  # warn-only
     must_clean = {"test", "test-all", "affected", "run", "watch", "verify", "ci-plan"}
     if args.command in must_clean:
         if not enforce_clean_tree():
@@ -186,9 +194,9 @@ def main(argv=None) -> int:
     if getattr(args, "header_live", False) and header_live_ctx:
         with header_live_ctx as update_fn:
             live_update_fn = update_fn
-            rc = _dispatch(args, projects, dry_run, log_event, require_confirm, status_update=live_update_fn)
+            rc = _dispatch(args, runtime, helper_config, orch_adapter, projects, dry_run, log_event, require_confirm, status_update=live_update_fn)
     else:
-        rc = _dispatch(args, projects, dry_run, log_event, require_confirm, status_update=live_update_fn)
+        rc = _dispatch(args, runtime, helper_config, orch_adapter, projects, dry_run, log_event, require_confirm, status_update=live_update_fn)
     if telemetry_enabled and log_event:
         try:
             log_event({"cmd": args.command, "rc": rc, "duration_sec": round(time.time() - start_time, 3)})
@@ -202,14 +210,14 @@ def main(argv=None) -> int:
     return rc
 
 
-def _dispatch(args, projects, dry_run, log_event, require_confirm, status_update=None):
+def _dispatch(args, runtime: RuntimeConfig, helper_config: HelperConfig, orch_adapter, projects, dry_run, log_event, require_confirm, status_update=None):
     py_bin = resolve_python()
     if args.command == "list":
         rc = orch_adapter.list_projects(projects)
         post_list_hint()
         return rc
     if args.command == "tasks":
-        aliases = config.task_aliases or TASKS
+        aliases = helper_config.task_aliases or TASKS
         return handle_tasks(aliases, getattr(args, "filter", None), getattr(args, "json", False))
     if args.command == "test":
         rc = handle_test(args, orch_adapter, projects, dry_run=dry_run, log_event=log_event)
@@ -268,7 +276,7 @@ def _dispatch(args, projects, dry_run, log_event, require_confirm, status_update
     if args.command == "sparse":
         runner = _run_cmd
         if status_update:
-            runner = partial(base_run_cmd, orch_root=config.root, log_event_fn=log_event, set_last_failed=set_last_failed, status_update=status_update)
+            runner = partial(base_run_cmd, orch_root=runtime.root, log_event_fn=log_event, set_last_failed=set_last_failed, status_update=status_update)
         return handle_sparse(args, require_confirm, runner)
     if args.command == "scaffold":
         return handle_scaffold(args)
@@ -287,8 +295,8 @@ def _dispatch(args, projects, dry_run, log_event, require_confirm, status_update
     if args.command == "rerun-last":
         runner = _run_cmd
         if status_update:
-            runner = partial(base_run_cmd, orch_root=config.root, log_event_fn=log_event, set_last_failed=set_last_failed, status_update=status_update)
-        return handle_rerun_last(load_favorites, lambda cmd: runner(cmd, cwd=env.ROOT))
+            runner = partial(base_run_cmd, orch_root=runtime.root, log_event_fn=log_event, set_last_failed=set_last_failed, status_update=status_update)
+        return handle_rerun_last(load_favorites, lambda cmd: runner(cmd, cwd=runtime.root))
     if args.command == "welcome":
         return handle_welcome()
     if args.command == "help":
@@ -306,7 +314,7 @@ def _dispatch(args, projects, dry_run, log_event, require_confirm, status_update
     if args.command == "playbook":
         return handle_playbook(args.name, args.dry_run)
     if args.command == "registry":
-        return handle_registry(args, config.registry_path)
+        return handle_registry(args, helper_config.registry_path)
     if args.command == "tasks-run":
         return handle_tasks_run(args, _run_cmd, log_event)
     if args.command == "map":
@@ -332,9 +340,8 @@ def _dispatch(args, projects, dry_run, log_event, require_confirm, status_update
                 print("[ma] textual is not installed; install with: python3 -m pip install 'textual>=0.55'")
                 return 1
             reg = orch_adapter.load_projects()
-            from ma_helper.core.env import LAST_RESULTS_FILE, LOG_FILE
-            results_path = Path(args.results) if getattr(args, "results", None) else LAST_RESULTS_FILE
-            log_path = Path(args.logs) if getattr(args, "logs", None) else LOG_FILE
+            results_path = Path(args.results) if getattr(args, "results", None) else runtime.last_results_file
+            log_path = Path(args.logs) if getattr(args, "logs", None) else runtime.log_file
             app = HelperTUI(list(reg.keys()), results_path=results_path, log_path=log_path, interval=getattr(args, "interval", 1.0))
             app.run()
             return 0
@@ -344,7 +351,7 @@ def _dispatch(args, projects, dry_run, log_event, require_confirm, status_update
     if args.command == "tour":
         return handle_tour(getattr(args, "reset", False), getattr(args, "advance", False))
     if args.command == "logs":
-        return handle_logs(args, env.LOG_FILE)
+        return handle_logs(args, runtime.log_file)
     if args.command == "profile":
         return handle_profile(args)
     if args.command == "cache":
