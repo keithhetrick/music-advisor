@@ -67,6 +67,7 @@ from tools.audio.key_detector import (
     key_confidence_label,
     normalize_key_confidence,
 )
+from tools.audio.loudness_analyzer import estimate_lufs, normalize_audio
 from shared.ma_utils.logger_factory import get_configured_logger
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -489,43 +490,6 @@ def _warn_if_schema_mismatch(payload: Dict[str, Any]) -> None:
         debug("schema warning: tempo_backend should be a string")
 
 
-def estimate_lufs(y: np.ndarray, sr: int) -> Optional[float]:
-    """
-    Estimate integrated LUFS using pyloudnorm if available.
-    Falls back to a simple RMS-based approximation if not.
-    """
-    if y is None or len(y) == 0:
-        return None
-
-    if pyln is not None:
-        try:
-            meter = pyln.Meter(sr)
-            return float(meter.integrated_loudness(y))
-        except Exception as e:
-            debug(f"pyloudnorm failed, falling back to RMS: {e}")
-
-    # Fallback: approximate LUFS from RMS
-    rms = np.sqrt(np.mean(y * y) + 1e-12)
-    lufs_approx = 20.0 * math.log10(rms + 1e-12) - 0.691
-    return float(lufs_approx)
-
-
-def normalize_audio(y: np.ndarray, sr: int, target_lufs: float = TARGET_LUFS) -> Tuple[np.ndarray, float, Optional[float]]:
-    """
-    Normalize audio to target LUFS (in-memory). Returns (y_norm, gain_db, norm_lufs).
-    If LUFS cannot be computed, returns original signal and zero gain.
-    """
-    raw_lufs = estimate_lufs(y, sr)
-    if raw_lufs is None:
-        return y, 0.0, None
-
-    gain_db = target_lufs - raw_lufs
-    # Clamp extreme gains to avoid excessive boosts/cuts
-    gain_db = float(np.clip(gain_db, -12.0, 12.0))
-    gain = 10.0 ** (gain_db / 20.0)
-    y_norm = y * gain
-    norm_lufs = estimate_lufs(y_norm, sr)
-    return y_norm, gain_db, norm_lufs
 
 
 
