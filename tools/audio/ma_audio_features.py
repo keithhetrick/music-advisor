@@ -50,6 +50,7 @@ from typing import Any, Dict, Optional, Tuple
 
 from tools.audio.qa_checker import compute_qa_metrics, determine_qa_status, validate_qa_strict
 from tools.audio.audio_loader import load_audio, probe_audio_duration
+from shared.ma_utils.logger_factory import get_configured_logger
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -328,13 +329,7 @@ NOTE_NAMES_SHARP = [
 ]
 
 DEFAULT_SIDECAR_CMD = get_default_sidecar_cmd()
-LOG_REDACT = os.environ.get("LOG_REDACT", "0") == "1"
-LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
-LOG_JSON = os.getenv("LOG_JSON") == "1"
-if LOG_JSON:
-    _log = get_structured_logger("ma_audio_features", defaults={"tool": "ma_audio_features"})
-else:
-    _log = get_logger("ma_audio_features(tools)", redact=LOG_REDACT, secrets=LOG_REDACT_VALUES)
+_log = get_configured_logger("ma_audio_features", defaults={"tool": "ma_audio_features"})
 _SANDBOX_CFG = get_logging_sandbox_defaults()
 
 
@@ -1557,17 +1552,8 @@ def main(argv=None) -> int:
     apply_log_sandbox_env(args)
     run_preflight_if_requested(args)
 
-    global LOG_JSON, LOG_REDACT, LOG_REDACT_VALUES, _log
-    LOG_JSON = os.getenv("LOG_JSON") == "1"
-    LOG_REDACT = args.log_redact or os.environ.get("LOG_REDACT", "0") == "1"
-    if args.log_redact_values:
-        LOG_REDACT_VALUES = [v for v in args.log_redact_values.split(",") if v]
-    else:
-        LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]
-    if LOG_JSON:
-        _log = get_structured_logger("ma_audio_features", defaults={"tool": "ma_audio_features"})
-    else:
-        _log = get_logger("ma_audio_features(tools)", redact=LOG_REDACT, secrets=LOG_REDACT_VALUES)
+    global _log
+    _log = get_configured_logger("ma_audio_features", defaults={"tool": "ma_audio_features"})
 
     settings = load_runtime_settings(args)
 
