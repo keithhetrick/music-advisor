@@ -40,19 +40,18 @@ def main() -> int:
     args = ap.parse_args()
 
     apply_log_sandbox_env(args)
-    global _log
-    _log = get_configured_logger("equilibrium_merge")
+    log = get_configured_logger("equilibrium_merge")
 
     internal_path = Path(args.internal).expanduser().resolve()
     external_path = Path(args.external).expanduser().resolve() if args.external else None
     out_path = Path(args.out).expanduser().resolve()
 
     require_file(internal_path, desc="internal equilibrium payload")
-    merged = load_json_guarded(internal_path, expect_mapping=True, logger=_log) or {}
+    merged = load_json_guarded(internal_path, expect_mapping=True, logger=log) or {}
     if external_path:
         require_file(external_path, desc="external equilibrium payload", is_dir=False, must_exist=False)
         if external_path.is_file():
-            ext = load_json_guarded(external_path, expect_mapping=True, logger=_log)
+            ext = load_json_guarded(external_path, expect_mapping=True, logger=log)
             if ext:
                 for k, v in ext.items():
                     merged.setdefault(k, v)
@@ -61,7 +60,7 @@ def main() -> int:
     with out_path.open("w") as f:
         json.dump(merged, f, indent=2)
 
-    _log(
+    log(
         f"[equilibrium_merge] wrote {out_path} "
         f"(internal={internal_path}, external={external_path}) "
         f"finished_at={utc_now_iso()}Z"

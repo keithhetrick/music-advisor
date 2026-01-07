@@ -85,8 +85,7 @@ def main():
         [v for v in (args.log_redact_values.split(",") if args.log_redact_values else []) if v]
         or redact_values_env
     )
-    global _log
-    _log = make_logger("calibration_readiness", use_rich=False, redact=redact_flag, secrets=secrets)
+    log = make_logger("calibration_readiness", use_rich=False, redact=redact_flag, secrets=secrets)
 
     calib_root = Path(args.root)
     pybin = Path(args.venv_python)
@@ -181,25 +180,25 @@ def main():
     Path(args.csv).write_text("\n".join(csv_rows))
 
     # Console summary
-    _log("\n== Calibration Readiness ==")
-    _log(f"Root: {calib_root}")
+    log("\n== Calibration Readiness ==")
+    log(f"Root: {calib_root}")
     if summary["errors"]:
-        _log("ERRORS:")
+        log("ERRORS:")
         for e in summary["errors"]:
-            _log(f"  - {e}")
+            log(f"  - {e}")
     if summary["warnings"]:
-        _log("WARNINGS:")
+        log("WARNINGS:")
         for w in summary["warnings"]:
-            _log(f"  - {w}")
+            log(f"  - {w}")
 
-    _log("\nCounts:")
+    log("\nCounts:")
     for folder_name in FIT_FOLDERS:
         c = summary["folders"].get(folder_name, {}).get("count", 0)
-        _log(f"  {folder_name}: {c} files")
+        log(f"  {folder_name}: {c} files")
 
-    _log(f"\nReport written: {report_path}")
-    _log(f"CSV written: {args.csv}")
-    _log(f"[DONE] Finished at {utc_now_iso()}")
+    log(f"\nReport written: {report_path}")
+    log(f"CSV written: {args.csv}")
+    log(f"[DONE] Finished at {utc_now_iso()}")
     return 1 if summary["errors"] else 0
 
 if __name__ == "__main__":

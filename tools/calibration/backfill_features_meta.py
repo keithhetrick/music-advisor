@@ -19,14 +19,12 @@ from pathlib import Path
 from typing import List, Dict, Any
 import os
 
-from ma_audio_engine.adapters import add_log_sandbox_arg, apply_log_sandbox_env
+from ma_audio_engine.adapters import add_log_sandbox_arg, apply_log_sandbox_env, make_logger
 from ma_audio_engine.adapters import utc_now_iso
 from ma_audio_engine.adapters.bootstrap import ensure_repo_root
 from ma_audio_features import analyze_pipeline
 from ma_config.paths import get_features_output_root, get_repo_root
-from shared.ma_utils.logger_factory import get_configured_logger
 
-_log = get_configured_logger("backfill_features_meta")
 ensure_repo_root()
 
 
@@ -46,11 +44,11 @@ def needs_backfill(data: Dict[str, Any]) -> bool:
     return False
 
 
-def backfill_file(path: Path, apply: bool, thresholds: argparse.Namespace) -> bool:
+def backfill_file(path: Path, apply: bool, thresholds: argparse.Namespace, log) -> bool:
     try:
         data = json.loads(path.read_text())
     except Exception as e:  # noqa: BLE001
-        _log(f"[backfill] ERROR reading {path}: {e}")
+        log(f"[backfill] ERROR reading {path}: {e}")
         return False
 
     if not needs_backfill(data):
@@ -58,10 +56,10 @@ def backfill_file(path: Path, apply: bool, thresholds: argparse.Namespace) -> bo
 
     source_audio = data.get("source_audio")
     if not source_audio:
-        _log(f"[backfill] WARN missing source_audio in {path}, skipping.")
+        log(f"[backfill] WARN missing source_audio in {path}, skipping.")
         return False
 
-    _log(f"[backfill] Needs meta: {path}")
+    log(f"[backfill] Needs meta: {path}")
     if not apply:
         return True
 
@@ -77,7 +75,7 @@ def backfill_file(path: Path, apply: bool, thresholds: argparse.Namespace) -> bo
             low_level_dbfs_threshold=thresholds.low_level_dbfs_threshold,
         )
     except Exception as e:  # noqa: BLE001
-        _log(f"[backfill] ERROR re-extracting {source_audio}: {e}")
+        log(f"[backfill] ERROR re-extracting {source_audio}: {e}")
         return False
 
     bak = path.with_suffix(path.suffix + ".bak")
@@ -85,7 +83,7 @@ def backfill_file(path: Path, apply: bool, thresholds: argparse.Namespace) -> bo
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(refreshed, indent=2))
     tmp.replace(path)
-    _log(f"[backfill] Updated {path} (backup at {bak})")
+    log(f"[backfill] Updated {path} (backup at {bak})")
     return True
 
 
@@ -123,13 +121,14 @@ def main() -> None:
     args = p.parse_args()
 
     apply_log_sandbox_env(args)
-    redact_flag = args.log_redact or LOG_REDACT
+    redact_env = os.getenv("LOG_REDACT", "0") == "1"
+    redact_values_env = [v for v in os.getenv("LOG_REDACT_VALUES", "").split(",") if v]
+    redact_flag = args.log_redact or redact_env
     redact_values = (
         [v for v in (args.log_redact_values.split(",") if args.log_redact_values else []) if v]
-        or LOG_REDACT_VALUES
+        or redact_values_env
     )
-    global _log
-    _log = make_logger("backfill_features_meta", redact=redact_flag, secrets=redact_values)
+    log = make_logger("backfill_features_meta", redact=redact_flag, secrets=redact_values)
 
     root = Path(args.root)
     if not root.exists():
@@ -137,7 +136,7 @@ def main() -> None:
 
     found: List[Path] = sorted(root.rglob("*.features.json"))
     if not found:
-        _log(f"[backfill] No *.features.json under {root}")
+        log(f"[backfill] No *.features.json under {root}")
         return
 
     need_count = 0
@@ -153,11 +152,12 @@ def main() -> None:
                 silence_ratio_threshold=args.silence_ratio_threshold,
                 low_level_dbfs_threshold=args.low_level_dbfs_threshold,
             ),
+            log=log,
         )
         need_count += 1 if changed else 0
 
     mode = "APPLIED" if args.apply else "REPORT"
-    _log(f"[backfill] {mode}: {need_count} file(s) needed meta refresh under {root} @ {utc_now_iso()}")
+    log(f"[backfill] {mode}: {need_count} file(s) needed meta refresh under {root} @ {utc_now_iso()}")
 
 
 if __name__ == "__main__":
