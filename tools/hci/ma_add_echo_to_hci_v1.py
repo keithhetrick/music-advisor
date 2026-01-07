@@ -67,17 +67,13 @@ from tools.echo_services import inject_echo_into_hci
 from ma_config.paths import get_historical_echo_db_path
 from shared.ma_utils.logger_factory import get_configured_logger
 
-_log = get_configured_logger("echo_hci")
-_QUIET = False
+def _log_info(msg: str, log, quiet: bool = False) -> None:
+    if not quiet:
+        log(msg)
 
 
-def _log_info(msg: str) -> None:
-    if not _QUIET:
-        _log(msg)
-
-
-def _log_warn(msg: str) -> None:
-    _log(msg)
+def _log_warn(msg: str, log) -> None:
+    log(msg)
 
 
 def parse_args() -> argparse.Namespace:
@@ -224,11 +220,11 @@ def compute_audio_feature_freshness(feature_path: Path, meta: Dict[str, Any]) ->
     return "ok"
 
 
-def load_feature_meta(path: Path, hci_path: Path) -> Dict[str, Any]:
+def load_feature_meta(path: Path, hci_path: Path, log) -> Dict[str, Any]:
     meta: Dict[str, Any] = {}
-    data = load_json_guarded(str(path), logger=_log_warn)
+    data = load_json_guarded(str(path), logger=lambda msg: _log_warn(msg, log))
     if not data:
-        _log_warn(f"[echo_hci]   WARN: could not read features JSON {path}")
+        _log_warn(f"[echo_hci]   WARN: could not read features JSON {path}", log)
         return meta
     try:
         feat = Features.from_json(path)
@@ -238,7 +234,7 @@ def load_feature_meta(path: Path, hci_path: Path) -> Dict[str, Any]:
         meta["tempo_backend"] = feat.tempo_backend
         meta["tempo_backend_detail"] = feat.tempo_backend_detail
     except Exception as e:
-        _log_warn(f"[echo_hci]   WARN: schema parse failed for {path}: {e}")
+        _log_warn(f"[echo_hci]   WARN: schema parse failed for {path}: {e}", log)
     try:
         meta["loudness_LUFS"] = data.get("loudness_LUFS")
         meta["loudness_LUFS_normalized"] = data.get("loudness_LUFS_normalized")
@@ -287,15 +283,17 @@ def load_feature_meta(path: Path, hci_path: Path) -> Dict[str, Any]:
         if backend_detail and backend_detail not in supported:
             _log_warn(
                 f"[echo_hci]   WARN: tempo backend '{backend_detail}' not in registry {supported}; "
-                "ensure config/backend_registry.json is aligned."
+                "ensure config/backend_registry.json is aligned.",
+                log
             )
         elif backend_detail and not is_backend_enabled(backend_detail):
             _log_warn(
                 f"[echo_hci]   WARN: tempo backend '{backend_detail}' is disabled in registry; "
-                "features may be using a non-preferred backend."
+                "features may be using a non-preferred backend.",
+                log
             )
     except Exception:
-        _log_warn(f"[echo_hci]   WARN: failed to parse feature meta from {path}")
+        _log_warn(f"[echo_hci]   WARN: failed to parse feature meta from {path}", log)
     return meta
 
 
@@ -365,45 +363,45 @@ def atomic_write_json(path: Path, payload: Dict[str, Any]) -> None:
     tmp_path.replace(path)
 
 
-def warn_if_hci_schema_sparse(path: Path, payload: Dict[str, Any]) -> None:
+def warn_if_hci_schema_sparse(path: Path, payload: Dict[str, Any], log) -> None:
     required = {"historical_echo_v1", "historical_echo_meta", "feature_pipeline_meta"}
     missing = [k for k in required if k not in payload]
     if missing:
-        _log_warn(f"[echo_hci]   WARN: {path.name} missing keys {missing} before write")
+        _log_warn(f"[echo_hci]   WARN: {path.name} missing keys {missing} before write", log)
     he = payload.get("historical_echo_v1")
     if not isinstance(he, dict) or "neighbors" not in he:
-        _log_warn(f"[echo_hci]   WARN: {path.name} historical_echo_v1 missing neighbors")
+        _log_warn(f"[echo_hci]   WARN: {path.name} historical_echo_v1 missing neighbors", log)
 
 
-def process_hci_file(hci_path: Path, args: argparse.Namespace) -> list[str]:
+def process_hci_file(hci_path: Path, args: argparse.Namespace, log, quiet: bool) -> list[str]:
     track_dir = hci_path.parent
     warnings: list[str] = []
-    if not args.quiet:
-        _log_info(f"[echo_hci] Processing: {hci_path}")
+    if not quiet:
+        _log_info(f"[echo_hci] Processing: {hci_path}", log, quiet)
 
     features_path = pick_features_file(track_dir)
     if not features_path:
-        _log_warn(f"[echo_hci]   WARN: No .features.json found in {track_dir}, skipping.")
+        _log_warn(f"[echo_hci]   WARN: No .features.json found in {track_dir}, skipping.", log)
         warnings.append(f"{hci_path.name}:missing_features")
         return warnings
 
-    if not require_file(str(hci_path), logger=_log_warn):
+    if not require_file(str(hci_path), logger=lambda msg: _log_warn(msg, log)):
         return warnings
-    if not require_file(str(features_path), logger=_log_warn):
-        _log_warn(f"[echo_hci]   WARN: missing features file for {track_dir}")
+    if not require_file(str(features_path), logger=lambda msg: _log_warn(msg, log)):
+        _log_warn(f"[echo_hci]   WARN: missing features file for {track_dir}", log)
         warnings.append(f"{hci_path.name}:missing_features")
         return warnings
-    data = load_json_guarded(str(hci_path), logger=_log_warn)
+    data = load_json_guarded(str(hci_path), logger=lambda msg: _log_warn(msg, log))
     if not data:
-        _log_warn(f"[echo_hci]   ERROR reading {hci_path}")
+        _log_warn(f"[echo_hci]   ERROR reading {hci_path}", log)
         warnings.append(f"{hci_path.name}:read_error")
         return warnings
 
-    feature_meta = load_feature_meta(features_path, hci_path)
+    feature_meta = load_feature_meta(features_path, hci_path, log)
     if args.qa_policy == "strict":
         gate = (feature_meta.get("qa_gate") or "").lower()
         if gate and gate not in {"pass", "ok"}:
-            _log_warn(f"[echo_hci]   SKIP: QA gate '{gate}' failed strict policy for {features_path.name}")
+            _log_warn(f"[echo_hci]   SKIP: QA gate '{gate}' failed strict policy for {features_path.name}", log)
             warnings.append(f"{features_path.name}:qa_gate:{gate}")
             return warnings
     missing_keys = []
@@ -414,7 +412,7 @@ def process_hci_file(hci_path: Path, args: argparse.Namespace) -> list[str]:
     if not feature_meta.get("pipeline_version"):
         missing_keys.append("pipeline_version")
     if missing_keys:
-        _log_warn(f"[echo_hci]   WARN: feature meta missing {missing_keys} for {features_path}")
+        _log_warn(f"[echo_hci]   WARN: feature meta missing {missing_keys} for {features_path}", log)
         warnings.extend([f"{features_path.name}:missing:{k}" for k in missing_keys])
 
     # Populate pipeline meta early so lint does not warn about missing key.
@@ -423,11 +421,11 @@ def process_hci_file(hci_path: Path, args: argparse.Namespace) -> list[str]:
     warn_feature, _ = lint_json_file(features_path, kind="features")
     warn_hci, _ = lint_json_file(hci_path, kind="hci")
     if warn_feature:
-        _log_warn(f"[echo_hci]   WARN feature lint ({features_path.name}): {warn_feature}")
+        _log_warn(f"[echo_hci]   WARN feature lint ({features_path.name}): {warn_feature}", log)
         if args.strict:
             raise SystemExit(f"lint failed for {features_path}: {warn_feature}")
     if warn_hci:
-        _log_warn(f"[echo_hci]   WARN hci lint ({hci_path.name}): {warn_hci}")
+        _log_warn(f"[echo_hci]   WARN hci lint ({hci_path.name}): {warn_hci}", log)
         if args.strict:
             raise SystemExit(f"lint failed for {hci_path}: {warn_hci}")
 
@@ -452,57 +450,56 @@ def process_hci_file(hci_path: Path, args: argparse.Namespace) -> list[str]:
 
     hist_block = data.get("historical_echo_v1") or {}
     if args.dry_run:
-        _log_info(f"[echo_hci]   DRY RUN: would update {hci_path}")
-        _log_info(f"[echo_hci]   Summary: {hist_block}")
+        _log_info(f"[echo_hci]   DRY RUN: would update {hci_path}", log, quiet)
+        _log_info(f"[echo_hci]   Summary: {hist_block}", log, quiet)
         return warnings
 
     # Atomic pretty JSON write
-    warn_if_hci_schema_sparse(hci_path, data)
+    warn_if_hci_schema_sparse(hci_path, data, log)
     atomic_write_json(hci_path, data)
     lint_warns, _ = lint_json_file(hci_path, "hci")
     warnings.extend([f"{hci_path.name}:{w}" for w in lint_warns])
-    if not args.quiet:
+    if not quiet:
         warn_suffix = f" (warnings={lint_warns})" if lint_warns else ""
-        _log_info(f"[echo_hci]   Updated {hci_path}{warn_suffix}")
-        _log_info(f"[echo_hci]   Summary: {hist_block}")
+        _log_info(f"[echo_hci]   Updated {hci_path}{warn_suffix}", log, quiet)
+        _log_info(f"[echo_hci]   Summary: {hist_block}", log, quiet)
     return warnings
 
 
 def main() -> None:
     args = parse_args()
-    global _log, _QUIET
-    _QUIET = bool(args.quiet)
+    quiet = bool(args.quiet)
     apply_log_sandbox_env(args)
     apply_log_format_env(args)
     run_preflight_if_requested(args)
     # Align runtime/config defaults across CLIs.
     _ = load_runtime_settings(args)
     settings = load_log_settings(args)
-    redact_flag = settings.log_redact or LOG_REDACT
-    redact_values = settings.log_redact_values or LOG_REDACT_VALUES
-    _log = di.make_logger("echo_hci", structured=os.getenv("LOG_JSON") == "1", defaults={"tool": "echo_hci"}, redact=redact_flag, secrets=redact_values)
+    redact_flag = settings.log_redact or os.getenv("LOG_REDACT", "0") == "1"
+    redact_values = settings.log_redact_values or [v for v in os.getenv("LOG_REDACT_VALUES", "").split(",") if v]
+    log = di.make_logger("echo_hci", structured=os.getenv("LOG_JSON") == "1", defaults={"tool": "echo_hci"}, redact=redact_flag, secrets=redact_values)
     allowed_qa = {"default", "lenient", "strict"}
     if not args.qa_policy or args.qa_policy not in allowed_qa:
         args.qa_policy = os.getenv("QA_POLICY", "default")
     if args.qa_policy not in allowed_qa:
         args.qa_policy = "default"
-    root = validate_root_dir(args.root, logger=_log_warn)
+    root = validate_root_dir(args.root, logger=lambda msg: _log_warn(msg, log))
     if root is None:
         return
     start_ts = time.perf_counter()
     if os.getenv("LOG_JSON") == "1":
         log_stage_start(
-            _log,
+            log,
             "echo_hci",
             root=str(root),
             qa_policy=args.qa_policy,
             year_max=args.year_max,
-            quiet=bool(args.quiet),
+            quiet=quiet,
         )
 
     hci_files = find_hci_files(root)
     if not hci_files:
-        _log_info(f"[echo_hci] No *.hci.json files found under {root}")
+        _log_info(f"[echo_hci] No *.hci.json files found under {root}", log, quiet)
         return
 
     def redact(path: Path) -> str:
@@ -510,24 +507,24 @@ def main() -> None:
 
     lint_failures = 0
     warnings: list[str] = []
-    _log_info(f"[echo_hci] Found {len(hci_files)} *.hci.json under {redact(root)}")
+    _log_info(f"[echo_hci] Found {len(hci_files)} *.hci.json under {redact(root)}", log, quiet)
     for hci_path in hci_files:
-        _log_info(f"[echo_hci] Processing: {redact(hci_path)}")
+        _log_info(f"[echo_hci] Processing: {redact(hci_path)}", log, quiet)
         try:
-            file_warns = process_hci_file(hci_path, args)
+            file_warns = process_hci_file(hci_path, args, log, quiet)
             warnings.extend(file_warns)
         except SystemExit as exc:
             lint_failures += 1
             if args.strict:
                 raise
-            _log_warn(f"[echo_hci] strict lint failure ignored (strict disabled): {exc}")
+            _log_warn(f"[echo_hci] strict lint failure ignored (strict disabled): {exc}", log)
     status = "ok"
     if (lint_failures or warnings) and args.strict:
         status = "error"
     if os.getenv("LOG_JSON") == "1":
         duration_ms = int((time.perf_counter() - start_ts) * 1000)
         log_stage_end(
-            _log,
+            log,
             "echo_hci",
             status=status,
             root=str(root),
@@ -536,7 +533,7 @@ def main() -> None:
             duration_ms=duration_ms,
             warnings=warnings,
         )
-        _log("end", {"event": "end", "tool": "echo_hci", "root": str(root), "status": "ok", "count": len(hci_files), "duration_ms": duration_ms})
+        log("end", {"event": "end", "tool": "echo_hci", "root": str(root), "status": "ok", "count": len(hci_files), "duration_ms": duration_ms})
     if (lint_failures or warnings) and args.strict:
         raise SystemExit("strict mode: lint warnings present")
 

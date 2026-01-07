@@ -79,21 +79,19 @@ except Exception:  # noqa: BLE001
     CLIENTRich = CLIENTRich  # type: ignore
     lint_client_rich_text = lint_client_rich_text  # type: ignore
 
-_log = get_configured_logger("echo_inject")
-_QUIET = False
 _SUPPORTED_BACKENDS = set(list_supported_backends())
 # Calibration/version tags for transparency in rich text; override via env.
 CAL_VERSION = os.getenv("HCI_CAL_VERSION", "HCI_v1 2025Q4")
 CAL_DATE = os.getenv("HCI_CAL_DATE", "2025-11-17")
 
 
-def _log_info(msg: str) -> None:
-    if not _QUIET:
-        _log(msg)
+def _log_info(msg: str, log, quiet: bool = False) -> None:
+    if not quiet:
+        log(msg)
 
 
-def _log_warn(msg: str) -> None:
-    _log(msg)
+def _log_warn(msg: str, log) -> None:
+    log(msg)
 
 
 def atomic_write_json(path: Path, payload: Dict[str, Any]) -> None:
@@ -103,14 +101,14 @@ def atomic_write_json(path: Path, payload: Dict[str, Any]) -> None:
     tmp.replace(path)
 
 
-def warn_if_client_schema_sparse(path: Path, payload: Dict[str, Any]) -> None:
+def warn_if_client_schema_sparse(path: Path, payload: Dict[str, Any], log) -> None:
     required = {"historical_echo_v1", "historical_echo_meta"}
     missing = [k for k in required if k not in payload]
     if missing:
-        _log_warn(f"[echo_inject]   WARN: {path.name} missing keys {missing} before write")
+        _log_warn(f"[echo_inject]   WARN: {path.name} missing keys {missing} before write", log)
     he = payload.get("historical_echo_v1")
     if not isinstance(he, dict) or "neighbors" not in he:
-        _log_warn(f"[echo_inject]   WARN: {path.name} historical_echo_v1 missing neighbors")
+        _log_warn(f"[echo_inject]   WARN: {path.name} historical_echo_v1 missing neighbors", log)
 
 
 def parse_args() -> argparse.Namespace:
@@ -268,10 +266,10 @@ def compute_audio_feature_freshness(feature_path: Path, meta: Dict[str, Any]) ->
     return "ok"
 
 
-def load_feature_meta(path: Path, parent_path: Path) -> Dict[str, Any]:
+def load_feature_meta(path: Path, parent_path: Path, log) -> Dict[str, Any]:
     meta: Dict[str, Any] = {}
     try:
-        data = load_json_guarded(str(path), logger=_log_warn)
+        data = load_json_guarded(str(path), logger=lambda msg: _log_warn(msg, log))
         if not data:
             return meta
         meta["loudness_LUFS"] = data.get("loudness_LUFS")
@@ -324,11 +322,13 @@ def load_feature_meta(path: Path, parent_path: Path) -> Dict[str, Any]:
         backend_detail = meta.get("tempo_backend_detail") or meta.get("tempo_backend")
         if backend_detail and backend_detail not in _SUPPORTED_BACKENDS:
             _log_warn(
-                f"[echo_inject]   WARN: {path.name} tempo backend '{backend_detail}' not in registry supported set {_SUPPORTED_BACKENDS}"
+                f"[echo_inject]   WARN: {path.name} tempo backend '{backend_detail}' not in registry supported set {_SUPPORTED_BACKENDS}",
+                log
             )
         if backend_detail and not is_backend_enabled(backend_detail):
             _log_warn(
-                f"[echo_inject]   WARN: {path.name} tempo backend '{backend_detail}' is disabled in registry"
+                f"[echo_inject]   WARN: {path.name} tempo backend '{backend_detail}' is disabled in registry",
+                log
             )
     except Exception:
         pass
@@ -699,30 +699,32 @@ def trim_neighbors(echo_data: Dict[str, Any], max_keep: int) -> Dict[str, Any]:
 def process_client_rich_file(
     client_path: Path,
     args: argparse.Namespace,
+    log,
+    quiet: bool,
 ) -> list[str]:
     hci_header_lines: List[str] = []
     audio_header_lines: List[str] = []
     neighbor_meta_lines: List[str] = []
     track_dir = client_path.parent
-    if not args.quiet:
-        _log_info(f"[echo_inject] Processing: {client_path}")
+    if not quiet:
+        _log_info(f"[echo_inject] Processing: {client_path}", log, quiet)
 
     warnings: list[str] = []
     lint_fn = lint_client_rich_text if _is_client_path(client_path) else lint_client_rich_text
     lint_warnings = lint_fn(client_path.read_text())
     if lint_warnings:
         warnings.extend([f"{client_path.name}:{w}" for w in lint_warnings])
-        _log_warn(f"[echo_inject]   LINT WARN ({client_path.name}): {lint_warnings}")
+        _log_warn(f"[echo_inject]   LINT WARN ({client_path.name}): {lint_warnings}", log)
         if args.strict:
             raise SystemExit(f"lint failed for {client_path}: {lint_warnings}")
 
     features_path = pick_features_file(track_dir)
     if not features_path:
-        _log_warn(f"[echo_inject]   WARN: No .features.json found in {track_dir}, skipping.")
+        _log_warn(f"[echo_inject]   WARN: No .features.json found in {track_dir}, skipping.", log)
         return warnings
-    if not require_file(str(client_path), logger=_log_warn):
+    if not require_file(str(client_path), logger=lambda msg: _log_warn(msg, log)):
         return warnings
-    if not require_file(str(features_path), logger=_log_warn):
+    if not require_file(str(features_path), logger=lambda msg: _log_warn(msg, log)):
         return warnings
 
     orig_content = client_path.read_text()
@@ -730,7 +732,7 @@ def process_client_rich_file(
         rich_cls = CLIENTRich if _is_client_path(client_path) else CLIENTRich
         client_obj, client_json = extract_client_rich(orig_content, rich_cls=rich_cls)
     except Exception as e:
-        _log_warn(f"[echo_inject]   ERROR parsing JSON from {client_path}: {e}")
+        _log_warn(f"[echo_inject]   ERROR parsing JSON from {client_path}: {e}", log)
         return warnings
 
     warn_feature, _ = lint_json_file(features_path, kind="features")
@@ -739,7 +741,7 @@ def process_client_rich_file(
     hci_path = pick_hci_file(track_dir)
     hci_meta = {}
     if hci_path:
-        if require_file(str(hci_path), logger=_log_warn):
+        if require_file(str(hci_path), logger=lambda msg: _log_warn(msg, log)):
             try:
                 hci_obj = HCI.from_json(hci_path)
                 hci_meta = {
@@ -753,7 +755,7 @@ def process_client_rich_file(
                     "hci_role": hci_obj.HCI_v1_role,
                 }
             except Exception as e:  # noqa: BLE001
-                _log_warn(f"[echo_inject]   WARN: failed to read {hci_path}: {e}")
+                _log_warn(f"[echo_inject]   WARN: failed to read {hci_path}: {e}", log)
             else:
                 warn_hci, _ = lint_json_file(hci_path, kind="hci")
     # Provide a sensible default source from the current client JSON (pack_writer)
@@ -762,7 +764,7 @@ def process_client_rich_file(
     # Always use the richer loader so AUDIO_PIPELINE gets populated.
     # The schema parse is still useful for validation, but we don't limit
     # ourselves to the small subset of fields in Features.from_json.
-    feature_meta = load_feature_meta(features_path, client_path)
+    feature_meta = load_feature_meta(features_path, client_path, log)
     try:
         feat_obj = Features.from_json(features_path)
         # If schema fields are present, patch them in (they may be stricter
@@ -777,7 +779,7 @@ def process_client_rich_file(
     if args.qa_policy == "strict":
         gate = (feature_meta.get("qa_gate") or "").lower()
         if gate and gate not in {"pass", "ok"}:
-            _log_warn(f"[echo_inject]   SKIP: QA gate '{gate}' failed strict policy for {features_path.name}")
+            _log_warn(f"[echo_inject]   SKIP: QA gate '{gate}' failed strict policy for {features_path.name}", log)
             return
     missing_keys = []
     if feature_meta and not feature_meta.get("source_hash"):
@@ -785,11 +787,11 @@ def process_client_rich_file(
     if feature_meta and not feature_meta.get("config_fingerprint"):
         missing_keys.append("config_fingerprint")
     if missing_keys:
-        _log_warn(f"[echo_inject]   WARN: feature meta missing {missing_keys} for {features_path}")
+        _log_warn(f"[echo_inject]   WARN: feature meta missing {missing_keys} for {features_path}", log)
     if warn_feature:
-        _log_warn(f"[echo_inject]   WARN feature lint ({features_path.name}): {warn_feature}")
+        _log_warn(f"[echo_inject]   WARN feature lint ({features_path.name}): {warn_feature}", log)
     if warn_hci:
-        _log_warn(f"[echo_inject]   WARN hci lint ({hci_path.name}): {warn_hci}")
+        _log_warn(f"[echo_inject]   WARN hci lint ({hci_path.name}): {warn_hci}", log)
 
     echo_data = run_echo_probe_for_features(
         features_path=str(features_path),
@@ -811,11 +813,11 @@ def process_client_rich_file(
         write_neighbors_file(str(neighbors_out), echo_data, max_neighbors=None, max_bytes=5 << 20)
         lint_neighbor_warns, _ = lint_json_file(neighbors_out, "neighbors")
         warnings.extend([f"{neighbors_out.name}:{w}" for w in lint_neighbor_warns])
-        if not args.quiet:
+        if not quiet:
             warn_suffix = f" (warnings={lint_neighbor_warns})" if lint_neighbor_warns else ""
-            _log_info(f"[echo_inject]   Wrote neighbors -> {neighbors_out}{warn_suffix}")
+            _log_info(f"[echo_inject]   Wrote neighbors -> {neighbors_out}{warn_suffix}", log, quiet)
     except Exception as e:  # noqa: BLE001
-        _log_warn(f"[echo_inject]   WARN: failed to write neighbors file {neighbors_out}: {e}")
+        _log_warn(f"[echo_inject]   WARN: failed to write neighbors file {neighbors_out}: {e}", log)
 
     client_json, inject_warns, bundle = inject_echo_into_client(
         client_json,
@@ -977,48 +979,47 @@ def process_client_rich_file(
     new_content = clean_header_spacing(new_content)
 
     if args.dry_run:
-        _log_info(f"[echo_inject]   DRY RUN: would update {client_path}")
-        _log_info(f"[echo_inject]   Summary: {echo_header_line}")
+        _log_info(f"[echo_inject]   DRY RUN: would update {client_path}", log, quiet)
+        _log_info(f"[echo_inject]   Summary: {echo_header_line}", log, quiet)
         return warnings
 
     # Atomic write to avoid partial files
-    warn_if_client_schema_sparse(client_path, client_json)
+    warn_if_client_schema_sparse(client_path, client_json, log)
     tmp_path = client_path.with_suffix(client_path.suffix + ".tmp")
     tmp_path.write_text(new_content)
     tmp_path.replace(client_path)
     lint_fn = lint_client_rich_text if _is_client_path(client_path) else lint_client_rich_text
     lint_client_warns = lint_fn(new_content)
     warnings.extend([f"{client_path.name}:{w}" for w in lint_client_warns])
-    if not args.quiet:
+    if not quiet:
         warn_suffix = f" (warnings={lint_client_warns})" if lint_client_warns else ""
-        _log_info(f"[echo_inject]   Updated {client_path}{warn_suffix}")
-        _log_info(f"[echo_inject]   Summary: {echo_header_line}")
+        _log_info(f"[echo_inject]   Updated {client_path}{warn_suffix}", log, quiet)
+        _log_info(f"[echo_inject]   Summary: {echo_header_line}", log, quiet)
     return warnings
 
 
 def main() -> None:
     args = parse_args()
-    global _log, _QUIET
-    _QUIET = bool(args.quiet)
+    quiet = bool(args.quiet)
     apply_log_sandbox_env(args)
     apply_log_format_env(args)
     run_preflight_if_requested(args)
     # Align runtime/config defaults across CLIs.
     _ = load_runtime_settings(args)
     settings = load_log_settings(args)
-    redact_flag = settings.log_redact or LOG_REDACT
-    redact_values = settings.log_redact_values or LOG_REDACT_VALUES
-    _log = di.make_logger("echo_inject", structured=os.getenv("LOG_JSON") == "1", defaults={"tool": "echo_inject"}, redact=redact_flag, secrets=redact_values)
-    root = validate_root_dir(args.root, logger=_log_warn)
+    redact_flag = settings.log_redact or os.getenv("LOG_REDACT", "0") == "1"
+    redact_values = settings.log_redact_values or [v for v in os.getenv("LOG_REDACT_VALUES", "").split(",") if v]
+    log = di.make_logger("echo_inject", structured=os.getenv("LOG_JSON") == "1", defaults={"tool": "echo_inject"}, redact=redact_flag, secrets=redact_values)
+    root = validate_root_dir(args.root, logger=lambda msg: _log_warn(msg, log))
     if not root:
         raise SystemExit(1)
     start_ts = time.perf_counter()
     if os.getenv("LOG_JSON") == "1":
-        log_stage_start(_log, "echo_inject_client", root=str(root), quiet=bool(args.quiet))
+        log_stage_start(log, "echo_inject_client", root=str(root), quiet=quiet)
 
     client_files = find_client_rich_files(root)
     if not client_files:
-        _log_info(f"[echo_inject] No *.{names.CLIENT_TOKEN}.rich.txt files found under {root}")
+        _log_info(f"[echo_inject] No *.{names.CLIENT_TOKEN}.rich.txt files found under {root}", log, quiet)
         return
 
     def redact(path: Path) -> str:
@@ -1026,24 +1027,24 @@ def main() -> None:
 
     lint_warn_total = 0
     warnings: list[str] = []
-    _log_info(f"[echo_inject] Found {len(client_files)} rich txt files under {redact(root)}")
+    _log_info(f"[echo_inject] Found {len(client_files)} rich txt files under {redact(root)}", log, quiet)
     for client_path in client_files:
-        _log_info(f"[echo_inject] Processing: {redact(client_path)}")
+        _log_info(f"[echo_inject] Processing: {redact(client_path)}", log, quiet)
         try:
-            file_warns = process_client_rich_file(client_path, args)
+            file_warns = process_client_rich_file(client_path, args, log, quiet)
             warnings.extend(file_warns)
         except SystemExit as exc:
             lint_warn_total += 1
             if args.strict:
                 raise
-            _log_warn(f"[echo_inject] strict lint failure ignored (strict disabled): {exc}")
+            _log_warn(f"[echo_inject] strict lint failure ignored (strict disabled): {exc}", log)
     status = "ok"
     if (lint_warn_total or warnings) and args.strict:
         status = "error"
     if os.getenv("LOG_JSON") == "1":
         duration_ms = int((time.perf_counter() - start_ts) * 1000)
         log_stage_end(
-            _log,
+            log,
             "echo_inject_client",
             status=status,
             root=str(root),

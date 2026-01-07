@@ -33,17 +33,14 @@ from ma_audio_engine.adapters import (
     validate_root_dir,
 )
 from tools.hci.hci_rank_service import RankOptions, effective_score, filter_entries, load_hci_score, render_report
-from shared.ma_utils.logger_factory import get_configured_logger
-
-_log = get_configured_logger("hci_rank")
 
 
-def _log_info(msg: str) -> None:
-    _log(msg)
+def _log_info(msg: str, log) -> None:
+    log(msg)
 
 
-def _log_warn(msg: str) -> None:
-    _log(msg)
+def _log_warn(msg: str, log) -> None:
+    log(msg)
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Rank HCI_v1 scores within a folder of *.hci.json files.")
@@ -120,7 +117,7 @@ def parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 
-def rank_folder(roots: List[Path], args: argparse.Namespace, qa_policy_name: str) -> int:
+def rank_folder(roots: List[Path], args: argparse.Namespace, qa_policy_name: str, log) -> int:
     tiers_filter = None
     if args.tiers:
         tiers_filter = {t.strip() for t in args.tiers.split(",") if t.strip()}
@@ -197,12 +194,14 @@ def rank_folder(roots: List[Path], args: argparse.Namespace, qa_policy_name: str
             if backend not in supported_backends:
                 _log_warn(
                     f"[hci_rank] WARN: tempo backend '{backend}' not in registry {supported_backends}; "
-                    "consider updating config/backend_registry.json."
+                    "consider updating config/backend_registry.json.",
+                    log
                 )
             elif not is_backend_enabled(backend):
                 _log_warn(
                     f"[hci_rank] WARN: tempo backend '{backend}' is disabled in registry; "
-                    "rank output may mix preferred and non-preferred backends."
+                    "rank output may mix preferred and non-preferred backends.",
+                    log
                 )
         warns = e.get("sidecar_warnings")
         if isinstance(warns, list):
@@ -215,7 +214,7 @@ def rank_folder(roots: List[Path], args: argparse.Namespace, qa_policy_name: str
 
     if not entries:
         out_path.write_text("No valid *.hci.json scores found.\n")
-        _log_info(f"[hci_rank] No scores found under {', '.join(str(r) for r in roots)}")
+        _log_info(f"[hci_rank] No scores found under {', '.join(str(r) for r in roots)}", log)
         return 0
 
     entries.sort(key=lambda x: effective_score(x), reverse=True)
@@ -270,22 +269,23 @@ def rank_folder(roots: List[Path], args: argparse.Namespace, qa_policy_name: str
         if args.fail_on_config_drift and (len(config_set) > 1 or len(pipeline_versions) > 1):
             lines.append("# ERROR: config drift detected and --fail-on-config-drift is set; aborting.")
             out_path.write_text("\n".join(lines) + "\n")
-            _log_warn(f"[hci_rank] Config drift detected; wrote summary to {out_path} and exiting due to --fail-on-config-drift.")
+            _log_warn(f"[hci_rank] Config drift detected; wrote summary to {out_path} and exiting due to --fail-on-config-drift.", log)
             return 1
     lines.append("")
 def main() -> None:
     args = parse_args()
-    global _log
     apply_log_sandbox_env(args)
-    redact_flag = args.log_redact or LOG_REDACT
+    redact_env = os.getenv("LOG_REDACT", "0") == "1"
+    redact_values_env = [v for v in os.getenv("LOG_REDACT_VALUES", "").split(",") if v]
+    redact_flag = args.log_redact or redact_env
     redact_values = (
         [v for v in (args.log_redact_values.split(",") if args.log_redact_values else []) if v]
-        or LOG_REDACT_VALUES
+        or redact_values_env
     )
     log_settings = load_log_settings(args)
     redact_flag = redact_flag or log_settings.log_redact
     redact_values = redact_values or log_settings.log_redact_values
-    _log = di.make_logger(
+    log = di.make_logger(
         "hci_rank",
         structured=os.getenv("LOG_JSON") == "1",
         defaults={"tool": "hci_rank"},
@@ -298,7 +298,7 @@ def main() -> None:
     _ = qa_policy  # currently only used for modular hook; retained for future thresholds
     if args.qa_strict and qa_policy_name != "strict":
         qa_policy_name = "strict"
-    validate_root_dir(args.root, logger=_log_warn)
+    validate_root_dir(args.root, logger=lambda msg: _log_warn(msg, log))
 
     roots: List[Path] = []
     for r in args.root.split(","):
@@ -318,7 +318,7 @@ def main() -> None:
     entries: List[Dict[str, Any]] = []
     for root in roots:
         for hci_path in root.rglob("*.hci.json"):
-            res = load_hci_score(hci_path, logger=_log_warn)
+            res = load_hci_score(hci_path, logger=lambda msg: _log_warn(msg, log))
             if res:
                 entries.append(res)
 
@@ -338,16 +338,16 @@ def main() -> None:
         fail_on_config_drift=args.fail_on_config_drift,
     )
 
-    entries, meta = filter_entries(entries, opts, log_warn=_log_warn)
+    entries, meta = filter_entries(entries, opts, log_warn=lambda msg: _log_warn(msg, log))
     status, lines, entries, top_n, bottom_n = render_report(roots, entries, opts, meta)
     if not entries:
         out_path.write_text("\n".join(lines))
-        _log_info(f"[hci_rank] No scores found under {', '.join(str(r) for r in roots)}")
+        _log_info(f"[hci_rank] No scores found under {', '.join(str(r) for r in roots)}", log)
         return status
 
     # Render report
     out_path.write_text("\n".join(lines))
-    _log_info(f"[hci_rank] Wrote ranking to {out_path}")
+    _log_info(f"[hci_rank] Wrote ranking to {out_path}", log)
 
     # Optional CSV output
     if args.csv_out:
@@ -369,7 +369,7 @@ def main() -> None:
                         e["path"],
                     ]
                 )
-        _log_info(f"[hci_rank] Wrote CSV to {csv_path}")
+        _log_info(f"[hci_rank] Wrote CSV to {csv_path}", log)
 
     # Optional Markdown output
     if args.markdown_out:
@@ -433,7 +433,7 @@ def main() -> None:
 
         md_path.parent.mkdir(parents=True, exist_ok=True)
         md_path.write_text("\n".join(md_lines) + "\n", encoding="utf-8")
-        _log_info(f"[hci_rank] Wrote Markdown to {md_path}")
+        _log_info(f"[hci_rank] Wrote Markdown to {md_path}", log)
 
     return status
 
