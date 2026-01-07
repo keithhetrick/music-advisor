@@ -48,6 +48,8 @@ import subprocess
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
+from tools.audio.qa_checker import compute_qa_metrics, determine_qa_status, validate_qa_strict
+
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -1354,31 +1356,17 @@ def analyze_pipeline(
     qa: Dict[str, Any] = {}
     qa_gate = "fail_missing_audio"
     if y is not None and len(y) > 0:
-        peak = float(np.max(np.abs(y)))
-        rms = float(np.sqrt(np.mean(y * y) + 1e-12))
-        qa = {
-            "peak_dbfs": float(20.0 * math.log10(peak + 1e-12)),
-            "rms_dbfs": float(20.0 * math.log10(rms + 1e-12)),
-            "clipping": peak >= clip_peak_threshold,
-            "silence_ratio": float(np.mean(np.abs(y) < 1e-4)),
-            "clip_peak_threshold": clip_peak_threshold,
-            "silence_ratio_threshold": silence_ratio_threshold,
-            "low_level_dbfs_threshold": low_level_dbfs_threshold,
-        }
-        qa_status = "ok"
-        if qa["clipping"]:
-            qa_status = "warn_clipping"
-            if fail_on_clipping_dbfs is not None and qa["peak_dbfs"] >= fail_on_clipping_dbfs:
-                raise RuntimeError(f"clipping error - peak_dbfs={qa['peak_dbfs']:.2f} exceeds fail_on_clipping_dbfs={fail_on_clipping_dbfs}")
-        elif qa["silence_ratio"] > silence_ratio_threshold:
-            qa_status = "warn_silence"
-        elif qa["rms_dbfs"] < low_level_dbfs_threshold:
-            qa_status = "warn_low_level"
+        qa = compute_qa_metrics(
+            y,
+            clip_peak_threshold=clip_peak_threshold,
+            silence_ratio_threshold=silence_ratio_threshold,
+            low_level_dbfs_threshold=low_level_dbfs_threshold,
+        )
+        qa_status, qa_gate = determine_qa_status(qa, fail_on_clipping_dbfs=fail_on_clipping_dbfs)
         qa["status"] = qa_status
-        qa_gate = "pass" if qa_status == "ok" else qa_status
         qa["gate"] = qa_gate
-        if QA_STRICT_MODE and qa_status != "ok":
-            raise RuntimeError(f"strict QA failed ({qa_status}) peak_dbfs={qa['peak_dbfs']:.2f} rms_dbfs={qa['rms_dbfs']:.2f} silence_ratio={qa['silence_ratio']:.3f}")
+        if QA_STRICT_MODE:
+            validate_qa_strict(qa, qa_status)
 
     now_ts = utc_now_iso(timespec="seconds")
 
