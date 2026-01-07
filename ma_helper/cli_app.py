@@ -66,19 +66,11 @@ from ma_helper.core.python import resolve_python
 from ma_helper.core.state import add_history, guard_level, load_favorites, save_favorites, set_last_failed
 from ma_helper.policy import permission_level, require_unlock
 
-DRY_RUN = False
-
-# Config / adapters
+# Root discovery for initial module load
 ROOT_ACTUAL = discover_root(env.ROOT)
-config = HelperConfig.load(ROOT_ACTUAL)
-env.apply_config(config)
-adapter_factory = get_orch_adapter(config.adapter)
-orch_adapter = adapter_factory(config.root)
 
 # Friendly task aliases (overrideable via config)
 TASKS: Dict[str, str] = {}
-log_event = partial(base_log_event, load_favorites, env.TELEMETRY_FILE)
-_run_cmd = partial(base_run_cmd, orch_root=config.root, log_event_fn=log_event, set_last_failed=set_last_failed)
 
 
 def cmd_dashboard() -> int:
@@ -124,8 +116,6 @@ def main(argv=None) -> int:
     adapter_factory = get_orch_adapter(helper_config.adapter)
     orch_adapter = adapter_factory(runtime.root)
 
-    # Temporary: also update legacy globals for consumers not yet migrated
-    env.apply_config(helper_config)
     # Persist whether the user explicitly asked for --live (defaults stay off).
     setattr(args, "_live_requested", live_requested)
 
@@ -133,7 +123,6 @@ def main(argv=None) -> int:
     telemetry_file = runtime.telemetry_file
     if getattr(args, "telemetry_file", None):
         telemetry_file = Path(args.telemetry_file).resolve()
-        env.TELEMETRY_FILE = telemetry_file  # Also update legacy global
 
     telemetry_enabled = not getattr(args, "no_telemetry", False) and telemetry_file is not None
     log_event = partial(base_log_event, load_favorites, telemetry_file if telemetry_enabled else None)
