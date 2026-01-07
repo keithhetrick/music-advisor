@@ -25,6 +25,13 @@ from ma_config.paths import get_lyric_intel_db_path  # noqa: E402
 from ma_config.neighbors import resolve_neighbors_config  # noqa: E402
 
 
+__all__ = [
+    "run_pipeline",
+    "parse_args",
+    "main",
+]
+
+
 def run_pipeline(args, log) -> None:
     out_dir = Path(args.out_dir).expanduser()
     out_dir.mkdir(parents=True, exist_ok=True)

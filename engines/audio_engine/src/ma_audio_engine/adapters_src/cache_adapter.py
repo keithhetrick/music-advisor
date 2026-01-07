@@ -24,6 +24,12 @@ from typing import Any, Dict, Optional
 
 from shared.ma_utils.cache_utils import FeatureCache
 
+__all__ = [
+    "CacheAdapter",
+    "get_cache",
+    "gc",
+]
+
 _CFG_PATH = Path(__file__).resolve().parents[1] / "config" / "cache.json"
 _DEFAULT_CACHE_DIR = None
 _DEFAULT_BACKEND = "disk"

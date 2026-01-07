@@ -15,6 +15,12 @@ from __future__ import annotations
 import os
 from typing import Any, Callable, Dict, Optional
 
+__all__ = [
+    "resolve_config_value",
+    "overlay_config",
+    "build_config_components",
+]
+
 
 def resolve_config_value(
     cli_value: Any,

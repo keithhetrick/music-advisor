@@ -17,6 +17,11 @@ import json
 import os
 from typing import Any, Callable, Optional
 
+__all__ = [
+    "load_json_guarded",
+    "require_file",
+]
+
 JsonLogger = Optional[Callable[[str], None]]
 
 

@@ -21,6 +21,10 @@ from typing import Dict, Optional
 
 from ma_audio_engine.policies.qa_policy import QAPolicy, get_policy
 
+__all__ = [
+    "load_qa_policy",
+]
+
 _CFG_PATH = Path(__file__).resolve().parents[1] / "config" / "qa_policy.json"
 _CONFIG_OVERRIDES: Dict[str, Dict[str, float]] = {}
 

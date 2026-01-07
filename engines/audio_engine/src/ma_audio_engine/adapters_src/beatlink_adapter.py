@@ -24,6 +24,10 @@ import pathlib
 import sys
 import time
 
+__all__ = [
+    "main",
+]
+
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="BeatLink adapter shim")

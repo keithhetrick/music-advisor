@@ -21,6 +21,13 @@ from ma_audio_engine.adapters_src import service_registry
 from ma_audio_engine.adapters.cache_adapter import CacheAdapter
 from ma_audio_engine.adapters_src import plugin_loader
 
+__all__ = [
+    "make_logger",
+    "make_cache",
+    "make_qa_policy",
+    "make_sidecar_runner",
+]
+
 
 def make_logger(prefix: str, *, structured: bool = False, defaults: Optional[dict] = None, **kwargs):
     """Return a plain or structured logger via service_registry (no-op plugins handled there)."""

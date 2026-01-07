@@ -16,6 +16,13 @@ from ma_config.paths import get_lyric_intel_db_path  # noqa: E402
 from ma_config.neighbors import resolve_neighbors_config  # noqa: E402
 
 
+__all__ = [
+    "run_neighbors",
+    "parse_args",
+    "main",
+]
+
+
 def run_neighbors(args, log) -> None:
     db_path = Path(args.db).expanduser()
     if not db_path.exists():

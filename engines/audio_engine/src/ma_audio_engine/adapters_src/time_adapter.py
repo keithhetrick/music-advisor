@@ -11,6 +11,10 @@ from __future__ import annotations
 
 from datetime import datetime
 
+__all__ = [
+    "utc_now_iso",
+]
+
 
 def utc_now_iso(timespec: str = "seconds") -> str:
     """

@@ -20,6 +20,11 @@ import json
 from pathlib import Path
 from typing import Tuple
 
+__all__ = [
+    "get_hash_params",
+    "hash_file",
+]
+
 _CFG_PATH = Path(__file__).resolve().parents[1] / "config" / "hash.json"
 _DEFAULT_ALGO = "sha256"
 _DEFAULT_CHUNK = 1 << 16

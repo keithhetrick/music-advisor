@@ -45,6 +45,13 @@ from ma_config.profiles import (  # noqa: E402
 from ma_config.paths import get_lyric_intel_db_path  # noqa: E402
 
 
+__all__ = [
+    "process_wip",
+    "parse_args",
+    "main",
+]
+
+
 def process_wip(args, log) -> None:
     """
     Run audio -> STT -> lyric_intel features for a single WIP track.

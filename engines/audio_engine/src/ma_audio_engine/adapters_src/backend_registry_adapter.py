@@ -24,6 +24,15 @@ from typing import List, Dict, Any, Optional
 
 from ma_audio_engine.adapters_src import plugin_loader
 
+__all__ = [
+    "list_supported_backends",
+    "get_default_sidecar_cmd",
+    "get_sidecar_cmd_for_backend",
+    "is_backend_enabled",
+    "get_backend_settings",
+    "validate_sidecar_cmd",
+]
+
 _CFG_PATH = Path(__file__).resolve().parents[1] / "config" / "backend_registry.json"
 # Keep the default inline here to avoid import cycles with sidecar_adapter.
 _DEFAULT_SIDECAR_CMD = "python3 tools/tempo_sidecar_runner.py --audio {audio} --out {out}"

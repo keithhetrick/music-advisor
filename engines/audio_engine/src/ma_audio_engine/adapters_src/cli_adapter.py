@@ -18,6 +18,16 @@ from pathlib import Path
 from security import subprocess as sec_subprocess
 from security.config import CONFIG as SEC_CONFIG
 
+__all__ = [
+    "add_log_sandbox_arg",
+    "add_log_format_arg",
+    "apply_log_format_env",
+    "add_preflight_arg",
+    "run_preflight_if_requested",
+    "add_qa_policy_arg",
+    "apply_log_sandbox_env",
+]
+
 
 def add_log_sandbox_arg(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(

@@ -30,6 +30,16 @@ from ma_audio_engine.adapters.logging_adapter import make_logger, make_structure
 from ma_audio_engine.adapters.cache_adapter import CacheAdapter
 from ma_audio_engine.adapters_src import plugin_loader
 
+__all__ = [
+    "get_exporter",
+    "get_logger",
+    "get_structured_logger",
+    "get_qa_policy",
+    "get_cache",
+    "get_logging_sandbox_defaults",
+    "scrub_payload_for_sandbox",
+]
+
 # Optional export hook: default is simple JSON writer
 def get_exporter() -> Callable[[dict, Path], None]:
     plugin_name = os.getenv("MA_EXPORTER_PLUGIN")

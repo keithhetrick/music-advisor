@@ -1,2 +1,4 @@
 """Shim for ma_host imports (legacy path) forwarding to local package."""
-from ma_host import *  # noqa: F401,F403
+# ma_host has no exports; this shim exists for backward compatibility only.
+
+__all__ = []

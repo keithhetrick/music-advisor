@@ -17,6 +17,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable, Iterable, List, Optional
 
+__all__ = [
+    "validate_root_dir",
+    "validate_root_list",
+    "ensure_parent_dir",
+    "require_paths",
+]
+
 JsonLogger = Optional[Callable[[str], None]]
 
 

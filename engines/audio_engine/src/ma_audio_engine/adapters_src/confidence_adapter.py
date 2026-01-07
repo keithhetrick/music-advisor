@@ -16,6 +16,12 @@ import json
 from pathlib import Path
 from typing import Optional, Tuple
 
+__all__ = [
+    "TEMPO_CONF_DEFAULTS",
+    "normalize_tempo_confidence",
+    "confidence_label",
+]
+
 TEMPO_CONF_DEFAULTS = {
     "essentia": {
         "lower": 0.93,  # p5 on benchmark_set_v1_1
