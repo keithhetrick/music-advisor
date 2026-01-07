@@ -24,7 +24,7 @@ from ma_audio_engine.adapters.logging_adapter import log_stage_start, log_stage_
 from ma_audio_engine.schemas import dump_json
 from shared.ma_utils import get_configured_logger
 from tools import names
-from tools.schema_utils import lint_merged_payload, lint_pack_payload
+from shared.ma_utils.schema_utils import lint_merged_payload, lint_pack_payload
 
 _log = get_configured_logger("pack_writer")
 

@@ -33,7 +33,7 @@ ensure_repo_root()
 from ma_audio_engine.adapters import add_log_sandbox_arg, add_log_format_arg, add_preflight_arg, apply_log_sandbox_env, apply_log_format_env, run_preflight_if_requested
 from ma_audio_engine.adapters import load_log_settings, load_runtime_settings
 from ma_audio_engine.adapters import utc_now_iso
-from tools.schema_utils import lint_json_file
+from shared.ma_utils.schema_utils import lint_json_file
 from ma_audio_engine.adapters import di
 from ma_audio_engine.adapters.logging_adapter import log_stage_start, log_stage_end
 from ma_audio_engine.schemas import dump_json

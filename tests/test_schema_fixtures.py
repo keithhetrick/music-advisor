@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
 from ma_audio_engine import schemas
-from tools import schema_utils
+from shared.ma_utils import schema_utils
 
 
 def test_golden_features_and_hci_lint_clean():

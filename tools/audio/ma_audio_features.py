@@ -106,7 +106,7 @@ from ma_audio_engine.adapters.cli_adapter import (
     apply_log_sandbox_env,
     run_preflight_if_requested,
 )
-from tools.schema_utils import lint_features_payload, lint_json_file
+from shared.ma_utils.schema_utils import lint_features_payload, lint_json_file
 from ma_audio_engine.adapters.service_registry import (
     get_cache,
     get_exporter,

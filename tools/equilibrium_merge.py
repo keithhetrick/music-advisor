@@ -22,7 +22,7 @@ from ma_audio_engine.adapters import di, load_log_settings
 from ma_audio_engine.adapters.logging_adapter import log_stage_start, log_stage_end
 from ma_audio_engine.schemas import dump_json
 from shared.ma_utils import get_configured_logger
-from tools.schema_utils import lint_merged_payload
+from shared.ma_utils.schema_utils import lint_merged_payload
 
 ESSENTIAL_KEYS = ["duration_sec", "tempo_bpm", "key", "mode", "loudness_LUFS"]
 

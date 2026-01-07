@@ -8,7 +8,7 @@ from tools.audio.ma_audio_features import analyze_pipeline, CLIP_PEAK_THRESHOLD,
 from tools.equilibrium_merge import merge_features
 from tools.pack_writer import build_pack, build_client_helper_payload
 from tools.ma_merge_client_and_hci import merge_client_hci
-from tools.schema_utils import lint_json_file, lint_pack_payload, lint_merged_payload
+from shared.ma_utils.schema_utils import lint_json_file, lint_pack_payload, lint_merged_payload
 
 
 def run_features(audio: str, *, tempo_sidecar_json_out: Optional[str] = None, require_sidecar: bool = False) -> Dict[str, Any]:

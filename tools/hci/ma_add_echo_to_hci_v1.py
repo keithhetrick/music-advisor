@@ -62,7 +62,7 @@ from ma_audio_engine.adapters import di
 from ma_audio_engine.schemas import dump_json
 from ma_audio_engine.schemas import Features, HCI, HistoricalEcho
 from tools.hci_echo_probe_from_spine_v1 import run_echo_probe_for_features
-from tools.schema_utils import lint_json_file
+from shared.ma_utils.schema_utils import lint_json_file
 from tools.echo_services import inject_echo_into_hci
 from ma_config.paths import get_historical_echo_db_path
 from shared.ma_utils.logger_factory import get_configured_logger

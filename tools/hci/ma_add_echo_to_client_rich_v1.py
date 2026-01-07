@@ -66,7 +66,7 @@ from ma_audio_engine.schemas import dump_json, CLIENTRich, HCI, Features
 from ma_audio_engine.schemas import lint_client_rich_text
 from tools import names
 from tools.hci_echo_probe_from_spine_v1 import run_echo_probe_for_features
-from tools.schema_utils import lint_json_file
+from shared.ma_utils.schema_utils import lint_json_file
 from tools.echo_services import inject_echo_into_client, write_neighbors_file
 from ma_config.paths import get_historical_echo_db_path
 from shared.ma_utils.logger_factory import get_configured_logger

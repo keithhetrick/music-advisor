@@ -19,7 +19,7 @@ from ma_audio_engine.adapters import load_log_settings, load_runtime_settings
 from ma_audio_engine.adapters.logging_adapter import log_stage_start, log_stage_end
 from ma_audio_engine.schemas import dump_json, HCI
 from shared.ma_utils import get_configured_logger
-from tools.schema_utils import lint_json_file
+from shared.ma_utils.schema_utils import lint_json_file
 from ma_audio_engine.schemas import lint_client_rich_text
 from tools import names
 from tools.key_norms_sidecar import format_key_name

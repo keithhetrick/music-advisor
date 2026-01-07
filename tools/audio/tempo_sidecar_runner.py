@@ -36,7 +36,7 @@ from ma_audio_engine.adapters import (  # noqa: E402
 from ma_audio_engine.adapters import load_log_settings, load_runtime_settings
 from ma_audio_engine.adapters.logging_adapter import log_stage_start, log_stage_end
 from ma_audio_engine.adapters import di
-from tools.schema_utils import lint_json_file
+from shared.ma_utils.schema_utils import lint_json_file
 from shared.ma_utils.logger_factory import get_configured_logger
 
 # Logging setup (allows LOG_SANDBOX via CLI/env)

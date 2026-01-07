@@ -1,4 +1,4 @@
-from tools import schema_utils
+from shared.ma_utils import schema_utils
 from tools.audio import ma_audio_features as maf
 
 

@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from tools.schema_utils import lint_json_file
+from shared.ma_utils.schema_utils import lint_json_file
 from ma_audio_engine.adapters import LOG_REDACT, LOG_REDACT_VALUES, make_logger
 from tools import names
 

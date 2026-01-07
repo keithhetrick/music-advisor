@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from tools.schema_utils import lint_json_file
+from shared.ma_utils.schema_utils import lint_json_file
 
 
 @pytest.fixture

@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
 from ma_audio_engine.adapters import is_backend_enabled, list_supported_backends, load_json_guarded, utc_now_iso
-from tools.schema_utils import lint_json_file
+from shared.ma_utils.schema_utils import lint_json_file
 
 
 def load_hci_score(path: Path, logger: Callable[[str], None]) -> Optional[Dict[str, Any]]:

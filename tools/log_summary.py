@@ -19,7 +19,7 @@ ensure_repo_root()
 from ma_audio_engine.adapters import di, load_log_settings
 from ma_audio_engine.adapters.logging_adapter import log_stage_start, log_stage_end
 from ma_audio_engine.schemas import Features, HCI, HistoricalEcho, dump_json
-from tools.schema_utils import lint_json_file
+from shared.ma_utils.schema_utils import lint_json_file
 from tools import names
 
 from ma_audio_engine.schemas import CLIENTRich, lint_client_rich_text  # type: ignore
