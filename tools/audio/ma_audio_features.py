@@ -61,6 +61,12 @@ from tools.audio.feature_calculator import (
     estimate_energy,
     estimate_valence,
 )
+from tools.audio.key_detector import (
+    NOTE_NAMES_SHARP,
+    estimate_mode_and_key,
+    key_confidence_label,
+    normalize_key_confidence,
+)
 from shared.ma_utils.logger_factory import get_configured_logger
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -334,11 +340,6 @@ CONFIG_COMPONENTS = build_config_components(
     low_level_dbfs_threshold=LOW_LEVEL_DBFS_THRESHOLD,
 )
 
-NOTE_NAMES_SHARP = [
-    "C", "C#", "D", "D#", "E", "F",
-    "F#", "G", "G#", "A", "A#", "B"
-]
-
 DEFAULT_SIDECAR_CMD = get_default_sidecar_cmd()
 _log = get_configured_logger("ma_audio_features", defaults={"tool": "ma_audio_features"})
 _SANDBOX_CFG = get_logging_sandbox_defaults()
@@ -531,33 +532,6 @@ def normalize_audio(y: np.ndarray, sr: int, target_lufs: float = TARGET_LUFS) ->
 
 
 
-def key_confidence_label(key_root: Optional[str]) -> str:
-    return "med" if key_root else "low"
-
-
-def estimate_mode_and_key(y: np.ndarray, sr: int) -> Tuple[Optional[str], Optional[str]]:
-    """
-    Crude key estimation: detect chroma, pick dominant pitch class,
-    infer mode (major/minor) from relative brightness.
-    """
-    if librosa is None:
-        return None, None
-    try:
-        chroma = librosa.feature.chroma_cqt(y=y, sr=sr)
-        chroma_mean = np.mean(chroma, axis=1)
-        root_index = int(np.argmax(chroma_mean))
-        key_root = NOTE_NAMES_SHARP[root_index]
-
-        spread = float(np.std(chroma_mean))
-        if spread > 0.05:
-            mode = "major"
-        else:
-            mode = "minor"
-
-        return key_root, mode
-    except Exception as e:
-        debug(f"mode/key estimation failed: {e}")
-        return None, None
 
 
 def normalize_external_confidence(
@@ -591,16 +565,6 @@ def normalize_external_confidence(
         return float(np.clip(norm, 0.0, 1.0))
 
     return float(np.clip(score, 0.0, 1.0))
-
-
-def normalize_key_confidence(raw_score: Optional[float]) -> Optional[float]:
-    """Clamp key confidence/strength into 0..1."""
-    if raw_score is None:
-        return None
-    try:
-        return float(np.clip(float(raw_score), 0.0, 1.0))
-    except Exception:
-        return None
 
 
 def analyze_pipeline(
