@@ -456,10 +456,10 @@ def build_config_fingerprint() -> str:
     return json.dumps(CONFIG_COMPONENTS, sort_keys=True)
 
 
-def debug(msg: str) -> None:
-    _log(msg)
+def debug(msg: str, log) -> None:
+    log(msg)
 
-def _pad_short_signal(y: Optional[np.ndarray], *, min_len: int = 2048, label: str = "short_signal") -> Optional[np.ndarray]:
+def _pad_short_signal(y: Optional[np.ndarray], *, min_len: int = 2048, label: str = "short_signal", log) -> Optional[np.ndarray]:
     """
     Pad short signals to avoid librosa FFT warnings on tiny inputs.
     Returns the padded array (or original if already sufficient).
@@ -469,7 +469,7 @@ def _pad_short_signal(y: Optional[np.ndarray], *, min_len: int = 2048, label: st
     if len(y) >= min_len:
         return y
     pad = min_len - len(y)
-    debug(f"{label}_pad:{len(y)}->{min_len}")
+    debug(f"{label}_pad:{len(y)}->{min_len}", log)
     return np.pad(y, (0, pad), mode="constant")
 
 
@@ -478,16 +478,16 @@ def compute_file_hash(path: str, chunk_size: int = None) -> str:
     return hash_file(path, algorithm=algo, chunk_size=chunk_size or default_chunk)
 
 
-def _warn_if_schema_mismatch(payload: Dict[str, Any]) -> None:
+def _warn_if_schema_mismatch(payload: Dict[str, Any], log) -> None:
     required = {"source_audio", "tempo_bpm", "tempo_backend", "key", "mode", "pipeline_version"}
     missing = [k for k in required if k not in payload]
     if missing:
-        debug(f"schema warning: missing required fields in features payload: {missing}")
+        debug(f"schema warning: missing required fields in features payload: {missing}", log)
     # sanity types (soft checks)
     if "tempo_bpm" in payload and not isinstance(payload["tempo_bpm"], (int, float)):
-        debug("schema warning: tempo_bpm should be numeric")
+        debug("schema warning: tempo_bpm should be numeric", log)
     if "tempo_backend" in payload and not isinstance(payload["tempo_backend"], str):
-        debug("schema warning: tempo_backend should be a string")
+        debug("schema warning: tempo_backend should be a string", log)
 
 
 
@@ -551,6 +551,7 @@ def analyze_pipeline(
     tempo_sidecar_conf_lower: Optional[float] = None,
     tempo_sidecar_conf_upper: Optional[float] = None,
     require_sidecar: bool = False,
+    log = None,
 ) -> Dict[str, Any]:
     """
     Analyze audio and return the flat pipeline feature structure.
@@ -561,7 +562,13 @@ def analyze_pipeline(
     - QA thresholds/confidence bounds are passed through for transparency in metadata.
     - Side effects: reads audio, may invoke external sidecar, may write cache depending on backend.
     """
-    debug("USING_PIPELINE_EXTRACTOR_v1 (tools)")
+    # Create local logger function
+    if log:
+        _debug = lambda msg: log(msg)
+    else:
+        _debug = lambda msg: None
+
+    _debug("USING_PIPELINE_EXTRACTOR_v1 (tools)")
     path_abs = os.path.abspath(path)
     # Basic path validation
     if not os.path.isfile(path_abs):
@@ -642,8 +649,8 @@ def analyze_pipeline(
             cache_key = f"{source_hash}_{hashlib.sha1((cmd or DEFAULT_SIDECAR_CMD).encode()).hexdigest()}_v{SIDECAR_CACHE_SCHEMA_V}.json"
             sidecar_cache_path = cache_dir / cache_key
             if sidecar_cache_path.exists():
-                cached_payload = load_json_guarded(sidecar_cache_path, max_bytes=MAX_JSON_BYTES, expect_mapping=True, logger=debug)
-                cached_valid = _validate_external_payload(cached_payload, logger=debug, source="sidecar_cache")
+                cached_payload = load_json_guarded(sidecar_cache_path, max_bytes=MAX_JSON_BYTES, expect_mapping=True, logger=_debug)
+                cached_valid = _validate_external_payload(cached_payload, logger=_debug, source="sidecar_cache")
                 if cached_valid:
                     external_data = cached_valid
                     external_source_path = str(sidecar_cache_path)
@@ -666,12 +673,12 @@ def analyze_pipeline(
                     cpu_limit_seconds=int(SIDECAR_CPU_LIMIT) if SIDECAR_CPU_LIMIT else None,
                     mem_limit_bytes=int(SIDECAR_MEM_LIMIT) if SIDECAR_MEM_LIMIT else None,
                     timeout_seconds=SIDECAR_TIMEOUT_SECONDS,
-                    debug=debug,
+                    debug=_debug,
                 )
                 if adapter_warnings:
                     sidecar_warnings.extend(adapter_warnings)
                 if sidecar_data:
-                    external_data = _validate_external_payload(sidecar_data, logger=debug, source="sidecar")
+                    external_data = _validate_external_payload(sidecar_data, logger=_debug, source="sidecar")
                     if external_data:
                         external_source_path = sidecar_path
                         sidecar_status = "used"
@@ -683,11 +690,11 @@ def analyze_pipeline(
                     sidecar_status = "failed"
                     if attempt < max_attempts:
                         sidecar_warnings.append("sidecar_retrying")
-                        debug(f"tempo sidecar attempt {attempt} failed; retrying ({attempt}/{max_attempts})")
+                        _debug(f"tempo sidecar attempt {attempt} failed; retrying ({attempt}/{max_attempts})")
             if sidecar_status != "used":
                 sidecar_attempts_used = attempt
             if sidecar_status != "used":
-                debug("tempo sidecar requested but failed; falling back to librosa backend")
+                _debug("tempo sidecar requested but failed; falling back to librosa backend")
                 sidecar_warnings.append("sidecar_failed_fallback_librosa")
         elif sidecar_cache_path and sidecar_cache_path.exists():
             sidecar_status = "cache_hit"
@@ -701,9 +708,9 @@ def analyze_pipeline(
 
     if not external_data and external_source_path:
         raw_external = load_json_guarded(
-            external_source_path, max_bytes=MAX_JSON_BYTES, expect_mapping=True, logger=debug
+            external_source_path, max_bytes=MAX_JSON_BYTES, expect_mapping=True, logger=_debug
         )
-        external_data = _validate_external_payload(raw_external, logger=debug, source="sidecar_file")
+        external_data = _validate_external_payload(raw_external, logger=_debug, source="sidecar_file")
         if external_data:
             tempo_backend_used = "external"
             key_backend_used = "external"
@@ -715,7 +722,7 @@ def analyze_pipeline(
             sidecar_status = "invalid"
             sidecar_warnings.append("sidecar_json_invalid_or_missing")
             if tempo_backend == "sidecar" and tempo_sidecar_json_out:
-                debug(f"expected sidecar json at {external_source_path} but could not parse")
+                _debug(f"expected sidecar json at {external_source_path} but could not parse")
 
     if external_data and tempo_backend_used == "librosa":
         tempo_backend_used = "external"
@@ -745,7 +752,7 @@ def analyze_pipeline(
         cached = cache.load(source_hash=source_hash, config_fingerprint=config_fp, source_mtime=source_mtime)
         if cached:
             if not isinstance(cached, dict) or "tempo_backend" not in cached or "source_audio" not in cached:
-                debug("cache entry missing required fields; ignoring")
+                _debug("cache entry missing required fields; ignoring")
             else:
                 if "qa_status" not in cached and isinstance(cached.get("qa"), dict) and "status" in cached["qa"]:
                     cached["qa_status"] = cached["qa"].get("status")
@@ -922,7 +929,7 @@ def analyze_pipeline(
                 else normalize_external_confidence(tempo_conf_score_raw, external_backend_hint, external_conf_bounds)
             )
             if tempo_sidecar_verbose and ext_conf_score_norm is not None:
-                debug(
+                _debug(
                     f"sidecar confidence normalized -> {tempo_conf_score:.3f} from raw={tempo_conf_score_raw} "
                     f"(backend={external_backend_hint or 'unknown'}, bounds={external_conf_bounds or 'auto'})"
                 )
@@ -979,7 +986,7 @@ def analyze_pipeline(
                 "orig_duration_sec": (info.frames / info.samplerate) if info.samplerate else None,
             }
         except Exception as e:  # noqa: BLE001
-            debug(f"soundfile inspect failed: {e}")
+            _debug(f"soundfile inspect failed: {e}")
 
     # QA metrics on the loaded mono signal
     qa: Dict[str, Any] = {}
@@ -1086,7 +1093,7 @@ def analyze_pipeline(
         data["cache_status"] = "disabled"
     if sidecar_warnings:
         data["sidecar_warnings"] = sidecar_warnings
-        debug(f"sidecar warnings: {sidecar_warnings}")
+        _debug(f"sidecar warnings: {sidecar_warnings}")
 
     # Enforce sidecar cache cap if we wrote a new entry
     if use_cache and 'sidecar_cache_dir' in locals() and sidecar_cache_dir and sidecar_cache_dir.exists():
@@ -1220,13 +1227,12 @@ def main(argv=None) -> int:
     apply_log_sandbox_env(args)
     run_preflight_if_requested(args)
 
-    global _log
-    _log = get_configured_logger("ma_audio_features", defaults={"tool": "ma_audio_features"})
+    log = get_configured_logger("ma_audio_features", defaults={"tool": "ma_audio_features"})
 
     settings = load_runtime_settings(args)
 
     if args.require_sidecar and os.getenv("ALLOW_REQUIRE_SIDECAR", "1") == "0":
-        debug("require_sidecar suppressed by ALLOW_REQUIRE_SIDECAR=0 (sandbox mode)")
+        debug("require_sidecar suppressed by ALLOW_REQUIRE_SIDECAR=0 (sandbox mode)", log)
         args.require_sidecar = False
 
     if args.cache_gc:
@@ -1236,8 +1242,8 @@ def main(argv=None) -> int:
         return 0
     start_ts = time.perf_counter()
     if LOG_JSON:
-        _log("start", {"event": "start", "audio": args.audio, "out": args.out, "tool": "ma_audio_features"})
-        log_stage_start(_log, "analyze_pipeline", audio=args.audio, out=args.out, tempo_backend=args.tempo_backend, require_sidecar=args.require_sidecar)
+        log("start", {"event": "start", "audio": args.audio, "out": args.out, "tool": "ma_audio_features"})
+        log_stage_start(log, "analyze_pipeline", audio=args.audio, out=args.out, tempo_backend=args.tempo_backend, require_sidecar=args.require_sidecar)
 
     if args.qa_policy:
         policy = get_qa_policy(args.qa_policy)
@@ -1252,9 +1258,9 @@ def main(argv=None) -> int:
         args.qa_policy = settings.qa_policy
 
     # Fast sanity for required inputs
-    if not require_file(args.audio, logger=debug):
+    if not require_file(args.audio, logger=log):
         return 2
-    if args.external_tempo_json and not require_file(args.external_tempo_json, logger=debug):
+    if args.external_tempo_json and not require_file(args.external_tempo_json, logger=log):
         return 2
 
     cache_dir = args.cache_dir or settings.cache_dir
@@ -1285,10 +1291,11 @@ def main(argv=None) -> int:
         tempo_sidecar_conf_lower=tempo_sidecar_conf_lower,
         tempo_sidecar_conf_upper=tempo_sidecar_conf_upper,
         require_sidecar=args.require_sidecar,
+        log=log,
     )
     duration_ms = int((time.perf_counter() - start_ts) * 1000)
 
-    _warn_if_schema_mismatch(result)
+    _warn_if_schema_mismatch(result, log)
     lint_warns: list[str] = []
     lint_warns.extend(lint_features_payload(result))
     sidecar_warnings = result.get("sidecar_warnings") or []
@@ -1303,7 +1310,7 @@ def main(argv=None) -> int:
     status = "ok"
     if lint_warns and args.strict:
         status = "error"
-        _log(f"[ma_audio_features] lint warnings: {lint_warns}")
+        log(f"[ma_audio_features] lint warnings: {lint_warns}")
 
     if LOG_JSON:
         meta_log: Dict[str, Any] | None = None
@@ -1314,7 +1321,7 @@ def main(argv=None) -> int:
                 for k in ("tempo_backend_source", "source_hash", "config_fingerprint"):
                     meta_log.pop(k, None)
         log_stage_end(
-            _log,
+            log,
             "analyze_pipeline",
             status=status,
             audio=args.audio,
@@ -1330,7 +1337,7 @@ def main(argv=None) -> int:
             sidecar_lint_warnings=len(lint_warns),
             warnings=lint_warns,
         )
-        _log(
+        log(
             "end",
             {
                 "event": "end",

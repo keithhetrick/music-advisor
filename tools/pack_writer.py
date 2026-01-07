@@ -310,13 +310,12 @@ def main() -> None:
     # Align runtime/config defaults across CLIs
     _ = load_runtime_settings(args)
     settings = load_log_settings(args)
-    global _log
-    _log = get_configured_logger("pack_writer", defaults={"tool": "pack_writer"})
+    log = get_configured_logger("pack_writer", defaults={"tool": "pack_writer"})
 
     start_ts = time.perf_counter()
     if os.getenv("LOG_JSON") == "1":
         log_stage_start(
-            _log,
+            log,
             "pack_writer",
             merged=args.merged,
             out_dir=args.out_dir,
@@ -346,12 +345,12 @@ def main() -> None:
     essentials = ["duration_sec", "tempo_bpm", "key", "mode", "loudness_LUFS"]
     missing = [k for k in essentials if merged.get(k) is None]
     if missing:
-        _log(
+        log(
             "[pack_writer] aborting: missing essentials "
             + json.dumps({k: merged.get(k) for k in essentials}, indent=2)
         )
         if os.getenv("LOG_JSON") == "1":
-            log_stage_end(_log, "pack_writer", status="error", reason="missing_essentials", missing=missing)
+            log_stage_end(log, "pack_writer", status="error", reason="missing_essentials", missing=missing)
         sys.exit(1)
 
     lint_merged = lint_merged_payload(merged)
@@ -403,7 +402,7 @@ def main() -> None:
     now = utc_now_iso()
     if os.getenv("LOG_JSON") == "1":
         log_stage_start(
-            _log,
+            log,
             "pack_writer",
             out_dir=args.out_dir,
             wrote_pack=bool(out_pack),
@@ -412,19 +411,19 @@ def main() -> None:
         )
     else:
         if out_pack:
-            _log(f"[pack_writer] wrote pack -> {out_pack} @ {now}")
+            log(f"[pack_writer] wrote pack -> {out_pack} @ {now}")
         if args.client_txt:
-            _log(f"[pack_writer] wrote {names.CLIENT_TOKEN}.txt -> {args.client_txt} @ {now}")
+            log(f"[pack_writer] wrote {names.CLIENT_TOKEN}.txt -> {args.client_txt} @ {now}")
         if args.client_json:
-            _log(f"[pack_writer] wrote {names.CLIENT_TOKEN}.json -> {args.client_json} @ {now}")
+            log(f"[pack_writer] wrote {names.CLIENT_TOKEN}.json -> {args.client_json} @ {now}")
 
     warnings = lint_merged + lint_pack
     if warnings:
-        _log(f"[pack_writer] lint warnings: {warnings}")
+        log(f"[pack_writer] lint warnings: {warnings}")
         if args.strict:
             if os.getenv("LOG_JSON") == "1":
                 log_stage_end(
-                    _log,
+                    log,
                     "pack_writer",
                     status="error",
                     out_dir=args.out_dir,
@@ -435,7 +434,7 @@ def main() -> None:
     if os.getenv("LOG_JSON") == "1":
         duration_ms = int((time.perf_counter() - start_ts) * 1000)
         log_stage_end(
-            _log,
+            log,
             "pack_writer",
             status="ok",
             out_dir=args.out_dir,
@@ -445,7 +444,7 @@ def main() -> None:
             wrote_client_json=bool(args.client_json),
             warnings=warnings,
         )
-        _log("end", {"event": "end", "tool": "pack_writer", "out_dir": args.out_dir, "status": "ok", "duration_ms": duration_ms, "warnings": warnings})
+        log("end", {"event": "end", "tool": "pack_writer", "out_dir": args.out_dir, "status": "ok", "duration_ms": duration_ms, "warnings": warnings})
 
 if __name__ == "__main__":
     main()

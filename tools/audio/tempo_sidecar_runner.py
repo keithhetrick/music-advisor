@@ -135,9 +135,9 @@ def parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 
-def log(msg: str, verbose: bool) -> None:
+def log(msg: str, verbose: bool, logger) -> None:
     if verbose:
-        _log(msg)
+        logger(msg)
 
 
 def parse_key_mode(label: Any) -> Tuple[Optional[str], Optional[str]]:
@@ -179,7 +179,7 @@ def get_backend_version(mod: Any, pkg_name: str) -> Optional[str]:
         return None
 
 
-def run_with_essentia(audio_path: str, sample_rate: int, verbose: bool) -> Optional[Dict[str, Any]]:
+def run_with_essentia(audio_path: str, sample_rate: int, verbose: bool, logger) -> Optional[Dict[str, Any]]:
     if es is None:
         return None
     try:
@@ -225,11 +225,11 @@ def run_with_essentia(audio_path: str, sample_rate: int, verbose: bool) -> Optio
             "beats_count": len(beat_positions) if beat_positions is not None else 0,
         }
     except Exception as e:  # noqa: BLE001
-        log(f"Essentia backend failed: {e}", verbose)
+        log(f"Essentia backend failed: {e}", verbose, logger)
         return None
 
 
-def run_with_madmom(audio_path: str, verbose: bool) -> Optional[Dict[str, Any]]:
+def run_with_madmom(audio_path: str, verbose: bool, logger) -> Optional[Dict[str, Any]]:
     if RNNBeatProcessor is None or DBNBeatTrackingProcessor is None:
         return None
     try:
@@ -300,11 +300,11 @@ def run_with_madmom(audio_path: str, verbose: bool) -> Optional[Dict[str, Any]]:
                     pass
         return result
     except Exception as e:  # noqa: BLE001
-        log(f"Madmom backend failed: {e}", verbose)
+        log(f"Madmom backend failed: {e}", verbose, logger)
         return None
 
 
-def run_with_librosa(audio_path: str, sample_rate: int, verbose: bool) -> Optional[Dict[str, Any]]:
+def run_with_librosa(audio_path: str, sample_rate: int, verbose: bool, logger) -> Optional[Dict[str, Any]]:
     try:
         y, sr = pipeline.load_audio(audio_path, sr=sample_rate)
         tempo_primary, tempo_half, tempo_double, _ = pipeline.estimate_tempo_with_folding(y, sr)
@@ -374,7 +374,7 @@ def run_with_librosa(audio_path: str, sample_rate: int, verbose: bool) -> Option
             "beats_count": len(beats) if beats is not None else 0,
         }
     except Exception as e:  # noqa: BLE001
-        log(f"Librosa fallback failed: {e}", verbose)
+        log(f"Librosa fallback failed: {e}", verbose, logger)
         return None
 
 
@@ -403,35 +403,34 @@ def main() -> int:
     _ = load_runtime_settings(args)
     # Rebuild logger after potential log-sandbox toggle and runtime redaction inputs
     _ = load_log_settings(args)
-    global _log
-    _log = get_configured_logger("tempo_sidecar")
-    if not require_file(args.audio, logger=lambda m: _log(m)):
+    logger = get_configured_logger("tempo_sidecar")
+    if not require_file(args.audio, logger=lambda m: logger(m)):
         return 2
 
     start_ts = time.perf_counter()
     if os.getenv("LOG_JSON") == "1":
-        _log("start", {"event": "start", "audio": args.audio, "out": args.out, "tool": "tempo_sidecar"})
-        log_stage_start(_log, "tempo_probe", audio=args.audio, out=args.out, requested_backend=args.backend)
+        logger("start", {"event": "start", "audio": args.audio, "out": args.out, "tool": "tempo_sidecar"})
+        log_stage_start(logger, "tempo_probe", audio=args.audio, out=args.out, requested_backend=args.backend)
 
     backend, _ = pick_backend(args.backend)
-    log(f"selected backend={backend}", args.verbose)
+    log(f"selected backend={backend}", args.verbose, logger)
 
     result: Optional[Dict[str, Any]] = None
     if backend == "essentia":
-        result = run_with_essentia(args.audio, args.sample_rate, args.verbose)
+        result = run_with_essentia(args.audio, args.sample_rate, args.verbose, logger)
         if result is None and args.backend == "auto":
             backend = "madmom" if RNNBeatProcessor is not None else "librosa"
     if result is None and backend == "madmom":
-        result = run_with_madmom(args.audio, args.verbose)
+        result = run_with_madmom(args.audio, args.verbose, logger)
         if result is None and args.backend == "auto":
             backend = "librosa"
     if result is None:
-        result = run_with_librosa(args.audio, args.sample_rate, args.verbose)
+        result = run_with_librosa(args.audio, args.sample_rate, args.verbose, logger)
 
     if result is None:
-        log("All tempo sidecar backends failed.", True)
+        log("All tempo sidecar backends failed.", True, logger)
         if os.getenv("LOG_JSON") == "1":
-            log_stage_end(_log, "tempo_probe", status="error", selected_backend=backend, reason="all_backends_failed")
+            log_stage_end(logger, "tempo_probe", status="error", selected_backend=backend, reason="all_backends_failed")
         return 1
 
     # Normalize mode label
@@ -459,12 +458,12 @@ def main() -> int:
         lint_warns, _ = lint_json_file(out_path, "sidecar")
         status = "ok"
         if lint_warns:
-            log(f"sidecar lint warnings: {lint_warns}", True)
+            log(f"sidecar lint warnings: {lint_warns}", True, logger)
             status = "error" if args.strict else "ok"
-        log(f"wrote sidecar payload -> {out_path}", args.verbose)
+        log(f"wrote sidecar payload -> {out_path}", args.verbose, logger)
         if os.getenv("LOG_JSON") == "1":
             log_stage_end(
-                _log,
+                logger,
                 "tempo_probe",
                 status=status,
                 audio=args.audio,
@@ -475,14 +474,14 @@ def main() -> int:
                 beats_count=len(result.get("beats_sec") or []),
                 warnings=lint_warns,
             )
-            _log("end", {"event": "end", "audio": args.audio, "out": args.out, "tool": "tempo_sidecar", "status": status, "backend": backend, "duration_ms": duration_ms, "warnings": lint_warns})
+            logger("end", {"event": "end", "audio": args.audio, "out": args.out, "tool": "tempo_sidecar", "status": status, "backend": backend, "duration_ms": duration_ms, "warnings": lint_warns})
         if status == "error":
             return 1
         return 0
     except Exception as exc:  # noqa: BLE001
-        log(f"failed to write sidecar payload to {args.out}: {exc}", True)
+        log(f"failed to write sidecar payload to {args.out}: {exc}", True, logger)
         if os.getenv("LOG_JSON") == "1":
-            log_stage_end(_log, "tempo_probe", status="error", audio=args.audio, out=args.out, selected_backend=backend, reason=str(exc))
+            log_stage_end(logger, "tempo_probe", status="error", audio=args.audio, out=args.out, selected_backend=backend, reason=str(exc))
         return 2
 
 
