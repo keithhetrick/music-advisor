@@ -40,6 +40,13 @@ __pycache__/
 *.so
 *.dylib
 
+# Ignore archive by default; keep BuilderPack snapshot tracked for installs
+archive/**
+!archive/builder_pack/**
+!archive/builder_pack/builder/**
+!archive/builder_pack/builder/export/**
+!archive/builder_pack/builder/export/MusicAdvisor/**
+
 # JUCE build artifacts
 /plugins/juce_ui_demo/build/
 /plugins/juce_ui_demo/build-ninja/
@@ -238,3 +245,5 @@ __pypackages__/
 # Scratch
 tmp/
 scratch/
+
+docs/repo_surgery/

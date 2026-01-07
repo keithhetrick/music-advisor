@@ -6,16 +6,26 @@ typeset -Ag STAGE_TS
 # Allow custom sidecar command by default in smoke runs (mirrors Automator behavior).
 export ALLOW_CUSTOM_SIDECAR_CMD="${ALLOW_CUSTOM_SIDECAR_CMD:-1}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO="$(cd "$SCRIPT_DIR/../.." && pwd)"
+PY="$REPO/.venv/bin/python"
+if [[ ! -x "$PY" ]]; then
+  if command -v python3 >/dev/null 2>&1; then
+    PY="$(command -v python3)"
+  else
+    echo "[ERR] python3 not found; create/activate $REPO/.venv" >&2
+    exit 1
+  fi
+fi
 . "$SCRIPT_DIR/lib_security.sh"
 now_ms() {
-  python3 - <<'PY'
+  "$PY" - <<'PY'
 import time
 print(int(time.time()*1000))
 PY
 }
 log_json() {
   if [[ "${LOG_JSON:-0}" == "1" ]]; then
-    python3 - <<'PY' "$1"
+    "$PY" - <<'PY' "$1"
 import json,sys
 from datetime import datetime
 payload=json.loads(sys.argv[1])
@@ -27,7 +37,7 @@ PY
 stage_start() {
   local stage="$1"; shift
   STAGE_TS[$stage]=$(now_ms)
-  log_json "$(python3 - <<'PY' "$stage" "$@"
+  log_json "$("$PY" - <<'PY' "$stage" "$@"
 import json,sys
 stage=sys.argv[1]
 extra=dict(arg.split("=",1) for arg in sys.argv[2:] if "=" in arg)
@@ -40,9 +50,20 @@ PY
 stage_end() {
   local stage="$1"; shift
   local end=$(now_ms)
-  local start=${STAGE_TS[$stage]:-0}
+  local start_marker=${STAGE_TS[$stage]:-}
+  if [[ -z "${start_marker}" ]]; then
+    STAGE_TS[$stage]=$end
+    start_marker=$end
+    log_json "$("$PY" - <<'PY' "$stage"
+import json,sys
+stage=sys.argv[1]
+print(json.dumps({"event":"stage_warn","tool":"smoke_full_chain","stage":stage,"warning":"stage_end_without_stage_start"}))
+PY
+)"
+  fi
+  local start=$start_marker
   local dur=$(( end - start ))
-  log_json "$(python3 - <<'PY' "$stage" "$dur" "$@"
+  log_json "$("$PY" - <<'PY' "$stage" "$dur" "$@"
 import json,sys
 stage=sys.argv[1]; dur=int(sys.argv[2])
 extra=dict(arg.split("=",1) for arg in sys.argv[3:] if "=" in arg)
@@ -56,15 +77,20 @@ PY
 # Minimal end-to-end smoke test for the HCI/client pipeline on a single audio file.
 # Usage: scripts/smoke_full_chain.sh /path/to/audio.wav
 
-REPO="$(cd "$(dirname "$0")/../.." && pwd)"
 export PYTHONPATH="$REPO:$REPO/src:${PYTHONPATH:-}"
 export LOG_REDACT="${LOG_REDACT:-1}"
 export LOG_SANDBOX="${LOG_SANDBOX:-1}"
+if [[ -n "${SMOKE_SIDECAR_TIMEOUT_SECONDS:-}" ]]; then
+  export SIDECAR_TIMEOUT_SECONDS="${SMOKE_SIDECAR_TIMEOUT_SECONDS}"
+fi
+if [[ -n "${SMOKE_SIDECAR_RETRY_ATTEMPTS:-}" ]]; then
+  export SIDECAR_RETRY_ATTEMPTS="${SMOKE_SIDECAR_RETRY_ATTEMPTS}"
+fi
 
 if [[ $# -lt 1 ]]; then
   if [[ "${SMOKE_GEN_AUDIO:-0}" == "1" ]]; then
     TMP_AUDIO="$(mktemp -t smoke_audio_XXXXXX).wav"
-    python3 - <<'PY' "$TMP_AUDIO"
+    "$PY" - <<'PY' "$TMP_AUDIO"
 import sys, math
 import numpy as np
 from pathlib import Path
@@ -102,17 +128,6 @@ if [[ ! -f "$IN_AUDIO" ]]; then
   exit 1
 fi
 
-PY="$REPO/.venv/bin/python"
-BIN="$REPO/.venv/bin"
-if [[ ! -x "$PY" ]]; then
-  if command -v python3 >/dev/null 2>&1; then
-    PY="$(command -v python3)"
-  else
-    echo "[ERR] python3 not found; create/activate $REPO/.venv" >&2
-    exit 1
-  fi
-fi
-
 TS="$(date -u +%Y%m%d_%H%M%S)"
 OUT_DIR="$REPO/data/features_output/smoke/$TS/$(basename "$IN_AUDIO" | sed 's/[[:space:]]/_/g')"
 mkdir -p "$OUT_DIR"
@@ -127,24 +142,42 @@ HCI_JSON="$OUT_DIR/smoke.hci.json"
 
 echo "[smoke] using PY=$PY"
 echo "[smoke] OUT_DIR=$OUT_DIR"
+echo "[smoke] require_sidecar=${SMOKE_REQUIRE_SIDECAR:-0} sidecar_timeout=${SMOKE_SIDECAR_TIMEOUT_SECONDS:-} sidecar_retries=${SMOKE_SIDECAR_RETRY_ATTEMPTS:-}"
 
 stage_start "smoke_full_chain" audio="$IN_AUDIO" out_dir="$OUT_DIR"
 set -x
-MA_AUDIO_CLI=("${MA_AUDIO_CLI[@]:-$PY}" "$REPO/tools/ma_audio_features.py")
-SIDECAR_CLI=("${SIDECAR_CLI[@]:-$PY}" "$REPO/tools/tempo_sidecar_runner.py")
-MERGE_CLI=("${MERGE_CLI[@]:-$PY}" "$REPO/tools/equilibrium_merge.py")
-PACK_CLI=("${PACK_CLI[@]:-$PY}" "$REPO/tools/pack_writer.py")
+MA_AUDIO_CLI=(${MA_AUDIO_CLI[@]:-"$PY"})
+MA_AUDIO_CLI+=("$REPO/tools/ma_audio_features.py")
+if [[ "${SMOKE_REQUIRE_SIDECAR:-0}" == "1" ]]; then
+  MA_AUDIO_CLI+=("--require-sidecar")
+fi
+SIDECAR_CLI=(${SIDECAR_CLI[@]:-"$PY"})
+SIDECAR_CLI+=("$REPO/tools/tempo_sidecar_runner.py")
+MERGE_CLI=(${MERGE_CLI[@]:-"$PY"})
+MERGE_CLI+=("$REPO/tools/equilibrium_merge.py")
+PACK_CLI=(${PACK_CLI[@]:-"$PY"})
+PACK_CLI+=("$REPO/tools/pack_writer.py")
 PACK_SCRIPT=""
 # Prefer in-repo pack_writer during smoke runs to pick up latest changes without reinstalling.
 if [[ "${SMOKE_GEN_AUDIO:-0}" == "1" ]]; then
   PACK_CLI=("$PY")
   PACK_SCRIPT="$REPO/tools/pack_writer.py"
 fi
+SIDECAR_CMD_PREFIX="${(j: :)${(q)SIDECAR_CLI[@]}}"
+SIDECAR_CMD="${SIDECAR_CMD_PREFIX} --audio {audio} --out {out}"
+if [[ "${LOG_REDACT:-1}" == "1" ]]; then
+  echo "[smoke] sidecar_cmd_template=<redacted>"
+else
+  echo "[smoke] sidecar_cmd_template=$SIDECAR_CMD"
+fi
 
-"${MA_AUDIO_CLI[@]}" --audio "$IN_AUDIO" --out "$FEATURES_JSON" --tempo-backend sidecar --require-sidecar --tempo-sidecar-json-out "$SIDECAR_JSON" --tempo-sidecar-cmd "${SIDECAR_CLI[*]} --audio {audio} --out {out}"
+stage_start "ma_audio_features" audio="$IN_AUDIO"
+"${MA_AUDIO_CLI[@]}" --audio "$IN_AUDIO" --out "$FEATURES_JSON" --tempo-backend sidecar --tempo-sidecar-json-out "$SIDECAR_JSON" --tempo-sidecar-cmd "$SIDECAR_CMD"
 stage_end "ma_audio_features" out="$FEATURES_JSON"
+stage_start "equilibrium_merge" merged="$MERGED_JSON"
 "${MERGE_CLI[@]}" --internal "$FEATURES_JSON" --out "$MERGED_JSON"
 stage_end "equilibrium_merge" out="$MERGED_JSON"
+stage_start "pack_writer" out_dir="$OUT_DIR"
 if [[ -n "$PACK_SCRIPT" ]]; then
   "${PACK_CLI[@]}" "$PACK_SCRIPT" --merged "$MERGED_JSON" --out-dir "$OUT_DIR" --client-json "$CLIENT_JSON" --client-txt "$CLIENT_TXT" --no-pack
 else
@@ -153,7 +186,7 @@ fi
 stage_end "pack_writer" out_dir="$OUT_DIR"
 
 # Ensure runtime_sec exists in client helper (smoke sanity).
-python3 - "$CLIENT_JSON" <<'PY'
+"$PY" - "$CLIENT_JSON" <<'PY'
 import json, sys
 path = sys.argv[1]
 data = json.loads(open(path).read())
@@ -166,7 +199,7 @@ with open(path, "w") as f:
 PY
 
 # Ensure feature_pipeline_meta has minimal defaults (helps lint/echo_hci), with a best-effort hash.
-python3 - <<'PY' "$FEATURES_JSON" "$IN_AUDIO" "${SMOKE_GEN_AUDIO:-0}"
+"$PY" - <<'PY' "$FEATURES_JSON" "$IN_AUDIO" "${SMOKE_GEN_AUDIO:-0}"
 import json, sys, hashlib, os
 feat_path, audio_path, is_smoke = sys.argv[1], sys.argv[2], sys.argv[3] == "1"
 data = json.loads(open(feat_path).read())
@@ -188,7 +221,8 @@ PY
 
 # Dummy HCI bootstrap: if no HCI exists, synthesize a minimal one from merged.json so downstream steps can run.
 if [[ ! -f "$HCI_JSON" ]]; then
-  python3 - <<'PY' "$MERGED_JSON" "$HCI_JSON"
+  stage_start "synthesize_hci" merged="$MERGED_JSON"
+  "$PY" - <<'PY' "$MERGED_JSON" "$HCI_JSON"
 import json, sys
 if len(sys.argv) < 3:
     raise SystemExit("usage: synth merged.json out.json")
@@ -316,11 +350,6 @@ hci = {
         "primary_decade_neighbor_count": 0,
         "top_neighbor": {},
     },
-    "feature_pipeline_meta": {
-        "source_hash": "smoke_synth",
-        "config_fingerprint": "smoke_synth",
-        "pipeline_version": "smoke_synth",
-    },
 }
 with open(out, "w") as f:
     json.dump(hci, f, indent=2)
@@ -329,22 +358,29 @@ PY
   stage_end "synthesize_hci" out="$HCI_JSON"
 fi
 
+stage_start "hci_final_score" root="$OUT_DIR"
 "$PY" "$REPO/tools/hci_final_score.py" --root "$OUT_DIR" --recompute
 stage_end "hci_final_score" root="$OUT_DIR"
+stage_start "philosophy_hci" root="$OUT_DIR"
 "$PY" "$REPO/tools/ma_add_philosophy_to_hci.py" --root "$OUT_DIR"
 stage_end "philosophy_hci" root="$OUT_DIR"
+stage_start "echo_hci" root="$OUT_DIR"
 "$PY" "$REPO/tools/ma_add_echo_to_hci_v1.py" --root "$OUT_DIR"
 stage_end "echo_hci" root="$OUT_DIR"
 # Rebuild client helpers right before merge to guarantee runtime_sec + fresh schema fields.
 "$PY" "$REPO/tools/pack_writer.py" --merged "$MERGED_JSON" --out-dir "$OUT_DIR" --client-json "$CLIENT_JSON" --client-txt "$CLIENT_TXT" --no-pack
+stage_start "merge_client_hci" out="$CLIENT_TXT"
 "$PY" "$REPO/tools/ma_merge_client_and_hci.py" --client-json "$CLIENT_JSON" --hci "$HCI_JSON" --client-out "$CLIENT_TXT"
 stage_end "merge_client_hci" out="$CLIENT_TXT"
+stage_start "philosophy_client" root="$OUT_DIR"
 "$PY" "$REPO/tools/ma_add_philosophy_to_client_rich.py" --root "$OUT_DIR"
 stage_end "philosophy_client" root="$OUT_DIR"
+stage_start "echo_client" root="$OUT_DIR"
 "$PY" "$REPO/tools/hci/ma_add_echo_to_client_rich_v1.py" --root "$OUT_DIR"
 stage_end "echo_client" root="$OUT_DIR"
 
 # Write a run summary with versions (useful for CI artifacts)
+stage_start "log_summary" out_dir="$OUT_DIR"
 "$PY" "$REPO/tools/log_summary.py" --out-dir "$OUT_DIR"
 stage_end "log_summary" out_dir="$OUT_DIR"
 set +x

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from adapters.bootstrap import ensure_repo_root
 """
 Sweep a folder of audio files with the tempo sidecar and log confidence/key metadata.
 
@@ -15,6 +14,8 @@ import sys
 import tempfile
 from pathlib import Path
 from typing import Any, Dict, Optional
+
+from adapters.bootstrap import ensure_repo_root
 
 HERE = Path(__file__).resolve()
 REPO_ROOT = HERE.parent.parent

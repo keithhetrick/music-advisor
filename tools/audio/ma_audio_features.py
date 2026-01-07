@@ -1,4 +1,3 @@
-from ma_audio_engine.adapters.bootstrap import ensure_repo_root
 #!/usr/bin/env python3
 """
 Pipeline feature extractor for MusicAdvisor HCI.
@@ -41,7 +40,6 @@ import math
 import os
 import shlex
 import shutil
-import subprocess
 import sys
 import tempfile
 import time
@@ -49,16 +47,13 @@ import warnings
 import subprocess
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
-from ma_audio_engine.adapters.cli_adapter import (
-    add_log_format_arg,
-    add_log_sandbox_arg,
-    add_preflight_arg,
-    apply_log_format_env,
-    apply_log_sandbox_env,
-    run_preflight_if_requested,
-)
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import numpy as np
+from ma_audio_engine.adapters.bootstrap import ensure_repo_root
 from ma_config.paths import get_repo_root
 
 ensure_repo_root()
@@ -73,13 +68,20 @@ from ma_audio_engine.adapters import (
     get_hash_params,
     hash_file,
     is_backend_enabled,
-    list_supported_backends,
     load_json_guarded,
     load_audio_mono,
+    load_runtime_settings,
+    normalize_tempo_confidence,
     require_file,
     utc_now_iso,
-    normalize_tempo_confidence,
-    load_runtime_settings,
+)
+from ma_audio_engine.adapters.cli_adapter import (
+    add_log_format_arg,
+    add_log_sandbox_arg,
+    add_preflight_arg,
+    apply_log_format_env,
+    apply_log_sandbox_env,
+    run_preflight_if_requested,
 )
 from tools.schema_utils import lint_features_payload, lint_json_file
 from ma_audio_engine.adapters.service_registry import (
@@ -119,6 +121,53 @@ try:
 except Exception:
     # If SciPy isn't present or something else goes wrong, just continue.
     pass
+
+# --- Backend normalization ---
+def _sanitize_tempo_backend_fields(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Force tempo backend fields into a safe, known set without changing schema keys."""
+    cleaned = payload
+    allowed_details = {"essentia", "madmom", "librosa", "auto", "external"}
+    backend_raw = cleaned.get("tempo_backend")
+    backend = "external" if isinstance(backend_raw, str) and backend_raw.strip() == "external" else "librosa"
+
+    detail_raw = cleaned.get("tempo_backend_detail")
+    if backend == "librosa":
+        detail = "librosa"
+    else:
+        if isinstance(detail_raw, str) and detail_raw.strip() in allowed_details:
+            detail = detail_raw.strip()
+            if detail == "auto":
+                detail = "external"
+        else:
+            detail = "external"
+
+    meta = cleaned.get("tempo_backend_meta")
+    meta_version = None
+    if isinstance(meta, dict):
+        if isinstance(meta.get("backend_version"), str):
+            meta_version = meta["backend_version"]
+    meta_backend_raw = meta.get("backend") if isinstance(meta, dict) else None
+    if backend == "librosa":
+        meta_backend = "librosa"
+    else:
+        if isinstance(meta_backend_raw, str) and meta_backend_raw.strip() in allowed_details:
+            meta_backend = meta_backend_raw.strip()
+            if meta_backend == "auto":
+                meta_backend = "external"
+        else:
+            meta_backend = detail
+
+    source = cleaned.get("tempo_backend_source")
+    if backend == "external":
+        source_val = source if isinstance(source, str) and source else "external"
+    else:
+        source_val = "librosa"
+
+    cleaned["tempo_backend"] = backend
+    cleaned["tempo_backend_detail"] = detail
+    cleaned["tempo_backend_meta"] = {"backend": meta_backend, "backend_version": meta_version}
+    cleaned["tempo_backend_source"] = source_val
+    return cleaned
 
 # --- Runtime dependency sanity (warn-only) ---
 def _warn_if_dep_out_of_range() -> None:
@@ -1013,7 +1062,11 @@ def analyze_pipeline(
         if tempo_backend == "sidecar":
             config_components["tempo_sidecar_cmd"] = tempo_sidecar_cmd or DEFAULT_SIDECAR_CMD
         sidecar_status = "used"
+    if "sidecar_timeout" in sidecar_warnings and sidecar_status != "used":
+        sidecar_status = "timeout"
     if require_sidecar and tempo_backend == "sidecar" and sidecar_status != "used":
+        if sidecar_status == "timeout":
+            raise RuntimeError(f"sidecar timed out (SIDECAR_TIMEOUT_SECONDS={SIDECAR_TIMEOUT_SECONDS}); cannot satisfy --require-sidecar")
         raise RuntimeError("require_sidecar enabled but sidecar was not used; failing run")
 
     if TRACK_TIMEOUT_SECONDS is not None:
@@ -1032,6 +1085,7 @@ def analyze_pipeline(
             if not isinstance(cached, dict) or "tempo_backend" not in cached or "source_audio" not in cached:
                 debug("cache entry missing required fields; ignoring")
             else:
+                cached = _sanitize_tempo_backend_fields(cached)
                 cached["cache_status"] = "hit"
                 return cached
 
@@ -1294,6 +1348,10 @@ def analyze_pipeline(
 
     now_ts = utc_now_iso(timespec="seconds")
 
+    external_used = bool(external_data)
+    tempo_backend_used = _sanitize_tempo_backend_value(tempo_backend_used, external_used, sidecar_warnings)
+    backend_detail = _sanitize_tempo_backend_value(external_backend_hint or tempo_backend_used, external_used, sidecar_warnings)
+
     key_confidence_score_norm = normalize_key_confidence(external_key_strength_raw) if (external_data and external_key_strength_raw is not None and math.isfinite(external_key_strength_raw)) else None
 
     data: Dict[str, Any] = {
@@ -1311,9 +1369,9 @@ def analyze_pipeline(
         "tempo_confidence_score_raw": tempo_conf_score_raw,
         "tempo_backend": tempo_backend_used,
         "tempo_backend_source": external_source_path if external_data else "librosa",
-        "tempo_backend_detail": external_backend_hint if external_data else tempo_backend_used,
+        "tempo_backend_detail": backend_detail,
         "tempo_backend_meta": {
-            "backend": external_backend_hint if external_data else tempo_backend_used,
+            "backend": backend_detail,
             "backend_version": external_backend_version if external_data else None,
         },
         "tempo_alternates": external_tempo_alternates,
@@ -1388,6 +1446,8 @@ def analyze_pipeline(
     if sandbox_cfg.get("enabled"):
         data = scrub_payload_for_sandbox(data, sandbox_cfg)
         data.setdefault("sandbox_warnings", []).append("payload_sandbox_scrubbed")
+
+    data = _sanitize_tempo_backend_fields(data)
 
     if external_data:
         # Keep a lean main payload: drop the full beat grid from the feature JSON, but leave count/meta.

@@ -1,48 +1,0 @@
-[aist#0:0/pcm_s24le @ 0x7fc9f4209680] Guessed Channel Layout: stereo
-Input #0, wav, from '/Volumes/Sound Bank/***Workload***/REFERENCES/44.1kHz/MusicAdvisor_calibration_11.10.2025/audio/99_legacy_pop_eval/1981_journey__dont_stop_believin__album.wav':
-  Metadata:
-    encoded_by      : Logic Pro X
-    date            : 2025-11-1
-    creation_time   : 17:13:3
-    time_reference  : 158760000
-    umid            : 0x00000000000000000000000000000000000000003B00795182219DDF804F1200000000007800000000000000C70AECB2F77F00005005ECB2F77F0000C092D90A
-    coding_history  : 
-  Duration: 00:04:08.92, bitrate: 2116 kb/s
-  Chapters:
-    Chapter #0:0: start 0.000000, end 248.917914
-      Metadata:
-        title           : Tempo: 120.0
-  Stream #0:0: Audio: pcm_s24le ([1][0][0][0] / 0x0001), 44100 Hz, stereo, s32 (24 bit), 2116 kb/s
-Stream mapping:
-  Stream #0:0 -> #0:0 (pcm_s24le (native) -> pcm_s16le (native))
-Press [q] to stop, [?] for help
-Output #0, null, to 'pipe:':
-  Metadata:
-    encoded_by      : Logic Pro X
-    date            : 2025-11-1
-    coding_history  : 
-    time_reference  : 158760000
-    umid            : 0x00000000000000000000000000000000000000003B00795182219DDF804F1200000000007800000000000000C70AECB2F77F00005005ECB2F77F0000C092D90A
-    encoder         : Lavf62.3.100
-  Chapters:
-    Chapter #0:0: start 0.000000, end 248.917914
-      Metadata:
-        title           : Tempo: 120.0
-  Stream #0:0: Audio: pcm_s16le, 192000 Hz, stereo, s16, 6144 kb/s
-    Metadata:
-      encoder         : Lavc62.11.100 pcm_s16le
-size=N/A time=00:00:09.80 bitrate=N/A speed=19.4x elapsed=0:00:00.50    size=N/A time=00:00:21.30 bitrate=N/A speed=21.1x elapsed=0:00:01.00    size=N/A time=00:00:31.90 bitrate=N/A speed=21.1x elapsed=0:00:01.51    size=N/A time=00:00:42.00 bitrate=N/A speed=20.8x elapsed=0:00:02.01    size=N/A time=00:00:51.50 bitrate=N/A speed=20.4x elapsed=0:00:02.52    size=N/A time=00:01:02.00 bitrate=N/A speed=20.5x elapsed=0:00:03.02    size=N/A time=00:01:13.50 bitrate=N/A speed=20.8x elapsed=0:00:03.53    size=N/A time=00:01:25.30 bitrate=N/A speed=21.1x elapsed=0:00:04.03    size=N/A time=00:01:37.30 bitrate=N/A speed=21.4x elapsed=0:00:04.53    size=N/A time=00:01:49.20 bitrate=N/A speed=21.6x elapsed=0:00:05.04    size=N/A time=00:02:00.70 bitrate=N/A speed=21.8x elapsed=0:00:05.54    size=N/A time=00:02:10.30 bitrate=N/A speed=21.5x elapsed=0:00:06.05    size=N/A time=00:02:20.10 bitrate=N/A speed=21.4x elapsed=0:00:06.55    size=N/A time=00:02:29.40 bitrate=N/A speed=21.2x elapsed=0:00:07.06    size=N/A time=00:02:39.30 bitrate=N/A speed=21.1x elapsed=0:00:07.56    size=N/A time=00:02:49.40 bitrate=N/A speed=  21x elapsed=0:00:08.07    size=N/A time=00:02:59.40 bitrate=N/A speed=20.9x elapsed=0:00:08.57    size=N/A time=00:03:10.00 bitrate=N/A speed=20.9x elapsed=0:00:09.07    size=N/A time=00:03:21.70 bitrate=N/A speed=  21x elapsed=0:00:09.58    size=N/A time=00:03:33.20 bitrate=N/A speed=21.1x elapsed=0:00:10.08    size=N/A time=00:03:44.90 bitrate=N/A speed=21.2x elapsed=0:00:10.59    size=N/A time=00:03:56.60 bitrate=N/A speed=21.3x elapsed=0:00:11.09    [Parsed_loudnorm_0 @ 0x7fc9f4206dc0] 
-{
-	"input_i" : "-14.11",
-	"input_tp" : "-2.02",
-	"input_lra" : "10.00",
-	"input_thresh" : "-24.35",
-	"output_i" : "-10.10",
-	"output_tp" : "-1.00",
-	"output_lra" : "2.50",
-	"output_thresh" : "-20.23",
-	"normalization_type" : "dynamic",
-	"target_offset" : "0.10"
-}
-[out#0/null @ 0x7fc9f4206540] video:0KiB audio:186688KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
-size=N/A time=00:04:09.00 bitrate=N/A speed=21.5x elapsed=0:00:11.58    

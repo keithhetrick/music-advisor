@@ -21,7 +21,7 @@ Minimal:
 adapter = "ma_orchestrator"         # orchestrator to use
 registry_path = "project_map.json"  # registry location
 [tasks]                              # optional task aliases for `ma tasks`
-test-all = "python tools/ma_orchestrator.py test-all"
+test-all = "python -m ma_helper test-all"
 ```
 
 Paths (relative to root unless absolute):
@@ -64,7 +64,7 @@ cache_dir = ".ma_cache"
 adapter = "ma_orchestrator"
 registry_path = "project_map.json"
 [tasks]
-test-all = "python tools/ma_orchestrator.py test-all"
+test-all = "python -m ma_helper test-all"
 ```
 
 3. Ensure your repo has `tools/ma_orchestrator.py` (or add your own adapter and set `adapter = "my_adapter"`).

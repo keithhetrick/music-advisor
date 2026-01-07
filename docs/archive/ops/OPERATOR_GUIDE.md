@@ -27,7 +27,7 @@
 ## CI/Smokes
 
 - Quick smoke: `make ci-smoke` (generates tone, runs end-to-end, writes `run_summary.json`)
-- Manual smoke on your audio: `make hci-smoke AUDIO=/path/to/audio`
+- Manual smoke on your audio: `MA_UNLOCK=write python -m ma_helper smoke /path/to/audio`
 - Lint/tests: `make lint`, `make test`
 
 ## Common issues

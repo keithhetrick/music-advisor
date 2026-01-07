@@ -28,7 +28,7 @@ librosa==0.10.1
 librt==0.6.3
 llvmlite==0.45.1
 # Editable install with no version control (ma-hf-a12==0.1.7)
--e /Users/keithhetrick/MusicAdvisor_AudioTools/vendor/MusicAdvisor_BuilderPack/builder/export/MusicAdvisor
+-e archive/builder_pack/builder/export/MusicAdvisor
 markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 mdurl==0.1.2

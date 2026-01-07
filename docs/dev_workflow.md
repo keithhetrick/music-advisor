@@ -1,6 +1,6 @@
 # Developer Workflow (Pseudo-Helper)
 
-Lightweight orchestration for the Music Advisor monorepo lives in `tools/ma_orchestrator.py`. It keeps per-project commands readable and mimics Nx/Turborepo “affected” runs without extra tooling.
+Lightweight orchestration for the Music Advisor monorepo lives in `ma` (ma_helper, delegating to tools/ma_orchestrator.py). It keeps per-project commands readable and mimics Nx/Turborepo “affected” runs without extra tooling.
 
 ## Prereqs
 
@@ -15,10 +15,10 @@ Lightweight orchestration for the Music Advisor monorepo lives in `tools/ma_orch
 
 ## Common commands
 
-- List projects: `python3 tools/ma_orchestrator.py list-projects` (also `make projects`).
-- Single project tests: `python3 tools/ma_orchestrator.py test audio_engine` or `make test-audio-engine`.
-- All tests: `python3 tools/ma_orchestrator.py test-all` or `make test`.
-- Affected tests: `python3 tools/ma_orchestrator.py test-affected --base origin/main` or `make test-affected`.
+- List projects: `python -m ma_helper graph` (also `make projects`).
+- Single project tests: `python -m ma_helper test audio_engine` or `make test-audio-engine`.
+- All tests: `python -m ma_helper test-all` or `make test`.
+- Affected tests: `python -m ma_helper affected --base origin/main` or `make test-affected`.
   - Default base is `origin/main`; override with `--base <ref>` or `MA_AFFECTED_BASE=<ref>`.
 - Run helpers (if configured):
   - Audio CLI help: `make run-audio-cli` (shows `ma_audio_engine.pipe_cli` usage).
@@ -28,7 +28,7 @@ Lightweight orchestration for the Music Advisor monorepo lives in `tools/ma_orch
   - Advisor host: `make run-advisor-host` (starts the FastAPI shim).
 - Helper CLI (Nx/Turbo-style UX): `ma list` (or `python -m ma_helper` / `python tools/ma.py`), `ma tasks [--filter substr] [--json]`, `ma select` (interactive picker; fuzzy if prompt_toolkit is installed, stays open with back/blank), `ma affected --base origin/main [--parallel N]`, `ma test-all [--parallel N]`, `ma deps --graph mermaid|dot|svg|text`, `ma ci-plan --base origin/main` (print affected without running), `ma watch audio_engine [--cmd \"make test-audio\"]` (uses `entr` if present, else `watchfiles` fallback; install via `pip install watchfiles`), `ma welcome`, `ma doctor`, `ma sparse --set ...|--list|--reset`, `ma scaffold --type ... --name ...`, `ma smoke pipeline|full`, `ma lint`, `ma typecheck`, `ma format`, `ma favorites ...`, `ma rerun-last`. See `docs/tools/helper_cli.md` for the full command list and options.
 - Taskfile alternative (if you use `task`): `task list-projects`, `task test-all`, `task test-affected base=origin/main`, `task test-audio`, `task run-audio-cli`, etc.
-- Dependency view: `python3 tools/ma_orchestrator.py deps` (or `--reverse` for dependents).
+- Dependency view: `python -m ma_helper graph --format ansi` (or add `--reverse` for dependents).
 - Per-project installs: `make install-audio`, `make install-lyrics`, `make install-ttc`, `make install-reco`, `make install-host`, `make install-host-core` (Taskfile equivalents exist).
 - Offline/restricted installs: if pip cannot fetch build deps, add `--no-build-isolation`, e.g. `pip install --no-build-isolation -e engines/audio_engine ...` (or use `make install-projects` after activating your venv).
 - External drives: cloning/running from an external disk works; create the venv on that disk and set `MA_DATA_ROOT` if you want data elsewhere.

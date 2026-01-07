@@ -1,4 +1,3 @@
-from ma_audio_engine.adapters.bootstrap import ensure_repo_root
 #!/usr/bin/env python3
 """
 spotify_apply_overrides_to_core_corpus.py
@@ -57,7 +56,6 @@ Usage
     --overrides data/core_spine_spotify_overrides.csv \
     --out data/core_1600_with_spotify_patched.csv
 """
-
 from __future__ import annotations
 
 import argparse
@@ -66,15 +64,13 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from ma_config.audio import resolve_hci_v2_targets
-
-from ma_audio_engine.adapters.bootstrap import ensure_repo_root
-
-ensure_repo_root()
-
 from ma_audio_engine.adapters import add_log_sandbox_arg, apply_log_sandbox_env
 from ma_audio_engine.adapters import make_logger
 from ma_audio_engine.adapters import utc_now_iso
+from ma_audio_engine.adapters.bootstrap import ensure_repo_root
+from ma_config.audio import resolve_hci_v2_targets
+
+ensure_repo_root()
 
 
 def _norm(s: str) -> str:

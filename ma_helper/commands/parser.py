@@ -12,6 +12,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--header-live", action="store_true", help="Keep a live header/status bar while the command runs (Rich Live if available; otherwise ignored)")
     p.add_argument("--no-telemetry", action="store_true", help="Disable telemetry/log event emission for this run")
     p.add_argument("--telemetry-file", help="Override telemetry NDJSON path for this run")
+    p.add_argument("--unlock-write", action="store_true", help="Permit commands that write to the working tree/cache")
+    p.add_argument("--unlock-danger", action="store_true", help="Permit destructive commands (requires confirmation unless --yes)")
+    p.add_argument("--yes", action="store_true", help="Auto-confirm prompts for danger operations")
     sub = p.add_subparsers(dest="command", required=True)
 
     sub.add_parser("list", help="List projects")
@@ -218,8 +221,8 @@ def build_parser() -> argparse.ArgumentParser:
     scaffold.add_argument("--path", help="Destination path (default: tools/scaffolds/<name>)")
     scaffold.add_argument("--write-registry", action="store_true", help="Also add to project_map.json (sorted)")
 
-    smoke = sub.add_parser("smoke", help="Run predefined smokes")
-    smoke.add_argument("target", choices=["pipeline", "full", "menu"], help="Which smoke to run")
+    smoke = sub.add_parser("smoke", help="Run canonical audio smoke")
+    smoke.add_argument("audio", help="Path to an audio file (wav/mp3/flac)")
 
     verify = sub.add_parser("verify", help="Run a short gate: lint + typecheck + smoke + affected(no-diff)")
     verify.add_argument("--ignore-failures", action="store_true", help="Continue even if a step fails")

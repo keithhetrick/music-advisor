@@ -7,16 +7,14 @@
 .PHONY: install-audio install-lyrics install-ttc install-reco install-host install-host-core
 .PHONY: bootstrap-all bootstrap-locked rebuild-venv
 
-# 1) Minimal end-to-end smoke (tone)
+# 1) Minimal end-to-end smoke (tone) via ma_helper front door
 smoke:
 	python -c 'import math,wave,struct; sr=44100; dur=1.0; f=440.0; n=int(sr*dur); w=wave.open("tone.wav","w"); w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr); [w.writeframes(struct.pack("<h", int(0.2*32767*math.sin(2*math.pi*f*i/sr)))) for i in range(n)]; w.close()'
-	./automator.sh tone.wav
-	@find features_output -name "*.pack.json" -maxdepth 5 | tail -n 1 | xargs -I{} python infra/scripts/pretty.py {}
+	MA_UNLOCK=write python -m ma_helper smoke tone.wav
 
-# 2) Same smoke but without baseline advisory (doesn't change HCI, only messaging)
+# 2) Same smoke but without baseline advisory (doesn't change HCI, only messaging) via ma_helper
 smoke-no-norms:
-	MA_DISABLE_NORMS_ADVISORY=1 ./automator.sh tone.wav
-	@find features_output -name "*.pack.json" -maxdepth 5 | tail -n 1 | xargs -I{} python infra/scripts/pretty.py {}
+	MA_DISABLE_NORMS_ADVISORY=1 MA_UNLOCK=write python -m ma_helper smoke tone.wav
 
 # 3) Run Automator over your calibration core folder
 calibrate-core:
@@ -42,7 +40,7 @@ eval-negatives:
 
 # Quick QA
 test:
-	$(PYTHON) $(ORCH) test-all
+	python -m ma_helper test-all
 
 lint:
 	./infra/scripts/with_repo_env.sh -m ruff check hosts/advisor_host engines/recommendation_engine/recommendation_engine
@@ -53,29 +51,26 @@ typecheck:
 check: lint typecheck test
 
 review:
-	$(PYTHON) -m ma_helper github-check --require-clean --preflight --verify --ci-plan --base origin/main
+	python -m ma_helper github-check --require-clean --preflight --verify --ci-plan --base origin/main
 
 optimize:
 	./infra/scripts/with_repo_env.sh -m ruff check hosts/advisor_host engines/recommendation_engine/recommendation_engine tools ma_helper
 	./infra/scripts/with_repo_env.sh -m mypy --config-file hosts/advisor_host/pyproject.toml hosts/advisor_host
-	$(PYTHON) -m ma_helper ci-plan --base origin/main
+	python -m ma_helper ci-plan --base origin/main
 
 optimize-fix:
 	./infra/scripts/with_repo_env.sh -m ruff check --fix hosts/advisor_host engines/recommendation_engine/recommendation_engine tools ma_helper
 	./infra/scripts/with_repo_env.sh -m mypy --config-file hosts/advisor_host/pyproject.toml hosts/advisor_host
-	$(PYTHON) -m ma_helper ci-plan --base origin/main
-PYTHON ?= python3
-ORCH ?= tools/ma_orchestrator.py
-
+	python -m ma_helper ci-plan --base origin/main
 projects:
-	$(PYTHON) $(ORCH) list-projects
+	python -m ma_helper graph
 
 deps:
-	$(PYTHON) $(ORCH) deps
+	python -m ma_helper graph --format ansi
 
 test-project:
 	@if [ -z "$(PROJECT)" ]; then echo "usage: make test-project PROJECT=name"; exit 1; fi
-	$(PYTHON) $(ORCH) test --project "$(PROJECT)"
+	python -m ma_helper test "$(PROJECT)"
 
 test-all-projects:
 	$(PYTHON) $(ORCH) test-all
@@ -133,7 +128,7 @@ hci-smoke:
 hci-smoke:
 	@if [ -z "$(AUDIO)" ]; then echo "usage: make hci-smoke AUDIO=/path/to/audio" >&2; exit 1; fi
 	@echo "[hci-smoke] audio=$(AUDIO)"
-	./infra/scripts/smoke_full_chain.sh "$(AUDIO)"
+	MA_UNLOCK=write python -m ma_helper smoke "$(AUDIO)"
 
 rebuild-venv:
 	@read -p "This will remove .venv and recreate it. Continue? [y/N] " ans; \
@@ -142,7 +137,7 @@ rebuild-venv:
 	$(MAKE) bootstrap-all
 
 ci-smoke:
-	./infra/scripts/ci_smoke.sh
+	MA_UNLOCK=write python -m ma_helper smoke tone.wav
 
 preflight:
 	./infra/scripts/preflight_check.py

@@ -1,4 +1,3 @@
-from ma_audio_engine.adapters.bootstrap import ensure_repo_root
 #!/usr/bin/env python3
 """
 backfill_features_meta.py
@@ -23,6 +22,7 @@ import os
 from ma_audio_engine.adapters import add_log_sandbox_arg, apply_log_sandbox_env
 from ma_audio_engine.adapters import make_logger
 from ma_audio_engine.adapters import utc_now_iso
+from ma_audio_engine.adapters.bootstrap import ensure_repo_root
 from ma_audio_features import analyze_pipeline
 from ma_config.paths import get_features_output_root, get_repo_root
 

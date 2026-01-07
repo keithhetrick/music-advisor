@@ -56,7 +56,7 @@ See `docs/ops/commands.md` for copy/paste commands covering the above.
 ## 6) Testing & checks
 
 - **Automated:** `pytest` (full); spine-only focus: `pytest tools/spine`. Host/recommendation engine: `make test`; lint/typecheck via `make lint`, `make typecheck`.
-- **Smoke:** `scripts/smoke_audio_pipeline.sh /path/to/audio.wav` (extractor+sidecar); `scripts/smoke_rank_inject.sh /path/to/output_root` (injectors+ranker); `make hci-smoke` for quick HCI run; `make quick-check` (or `infra/scripts/quick_check.sh`) for fast imports/tests.
+- **Smoke:** `MA_UNLOCK=write python -m ma_helper smoke /path/to/audio.wav` (extractor+sidecar); `scripts/smoke_rank_inject.sh /path/to/output_root` (injectors+ranker); the `hci-smoke` Make target delegates to `ma smoke` for quick HCI runs; `make quick-check` for fast imports/tests.
 - **Manual sanity:** after backfills, spot-check row counts and random rows; run `python tools/spine/spine_coverage_report_v1.py` and `python tools/spine/report_spine_missing_audio_v1.py` for coverage.
 - **Dev checks:** host/recommendation engine commands above; optional extras (Redis session, Google token verification) installed via host package extras.
 

@@ -1,4 +1,3 @@
-from ma_audio_engine.adapters.bootstrap import ensure_repo_root
 #!/usr/bin/env python3
 # tools/hci_recompute_axes_for_root.py
 """Recompute the 6 canonical audio axes for all .hci.json files under a root.
@@ -21,7 +20,6 @@ Example:
       --root features_output/2025/11/17 \
       --market-norms calibration/market_norms_us_pop.json
 """
-
 from __future__ import annotations
 
 import argparse

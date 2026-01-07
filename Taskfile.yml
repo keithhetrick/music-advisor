@@ -4,39 +4,39 @@ tasks:
   list-projects:
     desc: List all registered projects
     cmds:
-      - python3 tools/ma_orchestrator.py list-projects
+      - python3 -m ma_helper graph
 
   deps:
     desc: Show dependency graph (per project)
     cmds:
-      - python3 tools/ma_orchestrator.py deps
+      - python3 -m ma_helper graph
 
   test-all:
     desc: Run tests for all projects
     cmds:
-      - python3 tools/ma_orchestrator.py test-all
+      - python3 -m ma_helper test-all
 
   test-affected:
     desc: Run tests for projects affected since base (default origin/main)
     cmds:
-      - python3 tools/ma_orchestrator.py test-affected --base {{.base | default "origin/main"}}
+      - python3 -m ma_helper affected --base {{.base | default "origin/main"}}
     vars:
       base: ""
 
   test-audio:
     desc: Test audio engine
     cmds:
-      - python3 tools/ma_orchestrator.py test audio_engine
+      - python3 -m ma_helper test audio_engine
 
   test-lyrics:
     desc: Test lyrics engine
     cmds:
-      - python3 tools/ma_orchestrator.py test lyrics_engine
+      - python3 -m ma_helper test lyrics_engine
 
   test-ttc:
     desc: Test TTC engine
     cmds:
-      - python3 tools/ma_orchestrator.py test ttc_engine
+      - python3 -m ma_helper test ttc_engine
 
   test-macos-coverage:
     desc: Run macOS app tests with coverage (hosts/macos_app/.build/coverage.txt)
@@ -99,47 +99,47 @@ tasks:
   test-reco:
     desc: Test recommendation engine
     cmds:
-      - python3 tools/ma_orchestrator.py test recommendation_engine
+      - python3 -m ma_helper test recommendation_engine
 
   test-host:
     desc: Test advisor host
     cmds:
-      - python3 tools/ma_orchestrator.py test advisor_host
+      - python3 -m ma_helper test advisor_host
 
   test-host-core:
     desc: Test advisor host core contracts/helpers
     cmds:
-      - python3 tools/ma_orchestrator.py test advisor_host_core
+      - python3 -m ma_helper test advisor_host_core
 
   test-root:
     desc: Run root integration/pipeline tests
     cmds:
-      - python3 tools/ma_orchestrator.py test root_integration
+      - python3 -m ma_helper test root_integration
 
   run-audio-cli:
     desc: Show audio CLI help (ma_audio_engine.pipe_cli)
     cmds:
-      - python3 tools/ma_orchestrator.py run audio_engine
+      - python3 -m ma_helper run audio_engine
 
   run-lyrics-cli:
     desc: Show lyrics WIP pipeline CLI help
     cmds:
-      - python3 tools/ma_orchestrator.py run lyrics_engine
+      - python3 -m ma_helper run lyrics_engine
 
   run-ttc-cli:
     desc: Show TTC engine help
     cmds:
-      - python3 tools/ma_orchestrator.py run ttc_engine
+      - python3 -m ma_helper run ttc_engine
 
   run-reco-cli:
     desc: Show recommendation service help
     cmds:
-      - python3 tools/ma_orchestrator.py run recommendation_engine
+      - python3 -m ma_helper run recommendation_engine
 
   run-advisor-host:
     desc: Start advisor host FastAPI shim
     cmds:
-      - python3 tools/ma_orchestrator.py run advisor_host
+      - python3 -m ma_helper run advisor_host
 
   install-audio:
     desc: pip install -e engines/audio_engine

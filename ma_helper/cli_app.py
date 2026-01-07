@@ -62,7 +62,9 @@ from ma_helper.core.config import HelperConfig
 from ma_helper.core.root import discover_root
 from ma_helper.core.git import enforce_clean_tree, enforce_permissions, git_summary
 from ma_helper.core.graph import emit_graph
+from ma_helper.core.python import resolve_python
 from ma_helper.core.state import add_history, guard_level, load_favorites, save_favorites, set_last_failed
+from ma_helper.policy import permission_level, require_unlock
 
 DRY_RUN = False
 
@@ -201,6 +203,7 @@ def main(argv=None) -> int:
 
 
 def _dispatch(args, projects, dry_run, log_event, require_confirm, status_update=None):
+    py_bin = resolve_python()
     if args.command == "list":
         rc = orch_adapter.list_projects(projects)
         post_list_hint()
@@ -228,6 +231,8 @@ def _dispatch(args, projects, dry_run, log_event, require_confirm, status_update
             render_error_panel("affected failed", ["Retry with --no-diff if needed", "Check git status for untracked changes"])
         return rc
     if args.command == "run":
+        if not require_unlock("write", args, require_confirm=require_confirm):
+            return 1
         return handle_run(args, orch_adapter, projects, dry_run=dry_run, log_event=log_event, require_confirm=require_confirm)
     if args.command == "deps":
         if args.graph and args.graph != "text":
@@ -268,7 +273,7 @@ def _dispatch(args, projects, dry_run, log_event, require_confirm, status_update
     if args.command == "scaffold":
         return handle_scaffold(args)
     if args.command == "smoke":
-        return run_smoke(args.target)
+        return run_smoke(Path(args.audio).expanduser().resolve(), py_bin)
     if args.command == "verify":
         return run_verify(args, lambda: main(["affected", "--no-diff"]), post_verify_hint)
     if args.command == "ci-env":

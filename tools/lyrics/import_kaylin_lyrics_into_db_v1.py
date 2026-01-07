@@ -1,4 +1,3 @@
-from ma_audio_engine.adapters.bootstrap import ensure_repo_root
 #!/usr/bin/env python3
 """
 import_kaylin_lyrics_into_db_v1.py

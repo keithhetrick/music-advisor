@@ -210,6 +210,8 @@ def run_sidecar(
         return None, None, warnings
 
     payload = load_json_guarded(out_path, max_bytes=max_json_bytes, expect_mapping=True, logger=dbg)
+    if payload is None:
+        warnings.append("sidecar_payload_invalid")
     if tempdir and not keep_temp:
         tempdir.cleanup()
     return payload, out_path, warnings

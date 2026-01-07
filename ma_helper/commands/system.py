@@ -76,6 +76,24 @@ def _test_gaps(projects) -> tuple[list[str], list[str]]:
 
 
 def handle_doctor(require_optional: bool, interactive: bool = False, check_tests: bool = False, projects=None) -> int:
+    print(f"[ma] repo root: {ROOT}")
+    print(f"[ma] python: {sys.version.split()[0]} ({sys.executable})")
+    venv_py = ROOT / ".venv" / "bin" / "python"
+    if venv_py.exists():
+        print(f"[ma] venv: {venv_py}")
+    else:
+        print("[ma] venv: not found (.venv/bin/python missing)")
+    project_map = ROOT / "project_map.json"
+    if project_map.exists():
+        print(f"[ma] project_map: {project_map}")
+    else:
+        print("[ma] project_map: missing (expected project_map.json)")
+    try:
+        import tools.ma_orchestrator  # noqa: F401
+        print("[ma] ma_orchestrator import: ok")
+    except Exception as exc:  # pragma: no cover
+        render_error_panel("Doctor: cannot import tools.ma_orchestrator", [str(exc)])
+        return 1
     missing = []
     required = ["python3", "git"]
     optional = ["rich", "textual", "watchfiles", "entr", "dot"]

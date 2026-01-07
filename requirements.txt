@@ -8,4 +8,4 @@ pyyaml
 # Optional but recommended for lyric sentiment features
 vaderSentiment>=3.3
 # Vendored host package; installs CLIs like music-advisor, music-advisor-smoke
--e vendor/MusicAdvisor_BuilderPack/builder/export/MusicAdvisor
+-e archive/builder_pack/builder/export/MusicAdvisor

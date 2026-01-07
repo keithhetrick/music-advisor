@@ -20,19 +20,5 @@ def handle_scaffold(args) -> int:
 
 
 def handle_smoke(target: str) -> int:
-    if target == "pipeline":
-        cmds = [
-            "python tools/ma_orchestrator.py test-all",
-            "python tools/ma_orchestrator.py run audio_engine",
-        ]
-    elif target == "full":
-        cmds = ["python tools/ma_orchestrator.py test-all", "python tools/ma_orchestrator.py run advisor_host"]
-    else:
-        print("Smokes: pipeline | full")
-        return 0
-    for cmd in cmds:
-        print(f"[ma] {cmd}")
-        rc = subprocess.call(cmd, shell=True, cwd=ROOT)
-        if rc != 0:
-            return rc
+    print("[ma] scaffold smoke is deprecated; use `ma smoke <audio>`")
     return 0

@@ -1,26 +1,44 @@
-"""Smoke and playbook helpers."""
+"""Smoke helpers."""
 from __future__ import annotations
 
+import os
 import subprocess
-from typing import Dict, List
+from pathlib import Path
 
 from ma_helper.core.env import ROOT
 
-SMOKE_CMDS: Dict[str, str] = {
-    "pipeline": "./infra/scripts/quick_check.sh",
-    "full": "./infra/scripts/e2e_app_smoke.sh",
-}
+SMOKE_SCRIPT = ROOT / "infra" / "scripts" / "smoke_full_chain.sh"
+OUT_ROOT = ROOT / "data" / "features_output" / "smoke"
 
 
-def run_smoke(target: str) -> int:
-    if target == "menu":
-        print("Smokes:")
-        for key, val in SMOKE_CMDS.items():
-            print(f"- {key}: {val}")
-        return 0
-    cmd = SMOKE_CMDS.get(target)
-    if not cmd:
-        print(f"[ma] unknown smoke target {target}")
+def _latest_run_dir() -> Path | None:
+    if not OUT_ROOT.exists():
+        return None
+    candidates = sorted(OUT_ROOT.glob("*/*"), key=lambda p: p.stat().st_mtime)
+    return candidates[-1] if candidates else None
+
+
+def run_smoke(audio_file: Path, python_bin: Path) -> int:
+    """
+    Run the canonical full-chain smoke with a supplied audio file.
+    SAFE by default; writes only under data/features_output/smoke.
+    """
+    if not SMOKE_SCRIPT.exists():
+        print(f"[ma] smoke script missing: {SMOKE_SCRIPT}")
         return 1
-    print(f"[ma] running smoke '{target}': {cmd}")
-    return subprocess.call(cmd, shell=True, cwd=ROOT)
+    if not audio_file.exists():
+        print(f"[ma] audio not found: {audio_file}")
+        return 1
+    env = os.environ.copy()
+    env["PY"] = str(python_bin)
+    print(f"[ma] OUT_ROOT={OUT_ROOT}", flush=True)
+    print(f"[ma] smoke: {audio_file} via {SMOKE_SCRIPT.name} (PY={python_bin})")
+    rc = subprocess.call(
+        ["zsh", str(SMOKE_SCRIPT), str(audio_file)],
+        cwd=ROOT,
+        env=env,
+    )
+    latest = _latest_run_dir()
+    if latest:
+        print(f"[ma] OUT_DIR={latest}", flush=True)
+    return rc

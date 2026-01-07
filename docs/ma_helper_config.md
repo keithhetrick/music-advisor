@@ -20,7 +20,7 @@ cache_dir = ".ma_cache"
 
 [tasks]
 # Optional task aliases for `ma tasks`
-test-all = "python tools/ma_orchestrator.py test-all"
+test-all = "python -m ma_helper test-all"
 ```
 
 ## Overrides

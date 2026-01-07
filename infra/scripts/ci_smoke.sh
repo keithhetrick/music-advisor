@@ -46,15 +46,19 @@ for i in range(n):
 w.close()
 PY
 
-zsh "$REPO/scripts/smoke_full_chain.sh" "$TONE"
+OUT_DIR="$(
+  "$PY" -m ma_helper smoke "$TONE" \
+  | rg -o "OUT_DIR=.*" \
+  | tail -n1 \
+  | sed 's/OUT_DIR=//'
+)"
 
 # Lint: enforce strict summary and stage logs presence
-OUT_DIR=$(ls -td "$REPO"/features_output/smoke/* 2>/dev/null | head -n1)
 if [[ -z "$OUT_DIR" ]]; then
   echo "[ci-smoke] ERROR: no smoke output found" >&2
   exit 1
 fi
 echo "[ci-smoke] validating logs under $OUT_DIR"
-LOG_JSON=0 "$REPO/.venv/bin/python" "$REPO/tools/log_summary.py" --out-dir "$OUT_DIR" --strict
+LOG_JSON=0 "$PY" "$REPO/tools/log_summary.py" --out-dir "$OUT_DIR" --strict
 
-echo "[ci-smoke] complete; artifacts under features_output/smoke"
+echo "[ci-smoke] complete; artifacts under $OUT_DIR"

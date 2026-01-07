@@ -1,5 +1,3 @@
-from adapters.bootstrap import ensure_repo_root
-from ma_config.paths import get_historical_echo_db_path
 #!/usr/bin/env python3
 """
 backfill_musicbrainz_mbids_for_spine_tiers.py
@@ -21,6 +19,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
+
+from adapters.bootstrap import ensure_repo_root
+from ma_config.paths import get_historical_echo_db_path
 
 ensure_repo_root()
 

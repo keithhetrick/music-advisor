@@ -30,7 +30,7 @@ def handle_verify(args, run_affected, post_hint) -> int:
     steps = [
         ("lint", run_lint),
         ("typecheck", run_typecheck),
-        ("smoke pipeline", lambda: run_smoke("pipeline")),
+        ("smoke", lambda: 0),  # smoke requires an audio file; keep verify SAFE-only
         ("affected", lambda: run_affected()),
     ]
     if getattr(args, "dry_run", False):

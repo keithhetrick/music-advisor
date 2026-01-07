@@ -48,11 +48,12 @@ Music Advisor is a local, feature-only toolchain that turns that mess into a rep
 - Moving the repo: you can drag/clone to a new location; recreate the venv there and keep any env overrides (`MA_DATA_ROOT`, etc.) to point at your data.
 - Automator/macOS: Automator/Quick Actions call `automator.sh`; if you move the repo, update the workflow to the new path (and set `MA_DATA_ROOT`/`MA_CALIBRATION_ROOT` there if needed).
 - Symlink tip: for Automator, point a stable symlink (e.g., `~/music-advisor_current`) at your checkout and call `"$HOME/music-advisor_current/automator.sh" "$@"`; update the symlink if you move/rename the repo.
+- Preferred CLI front door: see `docs/HAPPY_PATH.md` for `ma ...` commands (doctor/graph/test/smoke). Avoid calling `infra/scripts/*` directly.
 
 ## Monorepo efficiency (targeted checkout)
 
 - Sparse checkout lets you work on a single component (chat host, a sidecar, or one engine) without pulling everything.
-- Each main component has its own `pyproject.toml`, tests, and run targets; the orchestrator (`tools/ma_orchestrator.py`) lets you run/test just that project.
+- Each main component has its own `pyproject.toml`, tests, and run targets; use `ma` (ma_helper) for list/test/run and it delegates to the orchestrator internally.
 - This keeps dependencies clear and reduces collisions when developing in isolation.
 - Helper CLI (ma_helper) makes this fast: `ma sparse --set hosts shared tools`, `ma test <proj>`, `ma affected --base origin/main`, `ma ci-plan --matrix`, `ma watch <proj> [--hotkeys]`, git-safe checks (`ma github-check`, pre-push/pre-commit hooks), graph views (`ma graph`), cache explain (`ma cache explain --task …`), and a Textual TUI (`ma ui`) for live runs. See docs/tools/helper_cli.md for the full surface.
 
@@ -151,7 +152,7 @@ If you previously installed from an older path (e.g., `MusicAdvisor_AudioTools`)
 source .venv/bin/activate
 
 # Run analysis on a WAV file
-./automator.sh /path/to/your/song.wav
+MA_UNLOCK=write python -m ma_helper smoke /path/to/your/song.wav
 
 # Outputs generated:
 # - features.json      (extracted audio features)
@@ -208,7 +209,7 @@ ma affected --base origin/main
 ma chat-dev  # Opens tmux split with server and logs
 ```
 
-4. Explore: list projects/tests with `python3 tools/ma_orchestrator.py list-projects`; see docs links above for deeper dives.
+4. Explore: list projects/tests with `python -m ma_helper graph`; see docs links above for deeper dives.
 5. Next step: run `python -m ma_helper help` (or `ma help` if you set `alias ma="python -m ma_helper"`) to see the helper commands. For a 30-second orientation, try `ma quickstart`. The helper is your main entrypoint for tasks, tests, affected runs, git/CI checks, and dashboards.
 6. Optional UX dependencies: install `rich` for TUI/live dashboards and `prompt_toolkit` for fuzzy prompts. `tmux` is used by `ma chat-dev` if available (falls back to printed commands). Git helpers require running inside the repo with `.git` present.
 

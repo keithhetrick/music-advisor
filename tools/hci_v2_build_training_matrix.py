@@ -1,4 +1,3 @@
-from ma_audio_engine.adapters.bootstrap import ensure_repo_root
 #!/usr/bin/env python
 """
 hci_v2_build_training_matrix.py
@@ -33,19 +32,18 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from ma_audio_engine.adapters.bootstrap import ensure_repo_root
-
-ensure_repo_root()
-
 from ma_audio_engine.adapters import add_log_sandbox_arg, apply_log_sandbox_env
 from ma_audio_engine.adapters import make_logger
 from ma_audio_engine.adapters import utc_now_iso
+from ma_audio_engine.adapters.bootstrap import ensure_repo_root
 from ma_config.audio import (
     resolve_hci_v2_targets,
     resolve_hci_v2_corpus,
     resolve_hci_v2_training_out,
 )
 from shared.config.paths import get_hci_v2_corpus_csv, get_hci_v2_targets_csv, get_hci_v2_training_csv
+
+ensure_repo_root()
 
 LOG_REDACT = os.environ.get("LOG_REDACT", "1") == "1"
 LOG_REDACT_VALUES = [v for v in os.environ.get("LOG_REDACT_VALUES", "").split(",") if v]

@@ -1,4 +1,3 @@
-from adapters.bootstrap import ensure_repo_root
 #!/usr/bin/env python3
 """
 import_kaylin_lyrics_into_db_v1.py
@@ -31,16 +30,15 @@ import re
 import sqlite3
 from pathlib import Path
 
-from adapters.bootstrap import ensure_repo_root
-
-ensure_repo_root()
-
 from adapters import add_log_sandbox_arg, apply_log_sandbox_env
 from adapters import make_logger
 from adapters import utc_now_iso
+from adapters.bootstrap import ensure_repo_root
 from ma_config.paths import get_historical_echo_db_path
 from shared.config.paths import get_external_data_root
 from security import db as sec_db
+
+ensure_repo_root()
 
 
 def norm_text(s: str) -> str:

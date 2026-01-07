@@ -22,8 +22,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-# Import the real cache implementation (bypasses the thin shim in tools/cache_utils.py).
-from tools.audio.cache_utils import FeatureCache
+from shared.ma_utils.cache_utils import FeatureCache
 
 _CFG_PATH = Path(__file__).resolve().parents[1] / "config" / "cache.json"
 _DEFAULT_CACHE_DIR = None

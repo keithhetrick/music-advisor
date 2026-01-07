@@ -1,6 +1,6 @@
 # Python compatibility notes
 
-Status: captured from pytest warnings during `python3 tools/ma_orchestrator.py test-all` (Py 3.11.2).
+Status: captured from pytest warnings during `python -m ma_helper test-all` (Py 3.11.2).
 
 - Deprecations targeting Python 3.13: `aifc`, `audioop`, `sunau` via `audioread.rawread` (pulled in by librosa fallback). Action: validate upgrades to libraries that drop these deps or switch loaders before bumping to 3.13.
 - Librosa warning: `librosa.core.audio.__audioread_load` is deprecated (0.10 → removal in 1.0) when audioread is used as a fallback. Action: prefer soundfile path where possible or bump librosa once a migration path is ready.

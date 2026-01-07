@@ -13,7 +13,7 @@ Authoritative snapshot of what lives where today, plus the intended target layou
 - Root package `musicadvisor-audiotools`: console scripts table exists for compatibility but points at the new package namespaces. Canonical definitions live in per-project `pyproject.toml` (audio/lyrics/ttc); prefer installing/running via those packages (e.g., `make install-projects`). Plan to drop root scripts after downstreams flip; legacy egg-info artifacts were removed.
 - Root shims have been removed and compatibility packages archived (`archive/legacy_src/`); console scripts in `.venv/bin` now point at `ma_audio_engine.*`. Module entry points also work (`python -m ma_audio_engine.pipe_cli`).
 - Shared namespace prep: `shared/config/__init__.py` re-exports `ma_config` (plus per-module shims), `shared/security/__init__.py` re-exports `security`; `shared/README.md` documents the plan.
-- Project metadata lives in `project_map.json` and powers `tools/ma_orchestrator.py` (Make targets: `make test`, `make test-affected`, `make projects`, `make run-*`). `tools/ma_tasks.py` remains as a shim for older entrypoints.
+- Project metadata lives in `project_map.json` and powers `ma` (ma_helper) which delegates to the orchestrator (Make targets now shell out to `ma ...`). `tools/ma_tasks.py` remains as a shim for older entrypoints.
 - Projects already split:
   - `engines/audio_engine` (pyproject + tests via root `tests/` today).
   - `engines/recommendation_engine` (pyproject + tests).
@@ -66,7 +66,7 @@ logs/                    # Automator run logs
 
 ## Pseudo-helper + future mapping
 
-- Entry point: `python3 tools/ma_orchestrator.py ...` or Make targets (`make test`, `make test-affected`, `make test-audio-engine`, `make run-audio-cli`).
+- Entry point: `python -m ma_helper ...` or Make targets (`make test`, `make test-affected`, `make test-audio-engine`, `make run-audio-cli`).
 - Registry: `project_map.json` defines `path`, `tests`, `deps`, and optional `run` targets; shared modules (config/calibration/core/security/utils) are included for affected expansion.
 - Affected logic: `git diff --name-only <base>...HEAD` → match project paths → add dependents → run pytest via `infra/scripts/with_repo_env.sh`.
 - Future helper parity:
@@ -83,7 +83,7 @@ logs/                    # Automator run logs
 
 - Layout: create under `engines/` or `hosts/` (or `shared/` for libs) with its own `pyproject.toml`, `src/`, and `tests/`.
 - Registry: add an entry to `project_map.json` with `path`, `tests`, `type`, `deps` (other project names), and optional `run` command.
-- Orchestrator: no code changes needed; `tools/ma_orchestrator.py` will pick up the new entry for `list-projects`, `test`, `test-affected`, and `run`.
+- Orchestrator: no code changes needed; `ma` will pick up the new entry for `list-projects`, `test`, `test-affected`, and `run`.
 - Tasks: if you want Make/Task targets, add a thin wrapper pointing to the orchestrator (`make test-<name>`, `task test-<name>`).
 - Installability: optional but recommended—add `pip install -e <project>` targets to Makefile/Taskfile for easy standalone usage.
 ```
