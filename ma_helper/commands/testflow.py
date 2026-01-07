@@ -13,7 +13,7 @@ from ma_helper.commands.ux import render_error_panel, render_hint_panel
 from ma_helper.ui.render import render_task_summary
 from ma_helper.core.cache import hash_project, should_skip_cached, update_cache, write_artifact
 from ma_helper.core.changes import collect_changes, compute_affected, resolve_base
-from ma_helper.core.env import ROOT, STATE_HOME
+from ma_helper.core.config import RuntimeConfig
 from ma_helper.core.graph import topo_sort
 from ma_helper.core.run import _print_summary, record_results, run_projects_parallel, run_projects_serial
 from ma_helper.core.state import add_history, guard_level
@@ -75,10 +75,17 @@ def _live_table(names, enabled: bool = True):
         return None, lambda: None
 
 
-def _event_writer() -> Optional[callable]:
+def _event_writer(runtime: RuntimeConfig = None) -> Optional[callable]:
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import STATE_HOME
+        state_home = STATE_HOME
+    else:
+        state_home = runtime.state_home
+
     path = os.environ.get("MA_UI_EVENTS")
     if not path:
-        path = STATE_HOME / "ui_events.ndjson"
+        path = state_home / "ui_events.ndjson"
     else:
         path = Path(path)
     try:
@@ -126,13 +133,19 @@ def _render_results(results, title: str):
     render_task_summary(results, title)
 
 
-def handle_test(args, orch, projects, *, dry_run: bool, log_event) -> int:
+def handle_test(args, orch, projects, *, dry_run: bool, log_event, runtime: RuntimeConfig = None) -> int:
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import ROOT
+        root = ROOT
+    else:
+        root = runtime.root
     proj = orch.resolve_project_arg(projects, args.project, None)
     add_history(f"python tools/ma_orchestrator.py test {proj.name}")
     if dry_run:
         print(f"[ma] dry-run: would run tests for {proj.name}")
         return 0
-    missing = [p for p in proj.tests if not (ROOT / p).exists()]
+    missing = [p for p in proj.tests if not (root / p).exists()]
     if missing:
         print(f"[ma] warning: missing test paths for {proj.name}: {', '.join(missing)}", file=sys.stderr)
     skip, info = should_skip_cached(proj, "test", getattr(args, "cache", "off"))
@@ -153,14 +166,14 @@ def handle_test(args, orch, projects, *, dry_run: bool, log_event) -> int:
     return rc
 
 
-def handle_test_all(args, orch, projects, *, dry_run: bool, log_event) -> int:
+def handle_test_all(args, orch, projects, *, dry_run: bool, log_event, runtime: RuntimeConfig = None) -> int:
     names = topo_sort(projects, [n for n, p in projects.items() if p.tests])
     if dry_run:
         print(f"[ma] dry-run: would run tests for: {', '.join(names)}")
         return 0
     live_enabled = bool(getattr(args, "_live_requested", False) and not getattr(args, "no_live", False))
     live_cb, live_finish = _live_table(names, enabled=live_enabled)
-    event_cb = _event_writer()
+    event_cb = _event_writer(runtime)
     progress_cb, finish = _combine_cbs(live_cb, event_cb)
     if finish is None:
         finish = lambda: None
@@ -191,7 +204,7 @@ def handle_test_all(args, orch, projects, *, dry_run: bool, log_event) -> int:
     return rc
 
 
-def handle_affected(args, orch, projects, *, dry_run: bool, log_event, post_hint) -> int:
+def handle_affected(args, orch, projects, *, dry_run: bool, log_event, post_hint, runtime: RuntimeConfig = None) -> int:
     base = resolve_base(args.base, getattr(args, "base_from", None))
     names, changes, mode = compute_affected(
         orch,
@@ -216,7 +229,7 @@ def handle_affected(args, orch, projects, *, dry_run: bool, log_event, post_hint
         return 0
     live_enabled = bool(getattr(args, "_live_requested", False) and not getattr(args, "no_live", False))
     live_cb, live_finish = _live_table(names, enabled=live_enabled)
-    event_cb = _event_writer()
+    event_cb = _event_writer(runtime)
     progress_cb, finish = _combine_cbs(live_cb, event_cb)
     if finish is None:
         finish = lambda: None
@@ -248,7 +261,13 @@ def handle_affected(args, orch, projects, *, dry_run: bool, log_event, post_hint
     return rc
 
 
-def handle_run(args, orch, projects, *, dry_run: bool, log_event, require_confirm) -> int:
+def handle_run(args, orch, projects, *, dry_run: bool, log_event, require_confirm, runtime: RuntimeConfig = None) -> int:
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import ROOT
+        root = ROOT
+    else:
+        root = runtime.root
     target = None
     proj_arg = args.project
     if ":" in proj_arg:
@@ -260,7 +279,7 @@ def handle_run(args, orch, projects, *, dry_run: bool, log_event, require_confir
         return 0
     if tgt == "run" and proj.run:
         first = proj.run[0]
-        if first.startswith("./") and not (ROOT / first).exists():
+        if first.startswith("./") and not (root / first).exists():
             print(f"[ma] warning: run target entry not found: {first}", file=sys.stderr)
             if os.environ.get("MA_REQUIRE_CONFIRM") == "1" or guard_level() == "strict" or os.environ.get("MA_REQUIRE_SAFE_RUN") == "1":
                 if not require_confirm(f"Proceed running {proj.name} even though {first} is missing?"):
@@ -279,10 +298,17 @@ def handle_run(args, orch, projects, *, dry_run: bool, log_event, require_confir
     return 1
 
 
-def handle_ci_plan(args, orch, projects) -> int:
+def handle_ci_plan(args, orch, projects, runtime: RuntimeConfig = None) -> int:
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import ROOT
+        root = ROOT
+    else:
+        root = runtime.root
+
     if os.environ.get("MA_REQUIRE_CLEAN") == "1":
         try:
-            res = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True, check=True)
+            res = subprocess.run(["git", "status", "--porcelain"], cwd=root, capture_output=True, text=True, check=True)
             if res.stdout.strip():
                 print("[ma] git working tree is dirty; set MA_REQUIRE_CLEAN=0 to bypass.", file=sys.stderr)
                 return 1

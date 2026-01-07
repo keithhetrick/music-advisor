@@ -7,11 +7,17 @@ from pathlib import Path
 from typing import Any, Dict
 
 from ma_helper.core.cache import load_cache, save_cache
-from ma_helper.core.env import ARTIFACT_DIR
+from ma_helper.core.config import RuntimeConfig
 from ma_helper.core.state import add_history, ensure_favorite, load_favorites
 
 
-def handle_favorites(args) -> int:
+def handle_favorites(args, runtime: RuntimeConfig = None) -> int:
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import ROOT
+        root = ROOT
+    else:
+        root = runtime.root
     if args.fav_action == "list":
         return list_favorites(getattr(args, "json", False))
     if args.fav_action == "add":
@@ -31,8 +37,7 @@ def handle_favorites(args) -> int:
         print(f"[ma] running favorite '{args.name}': {cmd}")
         add_history(cmd)
         import subprocess
-        from ma_helper.core.env import ROOT
-        return subprocess.call(cmd, shell=True, cwd=ROOT)
+        return subprocess.call(cmd, shell=True, cwd=root)
     return 1
 
 
@@ -63,7 +68,13 @@ def list_favorites(as_json: bool = False) -> int:
     return 0
 
 
-def handle_cache(args) -> int:
+def handle_cache(args, runtime: RuntimeConfig = None) -> int:
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import ARTIFACT_DIR
+        artifact_dir = ARTIFACT_DIR
+    else:
+        artifact_dir = runtime.artifact_dir
     action = args.action
     if action == "stats":
         cache = load_cache()
@@ -74,15 +85,15 @@ def handle_cache(args) -> int:
         print("[ma] cache cleared.")
         return 0
     if action == "list-artifacts":
-        if not ARTIFACT_DIR.exists():
+        if not artifact_dir.exists():
             print("[ma] no artifacts directory yet.")
             return 0
-        for p in sorted(ARTIFACT_DIR.glob("*.json")):
+        for p in sorted(artifact_dir.glob("*.json")):
             print(p.name)
         return 0
     if action == "show-artifact":
         name = args.name
-        path = ARTIFACT_DIR / f"{name}.json"
+        path = artifact_dir / f"{name}.json"
         if not path.exists():
             print(f"[ma] artifact {name} not found")
             return 1

@@ -220,20 +220,20 @@ def _dispatch(args, runtime: RuntimeConfig, helper_config: HelperConfig, orch_ad
         aliases = helper_config.task_aliases or TASKS
         return handle_tasks(aliases, getattr(args, "filter", None), getattr(args, "json", False))
     if args.command == "test":
-        rc = handle_test(args, orch_adapter, projects, dry_run=dry_run, log_event=log_event)
+        rc = handle_test(args, orch_adapter, projects, dry_run=dry_run, log_event=log_event, runtime=runtime)
         if rc != 0:
             from ma_helper.commands.ux import render_error_panel, render_hint_panel
             render_error_panel(f"Tests failed for {args.project}", ["Re-run failed: ma rerun-last", "Run doctor: ma doctor --check-tests"])
             render_hint_panel("Next", ["ma affected --base origin/main", "ma dashboard --json"])
         return rc
     if args.command == "test-all":
-        rc = handle_test_all(args, orch_adapter, projects, dry_run=dry_run, log_event=log_event)
+        rc = handle_test_all(args, orch_adapter, projects, dry_run=dry_run, log_event=log_event, runtime=runtime)
         if rc != 0:
             from ma_helper.commands.ux import render_error_panel
             render_error_panel("test-all failed", ["Re-run: ma test-all", "Inspect last results: tail -n 20 ~/.ma_helper/last_results.json"])
         return rc
     if args.command == "affected":
-        rc = handle_affected(args, orch_adapter, projects, dry_run=dry_run, log_event=log_event, post_hint=post_affected_hint)
+        rc = handle_affected(args, orch_adapter, projects, dry_run=dry_run, log_event=log_event, post_hint=post_affected_hint, runtime=runtime)
         if rc != 0:
             from ma_helper.commands.ux import render_error_panel
             render_error_panel("affected failed", ["Retry with --no-diff if needed", "Check git status for untracked changes"])
@@ -241,19 +241,19 @@ def _dispatch(args, runtime: RuntimeConfig, helper_config: HelperConfig, orch_ad
     if args.command == "run":
         if not require_unlock("write", args, require_confirm=require_confirm):
             return 1
-        return handle_run(args, orch_adapter, projects, dry_run=dry_run, log_event=log_event, require_confirm=require_confirm)
+        return handle_run(args, orch_adapter, projects, dry_run=dry_run, log_event=log_event, require_confirm=require_confirm, runtime=runtime)
     if args.command == "deps":
         if args.graph and args.graph != "text":
             return emit_graph(projects, args.graph)
         return orch_adapter.print_deps(projects, reverse=getattr(args, "reverse", False))
     if args.command == "select":
-        return handle_select(projects)
+        return handle_select(projects, runtime)
     if args.command == "watch":
         return handle_watch_cli(args, orch_adapter, dry_run=dry_run, require_confirm=require_confirm)
     if args.command == "ci-plan":
-        return handle_ci_plan(args, orch_adapter, projects)
+        return handle_ci_plan(args, orch_adapter, projects, runtime)
     if args.command == "favorites":
-        return handle_favorites(args)
+        return handle_favorites(args, runtime)
     if args.command == "doctor":
         return handle_doctor(getattr(args, "require_optional", False), getattr(args, "interactive", False), getattr(args, "check_tests", False), projects, runtime)
     if args.command == "guard":
@@ -312,7 +312,7 @@ def _dispatch(args, runtime: RuntimeConfig, helper_config: HelperConfig, orch_ad
     if args.command == "info":
         return handle_info(args.project)
     if args.command == "playbook":
-        return handle_playbook(args.name, args.dry_run)
+        return handle_playbook(args.name, args.dry_run, runtime)
     if args.command == "registry":
         return handle_registry(args, helper_config.registry_path, runtime)
     if args.command == "tasks-run":
@@ -349,13 +349,13 @@ def _dispatch(args, runtime: RuntimeConfig, helper_config: HelperConfig, orch_ad
             print(f"[ma] TUI failed: {exc}")
             return 1
     if args.command == "tour":
-        return handle_tour(getattr(args, "reset", False), getattr(args, "advance", False))
+        return handle_tour(getattr(args, "reset", False), getattr(args, "advance", False), runtime)
     if args.command == "logs":
         return handle_logs(args, runtime.log_file)
     if args.command == "profile":
-        return handle_profile(args)
+        return handle_profile(args, runtime)
     if args.command == "cache":
-        return handle_cache(args)
+        return handle_cache(args, runtime)
     if args.command == "shell":
         return handle_shell_cli(args, lambda: cmd_shell(with_dash=getattr(args, "dash", False), interval=getattr(args, "interval", 1.0)))
     if args.command == "completion":

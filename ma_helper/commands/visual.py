@@ -6,11 +6,17 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List
 
-from ma_helper.core.env import CACHE_DIR, LAST_RESULTS_FILE, ROOT
+from ma_helper.core.config import RuntimeConfig
 from ma_helper.core.registry import load_registry
 
 
-def _dashboard_payload() -> Dict[str, Any]:
+def _dashboard_payload(runtime: RuntimeConfig = None) -> Dict[str, Any]:
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import LAST_RESULTS_FILE, ROOT
+        last_results_file, root = LAST_RESULTS_FILE, ROOT
+    else:
+        last_results_file, root = runtime.last_results_file, runtime.root
     reg = load_registry()
     total = len(reg)
     engine = len([1 for _, m in reg.items() if m.get("type") == "engine"])
@@ -18,17 +24,17 @@ def _dashboard_payload() -> Dict[str, Any]:
     hosts = len([1 for _, m in reg.items() if m.get("type") == "host" or m.get("type") == "host_core"])
     misc = total - engine - shared - hosts
     last_results = {}
-    if LAST_RESULTS_FILE.exists():
+    if last_results_file.exists():
         try:
-            last_results = json.loads(LAST_RESULTS_FILE.read_text())
+            last_results = json.loads(last_results_file.read_text())
         except Exception:
             last_results = {}
     git_meta = {}
     try:
         import subprocess
 
-        branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=ROOT, text=True).strip()
-        dirty = subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True)
+        branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=root, text=True).strip()
+        dirty = subprocess.check_output(["git", "status", "--porcelain"], cwd=root, text=True)
         git_meta = {"branch": branch, "dirty": bool(dirty.strip())}
     except Exception:
         pass
@@ -40,8 +46,8 @@ def _dashboard_payload() -> Dict[str, Any]:
     }
 
 
-def render_dashboard(*, as_json=False, as_html=False, live=False, interval=1.0, duration=0.0) -> int:
-    payload = _dashboard_payload()
+def render_dashboard(*, as_json=False, as_html=False, live=False, interval=1.0, duration=0.0, runtime: RuntimeConfig = None) -> int:
+    payload = _dashboard_payload(runtime)
     if as_json:
         print(json.dumps(payload, indent=2))
         return 0
@@ -60,7 +66,7 @@ def render_dashboard(*, as_json=False, as_html=False, live=False, interval=1.0, 
             start = time.time()
             with Live(refresh_per_second=1, console=console) as live:
                 while True:
-                    payload = _dashboard_payload()
+                    payload = _dashboard_payload(runtime)
                     live.update(Panel(json.dumps(payload, indent=2), title="Dashboard"))
                     if duration and (time.time() - start) > duration:
                         break
@@ -68,7 +74,7 @@ def render_dashboard(*, as_json=False, as_html=False, live=False, interval=1.0, 
         except Exception:
             # fallback
             while True:
-                print(json.dumps(_dashboard_payload(), indent=2))
+                print(json.dumps(_dashboard_payload(runtime), indent=2))
                 if duration:
                     time.sleep(duration)
                     break

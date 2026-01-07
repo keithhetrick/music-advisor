@@ -9,7 +9,7 @@ import subprocess
 import tempfile
 from typing import Any, Dict, List
 
-from ma_helper.core.env import ROOT, STATE_HOME, CACHE_ENABLED
+from ma_helper.core.config import RuntimeConfig
 from ma_helper.core.registry import filter_projects, load_registry
 from ma_helper.core.state import guard_level
 from ma_helper.commands.ux import print_ma_banner, show_world
@@ -41,7 +41,13 @@ def handle_tasks(tasks: Dict[str, str], filter_substr: str | None = None, as_jso
         return 0
 
 
-def handle_select(projects) -> int:
+def handle_select(projects, runtime: RuntimeConfig = None) -> int:
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import ROOT
+        root = ROOT
+    else:
+        root = runtime.root
     choices = sorted(projects.keys())
     print("Select a project (blank to exit):")
     for idx, name in enumerate(choices, 1):
@@ -78,15 +84,15 @@ def handle_select(projects) -> int:
         print("[ma] invalid action.")
         return 1
     if act == "test":
-        return subprocess.call(f"python tools/ma_orchestrator.py test {name}", shell=True, cwd=ROOT)
+        return subprocess.call(f"python tools/ma_orchestrator.py test {name}", shell=True, cwd=root)
     if act == "run":
-        return subprocess.call(f"python tools/ma_orchestrator.py run {name}", shell=True, cwd=ROOT)
+        return subprocess.call(f"python tools/ma_orchestrator.py run {name}", shell=True, cwd=root)
     if act == "deps":
-        return subprocess.call(f"python -m ma_helper deps {name}", shell=True, cwd=ROOT)
+        return subprocess.call(f"python -m ma_helper deps {name}", shell=True, cwd=root)
     if act == "affected":
-        return subprocess.call("python -m ma_helper affected --base origin/main", shell=True, cwd=ROOT)
+        return subprocess.call("python -m ma_helper affected --base origin/main", shell=True, cwd=root)
     if act == "watch":
-        return subprocess.call(f"python -m ma_helper watch {name}", shell=True, cwd=ROOT)
+        return subprocess.call(f"python -m ma_helper watch {name}", shell=True, cwd=root)
     return 0
 
 
@@ -137,7 +143,13 @@ def handle_info(project: str) -> int:
     return 0
 
 
-def handle_playbook(name: str, dry_run: bool) -> int:
+def handle_playbook(name: str, dry_run: bool, runtime: RuntimeConfig = None) -> int:
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import ROOT
+        root = ROOT
+    else:
+        root = runtime.root
     scripts = {
         "pipeline-dev": ["python tools/ma_orchestrator.py test-all"],
         "host-dev": ["python tools/ma_orchestrator.py run advisor_host"],
@@ -151,7 +163,7 @@ def handle_playbook(name: str, dry_run: bool) -> int:
         if dry_run:
             print(f"[dry-run] {cmd}")
         else:
-            rc = subprocess.call(cmd, shell=True, cwd=ROOT)
+            rc = subprocess.call(cmd, shell=True, cwd=root)
             if rc != 0:
                 return rc
     return 0
@@ -220,7 +232,13 @@ def handle_map(fmt: str, flt: str | None, do_open: bool) -> int:
     return 0
 
 
-def handle_profile(args) -> int:
+def handle_profile(args, runtime: RuntimeConfig = None) -> int:
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import ROOT
+        root = ROOT
+    else:
+        root = runtime.root
     profiles = {
         "audio-dev": {"sparse": ["engines/audio_engine", "shared"], "playbook": "pipeline-dev"},
         "host-dev": {"sparse": ["hosts", "shared"], "playbook": "host-dev"},
@@ -251,7 +269,7 @@ def handle_profile(args) -> int:
         for step in steps:
             print(f"- {step}")
             if not args.dry_run:
-                subprocess.call(step, shell=True, cwd=ROOT)
+                subprocess.call(step, shell=True, cwd=root)
         return 0
     return 1
 
@@ -274,18 +292,32 @@ def _load_idx(progress_path) -> int:
     return 0
 
 
-def _save_idx(progress_path, idx: int) -> None:
-    if not CACHE_ENABLED:
+def _save_idx(progress_path, idx: int, runtime: RuntimeConfig = None) -> None:
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import CACHE_ENABLED, STATE_HOME
+        cache_enabled, state_home = CACHE_ENABLED, STATE_HOME
+    else:
+        cache_enabled, state_home = runtime.cache_enabled, runtime.state_home
+
+    if not cache_enabled:
         return
     try:
-        STATE_HOME.mkdir(parents=True, exist_ok=True)
+        state_home.mkdir(parents=True, exist_ok=True)
         progress_path.write_text(json.dumps({"idx": idx}))
     except Exception:
         print("[ma] warning: could not save tour progress.")
 
 
-def handle_tour(reset: bool = False, advance: bool = False) -> int:
+def handle_tour(reset: bool = False, advance: bool = False, runtime: RuntimeConfig = None) -> int:
     """Guided breadcrumb/tour with lightweight progress tracking."""
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import STATE_HOME
+        state_home = STATE_HOME
+    else:
+        state_home = runtime.state_home
+
     steps = [
         {"title": "Discover projects", "cmd": "ma list", "desc": "See all projects and paths."},
         {"title": "Pick a target", "cmd": "ma select", "desc": "Interactive picker for test/run/deps."},
@@ -299,13 +331,13 @@ def handle_tour(reset: bool = False, advance: bool = False) -> int:
         {"title": "Preflight push", "cmd": "ma github-check --require-clean --require-upstream", "desc": "Pre-push/CI readiness gate."},
         {"title": "Doctor tests", "cmd": "ma doctor --check-tests", "desc": "Ensure test paths are wired."},
     ]
-    progress_path = STATE_HOME / "tour_progress.json"
+    progress_path = state_home / "tour_progress.json"
     idx = 0 if reset else _load_idx(progress_path)
     idx = max(0, min(idx, len(steps)))
 
     if advance:
         idx = min(idx + 1, len(steps))
-        _save_idx(progress_path, idx)
+        _save_idx(progress_path, idx, runtime)
 
     def render(idx_val: int):
         try:
@@ -335,16 +367,23 @@ def handle_tour(reset: bool = False, advance: bool = False) -> int:
         print("Tour complete. Reset anytime with: ma tour --reset")
 
     if reset:
-        _save_idx(progress_path, 0)
+        _save_idx(progress_path, 0, runtime)
     elif advance:
-        _save_idx(progress_path, idx)
+        _save_idx(progress_path, idx, runtime)
     return 0
 
 
 # --- Tour auto-advance helper (called from CLI dispatcher) ---
-def maybe_advance_tour(cmd_name: str) -> None:
+def maybe_advance_tour(cmd_name: str, runtime: RuntimeConfig = None) -> None:
     """Auto-advance the tour when a matching command succeeds."""
-    if not CACHE_ENABLED:
+    # Backward compatibility
+    if runtime is None:
+        from ma_helper.core.env import CACHE_ENABLED, STATE_HOME
+        cache_enabled, state_home = CACHE_ENABLED, STATE_HOME
+    else:
+        cache_enabled, state_home = runtime.cache_enabled, runtime.state_home
+
+    if not cache_enabled:
         return
     steps = [
         "list",
@@ -361,7 +400,7 @@ def maybe_advance_tour(cmd_name: str) -> None:
     ]
     if cmd_name not in steps:
         return
-    progress_path = STATE_HOME / "tour_progress.json"
+    progress_path = state_home / "tour_progress.json"
     idx = 0
     try:
         if progress_path.exists():
@@ -373,7 +412,7 @@ def maybe_advance_tour(cmd_name: str) -> None:
     if idx <= target:
         idx = target + 1
         try:
-            STATE_HOME.mkdir(parents=True, exist_ok=True)
+            state_home.mkdir(parents=True, exist_ok=True)
             progress_path.write_text(json.dumps({"idx": idx}))
         except Exception:
             pass
