@@ -423,3 +423,210 @@ This complexity makes it hard to reason about all possible states.
 ## Conclusion
 
 Music Advisor has solid foundations—privacy-first design, defensive error handling, and comprehensive schema validation. The main technical debt is structural: a monolithic extractor, excessive shims, and duplicated orchestration logic. Addressing these would significantly improve maintainability and testability without requiring architectural changes to the core pipeline.
+
+---
+
+## Audit Progress (Updated: 2026-01-07)
+
+### Overview
+
+Following the recommendations in this audit, significant progress has been made on addressing technical debt, particularly around the monolithic feature extractor and duplicated logging patterns.
+
+### Completed Tasks
+
+#### Tasks 1-4: Star Import Elimination
+- **Scope**: Eliminated star imports (`from x import *`) across the codebase
+- **Files Modified**: 198 files
+- **Impact**: Improved code clarity, reduced namespace pollution, better IDE support
+
+#### Tasks 5-7, 10: Logger Factory Migration
+- **Scope**: Migrated tools to centralized logger factory
+- **Files Modified**: 14 tools (8 in Task 7, 1 in Task 10, others in Tasks 5-6)
+- **Lines Removed**: ~150 lines of duplicated LOG_* environment variable parsing
+- **Impact**: Centralized logging configuration, reduced boilerplate, consistent behavior
+
+#### Task 8: QA Checker Extraction
+- **Module Created**: `tools/audio/qa_checker.py` (196 lines)
+- **Tests Created**: `tests/test_qa_checker.py` (269 lines, 17 tests)
+- **Functions Extracted**:
+  - `compute_qa_metrics()`: Clipping, silence, low-level detection
+  - `determine_qa_status()`: Overall QA gate logic
+  - `validate_qa_strict()`: Strict mode validation
+- **Impact**: Isolated QA logic for reuse and testing
+
+#### Task 9: Audio Loader Extraction
+- **Module Created**: `tools/audio/audio_loader.py` (175 lines)
+- **Tests Created**: `tests/test_audio_loader.py` (240 lines, 14 tests)
+- **Functions Extracted**:
+  - `load_audio()`: Wrapper for mono audio loading
+  - `probe_audio_duration()`: Fast duration check via soundfile/ffprobe
+- **Impact**: Consolidated audio I/O logic, reduced duplication
+
+#### Task 11: Tempo Estimator Extraction
+- **Module Created**: `tools/audio/tempo_estimator.py` (338 lines)
+- **Tests Created**: `tests/test_tempo_estimator.py` (271 lines, 23 tests)
+- **Functions Extracted**:
+  - `robust_tempo()`: Beat tracking with librosa
+  - `estimate_tempo_with_folding()`: Tempo estimation with folding logic
+  - `select_tempo_with_folding()`: Select best tempo variant
+  - `compute_tempo_confidence()`: Confidence scoring
+- **Impact**: Isolated tempo logic, comprehensive test coverage
+
+#### Task 12: Feature Calculator Extraction
+- **Module Created**: `tools/audio/feature_calculator.py` (309 lines)
+- **Tests Created**: `tests/test_feature_calculator.py` (351 lines, 28 tests)
+- **Functions Extracted**:
+  - `estimate_energy()`: Perceptual energy from RMS + spectral centroid
+  - `estimate_danceability()`: Rhythm suitability from tempo + beat strength
+  - `estimate_valence()`: Musical positivity from mode + energy
+- **Impact**: Isolated feature calculations for reuse across tools
+
+#### Task 13: Key Detector Extraction
+- **Module Created**: `tools/audio/key_detector.py` (173 lines)
+- **Tests Created**: `tests/test_key_detector.py` (274 lines, 25 tests)
+- **Functions Extracted**:
+  - `estimate_mode_and_key()`: Chroma-based key/mode detection
+  - `key_confidence_label()`: Simple confidence heuristic
+  - `normalize_key_confidence()`: Clamp confidence to 0.0-1.0
+  - `NOTE_NAMES_SHARP`: Pitch class constant
+- **Impact**: Isolated key detection logic, improved testability
+
+### ma_audio_features.py Status
+
+| Metric | Original | Current | Change |
+|--------|----------|---------|--------|
+| **Total Lines** | 1,747 | 1,391 | -356 lines (-20%) |
+| **analyze_pipeline()** | ~650 lines | ~587 lines | -63 lines (-10%) |
+| **main()** | ~250 lines | ~235 lines | -15 lines (-6%) |
+
+#### Lines Extracted by Module
+
+| Module | Lines | Tests | Test Lines | Coverage |
+|--------|-------|-------|------------|----------|
+| qa_checker.py | 196 | 17 tests | 269 | Comprehensive |
+| audio_loader.py | 175 | 14 tests | 240 | Comprehensive |
+| tempo_estimator.py | 338 | 23 tests | 271 | Comprehensive |
+| feature_calculator.py | 309 | 28 tests | 351 | Comprehensive |
+| key_detector.py | 173 | 25 tests | 274 | Comprehensive |
+| **Total** | **1,191** | **107 tests** | **1,405** | **All modules** |
+
+### Remaining Structure in ma_audio_features.py
+
+The current file (1,391 lines) now primarily contains:
+
+#### 1. Configuration & Constants (Lines 1-350, ~350 lines)
+- Imports and path setup
+- Constants (TARGET_SR, TARGET_LUFS, thresholds)
+- Default configurations
+- Tempo confidence defaults
+- SciPy shim for librosa compatibility
+- **Extraction Potential**: Low (configuration should remain centralized)
+
+#### 2. Helper Functions (Lines 350-570, ~220 lines)
+- `_sanitize_tempo_backend_fields()`: Backend validation
+- `_ensure_feature_pipeline_meta()`: Metadata injection
+- `_validate_external_payload()`: External data validation
+- `build_config_fingerprint()`: Configuration hashing
+- `debug()`: Logging helper
+- `_pad_short_signal()`: Signal padding (still used internally)
+- `compute_file_hash()`: File hashing
+- `estimate_lufs()`: Loudness estimation (~20 lines)
+- `normalize_audio()`: Audio normalization (~15 lines)
+- `normalize_external_confidence()`: Confidence normalization (~30 lines)
+- **Extraction Potential**: Medium
+  - LUFS estimation could be extracted
+  - Audio normalization could join audio_loader
+  - External confidence normalization is tempo-specific (could stay or join adapters)
+
+#### 3. Pipeline Core (Lines 570-1156, ~587 lines)
+- `analyze_pipeline()`: Main feature extraction pipeline
+  - Caching logic (~80 lines)
+  - Sidecar orchestration (~120 lines)
+  - External data merging (~100 lines)
+  - Feature extraction coordination (~100 lines)
+  - Output assembly (~100 lines)
+  - Error handling (~87 lines)
+- **Extraction Potential**: Medium-High
+  - Caching could be extracted to `cache_orchestrator.py`
+  - Sidecar logic could be extracted to `sidecar_orchestrator.py`
+  - However, these are tightly coupled to the pipeline flow
+
+#### 4. CLI Entry Point (Lines 1157-1391, ~235 lines)
+- `main()`: Argument parsing and pipeline invocation
+  - Argument parser setup (~80 lines)
+  - Environment/settings loading (~30 lines)
+  - Pipeline invocation (~20 lines)
+  - Output writing (~30 lines)
+  - Error handling (~75 lines)
+- **Extraction Potential**: Low (CLI logic should remain with entry point)
+
+### Remaining Extraction Candidates
+
+#### High Value, Low Risk
+- [ ] **LUFS Estimation** (~20 lines)
+  - Extract `estimate_lufs()` to `tools/audio/loudness_estimator.py`
+  - Clean separation from other features
+  - Would add ~1 test file
+
+#### Medium Value, Medium Risk
+- [ ] **Audio Normalization** (~15 lines)
+  - Extract `normalize_audio()` to join `audio_loader.py`
+  - Logical fit with audio I/O operations
+  - Requires careful dependency analysis
+
+- [ ] **Caching Orchestration** (~80 lines)
+  - Extract caching logic to `tools/audio/cache_orchestrator.py`
+  - Currently embedded in `analyze_pipeline()`
+  - Would require refactoring pipeline flow
+
+- [ ] **Sidecar Orchestration** (~120 lines)
+  - Extract to `tools/audio/sidecar_orchestrator.py`
+  - Complex state management (8 status states)
+  - Tightly coupled to pipeline, high refactoring cost
+
+#### Low Value (Keep as-is)
+- Configuration constants (should remain centralized)
+- CLI argument parsing (belongs with entry point)
+- Pipeline coordination logic (core responsibility of the file)
+
+### Test Coverage Added
+
+- **Total New Test Files**: 5
+- **Total New Tests**: 107 tests
+- **Total Test Lines**: 1,405 lines
+- **Test-to-Code Ratio**: 1.18:1 (1,405 test lines / 1,191 extracted code lines)
+
+All extracted modules have comprehensive test coverage including:
+- Normal operation tests
+- Edge case handling (None, empty, invalid inputs)
+- Value range validation
+- Integration/workflow tests
+- Consistency/determinism tests
+
+### Impact Summary
+
+#### Code Quality Improvements
+- **Modularity**: Broken down monolithic extractor into 5 focused modules
+- **Testability**: Added 107 tests covering previously untested code
+- **Maintainability**: Reduced cognitive load—each module has single responsibility
+- **Reusability**: Extracted modules can be used by other tools
+
+#### Quantitative Metrics
+- **Lines Removed from ma_audio_features.py**: 356 lines (-20%)
+- **New Module Lines**: 1,191 lines (across 5 modules)
+- **Test Lines Added**: 1,405 lines
+- **Net Addition**: +2,240 lines (includes comprehensive tests and documentation)
+
+#### Future Work
+The remaining `analyze_pipeline()` function (587 lines) is still complex but now primarily focused on its core responsibility: orchestrating the feature extraction pipeline. Further extractions (caching, sidecar) are possible but have diminishing returns vs. refactoring cost.
+
+### Next Steps
+
+1. **Consider LUFS extraction** (highest value, lowest risk)
+2. **Evaluate audio normalization extraction** (clean fit with audio_loader)
+3. **Monitor ma_audio_features.py complexity** as new features are added
+4. **Continue test coverage expansion** for remaining helper functions
+
+---
+
+*Progress tracking ends. See commit history for detailed implementation.*
