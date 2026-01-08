@@ -36,14 +36,18 @@ HOP = 512
 
 
 def _load_audio(path: Path, sr: int) -> Tuple[Optional[Any], Optional[int]]:
+    import sys
     if librosa is None:
+        print(f"[ttc_auto_estimate] ERROR: librosa not available", file=sys.stderr)
         return None, None
     try:
         y, sr_out = librosa.load(path, sr=sr, mono=True)
         if y is None or len(y) == 0:
+            print(f"[ttc_auto_estimate] ERROR: loaded audio is empty: {path}", file=sys.stderr)
             return None, None
         return y, sr_out
-    except Exception:
+    except Exception as e:
+        print(f"[ttc_auto_estimate] ERROR: failed to load audio {path}: {type(e).__name__}: {e}", file=sys.stderr)
         return None, None
 
 
@@ -79,8 +83,11 @@ def _pick_ttc(y, sr: int) -> Optional[float]:
 
 
 def estimate_ttc(audio_path: Path, bpm_hint: Optional[float] = None, sr: int = DEFAULT_SR) -> Dict[str, Optional[float]]:
+    import sys
+    print(f"[ttc_auto_estimate] attempting to load: {audio_path} (exists={audio_path.exists()})", file=sys.stderr)
     y, sr_loaded = _load_audio(audio_path, sr)
     if y is None or sr_loaded is None:
+        print(f"[ttc_auto_estimate] audio load failed, returning status=audio_load_failed", file=sys.stderr)
         return {
             "ttc_seconds_first_chorus": None,
             "ttc_bars_first_chorus": None,
