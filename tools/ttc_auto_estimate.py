@@ -36,24 +36,43 @@ HOP = 512
 
 
 def _load_audio(path: Path, sr: int) -> Tuple[Optional[Any], Optional[int]]:
+    """
+    Load audio using librosa, with workaround for MP3 soundfile bug.
+
+    soundfile 0.12.1 with libsndfile 1.1.0 can open MP3 files but returns
+    zero frames when reading. Force audioread backend for MP3 files.
+    """
     import sys
-    import inspect
     if librosa is None:
         print(f"[ttc_auto_estimate] ERROR: librosa not available", file=sys.stderr)
         return None, None
-    try:
-        print(f"[ttc_auto_estimate] DEBUG: calling librosa.load(path={path}, sr={sr}, mono=True)", file=sys.stderr)
-        print(f"[ttc_auto_estimate] DEBUG: librosa.load signature: {inspect.signature(librosa.load)}", file=sys.stderr)
-        y, sr_out = librosa.load(path, sr=sr, mono=True)
-        print(f"[ttc_auto_estimate] DEBUG: librosa.load returned y={type(y).__name__ if y is not None else 'None'}, len={len(y) if y is not None else 'N/A'}, sr={sr_out}", file=sys.stderr)
-        if y is None or len(y) == 0:
-            print(f"[ttc_auto_estimate] ERROR: loaded audio is empty: {path}", file=sys.stderr)
+
+    # Workaround: soundfile 0.12.1 has a bug reading MP3 files.
+    # Force audioread backend for MP3s.
+    suffix = path.suffix.lower()
+    if suffix in ('.mp3', '.mp2'):
+        try:
+            import audioread
+            print(f"[ttc_auto_estimate] Using audioread backend for MP3: {path.name}", file=sys.stderr)
+            with audioread.audio_open(path) as f:
+                # Pre-open audioread object and pass to librosa
+                y, sr_out = librosa.load(f, sr=sr, mono=True)
+        except Exception as e:
+            print(f"[ttc_auto_estimate] ERROR: audioread failed for {path}: {type(e).__name__}: {e}", file=sys.stderr)
             return None, None
-        print(f"[ttc_auto_estimate] DEBUG: audio loaded successfully, shape={y.shape if hasattr(y, 'shape') else 'N/A'}", file=sys.stderr)
-        return y, sr_out
-    except Exception as e:
-        print(f"[ttc_auto_estimate] ERROR: failed to load audio {path}: {type(e).__name__}: {e}", file=sys.stderr)
+    else:
+        # Use default librosa loading for other formats
+        try:
+            y, sr_out = librosa.load(path, sr=sr, mono=True)
+        except Exception as e:
+            print(f"[ttc_auto_estimate] ERROR: failed to load audio {path}: {type(e).__name__}: {e}", file=sys.stderr)
+            return None, None
+
+    if y is None or len(y) == 0:
+        print(f"[ttc_auto_estimate] ERROR: loaded audio is empty: {path}", file=sys.stderr)
         return None, None
+
+    return y, sr_out
 
 
 def _estimate_bpm(y, sr: int, bpm_hint: Optional[float]) -> Tuple[Optional[float], Optional[Any]]:

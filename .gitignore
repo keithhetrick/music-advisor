@@ -246,5 +246,6 @@ __pypackages__/
 tmp/
 scratch/
 
+# Audit and repo surgery folders
 docs/audits/
 docs/repo_surgery/
