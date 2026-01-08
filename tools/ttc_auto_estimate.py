@@ -42,9 +42,11 @@ def _load_audio(path: Path, sr: int) -> Tuple[Optional[Any], Optional[int]]:
         return None, None
     try:
         y, sr_out = librosa.load(path, sr=sr, mono=True)
+        print(f"[ttc_auto_estimate] DEBUG: librosa.load returned y={type(y).__name__ if y is not None else 'None'}, len={len(y) if y is not None else 'N/A'}, sr={sr_out}", file=sys.stderr)
         if y is None or len(y) == 0:
             print(f"[ttc_auto_estimate] ERROR: loaded audio is empty: {path}", file=sys.stderr)
             return None, None
+        print(f"[ttc_auto_estimate] DEBUG: audio loaded successfully, shape={y.shape if hasattr(y, 'shape') else 'N/A'}", file=sys.stderr)
         return y, sr_out
     except Exception as e:
         print(f"[ttc_auto_estimate] ERROR: failed to load audio {path}: {type(e).__name__}: {e}", file=sys.stderr)
