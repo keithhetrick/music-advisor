@@ -435,17 +435,20 @@ Following the recommendations in this audit, significant progress has been made 
 ### Completed Tasks
 
 #### Tasks 1-4: Star Import Elimination
+
 - **Scope**: Eliminated star imports (`from x import *`) across the codebase
 - **Files Modified**: 198 files
 - **Impact**: Improved code clarity, reduced namespace pollution, better IDE support
 
 #### Tasks 5-7, 10: Logger Factory Migration
+
 - **Scope**: Migrated tools to centralized logger factory
 - **Files Modified**: 14 tools (8 in Task 7, 1 in Task 10, others in Tasks 5-6)
-- **Lines Removed**: ~150 lines of duplicated LOG_* environment variable parsing
+- **Lines Removed**: ~150 lines of duplicated LOG\_\* environment variable parsing
 - **Impact**: Centralized logging configuration, reduced boilerplate, consistent behavior
 
 #### Task 8: QA Checker Extraction
+
 - **Module Created**: `tools/audio/qa_checker.py` (196 lines)
 - **Tests Created**: `tests/test_qa_checker.py` (269 lines, 17 tests)
 - **Functions Extracted**:
@@ -455,6 +458,7 @@ Following the recommendations in this audit, significant progress has been made 
 - **Impact**: Isolated QA logic for reuse and testing
 
 #### Task 9: Audio Loader Extraction
+
 - **Module Created**: `tools/audio/audio_loader.py` (175 lines)
 - **Tests Created**: `tests/test_audio_loader.py` (240 lines, 14 tests)
 - **Functions Extracted**:
@@ -463,6 +467,7 @@ Following the recommendations in this audit, significant progress has been made 
 - **Impact**: Consolidated audio I/O logic, reduced duplication
 
 #### Task 11: Tempo Estimator Extraction
+
 - **Module Created**: `tools/audio/tempo_estimator.py` (338 lines)
 - **Tests Created**: `tests/test_tempo_estimator.py` (271 lines, 23 tests)
 - **Functions Extracted**:
@@ -473,6 +478,7 @@ Following the recommendations in this audit, significant progress has been made 
 - **Impact**: Isolated tempo logic, comprehensive test coverage
 
 #### Task 12: Feature Calculator Extraction
+
 - **Module Created**: `tools/audio/feature_calculator.py` (309 lines)
 - **Tests Created**: `tests/test_feature_calculator.py` (351 lines, 28 tests)
 - **Functions Extracted**:
@@ -482,6 +488,7 @@ Following the recommendations in this audit, significant progress has been made 
 - **Impact**: Isolated feature calculations for reuse across tools
 
 #### Task 13: Key Detector Extraction
+
 - **Module Created**: `tools/audio/key_detector.py` (173 lines)
 - **Tests Created**: `tests/test_key_detector.py` (274 lines, 25 tests)
 - **Functions Extracted**:
@@ -493,28 +500,29 @@ Following the recommendations in this audit, significant progress has been made 
 
 ### ma_audio_features.py Status
 
-| Metric | Original | Current | Change |
-|--------|----------|---------|--------|
-| **Total Lines** | 1,747 | 1,391 | -356 lines (-20%) |
-| **analyze_pipeline()** | ~650 lines | ~587 lines | -63 lines (-10%) |
-| **main()** | ~250 lines | ~235 lines | -15 lines (-6%) |
+| Metric                 | Original   | Current    | Change            |
+| ---------------------- | ---------- | ---------- | ----------------- |
+| **Total Lines**        | 1,747      | 1,391      | -356 lines (-20%) |
+| **analyze_pipeline()** | ~650 lines | ~587 lines | -63 lines (-10%)  |
+| **main()**             | ~250 lines | ~235 lines | -15 lines (-6%)   |
 
 #### Lines Extracted by Module
 
-| Module | Lines | Tests | Test Lines | Coverage |
-|--------|-------|-------|------------|----------|
-| qa_checker.py | 196 | 17 tests | 269 | Comprehensive |
-| audio_loader.py | 175 | 14 tests | 240 | Comprehensive |
-| tempo_estimator.py | 338 | 23 tests | 271 | Comprehensive |
-| feature_calculator.py | 309 | 28 tests | 351 | Comprehensive |
-| key_detector.py | 173 | 25 tests | 274 | Comprehensive |
-| **Total** | **1,191** | **107 tests** | **1,405** | **All modules** |
+| Module                | Lines     | Tests         | Test Lines | Coverage        |
+| --------------------- | --------- | ------------- | ---------- | --------------- |
+| qa_checker.py         | 196       | 17 tests      | 269        | Comprehensive   |
+| audio_loader.py       | 175       | 14 tests      | 240        | Comprehensive   |
+| tempo_estimator.py    | 338       | 23 tests      | 271        | Comprehensive   |
+| feature_calculator.py | 309       | 28 tests      | 351        | Comprehensive   |
+| key_detector.py       | 173       | 25 tests      | 274        | Comprehensive   |
+| **Total**             | **1,191** | **107 tests** | **1,405**  | **All modules** |
 
 ### Remaining Structure in ma_audio_features.py
 
 The current file (1,391 lines) now primarily contains:
 
 #### 1. Configuration & Constants (Lines 1-350, ~350 lines)
+
 - Imports and path setup
 - Constants (TARGET_SR, TARGET_LUFS, thresholds)
 - Default configurations
@@ -523,6 +531,7 @@ The current file (1,391 lines) now primarily contains:
 - **Extraction Potential**: Low (configuration should remain centralized)
 
 #### 2. Helper Functions (Lines 350-570, ~220 lines)
+
 - `_sanitize_tempo_backend_fields()`: Backend validation
 - `_ensure_feature_pipeline_meta()`: Metadata injection
 - `_validate_external_payload()`: External data validation
@@ -539,6 +548,7 @@ The current file (1,391 lines) now primarily contains:
   - External confidence normalization is tempo-specific (could stay or join adapters)
 
 #### 3. Pipeline Core (Lines 570-1156, ~587 lines)
+
 - `analyze_pipeline()`: Main feature extraction pipeline
   - Caching logic (~80 lines)
   - Sidecar orchestration (~120 lines)
@@ -552,6 +562,7 @@ The current file (1,391 lines) now primarily contains:
   - However, these are tightly coupled to the pipeline flow
 
 #### 4. CLI Entry Point (Lines 1157-1391, ~235 lines)
+
 - `main()`: Argument parsing and pipeline invocation
   - Argument parser setup (~80 lines)
   - Environment/settings loading (~30 lines)
@@ -563,18 +574,22 @@ The current file (1,391 lines) now primarily contains:
 ### Remaining Extraction Candidates
 
 #### High Value, Low Risk
+
 - [ ] **LUFS Estimation** (~20 lines)
   - Extract `estimate_lufs()` to `tools/audio/loudness_estimator.py`
   - Clean separation from other features
   - Would add ~1 test file
 
 #### Medium Value, Medium Risk
+
 - [ ] **Audio Normalization** (~15 lines)
+
   - Extract `normalize_audio()` to join `audio_loader.py`
   - Logical fit with audio I/O operations
   - Requires careful dependency analysis
 
 - [ ] **Caching Orchestration** (~80 lines)
+
   - Extract caching logic to `tools/audio/cache_orchestrator.py`
   - Currently embedded in `analyze_pipeline()`
   - Would require refactoring pipeline flow
@@ -585,6 +600,7 @@ The current file (1,391 lines) now primarily contains:
   - Tightly coupled to pipeline, high refactoring cost
 
 #### Low Value (Keep as-is)
+
 - Configuration constants (should remain centralized)
 - CLI argument parsing (belongs with entry point)
 - Pipeline coordination logic (core responsibility of the file)
@@ -597,6 +613,7 @@ The current file (1,391 lines) now primarily contains:
 - **Test-to-Code Ratio**: 1.18:1 (1,405 test lines / 1,191 extracted code lines)
 
 All extracted modules have comprehensive test coverage including:
+
 - Normal operation tests
 - Edge case handling (None, empty, invalid inputs)
 - Value range validation
@@ -606,6 +623,7 @@ All extracted modules have comprehensive test coverage including:
 ### Impact Summary (Final - 24 Tasks Completed)
 
 #### Code Quality Improvements
+
 - **Modularity**: Broken down monolithic extractor into **6 focused modules**
 - **Testability**: Added **108 tests** covering previously untested code (100% pass rate)
 - **Maintainability**: Reduced cognitive load—each module has single responsibility
@@ -614,13 +632,14 @@ All extracted modules have comprehensive test coverage including:
 
 #### Quantitative Metrics: ma_audio_features.py Reduction
 
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
+| Metric                   | Before      | After       | Change                  |
+| ------------------------ | ----------- | ----------- | ----------------------- |
 | **ma_audio_features.py** | 1,747 lines | 1,355 lines | **-392 lines (-22.4%)** |
-| **Extracted Modules** | 0 | 6 modules | **+1,287 lines** |
-| **Test Coverage** | 0 tests | 108 tests | **+1,641 test lines** |
+| **Extracted Modules**    | 0           | 6 modules   | **+1,287 lines**        |
+| **Test Coverage**        | 0 tests     | 108 tests   | **+1,641 test lines**   |
 
 **Extracted Modules:**
+
 1. `qa_checker.py` - 196 lines (QA metrics, validation)
 2. `audio_loader.py` - 175 lines (Audio loading, normalization)
 3. `tempo_estimator.py` - 338 lines (Tempo/beat detection)
@@ -633,16 +652,19 @@ All extracted modules have comprehensive test coverage including:
 #### Other Improvements (Tasks 1-21)
 
 **Star Import Elimination (Tasks 1-4):**
+
 - Removed all `from X import *` statements
 - Explicit imports improve IDE navigation and reduce namespace pollution
 - Files cleaned: 15+ modules across engines/shared/tools
 
 **Logger Factory Migration (Tasks 5-7, 10):**
+
 - Centralized logger creation in `shared/ma_utils/logger_factory.py`
 - Migrated 12+ modules to use `get_configured_logger()`
 - Consistent logging behavior across codebase
 
 **Shim Consolidation (Tasks 17-21):**
+
 - **Removed 24 shim files** (~366 lines of redirect code)
 - Migrated imports to canonical locations:
   - `shared.config` → `ma_config`
@@ -651,6 +673,7 @@ All extracted modules have comprehensive test coverage including:
 - Cleaner import paths, reduced indirection
 
 **Global State Audit (Task 22):**
+
 - Documented all 26 `global` keyword usages
 - Categorized by risk (logger, cache, config, calibration)
 - Created remediation plan (Priority 1-4)
@@ -664,6 +687,7 @@ $ pytest tests/test_*.py -v --tb=no -q
 ```
 
 **Test Coverage Breakdown:**
+
 - `test_qa_checker.py` - 273 lines (21 tests)
 - `test_audio_loader.py` - 244 lines (20 tests)
 - `test_tempo_estimator.py` - 271 lines (22 tests)
@@ -676,6 +700,7 @@ $ pytest tests/test_*.py -v --tb=no -q
 #### Remaining Work (Deferred/Out of Scope)
 
 **Pipeline Orchestration:**
+
 - `analyze_pipeline()` function remains (~500 lines)
 - Core responsibility: coordinate feature extraction steps
 - Tightly coupled to caching/sidecar logic
@@ -689,6 +714,7 @@ $ pytest tests/test_*.py -v --tb=no -q
 - See `docs/audits/GLOBAL_STATE_AUDIT.md` for detailed plan and completion status
 
 **Additional Extraction Candidates:**
+
 - Caching orchestration (~80 lines) - Medium value, high coupling
 - Sidecar orchestration (~120 lines) - Medium value, complex state
 - These remain tractable but are lower priority
@@ -704,17 +730,20 @@ $ pytest tests/test_*.py -v --tb=no -q
 **Commits**:
 
 1. **Task 25** (`3927408`) - tools/calibration/ (3 files)
+
    - backfill_features_meta.py
    - calibration_readiness.py
    - equilibrium_merge_full.py
 
 2. **Task 26** (`e1bb291`) - tools/hci/ (3 files)
+
    - hci_rank_from_folder.py
    - ma_add_echo_to_hci_v1.py
    - ma_add_echo_to_client_rich_v1.py
    - Special case: Also handled `global _QUIET` flag
 
 3. **Task 27** (`39f4cc9`) - tools/ top-level (5 files)
+
    - tools/lyrics/import_kaylin_lyrics_into_db_v1.py
    - spotify_apply_overrides_to_core_corpus.py
    - hci_final_score.py
@@ -722,6 +751,7 @@ $ pytest tests/test_*.py -v --tb=no -q
    - ma_merge_client_and_hci.py
 
 4. **Task 28** (`6fc6122`) - tools/audio/ + pack_writer.py (3 files)
+
    - tempo_sidecar_runner.py
    - ma_audio_features.py (1,300+ lines, used lambda wrapper pattern)
    - pack_writer.py
@@ -787,6 +817,7 @@ $ grep -rn "global _log" --include="*.py" . | grep -v archive | wc -l
 **Changes**:
 
 1. Updated `docs/audits/GLOBAL_STATE_AUDIT.md`:
+
    - Marked Priority 1 as ✅ COMPLETE
    - Updated Executive Summary (26 → 8 global statements)
    - Added completion dates and commit references
@@ -802,6 +833,7 @@ $ grep -rn "global _log" --include="*.py" . | grep -v archive | wc -l
 ## Summary: Audit Accomplishments
 
 **30 Tasks Completed:**
+
 1. ✅ Star import elimination (4 tasks)
 2. ✅ Logger factory creation and migration (4 tasks)
 3. ✅ Feature extractor modularization (5 tasks)
@@ -815,20 +847,120 @@ $ grep -rn "global _log" --include="*.py" . | grep -v archive | wc -l
 11. ✅ **Audit documentation update** (1 task: 30 - this update)
 
 **Key Metrics:**
+
 - **392 lines removed** from ma_audio_features.py (22.4% reduction)
 - **6 new modules** extracted (1,287 lines)
 - **108 new tests** (1,641 test lines, 100% pass rate)
 - **24 shim files removed** (~366 lines)
 - **26 global usages documented** with remediation plan
 - **✅ 18 logger globals eliminated** (100% of Priority 1)
+- **✅ 3 config globals eliminated** (100% of Priority 2)
 
 **Impact:**
+
 - Improved modularity and testability
 - Cleaner imports and reduced coupling
 - Comprehensive test coverage for critical audio processing
 - **Eliminated all logger globals** - explicit logger passing throughout codebase
+- **Eliminated all ma_helper config globals** - immutable RuntimeConfig pattern
 - Clear documentation of remaining technical debt
 
 ---
 
-*Progress update completed 2026-01-07 (Tasks 1-30). See commit history for detailed implementation.*
+### Tasks 31-39: ma_helper Config Migration (Priority 2)
+
+**Objective**: Eliminate all mutable configuration globals from ma_helper by migrating to an immutable RuntimeConfig pattern.
+
+**Background**: After completing Priority 1 (logger globals), the audit revealed 3 config-related global statements in ma_helper with 14 total mutable global variables. These were mutated at runtime via `apply_config()` and `--root` flag, creating hidden dependencies and making testing difficult.
+
+**Scope**:
+
+- [ma_helper/core/env.py](../ma_helper/core/env.py) - 11 mutable path globals + `apply_config()` function
+- [ma_helper/cli_app.py](../ma_helper/cli_app.py) - 3 module-level globals (config, orch_adapter, DRY_RUN)
+- 24 consumer files across ma_helper package
+
+**Commits**:
+
+- Task 31 (`68cf1b8`): Created RuntimeConfig frozen dataclass
+- Task 32 (`5ebfd06`): Migrated visual.py to RuntimeConfig
+- Task 33 (`3a23fa7`): Migrated helpdesk.py to RuntimeConfig
+- Task 34 (`e40dd08`): Migrated testflow.py to RuntimeConfig
+- Task 35 (`5d0e1bb`): Migrated favorites.py to RuntimeConfig
+- Task 36 (`4a0ffb6`): Migrated runtime.py, smoke.py, scaffold.py, chatdev.py to RuntimeConfig
+- Task 37 (`34dbde2`): Migrated adapters, core, and tui to RuntimeConfig
+- Task 38 (`04e8fcb`): Removed apply_config() and all global mutations
+- Task 39 (this commit): Updated audit documentation
+
+**Results**:
+
+- ✅ All 3 config global statements eliminated
+- ✅ `apply_config()` function removed entirely
+- ✅ 24 files migrated to accept RuntimeConfig parameter
+- ✅ Backward compatibility maintained with optional parameters
+- ✅ All ma_helper tests pass (3/3 config tests)
+- ✅ Global count reduced from 8 to 4 (only caches + 1 calibration threshold remain)
+
+**Technical Approach**:
+
+1. **Created frozen dataclass** (`@dataclass(frozen=True)`) for RuntimeConfig
+2. **Maintained backward compatibility** - all functions accept `runtime: RuntimeConfig | None = None`
+3. **Lazy fallback pattern** - functions import from env.py only when runtime is None
+4. **Fixed import-time evaluation** - state.py functions resolve paths at call time, not import time
+5. **Removed all mutations** - config, orch_adapter, and log_event created locally in main()
+
+**Verification**:
+
+```bash
+# No global statements in ma_helper
+$ grep -rn "global " ma_helper/ --include="*.py" | grep -v __pycache__
+# Returns 0 results ✅
+
+# No apply_config calls
+$ grep -rn "apply_config" ma_helper/ --include="*.py" | grep -v __pycache__
+# Returns 0 results (only comment references) ✅
+
+# Tests pass
+$ pytest tests/helper_unit/test_config.py -v
+# 3/3 tests pass ✅
+```
+
+**Documentation**:
+
+- [MA_HELPER_CONFIG_MIGRATION.md](MA_HELPER_CONFIG_MIGRATION.md) - Detailed migration plan and completion status
+- [GLOBAL_STATE_AUDIT.md](GLOBAL_STATE_AUDIT.md) - Updated with Type C completion
+
+---
+
+## Final Summary (Tasks 1-39)
+
+**Total achievements**:
+
+- **392 lines removed** from ma_audio_features.py (22.4% reduction)
+- **6 new modules** extracted (1,287 lines)
+- **108 new tests** (1,641 test lines, 100% pass rate)
+- **24 shim files removed** (~366 lines)
+- **39 tasks completed** across 3 priorities
+- **21 global statements eliminated** (26 → 4, 81% reduction)
+  - ✅ 18 logger globals (Priority 1, Tasks 25-29)
+  - ✅ 3 config globals (Priority 2, Tasks 31-38)
+- **4 global statements remain** (all legitimate caches + 1 calibration threshold)
+
+**Remaining globals** (acceptable):
+
+1. `tools/ma_benchmark_check.py:367` - Calibration threshold (Priority 3, low priority)
+2. `tools/aee_band_thresholds.py:92` - Threshold cache (acceptable lazy-load)
+3. `engines/lyrics_engine/src/ma_lyrics_engine/export.py:20` - Norms cache (acceptable)
+4. `hosts/advisor_host/auth/auth.py:38` - JWKS cache with TTL (acceptable)
+
+**Impact**:
+
+- Improved modularity and testability
+- Cleaner imports and reduced coupling
+- Comprehensive test coverage for critical audio processing
+- **Eliminated all problematic globals** - only caches remain
+- **Immutable configuration pattern** - thread-safe and testable
+- Clear documentation of remaining technical debt
+
+---
+
+_Progress update completed 2026-01-07 (Tasks 1-39). See commit history for detailed implementation._

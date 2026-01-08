@@ -8,17 +8,17 @@
 
 ## Executive Summary
 
-- **Total `global` statements**: 8 (down from 26)
+- **Total `global` statements**: 4 (down from 26)
 - **Type A (Logger reconfiguration)**: ✅ **0** - COMPLETE (was 18)
-- **Type B (Module-level caches)**: 3 (38%)
-- **Type C (Mutable config)**: 3 (38%)
-- **Type D (In-process calibration)**: 2 (24%)
+- **Type B (Module-level caches)**: 3 (75%)
+- **Type C (Mutable config)**: ✅ **0** - COMPLETE (was 3)
+- **Type D (In-process calibration)**: 1 (25%)
 
 ### Key Findings
 
 1. **✅ Logger globals eliminated** - All 18 logger globals removed (Tasks 25-29, completed 2026-01-07)
-2. **Caching is minimal** - Only 3 cache-related globals, all legitimate lazy-load patterns
-3. **Config mutation exists** - 3 config-related globals with varying risk levels
+2. **✅ Config globals eliminated** - All 3 ma_helper config globals removed (Tasks 31-38, completed 2026-01-07)
+3. **Caching is minimal** - Only 3 cache-related globals, all legitimate lazy-load patterns
 4. **No critical issues** - All global usage is deliberate and documented
 
 ---
@@ -39,27 +39,27 @@
 
 **Original instances** (now refactored):
 
-| File                                                                            | Variable       | Status    | Commit  |
-| ------------------------------------------------------------------------------- | -------------- | --------- | ------- |
-| `tools/lyrics/import_kaylin_lyrics_into_db_v1.py:194`                           | `_log`         | ✅ Fixed  | 39f4cc9 |
-| `tools/spotify_apply_overrides_to_core_corpus.py:289`                           | `_log`         | ✅ Fixed  | 39f4cc9 |
-| `tools/hci_final_score.py:364`                                                  | `_log`         | ✅ Fixed  | 39f4cc9 |
-| `tools/ma_add_philosophy_to_hci.py:71`                                          | `_log`         | ✅ Fixed  | 39f4cc9 |
-| `tools/hci/ma_add_echo_to_client_rich_v1.py:1001`                               | `_log, _QUIET` | ✅ Fixed  | e1bb291 |
-| `tools/hci/ma_add_echo_to_hci_v1.py:473`                                        | `_log, _QUIET` | ✅ Fixed  | e1bb291 |
-| `tools/hci/hci_rank_from_folder.py:278`                                         | `_log`         | ✅ Fixed  | e1bb291 |
-| `tools/calibration/backfill_features_meta.py:131`                               | `_log`         | ✅ Fixed  | 3927408 |
-| `tools/calibration/calibration_readiness.py:88`                                 | `_log`         | ✅ Fixed  | 3927408 |
-| `tools/calibration/equilibrium_merge_full.py:43`                                | `_log`         | ✅ Fixed  | 3927408 |
-| `tools/audio/tempo_sidecar_runner.py:406`                                       | `_log`         | ✅ Fixed  | 6fc6122 |
-| `tools/audio/ma_audio_features.py:1259`                                         | `_log`         | ✅ Fixed  | 6fc6122 |
-| `tools/ma_merge_client_and_hci.py:793`                                          | `_log`         | ✅ Fixed  | 39f4cc9 |
-| `tools/pack_writer.py:313`                                                      | `_log`         | ✅ Fixed  | 6fc6122 |
-| `engines/audio_engine/tools/misc/ma_truth_vs_ml_finalize_truth.py:91`           | `_log`         | ✅ Fixed  | 01d67e8 |
-| `engines/audio_engine/tools/misc/pack_show_hci.py:78`                           | `_log`         | ✅ Fixed  | 01d67e8 |
-| `engines/audio_engine/tools/calibration/build_baseline_from_snapshot.py:71`     | `_log`         | ✅ Fixed  | 01d67e8 |
-| `engines/audio_engine/tools/calibration/build_baseline_from_calibration.py:178` | `_log`         | ✅ Fixed  | 01d67e8 |
-| `engines/lyrics_engine/tools/lyrics/import_kaylin_lyrics_into_db_v1.py:193`     | `_log`         | ✅ Fixed  | 01d67e8 |
+| File                                                                            | Variable       | Status   | Commit  |
+| ------------------------------------------------------------------------------- | -------------- | -------- | ------- |
+| `tools/lyrics/import_kaylin_lyrics_into_db_v1.py:194`                           | `_log`         | ✅ Fixed | 39f4cc9 |
+| `tools/spotify_apply_overrides_to_core_corpus.py:289`                           | `_log`         | ✅ Fixed | 39f4cc9 |
+| `tools/hci_final_score.py:364`                                                  | `_log`         | ✅ Fixed | 39f4cc9 |
+| `tools/ma_add_philosophy_to_hci.py:71`                                          | `_log`         | ✅ Fixed | 39f4cc9 |
+| `tools/hci/ma_add_echo_to_client_rich_v1.py:1001`                               | `_log, _QUIET` | ✅ Fixed | e1bb291 |
+| `tools/hci/ma_add_echo_to_hci_v1.py:473`                                        | `_log, _QUIET` | ✅ Fixed | e1bb291 |
+| `tools/hci/hci_rank_from_folder.py:278`                                         | `_log`         | ✅ Fixed | e1bb291 |
+| `tools/calibration/backfill_features_meta.py:131`                               | `_log`         | ✅ Fixed | 3927408 |
+| `tools/calibration/calibration_readiness.py:88`                                 | `_log`         | ✅ Fixed | 3927408 |
+| `tools/calibration/equilibrium_merge_full.py:43`                                | `_log`         | ✅ Fixed | 3927408 |
+| `tools/audio/tempo_sidecar_runner.py:406`                                       | `_log`         | ✅ Fixed | 6fc6122 |
+| `tools/audio/ma_audio_features.py:1259`                                         | `_log`         | ✅ Fixed | 6fc6122 |
+| `tools/ma_merge_client_and_hci.py:793`                                          | `_log`         | ✅ Fixed | 39f4cc9 |
+| `tools/pack_writer.py:313`                                                      | `_log`         | ✅ Fixed | 6fc6122 |
+| `engines/audio_engine/tools/misc/ma_truth_vs_ml_finalize_truth.py:91`           | `_log`         | ✅ Fixed | 01d67e8 |
+| `engines/audio_engine/tools/misc/pack_show_hci.py:78`                           | `_log`         | ✅ Fixed | 01d67e8 |
+| `engines/audio_engine/tools/calibration/build_baseline_from_snapshot.py:71`     | `_log`         | ✅ Fixed | 01d67e8 |
+| `engines/audio_engine/tools/calibration/build_baseline_from_calibration.py:178` | `_log`         | ✅ Fixed | 01d67e8 |
+| `engines/lyrics_engine/tools/lyrics/import_kaylin_lyrics_into_db_v1.py:193`     | `_log`         | ✅ Fixed | 01d67e8 |
 
 **Refactoring approach**:
 
@@ -93,58 +93,52 @@
 
 ---
 
-### Type C: Mutable Configuration (3 instances)
+### Type C: Mutable Configuration ✅ **COMPLETE** (0 instances, was 3)
 
-**Pattern**: Runtime configuration updates based on CLI args or initialization.
+**Status**: ✅ **All ma_helper config globals eliminated** (Tasks 31-38, completed 2026-01-07)
 
-| File                       | Variable                               | Purpose                          | Risk       | Remediation                       |
-| -------------------------- | -------------------------------------- | -------------------------------- | ---------- | --------------------------------- |
-| `ma_helper/core/env.py:30` | `CACHE_DIR, CACHE_FILE, ...` (11 vars) | Apply config overrides           | **Medium** | Convert to config object          |
-| `ma_helper/cli_app.py:119` | `config, orch_adapter`                 | Update global config on `--root` | **Medium** | Pass as context object            |
-| `ma_helper/cli_app.py:169` | `DRY_RUN`                              | Persist dry-run flag             | **Low**    | Pass as arg or use args namespace |
+**Commits**:
 
-**Analysis**:
+- Task 31: `68cf1b8` - Created RuntimeConfig frozen dataclass
+- Task 32: `5ebfd06` - Migrated visual.py to RuntimeConfig
+- Task 33: `3a23fa7` - Migrated helpdesk.py to RuntimeConfig
+- Task 34: `e40dd08` - Migrated testflow.py to RuntimeConfig
+- Task 35: `5d0e1bb` - Migrated favorites.py to RuntimeConfig
+- Task 36: `4a0ffb6` - Migrated runtime.py, smoke.py, scaffold.py, chatdev.py to RuntimeConfig
+- Task 37: `34dbde2` - Migrated adapters, core, and tui to RuntimeConfig
+- Task 38: `04e8fcb` - Removed apply_config() and all global mutations
 
-#### `ma_helper/core/env.py:30` - Path Configuration
+**Original instances** (now refactored):
 
-- **Risk**: Medium - 11 module-level path variables mutated by `apply_config()`
-- **Impact**: Used throughout ma_helper for caching, logging, telemetry
-- **Why it exists**: Allow runtime override of default paths via `HelperConfig`
-- **Remediation**:
-  - Replace with immutable `Config` dataclass
-  - Pass config object explicitly to functions
-  - Estimated effort: 3-4 hours (affects ~20 files)
+| File                       | Variable                               | Status   | Commit  |
+| -------------------------- | -------------------------------------- | -------- | ------- |
+| `ma_helper/core/env.py:30` | `CACHE_DIR, CACHE_FILE, ...` (11 vars) | ✅ Fixed | 04e8fcb |
+| `ma_helper/cli_app.py:119` | `config, orch_adapter`                 | ✅ Fixed | 04e8fcb |
+| `ma_helper/cli_app.py:169` | `DRY_RUN`                              | ✅ Fixed | 04e8fcb |
 
-#### `ma_helper/cli_app.py:119` - Root Override
+**Refactoring approach**:
 
-- **Risk**: Medium - Updates `config` and `orch_adapter` when `--root` is passed
-- **Impact**: Reconfigures orchestrator adapter mid-execution
-- **Why it exists**: Allow per-command root override
-- **Remediation**:
-  - Pass config as explicit context object
-  - Avoid mutating global state after initialization
-  - Estimated effort: 2-3 hours
+- Created `@dataclass(frozen=True)` RuntimeConfig object
+- Replaced `apply_config()` with immutable config creation
+- Added `runtime: RuntimeConfig` parameter to all command handlers
+- Removed all module-level mutable globals from cli_app.py
+- Maintained backward compatibility with optional parameters
 
-#### `ma_helper/cli_app.py:169` - DRY_RUN Flag
+**Verification**:
 
-- **Risk**: Low - Single boolean flag for dry-run mode
-- **Impact**: Used by command handlers to skip side effects
-- **Why it exists**: Simplify dry-run checks across commands
-- **Remediation**:
-  - Pass via `args` namespace or context object
-  - Low priority - minimal impact
-  - Estimated effort: 30 minutes
+- `grep -rn "global " ma_helper/ --include="*.py"` returns 0 global statements
+- `grep -rn "apply_config" ma_helper/ --include="*.py"` returns 0 function calls
+- All ma_helper tests pass: `pytest tests/helper_unit/test_config.py` ✅
 
 ---
 
-### Type D: In-Process Calibration (2 instances)
+### Type D: In-Process Calibration (1 instance)
 
 **Pattern**: Calibrate thresholds at runtime based on loaded data.
 
-| File                                                                        | Variable                                                  | Purpose                          | Risk    | Remediation                                  |
-| --------------------------------------------------------------------------- | --------------------------------------------------------- | -------------------------------- | ------- | -------------------------------------------- |
-| `tools/ma_benchmark_check.py:367`                                           | `ENERGY_THRESHOLDS, DANCE_THRESHOLDS, VALENCE_THRESHOLDS` | Runtime threshold calibration    | **Low** | Return calibrated thresholds, pass as params |
-| `engines/lyrics_engine/tools/lyrics/import_kaylin_lyrics_into_db_v1.py:193` | `_log`                                                    | CLI logger (duplicate of Type A) | Low     | (See Type A)                                 |
+| File                              | Variable                                                   | Purpose                       | Risk    | Remediation                                  |
+| --------------------------------- | ---------------------------------------------------------- | ----------------------------- | ------- | -------------------------------------------- |
+| `tools/ma_benchmark_check.py:367` | `ENERGY_THRESHOLDS, DANCE_THRESHOLDS, VALENCE_THRESHOLDS` | Runtime threshold calibration | **Low** | Return calibrated thresholds, pass as params |
 
 **Analysis**:
 
@@ -194,31 +188,28 @@
 
 ---
 
-### Priority 2: Convert ma_helper Config to Immutable Object (2 files)
+### ✅ Priority 2: Convert ma_helper Config to Immutable Object - **COMPLETE**
 
-**Effort**: Medium (3-4 hours)
-**Impact**: Removes mutable config globals
-**Risk**: Medium - affects ~20 consuming files
+**Status**: ✅ **100% Complete** (Tasks 31-38, completed 2026-01-07)
+**Files refactored**: 24 files across 8 commits
+**Impact**: Eliminated 3 config global statements (all ma_helper config globals)
 
-**Steps**:
+**Commits**: (See Type C section above for full details)
 
-1. Create `@dataclass(frozen=True)` for `RuntimeConfig`
-2. Replace `env.py` globals with config object
-3. Pass config explicitly to functions needing paths
-4. Update `cli_app.py` to use config object
+**Results**:
 
-**Benefits**:
-
-- Eliminates 11 mutable path globals
-- Makes config immutable and thread-safe
-- Improves testing (can inject test configs)
+- ✅ All 3 config globals eliminated (11 path variables + 2 adapter variables + DRY_RUN)
+- ✅ RuntimeConfig is frozen (immutable and thread-safe)
+- ✅ All command handlers now accept runtime parameter
+- ✅ Backward compatibility maintained
+- ✅ All ma_helper tests pass
 
 ---
 
 ### Priority 3: Refactor Calibration Threshold Passing (1 file)
 
 **Effort**: Low (1-2 hours)
-**Impact**: Removes in-process calibration globals
+**Impact**: Removes last in-process calibration global
 **Risk**: Low - single file
 
 **Steps**:
@@ -231,19 +222,7 @@
 
 - Explicit data flow
 - Easier to test with custom thresholds
-
----
-
-### Priority 4: Remove DRY_RUN Global (1 file)
-
-**Effort**: Low (30 minutes)
-**Impact**: Minor cleanup
-**Risk**: Low
-
-**Steps**:
-
-1. Pass `dry_run` via `args` namespace to commands
-2. Remove `global DRY_RUN`
+- Eliminates final non-cache global
 
 ---
 
@@ -278,14 +257,20 @@
 
 ## Appendix: Full Global Usage List
 
-### Current State (8 remaining, as of 2026-01-07)
+### Current State (4 remaining, as of 2026-01-07)
 
 ```bash
-# Non-archive global statements (8 total, down from 26)
+# Non-archive global statements (4 total, down from 26)
 ./tools/ma_benchmark_check.py:367:    global ENERGY_THRESHOLDS, DANCE_THRESHOLDS, VALENCE_THRESHOLDS
 ./tools/aee_band_thresholds.py:92:    global _THRESHOLDS_CACHE
 ./engines/lyrics_engine/src/ma_lyrics_engine/export.py:20:    global _NORMS_CACHE, _NORMS_PATH_CACHE
 ./hosts/advisor_host/auth/auth.py:38:    global _JWKS_CACHE, _JWKS_FETCH_TS
+```
+
+### Eliminated in Tasks 31-38 (3 total, ma_helper config globals)
+
+```bash
+# ELIMINATED - ma_helper config globals (3 total) ✅
 ./ma_helper/core/env.py:30:    global CACHE_DIR, CACHE_FILE, LAST_RESULTS_FILE, ARTIFACT_DIR, STATE_HOME, LOG_DIR, LOG_FILE, TELEMETRY_FILE, FAVORITES_PATH, CACHE_ENABLED, ROOT
 ./ma_helper/cli_app.py:119:        global config, orch_adapter
 ./ma_helper/cli_app.py:169:    global DRY_RUN
