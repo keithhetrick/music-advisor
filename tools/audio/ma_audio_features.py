@@ -1241,7 +1241,7 @@ def main(argv=None) -> int:
         print(f"[ma_audio_features] cache gc -> removed temp={stats.get('temp_removed',0)} bad_entries={stats.get('entries_removed',0)}")
         return 0
     start_ts = time.perf_counter()
-    if LOG_JSON:
+    if os.getenv("LOG_JSON") == "1":
         log("start", {"event": "start", "audio": args.audio, "out": args.out, "tool": "ma_audio_features"})
         log_stage_start(log, "analyze_pipeline", audio=args.audio, out=args.out, tempo_backend=args.tempo_backend, require_sidecar=args.require_sidecar)
 
@@ -1312,12 +1312,12 @@ def main(argv=None) -> int:
         status = "error"
         log(f"[ma_audio_features] lint warnings: {lint_warns}")
 
-    if LOG_JSON:
+    if os.getenv("LOG_JSON") == "1":
         meta_log: Dict[str, Any] | None = None
         meta_src = result.get("feature_pipeline_meta")
         if isinstance(meta_src, dict):
             meta_log = dict(meta_src)
-            if LOG_REDACT:
+            if os.getenv("LOG_REDACT") == "1":
                 for k in ("tempo_backend_source", "source_hash", "config_fingerprint"):
                     meta_log.pop(k, None)
         log_stage_end(
