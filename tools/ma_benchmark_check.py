@@ -23,7 +23,15 @@ import csv
 import json
 import math
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Tuple
+
+
+class CalibratedThresholds(NamedTuple):
+    """Calibrated thresholds for 0-1 axes (energy, danceability, valence)."""
+
+    energy: Tuple[float, float]
+    dance: Tuple[float, float]
+    valence: Tuple[float, float]
 
 # ---------------------------------------------------------------------------
 # Banding helpers for structural axes (runtime, loudness)
@@ -74,10 +82,6 @@ def band_loudness(lufs: float) -> str:
 # Defaults (approximate, used as fallback if auto-calibration fails)
 DEFAULT_THRESHOLDS = (0.33, 0.66)
 
-ENERGY_THRESHOLDS: Tuple[float, float] = DEFAULT_THRESHOLDS
-DANCE_THRESHOLDS: Tuple[float, float] = DEFAULT_THRESHOLDS
-VALENCE_THRESHOLDS: Tuple[float, float] = DEFAULT_THRESHOLDS
-
 
 def band_from_thresholds(
     value: Optional[float],
@@ -98,16 +102,16 @@ def band_from_thresholds(
     return "hi"
 
 
-def band_energy(value: Optional[float]) -> str:
-    return band_from_thresholds(value, ENERGY_THRESHOLDS)
+def band_energy(value: Optional[float], thresholds: CalibratedThresholds) -> str:
+    return band_from_thresholds(value, thresholds.energy)
 
 
-def band_dance(value: Optional[float]) -> str:
-    return band_from_thresholds(value, DANCE_THRESHOLDS)
+def band_dance(value: Optional[float], thresholds: CalibratedThresholds) -> str:
+    return band_from_thresholds(value, thresholds.dance)
 
 
-def band_valence(value: Optional[float]) -> str:
-    return band_from_thresholds(value, VALENCE_THRESHOLDS)
+def band_valence(value: Optional[float], thresholds: CalibratedThresholds) -> str:
+    return band_from_thresholds(value, thresholds.valence)
 
 
 # ---------------------------------------------------------------------------
@@ -165,6 +169,7 @@ def find_features_json(root: Path, audio_name: str) -> Optional[Path]:
 def compare_one(
     truth_row: Dict[str, str],
     feats: Dict[str, Any],
+    thresholds: CalibratedThresholds,
 ) -> Dict[str, Any]:
     """
     Compare a single song's features to the benchmark truth row.
@@ -196,9 +201,9 @@ def compare_one(
     # --- band the local values ---
     runtime_band_local = band_runtime(duration_sec)
     loudness_band_local = band_loudness(loudness)
-    energy_band_local = band_energy(raw_energy)
-    dance_band_local = band_dance(raw_dance)
-    valence_band_local = band_valence(raw_valence)
+    energy_band_local = band_energy(raw_energy, thresholds)
+    dance_band_local = band_dance(raw_dance, thresholds)
+    valence_band_local = band_valence(raw_valence, thresholds)
 
     # --- status flags ---
     tempo_diff = tempo_local - tempo_truth
@@ -355,21 +360,18 @@ def _find_optimal_two_thresholds(
 
 def calibrate_axis_thresholds(
     records: Sequence[Tuple[Dict[str, str], Dict[str, Any]]],
-) -> None:
+) -> CalibratedThresholds:
     """
     Use the current benchmark truth to calibrate thresholds for
     energy/danceability/valence.
 
-    This does **not** change any on-disk files; it only updates the in-process
-    globals ENERGY_THRESHOLDS, DANCE_THRESHOLDS, VALENCE_THRESHOLDS used
-    by band_energy/band_dance/band_valence for this run.
+    Returns a CalibratedThresholds object with the calibrated thresholds
+    for this run. This does **not** change any on-disk files.
     """
-    global ENERGY_THRESHOLDS, DANCE_THRESHOLDS, VALENCE_THRESHOLDS
-
     # Start from defaults
-    ENERGY_THRESHOLDS = DEFAULT_THRESHOLDS
-    DANCE_THRESHOLDS = DEFAULT_THRESHOLDS
-    VALENCE_THRESHOLDS = DEFAULT_THRESHOLDS
+    energy_thresholds = DEFAULT_THRESHOLDS
+    dance_thresholds = DEFAULT_THRESHOLDS
+    valence_thresholds = DEFAULT_THRESHOLDS
 
     # Collect samples per axis
     energy_vals, energy_bands = _collect_axis_samples(records, "energy")
@@ -377,26 +379,34 @@ def calibrate_axis_thresholds(
     valence_vals, valence_bands = _collect_axis_samples(records, "valence")
 
     if energy_vals:
-        ENERGY_THRESHOLDS = _find_optimal_two_thresholds(
+        energy_thresholds = _find_optimal_two_thresholds(
             energy_vals, energy_bands, "energy", DEFAULT_THRESHOLDS
         )
 
     if dance_vals:
-        DANCE_THRESHOLDS = _find_optimal_two_thresholds(
+        dance_thresholds = _find_optimal_two_thresholds(
             dance_vals, dance_bands, "dance", DEFAULT_THRESHOLDS
         )
 
     if valence_vals:
-        VALENCE_THRESHOLDS = _find_optimal_two_thresholds(
+        valence_thresholds = _find_optimal_two_thresholds(
             valence_vals, valence_bands, "valence", DEFAULT_THRESHOLDS
         )
 
+    thresholds = CalibratedThresholds(
+        energy=energy_thresholds,
+        dance=dance_thresholds,
+        valence=valence_thresholds,
+    )
+
     print(
         "[calibration] final thresholds:\n"
-        f"  energy : {ENERGY_THRESHOLDS}\n"
-        f"  dance  : {DANCE_THRESHOLDS}\n"
-        f"  valence: {VALENCE_THRESHOLDS}"
+        f"  energy : {thresholds.energy}\n"
+        f"  dance  : {thresholds.dance}\n"
+        f"  valence: {thresholds.valence}"
     )
+
+    return thresholds
 
 
 # ---------------------------------------------------------------------------
@@ -532,12 +542,12 @@ def evaluate_benchmark(truth_csv: Path, root: Path) -> str:
         return "No records to evaluate (no matching features files found)."
 
     # 1) Use current truth + features to calibrate thresholds for 0-1 axes.
-    calibrate_axis_thresholds(records)
+    thresholds = calibrate_axis_thresholds(records)
 
     # 2) Run comparisons with the calibrated thresholds.
     results: List[Dict[str, Any]] = []
     for truth_row, feats in records:
-        res = compare_one(truth_row, feats)
+        res = compare_one(truth_row, feats, thresholds)
         results.append(res)
 
     report = summarize(results)
