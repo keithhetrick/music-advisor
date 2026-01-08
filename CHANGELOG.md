@@ -2,7 +2,21 @@
 
 ## Unreleased
 
-- macOS host polish: Application Support path created before SQLite init (first-launch persistence), queue stop now cancels pending jobs, sidecar actions are gated with “No sidecar yet” messaging, History search gets a clear affordance and focus ring, Run buttons/search fields have clearer focus rings, and lens/glass effects are opt-in per card for calmer busy views (Run/History). Backdrop noise/lens tuned cooler/subtle; button hover sheen softened.
+### Bug Fixes
+
+- **TTC Audio Loading (2026-01-07)**: Fixed critical MP3 loading bug in TTC estimator where soundfile 0.12.1 with libsndfile 1.1.0 would open MP3 files successfully but return zero frames without raising an error. Now forces audioread backend for .mp3/.mp2 files to ensure proper audio loading and BPM estimation. (commit `c82b396`)
+- **Logger Globals (2026-01-07)**: Fixed automator crashes from undefined `LOG_JSON` and `LOG_REDACT` variables after logger global refactoring. Replaced bare variable references with `os.getenv()` calls in `ma_audio_features.py`. (commit `1fe3934`)
+- **CLIENT_TOKEN Export (2026-01-07)**: Fixed `AttributeError` in pack_writer and echo injection by adding `CLIENT_TOKEN` to `__all__` exports in `shared/ma_utils/names.py` and compatibility shim. (commit `cf1dc70`)
+
+### Refactoring
+
+- **Global State Elimination (2026-01-07)**: Completed removal of all problematic global statements, reducing from 26 to 4 (81% reduction):
+  - ✅ Removed all 18 logger globals across tools and engines (Tasks 25-29)
+  - ✅ Removed all 3 ma_helper config globals via RuntimeConfig migration (Tasks 31-38)
+  - ✅ Removed calibration threshold globals from ma_benchmark_check.py (Task 40)
+  - Remaining 4 globals are acceptable module-level caches with TTL/invalidation
+
+- macOS host polish: Application Support path created before SQLite init (first-launch persistence), queue stop now cancels pending jobs, sidecar actions are gated with "No sidecar yet" messaging, History search gets a clear affordance and focus ring, Run buttons/search fields have clearer focus rings, and lens/glass effects are opt-in per card for calmer busy views (Run/History). Backdrop noise/lens tuned cooler/subtle; button hover sheen softened.
 - macOS host persistence and UX: added SQLite-backed Track/Artist store with one-time migration from legacy JSON; App Support path surfaced in Settings (reveal/copy), and a default run script (`scripts/swift_run_default.sh`) to build/run without HOME overrides. Run/queue flow refined with queue-aware runs, delayed track ingestion until successful job completion, and compacted Settings data-path UI.
 - Chat UI/state: chat context labels and badges now live in `AppStore`; chat sends carry the resolved `.client.rich.txt` path end-to-end to `ChatService`; smoke script added at `hosts/macos_app/scripts/chat_smoke.sh` (supports `--prompt` and `--context`) to build and run the chat engine smoke.
 - MAStyle toasts: centralized default duration (`MAStyle.ToastDefaults.autoDismissSeconds`), left-slide/accordion fade on dismiss, reusable `ToastProgressBar`, and a single knob for toast timing.

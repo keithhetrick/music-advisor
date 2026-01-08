@@ -1,6 +1,9 @@
 numpy>=1.23,<2
 scipy>=1.9,<1.12
 librosa>=0.10,<0.11
+# Note: soundfile 0.12.1 with libsndfile 1.1.0 has a bug reading MP3 files
+# (returns zero frames without error). Our TTC estimator works around this
+# by forcing audioread backend for .mp3/.mp2 files. See tools/ttc_auto_estimate.py
 soundfile>=0.12
 pydub
 jinja2
