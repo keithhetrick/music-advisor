@@ -99,6 +99,7 @@ def key_norms_sidecar_globs() -> List[str]:
     return [f"*{key_norms_sidecar_suffix()}"]
 
 __all__ = [
+    "CLIENT_TOKEN",
     "client_header_label",
     "client_json_globs",
     "client_json_suffix",

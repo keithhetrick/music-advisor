@@ -1,5 +1,6 @@
 """Compatibility shim delegating to shared.ma_utils.names."""
 from shared.ma_utils.names import (
+    CLIENT_TOKEN,
     client_header_label,
     client_json_globs,
     client_json_suffix,
@@ -21,6 +22,7 @@ from shared.ma_utils.names import (
 )
 
 __all__ = [
+    "CLIENT_TOKEN",
     "client_header_label",
     "client_json_globs",
     "client_json_suffix",
