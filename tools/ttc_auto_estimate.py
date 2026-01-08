@@ -37,10 +37,13 @@ HOP = 512
 
 def _load_audio(path: Path, sr: int) -> Tuple[Optional[Any], Optional[int]]:
     import sys
+    import inspect
     if librosa is None:
         print(f"[ttc_auto_estimate] ERROR: librosa not available", file=sys.stderr)
         return None, None
     try:
+        print(f"[ttc_auto_estimate] DEBUG: calling librosa.load(path={path}, sr={sr}, mono=True)", file=sys.stderr)
+        print(f"[ttc_auto_estimate] DEBUG: librosa.load signature: {inspect.signature(librosa.load)}", file=sys.stderr)
         y, sr_out = librosa.load(path, sr=sr, mono=True)
         print(f"[ttc_auto_estimate] DEBUG: librosa.load returned y={type(y).__name__ if y is not None else 'None'}, len={len(y) if y is not None else 'N/A'}, sr={sr_out}", file=sys.stderr)
         if y is None or len(y) == 0:
